@@ -16,7 +16,7 @@ export class InputParser {
 
         const argv: string[] = parsed._;
 
-        delete parsed._;
+        parsed._.splice(0, parsed._.length);
 
         return { args: argv, flags: parsed };
     }
