@@ -680,10 +680,15 @@ jobs:
               run: yarn setup
 
             - name: Change dir to package folder
-              run: cd packages/test
+              run: |
+                  pwd
+                  cd packages/test
+                  pwd
 
             - name: Test
-              run: yarn test:uvu
+              run: |
+                  pwd
+                  yarn test:uvu
 
 #            - name: Archive code coverage
 #              uses: actions/upload-artifact@v2
