@@ -683,7 +683,7 @@ jobs:
               run: cd packages/test
 
             - name: Test
-              run: yarn test
+              run: yarn test:uvu
 
 #            - name: Archive code coverage
 #              uses: actions/upload-artifact@v2

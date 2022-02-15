@@ -22,8 +22,7 @@
         "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
         "clean": "rimraf dist",
         "compile": "node ../../node_modules/typescript/bin/tsc",
-        "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "uvu -r tsm src .test.ts"
+        "test:uvu": "uvu -r tsm src .test.ts"
     },
     "dependencies": {
         "concordance": "~5.0.4",
