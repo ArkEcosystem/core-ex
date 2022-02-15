@@ -679,15 +679,9 @@ jobs:
             - name: Install & Build
               run: yarn setup
 
-            - name: Change dir to package folder
-              run: |
-                  pwd
-                  cd packages/test
-                  pwd
-
             - name: Test
               run: |
-                  pwd
+                  cd packages/test
                   yarn test:uvu
 
 #            - name: Archive code coverage
