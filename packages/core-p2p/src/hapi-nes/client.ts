@@ -7,6 +7,7 @@
 */
 
 import WebSocket from "ws";
+
 import { parseNesMessage, stringifyNesMessage } from "./utils";
 
 /* eslint no-undef: 0 */
@@ -96,8 +97,8 @@ export class Client {
         options.ws = {
             maxPayload: DEFAULT_MAX_PAYLOAD_CLIENT,
             ...options.ws,
-            perMessageDeflate: false
-        }
+            perMessageDeflate: false,
+        };
 
         // Configuration
         this._url = url;
