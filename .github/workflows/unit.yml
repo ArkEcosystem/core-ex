@@ -653,3 +653,40 @@ jobs:
               with:
                   name: ${{ github.job }}-coverage
                   path: .coverage/unit/${{ github.job }}/lcov.info
+
+    test:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Cache node modules
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: ${{ runner.os }}-node-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Install & Build
+              run: yarn setup
+
+            - name: Change dir to package folder
+              run: cd packages/crypto
+
+            - name: Test
+              run: yarn test
+
+#            - name: Archive code coverage
+#              uses: actions/upload-artifact@v2
+#              with:
+#                  name: ${{ github.job }}-coverage
+#                  path: .coverage/unit/${{ github.job }}/lcov.info
