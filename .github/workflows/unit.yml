@@ -680,7 +680,7 @@ jobs:
               run: yarn setup
 
             - name: Change dir to package folder
-              run: cd packages/crypto
+              run: cd packages/test
 
             - name: Test
               run: yarn test
