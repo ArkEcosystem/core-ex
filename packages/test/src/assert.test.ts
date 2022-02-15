@@ -1,4 +1,4 @@
-import { BigNumber } from "@payvo/sdk-helpers";
+import { BigNumber } from "@arkecosystem/utils";
 
 import { describe } from "./describe";
 
