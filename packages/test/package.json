@@ -23,7 +23,7 @@
         "clean": "rimraf dist",
         "compile": "node ../../node_modules/typescript/bin/tsc",
         "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "uvu -r tsm source .test.ts"
+        "test": "uvu -r tsm src .test.ts"
     },
     "dependencies": {
         "concordance": "~5.0.4",
