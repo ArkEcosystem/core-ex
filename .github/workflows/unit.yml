@@ -1,634 +1,634 @@
 name: Unit Testing
 
 on:
-  push:
-    branches:
-      - "master"
-      - "develop"
-  pull_request:
-    types: [ready_for_review, synchronize, opened]
+    push:
+        branches:
+            - "master"
+            - "develop"
+    pull_request:
+        types: [ready_for_review, synchronize, opened]
 
 jobs:
-  core:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core/
-
-  core-api:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-api/
-
-  core-blockchain:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-blockchain/
-
-  core-cli:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-cli/
-
-  core-database:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-database/
-
-  core-forger:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-forger/
-
-  core-kernel:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-kernel/
-
-  core-logger-pino:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-logger-pino/
-
-  core-p2p:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test packages/__tests__/unit/
-
-  core-snapshots:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-snapshots/
-
-  core-state:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-state/
-
-  core-test-framework:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-test-framework/
-
-  core-transaction-pool:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-transaction-pool/
-
-  core-transactions:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/core-transactions/
-
-  core-webhooks:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: cd packages/core-webhooks && pnpm run test
-
-  crypto:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 2.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: "2.7"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: latest
-          run_install: true
-
-      - name: Build
-        run: pnpm run setup
-
-      - name: Test
-        run: pnpm run test:parallel __tests__/unit/crypto/
+    core:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core/
+
+    core-api:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-api/
+
+    core-blockchain:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-blockchain/
+
+    core-cli:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-cli/
+
+    core-database:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-database/
+
+    core-forger:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-forger/
+
+    core-kernel:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-kernel/
+
+    core-logger-pino:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-logger-pino/
+
+    core-p2p:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test packages/__tests__/unit/
+
+    core-snapshots:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-snapshots/
+
+    core-state:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-state/
+
+    core-test-framework:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-test-framework/
+
+    core-transaction-pool:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-transaction-pool/
+
+    core-transactions:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/core-transactions/
+
+    core-webhooks:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: cd packages/core-webhooks && pnpm run test
+
+    crypto:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
+
+            - name: Test
+              run: pnpm run test:parallel __tests__/unit/crypto/
