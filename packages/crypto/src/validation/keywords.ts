@@ -10,7 +10,7 @@ const maxBytes = (ajv: Ajv) => {
         keyword: "maxBytes",
         type: "string",
         compile(schema, parentSchema) {
-            return ({ data }) => {
+            return (data) => {
                 if ((parentSchema as any).type !== "string") {
                     return false;
                 }
