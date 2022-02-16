@@ -19,7 +19,8 @@
         "clean": "rimraf dist",
         "compile": "node ../../node_modules/typescript/bin/tsc",
         "prepublishOnly": "pnpm run build",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
+        "test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
+        "test:integration": "cross-env CORE_ENV=test jest --forceExit --rootDir=\"__tests__/integration\""
     },
     "dependencies": {
         "@arkecosystem/core": "workspace:*",

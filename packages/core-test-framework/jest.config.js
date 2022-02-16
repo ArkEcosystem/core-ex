@@ -13,5 +13,4 @@ module.exports = {
     },
     watchman: false,
     setupFilesAfterEnv: ["jest-extended"],
-    modulePathIgnorePatterns: ["__tests__/integration"]
 };
