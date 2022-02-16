@@ -47,10 +47,6 @@ exports["hash-wasm.sha1"] = async () => {
     await hashWASM.sha1(transactionBytes);
 };
 
-exports["noble.sha1"] = async () => {
-    require("@noble/hashes/sha1").sha1(transactionBytes);
-};
-
 exports["bcrypto.ripemd160"] = () => {
     Crypto.HashAlgorithms.ripemd160(transactionBytes);
 };
@@ -67,18 +63,18 @@ exports["noble.ripemd160"] = async () => {
     require("@noble/hashes/ripemd160").ripemd160(transactionBytes);
 };
 
-exports["bcrypto.hash160"] = () => {
-    Crypto.HashAlgorithms.hash160(transactionBytes);
-};
+// exports["bcrypto.hash160"] = () => {
+//     Crypto.HashAlgorithms.hash160(transactionBytes);
+// };
 
-exports["node.hash160"] = () => {
-    createHash("ripemd160").update(nodeSha256(transactionBytes)).digest();
-};
+// exports["node.hash160"] = () => {
+//     createHash("ripemd160").update(nodeSha256(transactionBytes)).digest();
+// };
 
-exports["bcrypto.hash256"] = () => {
-    Crypto.HashAlgorithms.hash256(transactionBytes);
-};
+// exports["bcrypto.hash256"] = () => {
+//     Crypto.HashAlgorithms.hash256(transactionBytes);
+// };
 
-exports["node.hash256"] = () => {
-    nodeSha256(nodeSha256(transactionBytes));
-};
+// exports["node.hash256"] = () => {
+//     nodeSha256(nodeSha256(transactionBytes));
+// };
