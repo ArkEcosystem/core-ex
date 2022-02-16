@@ -1,5 +1,5 @@
 import { Application } from "@arkecosystem/core-kernel";
-import { ApiInjectClient } from "packages/core-test-framework/src/utils";
+import { ApiInjectClient } from "@packages/core-test-framework";
 
 import { setUp, tearDown } from "./__support__/setup";
 
