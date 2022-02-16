@@ -76,7 +76,7 @@ export class IpfsTransactionHandler extends TransactionHandler {
             return;
         }
 
-        AppUtils.assert.defined<Interfaces.IHtlcLockAsset>(transaction.data.asset?.ipfs);
+        AppUtils.assert.defined<any>(transaction.data.asset?.ipfs);
 
         if (this.walletRepository.hasByIndex(Contracts.State.WalletIndexes.Ipfs, transaction.data.asset.ipfs)) {
             throw new IpfsHashAlreadyExists();
