@@ -1,7 +1,7 @@
 import { sleep } from "@arkecosystem/utils";
 import { Application } from "@arkecosystem/core-kernel/dist/application";
 import { Logger } from "@arkecosystem/core-kernel/dist/contracts/kernel/log";
-import { Container, Identifiers } from "@arkecosystem/core-kernel/dist/ioc";
+import { Container } from "@arkecosystem/core-kernel";
 import { PinoLogger } from "./driver";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
@@ -14,7 +14,7 @@ let message: string;
 
 let app: Application;
 
-describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, nock, loader }) => {
+describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it}) => {
     beforeAll(() => {
         capcon.startCapture(process.stdout, (stdout) => (message = stdout.toString()));
 
@@ -30,9 +30,9 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, no
     afterAll(() => setGracefulCleanup());
 
     beforeEach(async () => {
-        app = new Application(new Container());
-        app.bind(Identifiers.ConfigFlags).toConstantValue("core");
-        app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+        app = new Application(new Container.Container());
+        app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
+        app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
         app.bind("path.log").toConstantValue(dirSync().name);
 
         logger = await app.resolve<Logger>(PinoLogger).make({
@@ -121,6 +121,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, no
         logger.suppressConsoleOutput(true);
 
         logger.info("silent_message");
+        console.log(message);
         assert.undefined(message);
 
         logger.suppressConsoleOutput(false);
@@ -162,9 +163,9 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, no
     });
 
     it("should rotate the log 3 times", async () => {
-        const app = new Application(new Container());
-        app.bind(Identifiers.ConfigFlags).toConstantValue("core");
-        app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+        const app = new Application(new Container.Container());
+        app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
+        app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
         app.useLogPath(dirSync().name);
 
         const ms = new Date().getMilliseconds();

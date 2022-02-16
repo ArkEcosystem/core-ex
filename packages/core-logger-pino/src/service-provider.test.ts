@@ -5,7 +5,7 @@ import { AnySchema } from "joi";
 import { dirSync } from "tmp";
 import { describe } from "@arkecosystem/core-test";
 
-describe("ServiceProvider", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, nock, loader }) => {
+describe("ServiceProvider", ({ assert, beforeEach, it}) => {
     let app: Application;
 
     let serviceProvider: ServiceProvider;
