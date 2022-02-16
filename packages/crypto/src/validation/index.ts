@@ -83,7 +83,6 @@ export class Validator {
                 $data: true,
                 schemas,
                 removeAdditional: true,
-                extendRefs: true,
             },
             ...options,
         });
