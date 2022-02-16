@@ -12,6 +12,7 @@
         "dist"
     ],
     "main": "dist/index",
+    "types": "dist/index",
     "scripts": {
         "build": "pnpm run clean && pnpm run compile",
         "build:watch": "pnpm run clean && pnpm run compile -- -w",
@@ -19,6 +20,7 @@
         "clean": "rimraf dist",
         "compile": "node ../../node_modules/typescript/bin/tsc",
         "prepublishOnly": "pnpm run build",
+        "pretest": "bash ../../scripts/pre-test.sh",
         "test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
         "test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
     },
