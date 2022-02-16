@@ -9,7 +9,6 @@ importers:
       '@commitlint/cli': 11.0.0
       '@commitlint/config-conventional': 11.0.0
       '@faustbrian/benchmarker': 0.1.2
-      '@hapi/hapi': 20.1.5
       '@noble/hashes': ^1.0.0
       '@oclif/dev-cli': 1.26.0
       '@types/babel__core': 7.1.16
@@ -68,7 +67,6 @@ importers:
       '@commitlint/cli': 11.0.0
       '@commitlint/config-conventional': 11.0.0
       '@faustbrian/benchmarker': 0.1.2
-      '@hapi/hapi': 20.1.5
       '@oclif/dev-cli': 1.26.0
       '@types/babel__core': 7.1.16
       '@types/create-hash': 1.2.2
@@ -604,6 +602,7 @@ importers:
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/crypto': workspace:*
+      '@hapi/hapi': 20.1.5
       '@types/got': 9.6.12
       bip39: 3.0.4
       bs58: 4.0.1
@@ -642,6 +641,7 @@ importers:
       tmp: 0.2.1
       xstate: 4.23.4
     devDependencies:
+      '@hapi/hapi': 20.1.5
       '@types/got': 9.6.12
       joi: 17.4.2
 

@@ -12,7 +12,6 @@
         "dist"
     ],
     "main": "dist/index",
-    "types": "dist/index",
     "scripts": {
         "build": "pnpm run clean && pnpm run compile",
         "build:watch": "pnpm run clean && pnpm run compile -- -w",
