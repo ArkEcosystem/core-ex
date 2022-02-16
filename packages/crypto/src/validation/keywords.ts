@@ -11,7 +11,7 @@ const maxBytes = (ajv: Ajv) => {
         keyword: "maxBytes",
         type: "string",
         compile(schema, parentSchema) {
-            return (data) => {
+            return ({ data }) => {
                 if ((parentSchema as any).type !== "string") {
                     return false;
                 }
@@ -30,9 +30,10 @@ const maxBytes = (ajv: Ajv) => {
 const transactionType = (ajv: Ajv) => {
     ajv.addKeyword({
         keyword: "transactionType",
-        // @ts-ignore
         compile(schema) {
-            return (data, dataPath, parentObject: ITransactionData) => {
+            return (data, dataCtx) => {
+                const parentObject = <ITransactionData> dataCtx.parentData;
+
                 // Impose dynamic multipayment limit based on milestone
                 if (
                     data === TransactionType.MultiPayment &&
@@ -78,7 +79,7 @@ const bignumber = (ajv: Ajv) => {
     ajv.addKeyword({
         keyword: "bignumber",
         compile(schema) {
-            return (data, dataPath, parentObject: any, property) => {
+            return (data, dataCtx) => {
                 const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : 0;
                 const maximum = typeof schema.maximum !== "undefined" ? schema.maximum : "9223372036854775807"; // 8 byte maximum
 
@@ -93,17 +94,17 @@ const bignumber = (ajv: Ajv) => {
                     return false;
                 }
 
-                if (parentObject && property) {
-                    parentObject[property] = bignum;
+                if (dataCtx.parentData && dataCtx.parentDataProperty) {
+                    dataCtx.parentData[dataCtx.parentDataProperty] = bignum;
                 }
 
                 let bypassGenesis: boolean = false;
                 if (schema.bypassGenesis) {
-                    if (parentObject.id) {
+                    if (dataCtx.parentData.id) {
                         if (schema.block) {
-                            bypassGenesis = parentObject.height === 1;
+                            bypassGenesis = dataCtx.parentData.height === 1;
                         } else {
-                            bypassGenesis = isGenesisTransaction(parentObject.id);
+                            bypassGenesis = isGenesisTransaction(dataCtx.parentData.id);
                         }
                     }
                 }
@@ -138,8 +139,8 @@ const blockId = (ajv: Ajv) => {
     ajv.addKeyword({
         keyword: "blockId",
         compile(schema) {
-            return (data, dataPath, parentObject: any) => {
-                if (parentObject && parentObject.height === 1 && schema.allowNullWhenGenesis) {
+            return (data, dataCtx) => {
+                if (dataCtx.parentData && dataCtx.parentData.height === 1 && schema.allowNullWhenGenesis) {
                     if (!data || Number(data) === 0) {
                         return true;
                     }
@@ -154,8 +155,8 @@ const blockId = (ajv: Ajv) => {
                 const isPartial = /^[0-9]{1,20}$/.test(data) || /^[0-9a-f]{16}$/i.test(data);
                 const isFullSha256 = /^[0-9a-f]{64}$/i.test(data);
 
-                if (parentObject && parentObject.height) {
-                    const height = schema.isPreviousBlock ? parentObject.height - 1 : parentObject.height;
+                if (dataCtx.parentData && dataCtx.parentData.height) {
+                    const height = schema.isPreviousBlock ? dataCtx.parentData.height - 1 : dataCtx.parentData.height;
                     const constants = configManager.getMilestone(height ?? 1); // if height === 0 set it to 1
                     return constants.block.idFullSha256 ? isFullSha256 : isPartial;
                 }
