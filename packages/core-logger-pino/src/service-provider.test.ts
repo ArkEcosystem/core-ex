@@ -5,16 +5,26 @@ import { AnySchema } from "joi";
 import { dirSync } from "tmp";
 import { describe } from "@arkecosystem/core-test";
 
-describe("ServiceProvider", ({ assert, beforeEach, it}) => {
+describe("ServiceProvider", ({ assert, afterEach, beforeEach, it}) => {
     let app: Application;
 
     let serviceProvider: ServiceProvider;
+    let preserveValue = undefined;
+    let writableDefaults;
 
     beforeEach(() => {
         app = new Application(new Container.Container());
         app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
 
         serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
+
+        preserveValue = process.env.CORE_LOG_LEVEL;
+
+        writableDefaults = {...defaults };
+    });
+
+    afterEach(() => {
+        process.env.CORE_LOG_LEVEL = preserveValue;
     });
 
     it("should register", async () => {
@@ -24,7 +34,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
 
         await app.get<Services.Log.LogManager>(Container.Identifiers.LogManager).boot();
 
-        serviceProvider.setConfig(app.resolve(Providers.PluginConfiguration).merge(defaults));
+        serviceProvider.setConfig(app.resolve(Providers.PluginConfiguration).merge(writableDefaults));
 
         app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("token-network");
         app.bind("path.log").toConstantValue(dirSync().name);
@@ -39,7 +49,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
 
         await app.get<Services.Log.LogManager>(Container.Identifiers.LogManager).boot();
 
-        serviceProvider.setConfig(app.resolve(Providers.PluginConfiguration).merge(defaults));
+        serviceProvider.setConfig(app.resolve(Providers.PluginConfiguration).merge(writableDefaults));
 
         app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("token-network");
         app.bind("path.log").toConstantValue(dirSync().name);
@@ -67,7 +77,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
         });
 
         it("should validate schema using defaults", async () => {
-            const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+            const result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
             assert.undefined(result.error);
 
@@ -78,10 +88,9 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
         });
 
         it("should allow configuration extension", async () => {
-            // @ts-ignore
-            defaults.customField = "dummy";
+            writableDefaults.customField = "dummy";
 
-            const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+            const result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
             assert.undefined(result.error);
             assert.equal(result.value.customField, "dummy");
@@ -91,7 +100,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
             it("should return value of process.env.CORE_LOG_LEVEL if defined", async () => {
                 process.env.CORE_LOG_LEVEL = "dummy";
 
-                const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                const result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.undefined(result.error);
                 assert.equal(result.value.levels.console, "dummy");
@@ -102,7 +111,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
             it("should return value of process.env.CORE_LOG_LEVEL_FILE if defined", async () => {
                 process.env.CORE_LOG_LEVEL_FILE = "dummy";
 
-                const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                const result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.undefined(result.error);
                 assert.equal(result.value.levels.file, "dummy");
@@ -110,12 +119,6 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
         });
 
         describe("schema restrictions", () => {
-            let writableDefaults;
-
-            beforeEach(async () => {
-                writableDefaults = {...defaults };
-            });
-
             it("levels is required && is object", async () => {
                 writableDefaults.levels = false;
                 let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
