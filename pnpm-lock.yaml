@@ -33,6 +33,7 @@ importers:
       eslint-config-prettier: 6.15.0
       eslint-plugin-prettier: 3.4.1
       eslint-plugin-simple-import-sort: 5.0.3
+      fs-extra: 10.0.0
       get-port: 5.1.1
       hash-wasm: ^4.9.0
       husky: 4.3.8
@@ -89,6 +90,7 @@ importers:
       eslint-config-prettier: 6.15.0_eslint@7.32.0
       eslint-plugin-prettier: 3.4.1_18e66910a58232de989ec14832900b60
       eslint-plugin-simple-import-sort: 5.0.3_eslint@7.32.0
+      fs-extra: 10.0.0
       get-port: 5.1.1
       husky: 4.3.8
       jest: 26.6.3
@@ -7196,8 +7198,17 @@ packages:
   /fs-constants/1.0.0:
     resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
 
+  /fs-extra/10.0.0:
+    resolution: {integrity: sha512-C5owb14u9eJwizKGdchcDUQeFtlSHHthBk8pbX9Vc1PFZrLombudjDnNns88aYslCyF6IY5SUw3Roz6xShcEIQ==, registry: https://registry.npmjs.com/}
+    engines: {node: '>=12'}
+    dependencies:
+      graceful-fs: 4.2.9
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: true
+
   /fs-extra/6.0.1:
-    resolution: {integrity: sha512-GnyIkKhhzXZUWFCaJzvyDLEEgDkPfb4/TPvJCJVuS8MWZgoSsErf++QpiAlDnKFcqhRlm+tIOcencCjyJE6ZCA==}
+    resolution: {integrity: sha512-GnyIkKhhzXZUWFCaJzvyDLEEgDkPfb4/TPvJCJVuS8MWZgoSsErf++QpiAlDnKFcqhRlm+tIOcencCjyJE6ZCA==, registry: https://registry.npmjs.com/}
     dependencies:
       graceful-fs: 4.2.9
       jsonfile: 4.0.0
@@ -7213,7 +7224,7 @@ packages:
       universalify: 0.1.2
 
   /fs-extra/9.1.0:
-    resolution: {integrity: sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==}
+    resolution: {integrity: sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==, registry: https://registry.npmjs.com/}
     engines: {node: '>=10'}
     dependencies:
       at-least-node: 1.0.0
@@ -7552,7 +7563,7 @@ packages:
       url-parse-lax: 3.0.0
 
   /graceful-fs/4.2.9:
-    resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
+    resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==, registry: https://registry.npmjs.com/}
 
   /graphviz/0.0.9:
     resolution: {integrity: sha512-SmoY2pOtcikmMCqCSy2NO1YsRfu9OO0wpTlOYW++giGjfX1a6gax/m1Fo8IdUd0/3H15cTOfR1SMKwohj4LKsg==}
@@ -9085,7 +9096,7 @@ packages:
       graceful-fs: 4.2.9
 
   /jsonfile/6.1.0:
-    resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
+    resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==, registry: https://registry.npmjs.com/}
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
@@ -13139,7 +13150,7 @@ packages:
     engines: {node: '>= 4.0.0'}
 
   /universalify/2.0.0:
-    resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
+    resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==, registry: https://registry.npmjs.com/}
     engines: {node: '>= 10.0.0'}
     dev: true
 
