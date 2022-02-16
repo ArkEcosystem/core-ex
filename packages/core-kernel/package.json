@@ -23,7 +23,6 @@
     },
     "dependencies": {
         "@arkecosystem/crypto": "workspace:*",
-        "@arkecosystem/core-state": "workspace:*",
         "@arkecosystem/utils": "1.3.1",
         "@pm2/io": "4.3.5",
         "chalk": "4.1.2",
@@ -46,6 +45,7 @@
         "type-fest": "0.21.3"
     },
     "devDependencies": {
+        "@arkecosystem/core-state": "workspace:*",
         "@types/cron": "1.7.3",
         "@types/fs-extra": "8.1.2",
         "@types/functional-red-black-tree": "1.0.1",
