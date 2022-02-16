@@ -20,7 +20,8 @@
         "compile": "node ../../node_modules/typescript/bin/tsc",
         "prepublishOnly": "pnpm run build",
         "pretest": "bash ../../scripts/pre-test.sh",
-        "test": "cross-env CORE_ENV=test jest --forceExit"
+        "test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=integration",
+        "test:integration": "cross-env CORE_ENV=test jest --forceExit integration"
     },
     "dependencies": {
         "@arkecosystem/core-database": "workspace:*",
