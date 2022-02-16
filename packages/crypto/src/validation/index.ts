@@ -128,7 +128,6 @@ export class Validator {
         ajv.addSchema({
             $id: "transactions",
             type: "array",
-            additionalItems: false,
             items: { anyOf: [...this.transactionSchemas.keys()].map((schema) => ({ $ref: `${schema}Signed` })) },
         });
         ajv.addSchema(schemas.block);

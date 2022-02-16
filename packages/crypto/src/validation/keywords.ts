@@ -129,7 +129,6 @@ const bignumber = (ajv: Ajv) => {
                 bypassGenesis: { type: "boolean" },
                 block: { type: "boolean" },
             },
-            additionalItems: false,
         },
     });
 };
@@ -170,7 +169,6 @@ const blockId = (ajv: Ajv) => {
                 allowNullWhenGenesis: { type: "boolean" },
                 isPreviousBlock: { type: "boolean" },
             },
-            additionalItems: false,
         },
     });
 };
