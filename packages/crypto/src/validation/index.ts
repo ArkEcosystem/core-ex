@@ -1,4 +1,4 @@
-import Ajv from "ajv";
+import Ajv, { Format, KeywordDefinition } from "ajv";
 import ajvKeywords from "ajv-keywords";
 
 import { ISchemaValidationResult } from "../interfaces";
@@ -37,12 +37,12 @@ export class Validator {
         return this.validateSchema(ajv, schemaKeyRef, data);
     }
 
-    public addFormat(name: string, format: Ajv.FormatDefinition): void {
+    public addFormat(name: string, format: Format): void {
         this.ajv.addFormat(name, format);
     }
 
-    public addKeyword(keyword: string, definition: Ajv.KeywordDefinition): void {
-        this.ajv.addKeyword(keyword, definition);
+    public addKeyword(definition: KeywordDefinition): void {
+        this.ajv.addKeyword(definition);
     }
 
     public addSchema(schema: object | object[], key?: string): void {
