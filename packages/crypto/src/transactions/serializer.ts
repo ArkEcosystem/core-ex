@@ -159,10 +159,6 @@ export class Serializer {
             bb.writeBuffer(Buffer.from(transaction.signature, "hex"));
         }
 
-        if (!options.excludeSecondSignature && transaction.secondSignature) {
-            bb.writeBuffer(Buffer.from(transaction.secondSignature, "hex"));
-        }
-
         return bb.getResult();
     }
 
@@ -214,12 +210,6 @@ export class Serializer {
     ): void {
         if (transaction.signature && !options.excludeSignature) {
             buff.writeBuffer(Buffer.from(transaction.signature, "hex"));
-        }
-
-        const secondSignature: string | undefined = transaction.secondSignature || transaction.signSignature;
-
-        if (secondSignature && !options.excludeSecondSignature) {
-            buff.writeBuffer(Buffer.from(secondSignature, "hex"));
         }
 
         if (transaction.signatures) {

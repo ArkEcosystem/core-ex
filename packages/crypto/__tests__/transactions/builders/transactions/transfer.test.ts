@@ -70,31 +70,6 @@ describe("Transfer Transaction", () => {
         });
     });
 
-    describe("secondSignWithWif", () => {
-        it("should sign a transaction and match signed with a passphrase", () => {
-            const passphrase = "first passphrase";
-            const secondPassphrase = "second passphrase";
-            const network = 23;
-            const keys = Keys.fromPassphrase(secondPassphrase);
-            const wif = WIF.fromKeys(keys, devnet.network);
-
-            const wifTransaction = builder
-                .recipientId(identity.address)
-                .amount("10")
-                .fee("10")
-                .network(network)
-                .sign(passphrase);
-
-            const passphraseTransaction = BuilderFactory.transfer();
-            passphraseTransaction.data = { ...wifTransaction.data };
-
-            wifTransaction.secondSignWithWif(wif, 170);
-            passphraseTransaction.secondSign(secondPassphrase);
-
-            expect(wifTransaction.data.secondSignature).toBe(passphraseTransaction.data.secondSignature);
-        });
-    });
-
     it("should have its specific properties", () => {
         expect(builder).toHaveProperty("data.type", TransactionType.Transfer);
         expect(builder).toHaveProperty("data.fee", Two.TransferTransaction.staticFee());

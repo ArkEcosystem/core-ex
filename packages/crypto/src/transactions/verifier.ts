@@ -20,24 +20,6 @@ export class Verifier {
         return Verifier.verifyHash(data, options?.disableVersionCheck);
     }
 
-    public static verifySecondSignature(
-        transaction: ITransactionData,
-        publicKey: string,
-        options?: IVerifyOptions,
-    ): boolean {
-        const secondSignature: string | undefined = transaction.secondSignature || transaction.signSignature;
-
-        if (!secondSignature) {
-            return false;
-        }
-
-        const hash: Buffer = Utils.toHash(transaction, {
-            disableVersionCheck: options?.disableVersionCheck,
-            excludeSecondSignature: true,
-        });
-        return this.internalVerifySignature(hash, secondSignature, publicKey);
-    }
-
     public static verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): boolean {
         if (!multiSignature) {
             throw new InvalidMultiSignatureAssetError();

@@ -26,10 +26,6 @@ describe("Builder Factory", () => {
         expect(BuilderFactory.multiSignature()).toBeInstanceOf(MultiSignatureBuilder);
     });
 
-    it("should create SecondSignatureBuilder", () => {
-        expect(BuilderFactory.secondSignature()).toBeInstanceOf(SecondSignatureBuilder);
-    });
-
     it("should create TransferBuilder", () => {
         expect(BuilderFactory.transfer()).toBeInstanceOf(TransferBuilder);
     });

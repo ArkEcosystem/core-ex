@@ -20,7 +20,6 @@ describe("Valid Second Signature", () => {
                 .make();
 
             expect(transaction.data.signature).toBeDefined();
-            expect(transaction.data.secondSignature).toBeDefined();
             expect(transaction.data).toHaveValidSecondSignature({
                 publicKey: Identities.PublicKey.fromPassphrase(passphrases[1]),
             });
@@ -30,7 +29,6 @@ describe("Valid Second Signature", () => {
             const transaction: Interfaces.ITransaction = factory.get("Transfer").make();
 
             expect(transaction.data.signature).toBeUndefined();
-            expect(transaction.data.secondSignature).toBeUndefined();
             expect(transaction.data).not.toHaveValidSecondSignature({
                 publicKey: Identities.PublicKey.fromPassphrase(passphrases[1]),
             });

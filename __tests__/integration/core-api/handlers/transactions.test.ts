@@ -621,7 +621,6 @@ describe("API 2.0 - Transactions", () => {
                     htlcRefund: "0",
                     multiPayment: "10000000",
                     multiSignature: "500000000",
-                    secondSignature: "500000000",
                     transfer: "10000000",
                     vote: "100000000",
                 },

@@ -82,41 +82,6 @@ describe("Transaction Forging - Vote", () => {
         await expect(vote.id).not.toBeForged();
     });
 
-    it("should broadcast, accept and forge it [Signed with 2 Passphrases]", async () => {
-        // Make a fresh wallet for the second signature tests
-        const passphrase = secondPassphrase;
-
-        // Initial Funds
-        const initialFunds = TransactionFactory.initialize(app)
-            .transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
-            .withPassphrase(secrets[0])
-            .createOne();
-
-        await expect(initialFunds).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(initialFunds.id).toBeForged();
-
-        // Register a second passphrase
-        const secondSignature = TransactionFactory.initialize(app)
-            .secondSignature(secondPassphrase)
-            .withPassphrase(passphrase)
-            .createOne();
-
-        await expect(secondSignature).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(secondSignature.id).toBeForged();
-
-        // Submit a vote
-        const vote = TransactionFactory.initialize(app)
-            .vote(Identities.PublicKey.fromPassphrase(secrets[0]))
-            .withPassphrasePair({ passphrase, secondPassphrase })
-            .createOne();
-
-        await expect(vote).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(vote.id).toBeForged();
-    });
-
     it("should broadcast, accept and forge it [3-of-3 multisig]", async () => {
         // Funds to register a multi signature wallet
         const initialFunds = TransactionFactory.initialize(app)

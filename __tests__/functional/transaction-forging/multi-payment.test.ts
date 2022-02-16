@@ -121,41 +121,6 @@ describe("Transaction Forging - Multipayment", () => {
         await expect(transaction.id).not.toBeForged();
     });
 
-    it("should broadcast, accept and forge it [Signed with 2 Passphrases]", async () => {
-        // Make a fresh wallet for the second signature tests
-        const passphrase = secondPassphrase;
-
-        // Initial Funds
-        const initialFunds = TransactionFactory.initialize(app)
-            .transfer(Identities.Address.fromPassphrase(passphrase), 100 * 1e8)
-            .withPassphrase(secrets[0])
-            .createOne();
-
-        await expect(initialFunds).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(initialFunds.id).toBeForged();
-
-        // Register a second passphrase
-        const secondSignature = TransactionFactory.initialize(app)
-            .secondSignature(secondPassphrase)
-            .withPassphrase(passphrase)
-            .createOne();
-
-        await expect(secondSignature).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(secondSignature.id).toBeForged();
-
-        // Submit multipayment transaction
-        const transactions = TransactionFactory.initialize(app)
-            .multiPayment(payments)
-            .withPassphrasePair({ passphrase, secondPassphrase })
-            .createOne();
-
-        await expect(transactions).toBeAccepted();
-        await snoozeForBlock(1);
-        await expect(transactions.id).toBeForged();
-    });
-
     it("should broadcast, accept and forge it [3-of-3 multisig]", async () => {
         // Funds to register a multi signature wallet
         const initialFunds = TransactionFactory.initialize(app)

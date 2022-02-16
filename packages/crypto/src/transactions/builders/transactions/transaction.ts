@@ -155,7 +155,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
         const struct: ITransactionData = {
             id: Utils.getId(this.data).toString(),
             signature: this.data.signature,
-            secondSignature: this.data.secondSignature,
             version: this.data.version,
             type: this.data.type,
             fee: this.data.fee,
@@ -188,11 +187,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
             disableVersionCheck: this.disableVersionCheck,
         });
 
-        return this.instance();
-    }
-
-    private secondSignWithKeyPair(keys: IKeyPair): TBuilder {
-        this.data.secondSignature = Signer.secondSign(this.getSigningObject(), keys);
         return this.instance();
     }
 

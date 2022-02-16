@@ -30,7 +30,6 @@ import {
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
-let secondSignatureWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
@@ -65,12 +64,10 @@ beforeEach(() => {
     Factories.registerTransactionFactory(factoryBuilder);
 
     senderWallet = buildSenderWallet(factoryBuilder);
-    secondSignatureWallet = buildSecondSignatureWallet(factoryBuilder);
     multiSignatureWallet = buildMultiSignatureWallet();
     recipientWallet = buildRecipientWallet(factoryBuilder);
 
     walletRepository.index(senderWallet);
-    walletRepository.index(secondSignatureWallet);
     walletRepository.index(multiSignatureWallet);
     walletRepository.index(recipientWallet);
 });
@@ -127,7 +124,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
             .sign(passphrases[0])
             .build();
 
-        multiSignatureTransaction.data.asset!.multiSignatureLegacy = "multiSignatureLegacy mock" as any;
+        multiSignatureTransaction.data.asset.multiSignatureLegacy = "multiSignatureLegacy mock" as any;
     });
 
     describe("dependencies", () => {
@@ -176,7 +173,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
         });
 
         it("should throw if asset.multiSignatureLegacy is undefined", async () => {
-            multiSignatureTransaction.data.asset!.multiSignatureLegacy = undefined;
+            multiSignatureTransaction.data.asset.multiSignatureLegacy = undefined;
             transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
                 yield multiSignatureTransaction.data;
             });

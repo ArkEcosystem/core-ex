@@ -45,18 +45,6 @@ export class Signer {
         return transaction.getStruct();
     }
 
-    public makeSecondSignature(opts: Record<string, any>): any {
-        const transaction = Transactions.BuilderFactory.secondSignature()
-            .fee(this.toSatoshi(opts.signatureFee))
-            .nonce(this.nonce.toString())
-            .signatureAsset(opts.secondPassphrase)
-            .sign(opts.passphrase)
-            .getStruct();
-
-        this.incrementNonce();
-        return transaction;
-    }
-
     public makeVote(opts: Record<string, any>): any {
         const transaction = Transactions.BuilderFactory.vote()
             .fee(this.toSatoshi(opts.voteFee))

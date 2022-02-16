@@ -34,7 +34,6 @@ import {
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
-let secondSignatureWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
@@ -66,12 +65,10 @@ beforeEach(() => {
     Factories.registerTransactionFactory(factoryBuilder);
 
     senderWallet = buildSenderWallet(factoryBuilder);
-    secondSignatureWallet = buildSecondSignatureWallet(factoryBuilder);
     multiSignatureWallet = buildMultiSignatureWallet();
     recipientWallet = buildRecipientWallet(factoryBuilder);
 
     walletRepository.index(senderWallet);
-    walletRepository.index(secondSignatureWallet);
     walletRepository.index(multiSignatureWallet);
     walletRepository.index(recipientWallet);
 });
@@ -82,7 +79,6 @@ afterEach(() => {
 
 describe("DelegateRegistrationTransaction", () => {
     let delegateRegistrationTransaction: Interfaces.ITransaction;
-    let secondSignaturedDelegateRegistrationTransaction: Interfaces.ITransaction;
     let handler: TransactionHandler;
 
     beforeEach(async () => {
@@ -101,13 +97,6 @@ describe("DelegateRegistrationTransaction", () => {
             .usernameAsset("dummy")
             .nonce("1")
             .sign(passphrases[0])
-            .build();
-
-        secondSignaturedDelegateRegistrationTransaction = BuilderFactory.delegateRegistration()
-            .usernameAsset("dummy")
-            .nonce("1")
-            .sign(passphrases[1])
-            .secondSign(passphrases[2])
             .build();
     });
 
@@ -304,16 +293,6 @@ describe("DelegateRegistrationTransaction", () => {
             expect(TransactionHandler.prototype.throwIfCannotBeApplied).toHaveBeenCalledTimes(1);
         });
 
-        it("should not throw - second sign", async () => {
-            jest.spyOn(TransactionHandler.prototype, "throwIfCannotBeApplied");
-
-            await expect(
-                handler.throwIfCannotBeApplied(secondSignaturedDelegateRegistrationTransaction, secondSignatureWallet),
-            ).toResolve();
-
-            expect(TransactionHandler.prototype.throwIfCannotBeApplied).toHaveBeenCalledTimes(1);
-        });
-
         it("should throw if wallet has a multi signature", async () => {
             const multiSignatureAsset: IMultiSignatureAsset = {
                 min: 2,
@@ -341,7 +320,7 @@ describe("DelegateRegistrationTransaction", () => {
         });
 
         it("should throw if asset.delegate is undefined", async () => {
-            delegateRegistrationTransaction.data.asset!.delegate = undefined;
+            delegateRegistrationTransaction.data.asset.delegate = undefined;
 
             await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
                 Exceptions.Runtime.AssertionException,
@@ -461,7 +440,7 @@ describe("DelegateRegistrationTransaction", () => {
         });
 
         it("should throw if asset.delegate is undefined", async () => {
-            delegateRegistrationTransaction.data.asset!.delegate = undefined;
+            delegateRegistrationTransaction.data.asset.delegate = undefined;
 
             await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
                 Exceptions.Runtime.AssertionException,
@@ -525,7 +504,7 @@ describe("DelegateRegistrationTransaction", () => {
         });
 
         it("should throw if asset.delegate is undefined", async () => {
-            delegateRegistrationTransaction.data.asset!.delegate = undefined;
+            delegateRegistrationTransaction.data.asset.delegate = undefined;
             handler.throwIfCannotBeApplied = jest.fn();
 
             await expect(handler.applyToSender(delegateRegistrationTransaction)).rejects.toThrow(

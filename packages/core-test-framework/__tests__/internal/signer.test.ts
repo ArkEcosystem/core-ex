@@ -26,7 +26,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeTransfer(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.vendorField).toBeDefined();
     });
 
@@ -43,7 +42,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeTransfer(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.vendorField).toBeDefined();
     });
 
@@ -57,7 +55,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeDelegate(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.delegate?.username).toBeString();
     });
 
@@ -72,7 +69,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeDelegate(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.delegate?.username).toBeString();
     });
 
@@ -87,7 +83,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeSecondSignature(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.signature?.publicKey).toBeString();
     });
 
@@ -101,7 +96,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeVote(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.votes).toBeArray();
     });
 
@@ -116,7 +110,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeVote(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.votes).toBeArray();
     });
 
@@ -133,7 +126,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeMultiSignatureRegistration(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.signatures).toBeArray();
         expect(entity.asset?.multiSignature?.min).toBeNumber();
         expect(entity.asset?.multiSignature?.publicKeys).toBeArray();
@@ -153,7 +145,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeMultiSignatureRegistration(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.signatures).toBeArray();
         expect(entity.asset?.multiSignature?.min).toBeNumber();
         expect(entity.asset?.multiSignature?.publicKeys).toBeArray();
@@ -178,7 +169,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeMultipayment(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.payments).toBeArray();
     });
 
@@ -202,7 +192,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeMultipayment(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.payments).toBeArray();
     });
 
@@ -224,7 +213,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcLock(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.lock?.secretHash).toBeString();
         expect(entity.asset?.lock?.expiration).toBeDefined();
     });
@@ -248,7 +236,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcLock(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.lock?.secretHash).toBeString();
         expect(entity.asset?.lock?.expiration).toBeDefined();
     });
@@ -266,7 +253,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcClaim(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.claim?.lockTransactionId).toBeString();
         expect(entity.asset?.claim?.unlockSecret).toBeString();
     });
@@ -285,7 +271,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcClaim(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.claim?.lockTransactionId).toBeString();
         expect(entity.asset?.claim?.unlockSecret).toBeString();
     });
@@ -302,7 +287,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcRefund(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeUndefined();
         expect(entity.asset?.refund?.lockTransactionId).toBeString();
     });
 
@@ -319,7 +303,6 @@ describe("Signer", () => {
         const entity: Interfaces.ITransactionData = signer.makeHtlcRefund(options);
 
         expect(entity.signature).toBeDefined();
-        expect(entity.secondSignature).toBeDefined();
         expect(entity.asset?.refund?.lockTransactionId).toBeString();
     });
 });

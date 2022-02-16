@@ -41,20 +41,6 @@ describe("TransactionFactory", () => {
         });
     });
 
-    describe("secondSignature", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.secondSignature(passphrases[0]);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-
-        it("should return transaction factory - with default parameters", async () => {
-            const entity = transactionFactory.secondSignature();
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
     describe("delegateRegistration", () => {
         it("should return transaction factory", async () => {
             const entity = transactionFactory.delegateRegistration("username");

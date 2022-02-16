@@ -22,15 +22,6 @@ export const createRandomTx = (type) => {
             break;
         }
 
-        case 1: {
-            // second signature
-            transaction = BuilderFactory.secondSignature()
-                .signatureAsset(Math.random().toString(36))
-                .sign(Math.random().toString(36))
-                .build();
-            break;
-        }
-
         case 2: {
             // delegate registration
             transaction = BuilderFactory.delegateRegistration()

@@ -94,23 +94,9 @@ describe("Verifier", () => {
             .withSecondPassphrase("secret two")
             .createOne();
 
-        const otherPublicKey = "0203bc6522161803a4cd9d8c7b7e3eb5b29f92106263a3979e3e02d27a70e830b4";
-
         it("should return true on a valid signature", () => {
             configManager.getMilestone().aip11 = true;
             expect(Verifier.verifySecondSignature(transaction, keys2.publicKey)).toBeTrue();
-        });
-
-        it("should return false on an invalid second signature", () => {
-            expect(Verifier.verifySecondSignature(transaction, otherPublicKey)).toBeFalse();
-        });
-
-        it("should return false on a missing second signature", () => {
-            const transactionWithoutSignature = Object.assign({}, transaction);
-            delete transactionWithoutSignature.secondSignature;
-            delete transactionWithoutSignature.signSignature;
-
-            expect(Verifier.verifySecondSignature(transactionWithoutSignature, keys2.publicKey)).toBeFalse();
         });
 
         it("should fail this.getHash for transaction version > 1", () => {

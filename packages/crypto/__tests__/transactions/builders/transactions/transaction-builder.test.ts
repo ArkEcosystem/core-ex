@@ -16,7 +16,6 @@ beforeAll(() => {
 
 describe.each([
     BuilderFactory.transfer,
-    BuilderFactory.secondSignature,
     BuilderFactory.delegateRegistration,
     BuilderFactory.vote,
     BuilderFactory.multiSignature,

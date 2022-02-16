@@ -93,10 +93,6 @@ describe("Delegate Registration Transaction", () => {
                 expect(builder.getStruct().signature).toBe(builder.data.signature);
             });
 
-            it("returns the second signature", () => {
-                expect(builder.getStruct().secondSignature).toBe(builder.data.secondSignature);
-            });
-
             it("returns the timestamp", () => {
                 expect(builder.getStruct().timestamp).toBe(builder.data.timestamp);
             });

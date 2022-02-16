@@ -54,14 +54,6 @@ export class TransactionFactory {
         return this;
     }
 
-    public secondSignature(secondPassphrase?: string): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.secondSignature().signatureAsset(
-            secondPassphrase || defaultPassphrase,
-        );
-
-        return this;
-    }
-
     public delegateRegistration(username?: string): TransactionFactory {
         const builder = Transactions.BuilderFactory.delegateRegistration();
 

@@ -189,19 +189,5 @@ describe("TransactionResource", () => {
                 tmpTransactionDataWithBlockDataTransformed,
             );
         });
-
-        it("should return transformed with secondSignature", async () => {
-            const tmpTransactionDataWithBlockData = cloneDeep(transactionDataWithBlockData);
-            const tmpTransactionDataWithBlockDataTransformed = cloneDeep(transactionDataWithBlockDataTransformed);
-
-            // @ts-ignore
-            tmpTransactionDataWithBlockData.data.secondSignature = "dummy_signature";
-            // @ts-ignore
-            tmpTransactionDataWithBlockDataTransformed.signSignature = "dummy_signature";
-
-            expect(resource.transform(tmpTransactionDataWithBlockData)).toEqual(
-                tmpTransactionDataWithBlockDataTransformed,
-            );
-        });
     });
 });

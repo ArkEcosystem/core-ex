@@ -20,18 +20,6 @@ export class Signer {
         return signature;
     }
 
-    public static secondSign(transaction: ITransactionData, keys: IKeyPair): string {
-        const hash: Buffer = Utils.toHash(transaction, { excludeSecondSignature: true });
-        const signature: string =
-            transaction.version && transaction.version > 1 ? Hash.signSchnorr(hash, keys) : Hash.signECDSA(hash, keys);
-
-        if (!transaction.secondSignature) {
-            transaction.secondSignature = signature;
-        }
-
-        return signature;
-    }
-
     public static multiSign(transaction: ITransactionData, keys: IKeyPair, index = -1): string {
         if (!transaction.signatures) {
             transaction.signatures = [];

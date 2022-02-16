@@ -28,7 +28,6 @@ interface DynamicFees {
     minFeeBroadcast?: number;
     addonBytes: {
         transfer?: number;
-        secondSignature?: number;
         delegateRegistration?: number;
         vote?: number;
         multiSignature?: number;
@@ -611,7 +610,6 @@ export class Command extends Commands.Command {
                 fees: {
                     staticFees: {
                         transfer: options.feeStaticTransfer,
-                        secondSignature: options.feeStaticSecondSignature,
                         delegateRegistration: options.feeStaticDelegateRegistration,
                         vote: options.feeStaticVote,
                         multiSignature: options.feeStaticMultiSignature,
@@ -733,14 +731,6 @@ export class Command extends Commands.Command {
         }
         if (options.feeDynamicBytesTransfer) {
             dynamicFees.addonBytes.transfer = options.feeDynamicBytesTransfer;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesSecondSignature) {
-            dynamicFees.addonBytes.secondSignature = options.feeDynamicBytesSecondSignature;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesSecondSignature) {
-            dynamicFees.addonBytes.secondSignature = options.feeDynamicBytesSecondSignature;
             includeDynamicFees = true;
         }
         if (options.feeDynamicBytesDelegateRegistration) {

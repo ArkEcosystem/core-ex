@@ -70,18 +70,6 @@ export const registerTransferFactory = (factory: FactoryBuilder): void => {
     factory.get("Transfer").state("multiSign", multiSign);
 };
 
-export const registerSecondSignatureFactory = (factory: FactoryBuilder): void => {
-    factory.set("SecondSignature", ({ options }) =>
-        applyModifiers(
-            Transactions.BuilderFactory.secondSignature().signatureAsset(options.passphrase || secrets[1]),
-            options,
-        ),
-    );
-
-    factory.get("SecondSignature").state("sign", sign);
-    factory.get("SecondSignature").state("secondSign", secondSign);
-};
-
 export const registerDelegateRegistrationFactory = (factory: FactoryBuilder): void => {
     factory.set("DelegateRegistration", ({ options }) =>
         Transactions.BuilderFactory.delegateRegistration().usernameAsset(
@@ -223,8 +211,6 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder): void => {
 
 export const registerTransactionFactory = (factory: FactoryBuilder): void => {
     registerTransferFactory(factory);
-
-    registerSecondSignatureFactory(factory);
 
     registerDelegateRegistrationFactory(factory);
 
