@@ -1,5 +1,4 @@
 import { Enums, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import bs58 from "bs58";
 import { createHash } from "crypto";
 
 import secrets from "../../internal/passphrases.json";
