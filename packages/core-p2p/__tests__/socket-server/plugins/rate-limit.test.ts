@@ -2,8 +2,8 @@ import { Server } from "@hapi/hapi";
 import Joi from "joi";
 import { Container } from "@arkecosystem/core-kernel";
 
-import { RateLimitPlugin } from "@arkecosystem/core-p2p/src/socket-server/plugins/rate-limit";
-import * as utils from "@arkecosystem/core-p2p/src/utils/build-rate-limiter";
+import { RateLimitPlugin } from "@packages/core-p2p/src/socket-server/plugins/rate-limit";
+import * as utils from "@packages/core-p2p/src/utils/build-rate-limiter";
 
 afterEach(() => {
     jest.clearAllMocks();

@@ -1,16 +1,16 @@
 import "jest-extended";
 
 import { Container, Utils as KernelUtils } from "@arkecosystem/core-kernel";
-import { constants } from "@arkecosystem/core-p2p/src/constants";
+import { constants } from "@packages/core-p2p/src/constants";
 import {
     PeerPingTimeoutError,
     PeerStatusResponseError,
     PeerVerificationFailedError,
-} from "@arkecosystem/core-p2p/src/errors";
-import { Peer } from "@arkecosystem/core-p2p/src/peer";
-import { PeerCommunicator } from "@arkecosystem/core-p2p/src/peer-communicator";
-import { PeerVerificationResult } from "@arkecosystem/core-p2p/src/peer-verifier";
-import { replySchemas } from "@arkecosystem/core-p2p/src/schemas";
+} from "@packages/core-p2p/src/errors";
+import { Peer } from "@packages/core-p2p/src/peer";
+import { PeerCommunicator } from "@packages/core-p2p/src/peer-communicator";
+import { PeerVerificationResult } from "@packages/core-p2p/src/peer-verifier";
+import { replySchemas } from "@packages/core-p2p/src/schemas";
 import { Blocks, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import delay from "delay";
 
