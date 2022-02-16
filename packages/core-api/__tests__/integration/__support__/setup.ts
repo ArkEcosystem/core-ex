@@ -1,9 +1,10 @@
-import { Application, Container, Contracts, Utils as AppUtils } from "@packages/core-kernel";
-import { Managers, Utils } from "@packages/crypto";
-import { ServiceProvider } from "@packages/core-api/src";
-import { Sandbox } from "@packages/core-test-framework/src"; // TODO (josip): can we omit this (and all other occurrences) reference to /src?
+import { Application, Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Managers, Utils } from "@arkecosystem/crypto";
+import { Sandbox } from "@arkecosystem/core-test-framework";
 import { EventEmitter } from "events";
 import { resolve } from "path";
+
+import { ServiceProvider } from "../../../src";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
 
@@ -25,33 +26,32 @@ export const setUp = async (): Promise<Application> => {
             list: [{ ip: "127.0.0.1", port: 4000 }], // need some peers defined for the app to run
         },
     });
-
     await sandbox
         .withCoreOptions({
             app: {
                 core: {
                     plugins: [
-                        { package: "@arkecosystem/core-state" },
-                        { package: "@arkecosystem/core-database" },
-                        { package: "@arkecosystem/core-transactions" },
-                        { package: "@arkecosystem/core-transaction-pool" },
-                        { package: "@arkecosystem/core-p2p" },
-                        { package: "@arkecosystem/core-blockchain" },
-                        { package: "@arkecosystem/core-forger" },
+                        { package: "@packages/core-state" },
+                        { package: "@packages/core-database" },
+                        { package: "@packages/core-transactions" },
+                        { package: "@packages/core-transaction-pool" },
+                        { package: "@packages/core-p2p" },
+                        { package: "@packages/core-blockchain" },
+                        { package: "@packages/core-forger" },
                     ],
                 },
                 relay: {
                     plugins: [
-                        { package: "@arkecosystem/core-state" },
-                        { package: "@arkecosystem/core-database" },
-                        { package: "@arkecosystem/core-transactions" },
-                        { package: "@arkecosystem/core-transaction-pool" },
-                        { package: "@arkecosystem/core-p2p" },
-                        { package: "@arkecosystem/core-blockchain" },
+                        { package: "@packages/core-state" },
+                        { package: "@packages/core-database" },
+                        { package: "@packages/core-transactions" },
+                        { package: "@packages/core-transaction-pool" },
+                        { package: "@packages/core-p2p" },
+                        { package: "@packages/core-blockchain" },
                     ],
                 },
                 forger: {
-                    plugins: [{ package: "@arkecosystem/core-forger" }],
+                    plugins: [{ package: "@packages/core-forger" }],
                 },
             },
         })
@@ -68,7 +68,7 @@ export const setUp = async (): Promise<Application> => {
             // We need to manually register the service provider from source so that jest can collect coverage.
             sandbox.registerServiceProvider({
                 name: "@arkecosystem/core-api",
-                path: resolve(__dirname, "../../../../packages/core-api"),
+                path: resolve(__dirname, "../../../../core-api"),
                 klass: ServiceProvider,
             });
 
