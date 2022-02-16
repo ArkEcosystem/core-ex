@@ -113,14 +113,6 @@ describe("TransactionFactory", () => {
         });
     });
 
-    describe("ipfs", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.ipfs("dummy_id");
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
     describe("multiPayment", () => {
         it("should return transaction factory", async () => {
             const entity = transactionFactory.multiPayment([

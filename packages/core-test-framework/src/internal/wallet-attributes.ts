@@ -14,8 +14,6 @@ export function getWalletAttributeSet(): Services.Attributes.AttributeSet {
     attributes.set("delegate.username");
     attributes.set("delegate.voteBalance");
     attributes.set("delegate");
-    attributes.set("ipfs.hashes");
-    attributes.set("ipfs");
     attributes.set("multiSignature");
     attributes.set("multiSignature.legacy");
     attributes.set("secondPublicKey");

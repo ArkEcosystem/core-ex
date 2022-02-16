@@ -1,6 +1,5 @@
 import { DelegateRegistrationBuilder } from "./transactions/delegate-registration";
 import { DelegateResignationBuilder } from "./transactions/delegate-resignation";
-import { IPFSBuilder } from "./transactions/ipfs";
 import { MultiPaymentBuilder } from "./transactions/multi-payment";
 import { MultiSignatureBuilder } from "./transactions/multi-signature";
 import { SecondSignatureBuilder } from "./transactions/second-signature";
@@ -28,10 +27,6 @@ export class BuilderFactory {
 
     public static multiSignature(): MultiSignatureBuilder {
         return new MultiSignatureBuilder();
-    }
-
-    public static ipfs(): IPFSBuilder {
-        return new IPFSBuilder();
     }
 
     public static multiPayment(): MultiPaymentBuilder {

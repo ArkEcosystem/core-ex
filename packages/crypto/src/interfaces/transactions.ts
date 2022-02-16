@@ -39,7 +39,6 @@ export interface ITransactionAsset {
     votes?: string[];
     multiSignatureLegacy?: IMultiSignatureLegacyAsset;
     multiSignature?: IMultiSignatureAsset;
-    ipfs?: string;
     payments?: IMultiPaymentItem[];
 }
 
@@ -101,8 +100,6 @@ export interface ITransactionJson {
 
     blockId?: string;
     sequence?: number;
-
-    ipfsHash?: string;
 }
 
 export interface ISchemaValidationResult<T = any> {

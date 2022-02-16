@@ -122,13 +122,6 @@ export class TransactionFactory {
         return this;
     }
 
-    public ipfs(ipfsId: string): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.ipfs().ipfsAsset(ipfsId);
-
-        return this;
-    }
-
-
     public multiPayment(payments: Array<{ recipientId: string; amount: string }>): TransactionFactory {
         const builder = Transactions.BuilderFactory.multiPayment();
 

@@ -562,11 +562,6 @@ describe("BlockState", () => {
             .sign("delegatePassphrase")
             .build();
 
-        const ipfs = factory
-            .get("Ipfs")
-            .withOptions({ senderPublicKey: sender.getPublicKey(), recipientId: recipientWallet.getAddress() })
-            .make();
-
         describe.each`
             type                      | transaction
             ${"transfer"}             | ${transfer}
@@ -574,7 +569,6 @@ describe("BlockState", () => {
             ${"2nd sign"}             | ${secondSign}
             ${"vote"}                 | ${vote}
             ${"delegateResignation"}  | ${delegateRes}
-            ${"ipfs"}                 | ${ipfs}
         `("when the transaction is a $type", ({ transaction }) => {
             it("should call the transaction handler apply the transaction to the sender & recipient", async () => {
                 await blockState.applyTransaction(transaction);
