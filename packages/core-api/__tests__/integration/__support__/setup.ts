@@ -1,6 +1,6 @@
-import { Application, Container, Contracts, Utils as AppUtils } from "@packages/core-kernel";
-import { Sandbox } from "@packages/core-test-framework";
-import { Managers, Utils } from "@packages/crypto";
+import { Application, Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { Sandbox } from "@arkecosystem/core-test-framework";
+import { Managers, Utils } from "@arkecosystem/crypto";
 import { ServiceProvider } from "@packages/core-api/src";
 import { EventEmitter } from "events";
 import { resolve } from "path";
@@ -31,27 +31,27 @@ export const setUp = async (): Promise<Application> => {
             app: {
                 core: {
                     plugins: [
-                        { package: "@packages/core-state" },
-                        { package: "@packages/core-database" },
-                        { package: "@packages/core-transactions" },
-                        { package: "@packages/core-transaction-pool" },
-                        { package: "@packages/core-p2p" },
-                        { package: "@packages/core-blockchain" },
-                        { package: "@packages/core-forger" },
+                        { package: "@arkecosystem/core-state" },
+                        { package: "@arkecosystem/core-database" },
+                        { package: "@arkecosystem/core-transactions" },
+                        { package: "@arkecosystem/core-transaction-pool" },
+                        { package: "@arkecosystem/core-p2p" },
+                        { package: "@arkecosystem/core-blockchain" },
+                        { package: "@arkecosystem/core-forger" },
                     ],
                 },
                 relay: {
                     plugins: [
-                        { package: "@packages/core-state" },
-                        { package: "@packages/core-database" },
-                        { package: "@packages/core-transactions" },
-                        { package: "@packages/core-transaction-pool" },
-                        { package: "@packages/core-p2p" },
-                        { package: "@packages/core-blockchain" },
+                        { package: "@arkecosystem/core-state" },
+                        { package: "@arkecosystem/core-database" },
+                        { package: "@arkecosystem/core-transactions" },
+                        { package: "@arkecosystem/core-transaction-pool" },
+                        { package: "@arkecosystem/core-p2p" },
+                        { package: "@arkecosystem/core-blockchain" },
                     ],
                 },
                 forger: {
-                    plugins: [{ package: "@packages/core-forger" }],
+                    plugins: [{ package: "@arkecosystem/core-forger" }],
                 },
             },
         })
@@ -67,8 +67,8 @@ export const setUp = async (): Promise<Application> => {
 
             // We need to manually register the service provider from source so that jest can collect coverage.
             sandbox.registerServiceProvider({
-                name: "@packages/core-api",
-                path: resolve(__dirname, "../../../../../packages/core-api"),
+                name: "@arkecosystem/core-api",
+                path: resolve(__dirname, "../../../../core-api"),
                 klass: ServiceProvider,
             });
 
