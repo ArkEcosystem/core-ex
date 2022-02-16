@@ -14,6 +14,15 @@ describe("assert", ({ assert, it, schema }) => {
         assert.not.equal(true, false);
     });
 
+    it("determines if a value is defined or undefined", () => {
+        assert.undefined(undefined);
+        assert.defined({});
+
+        // Not...
+        assert.not.undefined({});
+        assert.not.defined(undefined);
+    });
+
     it("determines if two numbers are equal", () => {
         assert.equal(BigNumber.make(10), BigNumber.make(10));
 
