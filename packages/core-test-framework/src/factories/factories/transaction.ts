@@ -1,11 +1,8 @@
-import { Enums, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { createHash } from "crypto";
+import { Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder";
 import { FactoryFunctionOptions } from "../types";
-
-const randomHash = (): string => createHash("sha256").update(Math.random().toString(36).substring(8)).digest("hex");
 
 const sign = ({ entity, options }: FactoryFunctionOptions) => entity.sign(options.passphrase || secrets[0]);
 
