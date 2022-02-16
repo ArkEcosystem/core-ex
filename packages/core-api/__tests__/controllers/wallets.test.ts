@@ -64,23 +64,6 @@ const walletResource2Cold: Resources.WalletResource = {
     attributes: {},
 };
 
-const wallet1LockResource1: Resources.LockResource = {
-    lockId: "700bef5e3c2fcbbac83472b7320a635cf02fddb14e12d83f911f05faea8e540c",
-    senderPublicKey: "03c6e98f9aff65c517c824c9b21b6e1bc053a19f81d95d4f76426b1f5e651e64db",
-    isExpired: false,
-    amount: Utils.BigNumber.make("1000"),
-    secretHash: "9929b94c6caf437576b458334b10605b4471086bda5dfdac6e3108043e349324",
-    recipientId: "AXm433vapiwt83xfh8x9ciNxYkVd76pbNe",
-    timestamp: {
-        epoch: 108158400,
-        unix: 1598259600,
-        human: "2020-08-24T09:00:00.000Z",
-    },
-    expirationType: Enums.HtlcLockExpirationType.EpochTimestamp,
-    expirationValue: 108158500,
-    vendorField: "ArkPool payments",
-};
-
 describe("WalletsController", () => {
     describe("Index", () => {
         it("should get criteria from query and return wallets page from WalletSearchService", () => {
