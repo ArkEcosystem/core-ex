@@ -304,7 +304,7 @@ describe("TransactionsController", () => {
         it("should return registered schemas", async () => {
             const response = (await controller.schemas(undefined, undefined)) as ItemResponse;
 
-            const coreTransactionHandlersCount = 11;
+            const coreTransactionHandlersCount = 10;
             expect(Object.keys(response.data["1"]).length).toBe(coreTransactionHandlersCount);
         });
     });
