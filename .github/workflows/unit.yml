@@ -19,29 +19,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test __tests__/unit/core/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core && pnpm run test
 
     core-api:
         runs-on: ubuntu-latest
@@ -53,29 +58,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-api/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-api && pnpm run test
 
     core-blockchain:
         runs-on: ubuntu-latest
@@ -87,29 +97,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-blockchain/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-blockchain && pnpm run test
 
     core-cli:
         runs-on: ubuntu-latest
@@ -121,29 +136,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-cli/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-cli && pnpm run test
 
     core-database:
         runs-on: ubuntu-latest
@@ -155,29 +175,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-database/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-database && pnpm run test
 
     core-forger:
         runs-on: ubuntu-latest
@@ -189,29 +214,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-forger/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-forger && pnpm run test
 
     core-kernel:
         runs-on: ubuntu-latest
@@ -223,29 +253,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-kernel/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-kernel && pnpm run test
 
     core-logger-pino:
         runs-on: ubuntu-latest
@@ -257,131 +292,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-logger-pino/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
-
-    core-magistrate-api:
-        runs-on: ubuntu-latest
-
-        strategy:
-            matrix:
-                node-version: [14.x]
-
-        steps:
-            - uses: actions/checkout@v2
-
-            - name: Cache node modules
-              uses: actions/cache@v1
-              with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
-
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
-              with:
-                  node-version: ${{ matrix.node-version }}
-
-            - name: Install & Build
-              run: yarn setup
-
-            - name: Test
-              run: yarn test:parallel __tests__/unit/core-magistrate-api/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
-
-    core-magistrate-crypto:
-        runs-on: ubuntu-latest
-
-        strategy:
-            matrix:
-                node-version: [14.x]
-
-        steps:
-            - uses: actions/checkout@v2
-
-            - name: Cache node modules
-              uses: actions/cache@v1
-              with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
-
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
-              with:
-                  node-version: ${{ matrix.node-version }}
-
-            - name: Install & Build
-              run: yarn setup
-
-            - name: Test
-              run: yarn test:parallel __tests__/unit/core-magistrate-crypto/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
-
-    core-magistrate-transactions:
-        runs-on: ubuntu-latest
-
-        strategy:
-            matrix:
-                node-version: [14.x]
-
-        steps:
-            - uses: actions/checkout@v2
-
-            - name: Cache node modules
-              uses: actions/cache@v1
-              with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
-
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
-              with:
-                  node-version: ${{ matrix.node-version }}
-
-            - name: Install & Build
-              run: yarn setup
-
-            - name: Test
-              run: yarn test:parallel __tests__/unit/core-magistrate-transactions/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-logger-pino && pnpm run test
 
     core-p2p:
         runs-on: ubuntu-latest
@@ -393,29 +331,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test __tests__/unit/core-p2p/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: pnpm run test packages/__tests__/unit/
 
     core-snapshots:
         runs-on: ubuntu-latest
@@ -427,29 +370,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-snapshots/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-snapshots && pnpm run test
 
     core-state:
         runs-on: ubuntu-latest
@@ -461,29 +409,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-state/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-state && pnpm run test
 
     core-test-framework:
         runs-on: ubuntu-latest
@@ -495,29 +448,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-test-framework/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-test-framework && pnpm run test
 
     core-transaction-pool:
         runs-on: ubuntu-latest
@@ -529,29 +487,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-transaction-pool/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-transaction-pool && pnpm run test
 
     core-transactions:
         runs-on: ubuntu-latest
@@ -563,29 +526,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-transactions/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-transactions && pnpm run test
 
     core-webhooks:
         runs-on: ubuntu-latest
@@ -597,29 +565,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/core-webhooks/ --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/core-webhooks && pnpm run test
 
     crypto:
         runs-on: ubuntu-latest
@@ -631,28 +604,34 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: yarn test:parallel __tests__/unit/crypto/ --coverage --coverage --coverageDirectory .coverage/unit/${{ github.job }}
-            - name: Archive code coverage
-              uses: actions/upload-artifact@v2
-              with:
-                  name: ${{ github.job }}-coverage
-                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/crypto && pnpm run test
 
     test:
         runs-on: ubuntu-latest
@@ -664,28 +643,31 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache node modules
-              uses: actions/cache@v1
+            - name: Set up Python 2.7
+              uses: actions/setup-python@v2
               with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
+                  python-version: "2.7"
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v2
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
 
-            - name: Install & Build
-              run: yarn setup
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: latest
+                  run_install: true
+
+            - name: Build
+              run: pnpm run setup
 
             - name: Test
-              run: |
-                  cd packages/test
-                  yarn test:uvu
-
-#            - name: Archive code coverage
-#              uses: actions/upload-artifact@v2
-#              with:
-#                  name: ${{ github.job }}-coverage
-#                  path: .coverage/unit/${{ github.job }}/lcov.info
+              run: cd packages/test && pnpm run test
