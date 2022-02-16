@@ -1,5 +1,5 @@
 {
-    "name": "@arkecosystem/test",
+    "name": "@arkecosystem/core-test",
     "version": "3.1.1",
     "description": "Test utilities for the ARK Blockchain",
     "license": "MIT",

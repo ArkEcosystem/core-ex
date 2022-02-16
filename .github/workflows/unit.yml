@@ -633,7 +633,7 @@ jobs:
             - name: Test
               run: cd packages/crypto && pnpm run test
 
-    test:
+    core-test:
         runs-on: ubuntu-latest
 
         strategy:
@@ -670,4 +670,4 @@ jobs:
               run: pnpm run setup
 
             - name: Test
-              run: cd packages/test && pnpm run test
+              run: cd packages/core-test && pnpm run test
