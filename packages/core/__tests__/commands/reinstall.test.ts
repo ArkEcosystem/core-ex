@@ -5,7 +5,7 @@ import { Console } from "@packages/core-test-framework";
 import { Command } from "@packages/core/src/commands/reinstall";
 import prompts from "prompts";
 
-import execa from "../../../../__mocks__/execa";
+import execa from "../../__mocks__/execa";
 
 let cli;
 let processManager;
