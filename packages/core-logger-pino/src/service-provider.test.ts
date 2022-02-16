@@ -67,9 +67,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
         });
 
         it("should validate schema using defaults", async () => {
-            const result = (serviceProvider.configSchema() as AnySchema).validate(
-                defaults
-            );
+            const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
             assert.undefined(result.error);
 
@@ -80,8 +78,6 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
         });
 
         it("should allow configuration extension", async () => {
-            const defaults = (await import("./defaults")).defaults;
-
             // @ts-ignore
             defaults.customField = "dummy";
 
@@ -95,9 +91,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
             it("should return value of process.env.CORE_LOG_LEVEL if defined", async () => {
                 process.env.CORE_LOG_LEVEL = "dummy";
 
-                const result = (serviceProvider.configSchema() as AnySchema).validate(
-                    (await import("./defaults")).defaults,
-                );
+                const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
                 assert.undefined(result.error);
                 assert.equal(result.value.levels.console, "dummy");
@@ -108,9 +102,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
             it("should return value of process.env.CORE_LOG_LEVEL_FILE if defined", async () => {
                 process.env.CORE_LOG_LEVEL_FILE = "dummy";
 
-                const result = (serviceProvider.configSchema() as AnySchema).validate(
-                    (await import("./defaults")).defaults,
-                );
+                const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
                 assert.undefined(result.error);
                 assert.equal(result.value.levels.file, "dummy");
@@ -118,69 +110,69 @@ describe("ServiceProvider", ({ assert, beforeEach, it}) => {
         });
 
         describe("schema restrictions", () => {
-            let defaults;
+            let writableDefaults;
 
             beforeEach(async () => {
-                defaults = (await import("./defaults")).defaults;
+                writableDefaults = {...defaults };
             });
 
             it("levels is required && is object", async () => {
-                defaults.levels = false;
-                let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                writableDefaults.levels = false;
+                let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
 
                 assert.equal(result.error!.message, '"levels" must be of type object');
 
-                delete defaults.levels;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                delete writableDefaults.levels;
+                result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"levels" is required');
             });
 
             it("levels.console is required && is string", async () => {
-                defaults.levels.console = false;
-                let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                writableDefaults.levels.console = false;
+                let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"levels.console" must be a string');
 
-                delete defaults.levels.console;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                delete writableDefaults.levels.console;
+                result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"levels.console" is required');
             });
 
             it("levels.file is required && is string", async () => {
-                defaults.levels.file = false;
-                let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                writableDefaults.levels.file = false;
+                let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"levels.file" must be a string');
 
-                delete defaults.levels.file;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                delete writableDefaults.levels.file;
+                result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"levels.file" is required');
             });
 
             it("fileRotator is required && is object", async () => {
-                defaults.fileRotator = false;
-                let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                writableDefaults.fileRotator = false;
+                let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"fileRotator" must be of type object');
 
-                delete defaults.fileRotator;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                delete writableDefaults.fileRotator;
+                result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"fileRotator" is required');
             });
 
             it("fileRotator.interval is required && is string", async () => {
-                defaults.fileRotator.interval = false;
-                let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                writableDefaults.fileRotator.interval = false;
+                let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"fileRotator.interval" must be a string');
 
-                delete defaults.fileRotator.interval;
-                result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
+                delete writableDefaults.fileRotator.interval;
+                result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
                 assert.equal(result.error!.message, '"fileRotator.interval" is required');
             });
