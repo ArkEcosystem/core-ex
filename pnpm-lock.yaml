@@ -385,7 +385,6 @@ importers:
 
   packages/core-kernel:
     specifiers:
-      '@arkecosystem/core-state': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@arkecosystem/utils': workspace:*
       '@pm2/io': 4.3.5
@@ -436,7 +435,6 @@ importers:
       semver: 6.3.0
       type-fest: 0.21.3
     devDependencies:
-      '@arkecosystem/core-state': link:../core-state
       '@types/cron': 1.7.3
       '@types/fs-extra': 8.1.2
       '@types/functional-red-black-tree': 1.0.1
