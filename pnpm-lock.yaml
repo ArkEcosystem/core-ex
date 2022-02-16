@@ -117,18 +117,6 @@ importers:
     dependencies:
       express: 4.17.1
 
-  __tests__/unit/core-cli/services/plugins/@namespace/package2:
-    specifiers: {}
-
-  __tests__/unit/core-cli/services/plugins/package1:
-    specifiers: {}
-
-  __tests__/unit/core-kernel/__stubs__/stub-plugin:
-    specifiers: {}
-
-  __tests__/unit/core-kernel/__stubs__/stub-plugin-with-defaults:
-    specifiers: {}
-
   packages/core:
     specifiers:
       '@arkecosystem/core-api': workspace:*
@@ -326,6 +314,12 @@ importers:
       '@types/semver': 6.2.3
       '@types/yargs-parser': 20.2.1
 
+  packages/core-cli/__tests__/services/plugins/@namespace/package2:
+    specifiers: {}
+
+  packages/core-cli/__tests__/services/plugins/package1:
+    specifiers: {}
+
   packages/core-database:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
@@ -427,6 +421,12 @@ importers:
       '@types/got': 9.6.12
       '@types/log-process-errors': 4.1.0
       '@types/semver': 6.2.3
+
+  packages/core-kernel/__tests__/__stubs__/stub-plugin:
+    specifiers: {}
+
+  packages/core-kernel/__tests__/__stubs__/stub-plugin-with-defaults:
+    specifiers: {}
 
   packages/core-logger-pino:
     specifiers:
