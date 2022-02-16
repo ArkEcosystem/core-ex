@@ -1,5 +1,4 @@
 import Ajv from "ajv";
-import ajvKeywords from "ajv-keywords";
 
 import { TransactionType } from "../enums";
 import { ITransactionData } from "../interfaces";
@@ -73,7 +72,7 @@ const network = (ajv: Ajv) => {
 };
 
 const bignumber = (ajv: Ajv) => {
-    const instanceOf = ajvKeywords.get("instanceof").definition;
+    const instanceOf = require("ajv-keywords/dist/definitions/instanceof");
     instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
 
     ajv.addKeyword({
