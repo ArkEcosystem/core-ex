@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import execa from "../../../../../__mocks__/execa";
+import execa from "../../../__mocks__/execa";
 
 let dataPath: string;
 let tempPath: string;

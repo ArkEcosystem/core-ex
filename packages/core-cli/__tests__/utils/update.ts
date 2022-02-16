@@ -3,7 +3,7 @@ import "jest-extended";
 import { getLatestVersion, getRegistryChannel, installFromChannel } from "@packages/core/src/common/update";
 import nock from "nock";
 
-import execa from "../../../../__mocks__/execa";
+import execa from "../../__mocks__/execa";
 import { versionLatest, versionNext } from "./__fixtures__/latest-version";
 
 beforeEach(() => nock.cleanAll());

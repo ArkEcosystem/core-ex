@@ -17,7 +17,7 @@ beforeEach(() => {
 describe("DiscoverCommands", () => {
     describe("#within", () => {
         it("should discover commands within the given directory", () => {
-            const commandPath: string = resolve(__dirname, "../../../../packages/core/dist/commands");
+            const commandPath: string = resolve(__dirname, "../../../core/dist/commands");
 
             const commands = cmd.within(commandPath);
 

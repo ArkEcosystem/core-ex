@@ -3,9 +3,8 @@ import "jest-extended";
 import { Contracts } from "@packages/core-cli";
 import { Console } from "@packages/core-test-framework";
 import { ProcessManager } from "@packages/core-cli/src/services";
-import execa from "execa";
 
-jest.mock("execa");
+import execa from "../../__mocks__/execa";
 
 let cli;
 let processManager;

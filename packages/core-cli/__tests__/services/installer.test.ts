@@ -5,7 +5,7 @@ import { Console } from "@packages/core-test-framework";
 import { Installer } from "@packages/core-cli/src/services";
 import { setGracefulCleanup } from "tmp";
 
-import execa from "../../../../__mocks__/execa";
+import execa from "../../__mocks__/execa";
 
 let cli;
 let installer;
