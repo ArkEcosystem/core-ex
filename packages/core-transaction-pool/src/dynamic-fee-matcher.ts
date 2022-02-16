@@ -7,7 +7,7 @@ import { TransactionFeeToHighError, TransactionFeeToLowError } from "./errors";
 @Container.injectable()
 export class DynamicFeeMatcher implements Contracts.TransactionPool.DynamicFeeMatcher {
     @Container.inject(Container.Identifiers.PluginConfiguration)
-    @Container.tagged("plugin", "@arkecosystem/core-transaction-pool")
+    @Container.tagged("plugin", "core-transaction-pool")
     private readonly configuration!: Providers.PluginConfiguration;
 
     @Container.inject(Container.Identifiers.TransactionHandlerRegistry)
@@ -21,9 +21,8 @@ export class DynamicFeeMatcher implements Contracts.TransactionPool.DynamicFeeMa
     private readonly logger!: Contracts.Kernel.Logger;
 
     public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
-        const dynamicFeesConfiguration: Record<string, any> = this.configuration.getRequired<Record<string, any>>(
-            "dynamicFees",
-        );
+        const dynamicFeesConfiguration: Record<string, any> =
+            this.configuration.getRequired<Record<string, any>>("dynamicFees");
         const feeStr = Utils.formatSatoshi(transaction.data.fee);
 
         if (dynamicFeesConfiguration.enabled) {
@@ -64,9 +63,8 @@ export class DynamicFeeMatcher implements Contracts.TransactionPool.DynamicFeeMa
     }
 
     public async throwIfCannotBroadcast(transaction: Interfaces.ITransaction): Promise<void> {
-        const dynamicFeesConfiguration: Record<string, any> = this.configuration.getRequired<Record<string, any>>(
-            "dynamicFees",
-        );
+        const dynamicFeesConfiguration: Record<string, any> =
+            this.configuration.getRequired<Record<string, any>>("dynamicFees");
         const feeStr = Utils.formatSatoshi(transaction.data.fee);
 
         if (dynamicFeesConfiguration.enabled) {

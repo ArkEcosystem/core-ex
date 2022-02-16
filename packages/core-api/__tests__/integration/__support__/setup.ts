@@ -31,27 +31,27 @@ export const setUp = async (): Promise<Application> => {
             app: {
                 core: {
                     plugins: [
-                        { package: "@arkecosystem/core-state" },
-                        { package: "@arkecosystem/core-database" },
-                        { package: "@arkecosystem/core-transactions" },
-                        { package: "@arkecosystem/core-transaction-pool" },
-                        { package: "@arkecosystem/core-p2p" },
-                        { package: "@arkecosystem/core-blockchain" },
-                        { package: "@arkecosystem/core-forger" },
+                        { package: "@packages/core-state" },
+                        { package: "@packages/core-database" },
+                        { package: "@packages/core-transactions" },
+                        { package: "@packages/core-transaction-pool" },
+                        { package: "@packages/core-p2p" },
+                        { package: "@packages/core-blockchain" },
+                        { package: "@packages/core-forger" },
                     ],
                 },
                 relay: {
                     plugins: [
-                        { package: "@arkecosystem/core-state" },
-                        { package: "@arkecosystem/core-database" },
-                        { package: "@arkecosystem/core-transactions" },
-                        { package: "@arkecosystem/core-transaction-pool" },
-                        { package: "@arkecosystem/core-p2p" },
-                        { package: "@arkecosystem/core-blockchain" },
+                        { package: "@packages/core-state" },
+                        { package: "@packages/core-database" },
+                        { package: "@packages/core-transactions" },
+                        { package: "@packages/core-transaction-pool" },
+                        { package: "@packages/core-p2p" },
+                        { package: "@packages/core-blockchain" },
                     ],
                 },
                 forger: {
-                    plugins: [{ package: "@arkecosystem/core-forger" }],
+                    plugins: [{ package: "@packages/core-forger" }],
                 },
             },
         })

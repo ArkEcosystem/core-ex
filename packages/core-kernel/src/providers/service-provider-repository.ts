@@ -205,6 +205,12 @@ export class ServiceProviderRepository {
             .toConstantValue(serviceProvider.config())
             .whenTargetTagged("plugin", name);
 
+        // @TODO: remove this after "uvu" migration
+        this.app
+            .bind(Identifiers.PluginConfiguration)
+            .toConstantValue(serviceProvider.config())
+            .whenTargetTagged("plugin", name.split("/")[1]);
+
         await serviceProvider.register();
         await this.eventDispatcher.dispatch(KernelEvent.ServiceProviderRegistered, { name });
     }
