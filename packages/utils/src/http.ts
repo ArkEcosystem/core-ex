@@ -87,7 +87,7 @@ const sendRequest = (method: string, url: string, opts?: HttpOptions): Promise<H
                     try {
                         accumulator = JSON.parse(accumulator);
                     } catch (error) {
-                        return rej(new HttpError(response, error));
+                        return rej(new HttpError(response, error as any));
                     }
                 }
 
