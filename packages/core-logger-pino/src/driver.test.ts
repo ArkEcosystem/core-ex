@@ -1,132 +1,132 @@
-import "jest-extended";
-
 import { sleep } from "@arkecosystem/utils";
-import { Application } from "@packages/core-kernel/src/application";
-import { Logger } from "@packages/core-kernel/src/contracts/kernel/log";
-import { Container, Identifiers } from "@packages/core-kernel/src/ioc";
-import { PinoLogger } from "@packages/core-logger-pino/src/driver";
+import { Application } from "@arkecosystem/core-kernel/dist/application";
+import { Logger } from "@arkecosystem/core-kernel/dist/contracts/kernel/log";
+import { Container, Identifiers } from "@arkecosystem/core-kernel/dist/ioc";
+import { PinoLogger } from "./driver";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
 import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
+import { describe } from "@arkecosystem/core-test";
 
 let logger: Logger;
 let message: string;
 
 let app: Application;
 
-beforeEach(async () => {
-    app = new Application(new Container());
-    app.bind(Identifiers.ConfigFlags).toConstantValue("core");
-    app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
-    app.bind("path.log").toConstantValue(dirSync().name);
+describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, nock, loader }) => {
+    beforeAll(() => {
+        capcon.startCapture(process.stdout, (stdout) => (message = stdout.toString()));
 
-    logger = await app.resolve<Logger>(PinoLogger).make({
-        levels: {
-            console: process.env.CORE_LOG_LEVEL || "debug",
-            file: process.env.CORE_LOG_LEVEL_FILE || "debug",
-        },
-        fileRotator: {
-            interval: "1d",
-        },
+        capcon.startCapture(process.stderr, (stderr) => (message = stderr.toString()));
+
+        // @ts-ignore
+        capcon.startCapture(console._stdout, (stdout) => (message = stdout.toString()));
+
+        // @ts-ignore
+        capcon.startCapture(console._stderr, (stderr) => (message = stderr.toString()));
     });
-});
 
-afterEach(() => (message = undefined));
+    afterAll(() => setGracefulCleanup());
 
-beforeAll(() => {
-    capcon.startCapture(process.stdout, (stdout) => (message = stdout.toString()));
+    beforeEach(async () => {
+        app = new Application(new Container());
+        app.bind(Identifiers.ConfigFlags).toConstantValue("core");
+        app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+        app.bind("path.log").toConstantValue(dirSync().name);
 
-    capcon.startCapture(process.stderr, (stderr) => (message = stderr.toString()));
+        logger = await app.resolve<Logger>(PinoLogger).make({
+            levels: {
+                console: process.env.CORE_LOG_LEVEL || "debug",
+                file: process.env.CORE_LOG_LEVEL_FILE || "debug",
+            },
+            fileRotator: {
+                interval: "1d",
+            },
+        });
+    });
 
-    // @ts-ignore
-    capcon.startCapture(console._stdout, (stdout) => (message = stdout.toString()));
+    afterEach(() => (message = undefined));
 
-    // @ts-ignore
-    capcon.startCapture(console._stderr, (stderr) => (message = stderr.toString()));
-});
-
-afterAll(() => setGracefulCleanup());
-
-describe("Logger", () => {
     it("should not be logged if empty", () => {
         logger.info(undefined);
 
-        expect(message).toBeUndefined();
+        assert.undefined(message);
     });
 
     it("should modify the message if it is not a string", () => {
         logger.info(["Hello World"]);
 
-        expect(message.trim()).toBeString();
+        assert.match(message.trim(), "[ 'Hello World' ]");
     });
 
     it("should log a message with the [emergency] level", () => {
         logger.emergency("emergency_message");
 
-        expect(message).toMatch(/emergency/);
-        expect(message).toMatch(/emergency_message/);
+
+        assert.match(message, /emergency/);
+        assert.match(message, /emergency_message/);
     });
 
     it("should log a message with the [alert] level", () => {
         logger.alert("alert_message");
 
-        expect(message).toMatch(/alert/);
-        expect(message).toMatch(/alert_message/);
+        assert.match(message, /alert/);
+        assert.match(message, /alert_message/);
     });
 
     it("should log a message with the [critical] level", () => {
         logger.critical("critical_message");
 
-        expect(message).toMatch(/critical/);
-        expect(message).toMatch(/critical_message/);
+        assert.match(message, /critical/);
+        assert.match(message, /critical_message/);
     });
 
     it("should log a message with the [error] level", () => {
         logger.error("error_message");
 
-        expect(message).toMatch(/error/);
-        expect(message).toMatch(/error_message/);
+        assert.match(message, /error/);
+        assert.match(message, /error_message/);
     });
 
     it("should log a message with the [warning] level", () => {
         logger.warning("warning_message");
 
-        expect(message).toMatch(/warning/);
-        expect(message).toMatch(/warning_message/);
+        assert.match(message, /warning/);
+        assert.match(message, /warning_message/);
     });
 
     it("should log a message with the [notice] level", () => {
         logger.notice("notice_message");
 
-        expect(message).toMatch(/notice/);
-        expect(message).toMatch(/notice_message/);
+        assert.match(message, /notice/);
+        assert.match(message, /notice_message/);
     });
 
     it("should log a message with the [info] level", () => {
         logger.info("info_message");
 
-        expect(message).toMatch(/info/);
-        expect(message).toMatch(/info_message/);
+        assert.match(message, /info/);
+        assert.match(message, /info_message/);
     });
 
     it("should log a message with the [debug] level", () => {
         logger.debug("debug_message");
 
-        expect(message).toMatch(/debug/);
-        expect(message).toMatch(/debug_message/);
+        assert.match(message, /debug/);
+        assert.match(message, /debug_message/);
     });
 
     it("should suppress console output", () => {
         logger.suppressConsoleOutput(true);
 
         logger.info("silent_message");
-        expect(message).toBeUndefined();
+        assert.undefined(message);
 
         logger.suppressConsoleOutput(false);
 
         logger.info("non_silent_message");
-        expect(message).toMatch(/non_silent_message/);
+        assert.match(message, /non_silent_message/);
     });
 
     it("should log error if there is an error on file stream", async () => {
@@ -156,9 +156,9 @@ describe("Logger", () => {
 
         await sleep(100);
 
-        expect(message).toMatch("File stream closed due to an error: Error: Test error");
+        assert.match(message, "File stream closed due to an error: Error: Test error");
 
-        await expect(logger.dispose()).toResolve();
+        await assert.resolves(() => logger.dispose());
     });
 
     it("should rotate the log 3 times", async () => {
@@ -187,14 +187,15 @@ describe("Logger", () => {
         }
 
         const files = readdirSync(app.logPath());
-        expect(files.filter((file) => file.endsWith(".log.gz"))).toHaveLength(3);
-        expect(files).toHaveLength(5);
+        assert.length(files.filter((file) => file.endsWith(".log.gz")), 3);
+        assert.length(files, 5);
     });
 
     describe("make", () => {
         it("should create a file stream if level is valid", () => {
+
             // @ts-ignore
-            expect(logger.combinedFileStream).toBeDefined();
+            assert.defined(logger.combinedFileStream);
         });
 
         it("should not create a file stream if level not is valid", async () => {
@@ -209,7 +210,7 @@ describe("Logger", () => {
             });
 
             // @ts-ignore
-            expect(logger.combinedFileStream).not.toBeDefined();
+            assert.undefined(logger.combinedFileStream);
         });
     });
 
@@ -217,11 +218,11 @@ describe("Logger", () => {
         it("should dispose before make", async () => {
             const logger = await app.resolve<PinoLogger>(PinoLogger);
 
-            await expect(logger.dispose()).toResolve();
+            await assert.resolves(() => logger.dispose());
         });
 
         it("should dispose after make", async () => {
-            await expect(logger.dispose()).toResolve();
+            await assert.resolves(() => logger.dispose());
         });
     });
 });
