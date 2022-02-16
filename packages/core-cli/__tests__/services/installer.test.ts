@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Console } from "@arkecosystem/core-test-framework";
+import { Console } from "@packages/core-test-framework";
 // import path from "path";
 import { Installer } from "@packages/core-cli/src/services";
 import { setGracefulCleanup } from "tmp";

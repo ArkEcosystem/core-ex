@@ -2,8 +2,8 @@ import "jest-extended";
 
 import { Git } from "@packages/core-cli/src/services/source-providers";
 import fs from "fs-extra";
-import { dirSync, setGracefulCleanup } from "tmp";
 import { join } from "path";
+import { dirSync, setGracefulCleanup } from "tmp";
 
 import execa from "../../../../../__mocks__/execa";
 
@@ -19,9 +19,9 @@ beforeEach(() => {
 
 afterEach(() => {
     jest.clearAllMocks();
-})
+});
 
-afterAll(() =>  setGracefulCleanup());
+afterAll(() => setGracefulCleanup());
 
 describe("Git", () => {
     describe("#exists", () => {
@@ -71,7 +71,9 @@ describe("Git", () => {
             // Assert
             expect(spyOnExeca).toHaveBeenCalledWith(`git`, ["reset", "--hard"], { cwd: join(dataPath, packageName) });
             expect(spyOnExeca).toHaveBeenCalledWith(`git`, ["pull"], { cwd: join(dataPath, packageName) });
-            expect(spyOnExeca).toHaveBeenCalledWith(`yarn`, ["install", "--production"], { cwd: join(dataPath, packageName) });
+            expect(spyOnExeca).toHaveBeenCalledWith(`yarn`, ["install", "--production"], {
+                cwd: join(dataPath, packageName),
+            });
         });
     });
 });
