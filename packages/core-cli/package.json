@@ -14,7 +14,7 @@
     "scripts": {
         "ark": "node ./bin/run",
         "build": "pnpm run clean && pnpm run compile",
-        "build:watch": "pnpm run clean && pnpm run compile -w",
+        "build:watch": "pnpm run clean && pnpm run compile -- -w",
         "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
         "clean": "rimraf dist",
         "compile": "node ../../node_modules/typescript/bin/tsc",
@@ -34,6 +34,7 @@
         "fast-levenshtein": "2.0.6",
         "fs-extra": "8.1.0",
         "glob": "7.1.7",
+        "got": "11.8.2",
         "inversify": "5.1.1",
         "joi": "17.4.2",
         "kleur": "4.0.0",
