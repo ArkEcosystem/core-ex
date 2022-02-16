@@ -367,6 +367,7 @@ importers:
 
   packages/core-kernel:
     specifiers:
+      '@arkecosystem/core-state': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@arkecosystem/utils': 1.3.1
       '@pm2/io': 4.3.5
@@ -395,6 +396,7 @@ importers:
       semver: 6.3.0
       type-fest: 0.21.3
     dependencies:
+      '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/crypto': link:../crypto
       '@arkecosystem/utils': 1.3.1
       '@pm2/io': 4.3.5
