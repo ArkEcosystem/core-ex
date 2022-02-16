@@ -68,7 +68,7 @@ export class Block implements IBlock {
         for (const err of result.errors) {
             let fatal = false;
 
-            const match = err.dataPath.match(/\.transactions\[([0-9]+)\]/);
+            const match = err.instancePath.match(/\.transactions\[([0-9]+)\]/);
             if (match === null) {
                 if (!isException(data)) {
                     fatal = true;
@@ -88,7 +88,7 @@ export class Block implements IBlock {
             if (fatal) {
                 throw new BlockSchemaError(
                     data.height,
-                    `Invalid data${err.dataPath ? " at " + err.dataPath : ""}: ` +
+                    `Invalid data${err.instancePath ? " at " + err.instancePath : ""}: ` +
                         `${err.message}: ${JSON.stringify(err.data)}`,
                 );
             }
