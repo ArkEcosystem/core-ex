@@ -21,7 +21,7 @@
         "prepublishOnly": "pnpm run build",
         "pretest": "bash ../../scripts/pre-test.sh",
         "test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
-        "test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
+        "test:integration": "cross-env CORE_ENV=test jest --forceExit __tests__/integration/handlers/blockchain.test.ts"
     },
     "dependencies": {
         "@arkecosystem/core-database": "workspace:*",
