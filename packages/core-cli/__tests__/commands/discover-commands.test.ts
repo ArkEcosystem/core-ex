@@ -34,7 +34,7 @@ describe("DiscoverCommands", () => {
             expect(commands).toBeEmpty();
         });
 
-        it("should discover commands within the given packages", () => {
+        it.skip("should discover commands within the given packages", () => {
             const commandPath: string = resolve(__dirname, "./dist");
 
             const commands = cmd.from([commandPath]);
