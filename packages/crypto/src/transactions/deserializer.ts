@@ -195,8 +195,9 @@ export class Deserializer {
             return true;
         }
 
-        // only possiblity left is a type 4 transaction with a signature.
-        if ((remaining - 64) % 65 === 0) {
+        // @TODO
+        // only possiblity left is a type 4 transaction with and without a `secondSignature`.
+        if ((remaining - 64) % 65 === 0 || (remaining - 128) % 65 === 0) {
             return true;
         }
 
