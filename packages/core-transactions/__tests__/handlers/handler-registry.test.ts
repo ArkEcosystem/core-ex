@@ -137,7 +137,6 @@ beforeEach(() => {
     app.bind(Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.IpfsTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.HtlcLockTransactionHandler);
@@ -228,13 +227,6 @@ describe("Registry", () => {
                 transactionHandlerRegistry.getRegisteredHandlerByType(
                     Transactions.InternalTransactionType.from(
                         Enums.TransactionType.MultiSignature,
-                        Enums.TransactionTypeGroup.Core,
-                    ),
-                    2,
-                ),
-                transactionHandlerRegistry.getRegisteredHandlerByType(
-                    Transactions.InternalTransactionType.from(
-                        Enums.TransactionType.Ipfs,
                         Enums.TransactionTypeGroup.Core,
                     ),
                     2,
