@@ -18,7 +18,7 @@ export const assert = {
         }
     },
     containValues: (value: object, key: string): void => assert.false(Object.values(value).includes(key)),
-    defined: (value: unknown): void => uvu.ok(value !== undefined),
+    defined: (value: unknown): void => uvu.ok(value !== undefined, "Expected value to be defined."),
     empty: (value: any): void => uvu.ok(!value || value.length === 0 || Object.keys(value).length === 0),
     equal: (a: any, b: any): void => {
         if (a instanceof BigNumber) {
@@ -43,7 +43,7 @@ export const assert = {
     matchesObject: (value: unknown, schema: ZodRawShape): void => uvu.not.throws(() => z.object(schema).parse(value)),
     not: {
         ...uvu.not,
-        defined: (value: unknown): void => uvu.ok(value === undefined),
+        defined: (value: unknown): void => uvu.ok(value === undefined, "Expected value not to be defined."),
         equal: (a: any, b: any): void => {
             if (a instanceof BigNumber) {
                 a = a.toString();
@@ -58,7 +58,7 @@ export const assert = {
         containKey: (value: object, key: string): void => assert.false(Object.keys(value).includes(key)),
         empty: (value: unknown[]): void => uvu.ok(Object.keys(value).length > 0),
         matchesObject: (value: unknown, schema: ZodRawShape): void => uvu.throws(() => z.object(schema).parse(value)),
-        undefined: (value: unknown): void => uvu.ok(value !== undefined),
+        undefined: (value: unknown): void => uvu.ok(value !== undefined, "Expected value not to be undefined."),
     },
     null: (value: unknown): void => uvu.ok(value === null),
     number: (value: unknown): void => uvu.type(value, "number"),
@@ -123,5 +123,5 @@ export const assert = {
     stringArray: (values: unknown[]): void => uvu.ok(values.every((value) => typeof value === "string")),
     true: (value: unknown): void => uvu.is(value, true),
     truthy: (value: unknown): void => uvu.ok(!!value),
-    undefined: (value: unknown): void => uvu.ok(value === undefined),
+    undefined: (value: unknown): void => uvu.ok(value === undefined, "Expected value to be undefined."),
 };
