@@ -7,7 +7,8 @@ import { configManager } from "../managers";
 import { BigNumber, isGenesisTransaction } from "../utils";
 
 const maxBytes = (ajv: Ajv) => {
-    ajv.addKeyword("maxBytes", {
+    ajv.addKeyword({
+        keyword: "maxBytes",
         type: "string",
         compile(schema, parentSchema) {
             return (data) => {
@@ -27,7 +28,8 @@ const maxBytes = (ajv: Ajv) => {
 };
 
 const transactionType = (ajv: Ajv) => {
-    ajv.addKeyword("transactionType", {
+    ajv.addKeyword({
+        keyword: "transactionType",
         // @ts-ignore
         compile(schema) {
             return (data, dataPath, parentObject: ITransactionData) => {
@@ -55,7 +57,8 @@ const transactionType = (ajv: Ajv) => {
 };
 
 const network = (ajv: Ajv) => {
-    ajv.addKeyword("network", {
+    ajv.addKeyword({
+        keyword: "network",
         compile(schema) {
             return (data) => {
                 return schema && data === configManager.get("network.pubKeyHash");
@@ -72,7 +75,8 @@ const bignumber = (ajv: Ajv) => {
     const instanceOf = ajvKeywords.get("instanceof").definition;
     instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
 
-    ajv.addKeyword("bignumber", {
+    ajv.addKeyword({
+        keyword: "bignumber",
         compile(schema) {
             return (data, dataPath, parentObject: any, property) => {
                 const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : 0;
@@ -131,7 +135,8 @@ const bignumber = (ajv: Ajv) => {
 };
 
 const blockId = (ajv: Ajv) => {
-    ajv.addKeyword("blockId", {
+    ajv.addKeyword({
+        keyword: "blockId",
         compile(schema) {
             return (data, dataPath, parentObject: any) => {
                 if (parentObject && parentObject.height === 1 && schema.allowNullWhenGenesis) {
