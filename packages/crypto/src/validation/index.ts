@@ -8,7 +8,7 @@ import { keywords } from "./keywords";
 import { schemas } from "./schemas";
 
 export class Validator {
-    private ajv: Ajv.Ajv;
+    private ajv: Ajv;
     private readonly transactionSchemas: Map<string, TransactionSchema> = new Map<string, TransactionSchema>();
 
     private constructor(options: Record<string, any>) {
@@ -19,7 +19,7 @@ export class Validator {
         return new Validator(options);
     }
 
-    public getInstance(): Ajv.Ajv {
+    public getInstance(): Ajv {
         return this.ajv;
     }
 
@@ -62,7 +62,7 @@ export class Validator {
     }
 
     private validateSchema<T = any>(
-        ajv: Ajv.Ajv,
+        ajv: Ajv,
         schemaKeyRef: string | boolean | object,
         data: T,
     ): ISchemaValidationResult<T> {
@@ -100,7 +100,7 @@ export class Validator {
         return ajv;
     }
 
-    private extendTransactionSchema(ajv: Ajv.Ajv, schema: TransactionSchema, remove?: boolean) {
+    private extendTransactionSchema(ajv: Ajv, schema: TransactionSchema, remove?: boolean) {
         if (ajv.getSchema(schema.$id)) {
             remove = true;
         }
@@ -122,7 +122,7 @@ export class Validator {
         this.updateTransactionArray(ajv);
     }
 
-    private updateTransactionArray(ajv: Ajv.Ajv) {
+    private updateTransactionArray(ajv: Ajv) {
         ajv.removeSchema("block");
         ajv.removeSchema("transactions");
         ajv.addSchema({
