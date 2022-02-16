@@ -80,7 +80,7 @@ describe("PeerVerifier", () => {
         peerVerifier.initialize(peer);
     });
 
-    describe("checkState", () => {
+    describe.skip("checkState", () => {
         describe("when claimed state block header does not match claimed state height", () => {
             it("should return undefined", async () => {
                 const claimedState: Contracts.P2P.PeerState = {
