@@ -23,9 +23,6 @@ describe.each([
     BuilderFactory.ipfs,
     BuilderFactory.multiPayment,
     BuilderFactory.delegateResignation,
-    BuilderFactory.htlcLock,
-    BuilderFactory.htlcClaim,
-    BuilderFactory.htlcRefund,
 ])("%s", (provider) => {
     describe("TransactionBuilder", () => {
         let identity;

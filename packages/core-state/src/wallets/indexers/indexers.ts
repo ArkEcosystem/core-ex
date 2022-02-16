@@ -24,16 +24,6 @@ export const resignationsIndexer = (index: Contracts.State.WalletIndex, wallet: 
     }
 };
 
-export const locksIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.Wallet) => {
-    if (wallet.hasAttribute("htlc.locks")) {
-        const locks: object = wallet.getAttribute("htlc.locks");
-
-        for (const lockId of Object.keys(locks)) {
-            index.set(lockId, wallet);
-        }
-    }
-};
-
 export const ipfsIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.Wallet) => {
     if (wallet.hasAttribute("ipfs.hashes")) {
         const hashes: object = wallet.getAttribute("ipfs.hashes");

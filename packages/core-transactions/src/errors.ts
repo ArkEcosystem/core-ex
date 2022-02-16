@@ -221,29 +221,3 @@ export class IpfsHashAlreadyExists extends TransactionError {
         super(`Failed to apply transaction, because this IPFS hash is already registered on the blockchain.`);
     }
 }
-
-export class HtlcLockTransactionNotFoundError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because the associated HTLC lock transaction could not be found.`);
-    }
-}
-
-export class HtlcSecretHashMismatchError extends TransactionError {
-    public constructor() {
-        super(
-            `Failed to apply transaction, because the secret provided does not match the associated HTLC lock transaction secret.`,
-        );
-    }
-}
-
-export class HtlcLockNotExpiredError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because the associated HTLC lock transaction did not expire yet.`);
-    }
-}
-
-export class HtlcLockExpiredError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because the associated HTLC lock transaction expired.`);
-    }
-}

@@ -325,9 +325,6 @@ describe("TransactionsController", () => {
                     ipfs: "500000000",
                     multiPayment: "10000000",
                     delegateResignation: "2500000000",
-                    htlcLock: "10000000",
-                    htlcClaim: "0",
-                    htlcRefund: "0",
                 }),
             );
         });
