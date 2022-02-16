@@ -3,11 +3,9 @@ import { ServiceProvider } from "./service-provider";
 import { defaults } from "./defaults";
 import { AnySchema } from "joi";
 import { dirSync } from "tmp";
-import { Identifiers, interfaces } from "@arkecosystem/core-kernel/dist/ioc";
-import { LogManager } from "@arkecosystem/core-kernel/dist/services/log";
 import { describe } from "@arkecosystem/core-test";
 
-describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
+describe("ServiceProvider", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, nock, loader }) => {
     let app: Application;
 
     let serviceProvider: ServiceProvider;
@@ -31,7 +29,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
         app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("token-network");
         app.bind("path.log").toConstantValue(dirSync().name);
 
-        await expect(serviceProvider.register()).toResolve();
+        await assert.resolves(() => serviceProvider.register());
     });
 
     it("should be disposable", async () => {
@@ -46,13 +44,13 @@ describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
         app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("token-network");
         app.bind("path.log").toConstantValue(dirSync().name);
 
-        app.bind(Identifiers.LogService).toDynamicValue((context: interfaces.Context) =>
-            context.container.get<LogManager>(Identifiers.LogManager).driver(),
+        app.bind(Container.Identifiers.LogService).toDynamicValue((context: Container.interfaces.Context) =>
+            context.container.get<Services.Log.LogManager>(Container.Identifiers.LogManager).driver(),
         );
 
-        await expect(serviceProvider.register()).toResolve();
+        await assert.resolves(() => serviceProvider.register());
 
-        await expect(serviceProvider.dispose()).toResolve();
+        await assert.resolves(() => serviceProvider.dispose());
     });
 
     describe("ServiceProvider.configSchema", () => {
@@ -69,21 +67,19 @@ describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
         });
 
         it("should validate schema using defaults", async () => {
-            jest.resetModules();
             const result = (serviceProvider.configSchema() as AnySchema).validate(
-                (await import("./defaults")).defaults,
+                defaults
             );
 
-            expect(result.error).toBeUndefined();
+            assert.undefined(result.error);
 
-            expect(result.value.levels.console).toBeString();
-            expect(result.value.levels.file).toBeString();
+            assert.string(result.value.levels.console);
+            assert.string(result.value.levels.file);
 
-            expect(result.value.fileRotator.interval).toBeString();
+            assert.string(result.value.fileRotator.interval);
         });
 
         it("should allow configuration extension", async () => {
-            jest.resetModules();
             const defaults = (await import("./defaults")).defaults;
 
             // @ts-ignore
@@ -91,21 +87,20 @@ describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
 
             const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-            expect(result.error).toBeUndefined();
-            expect(result.value.customField).toEqual("dummy");
+            assert.undefined(result.error);
+            assert.equal(result.value.customField, "dummy");
         });
 
         describe("process.env.CORE_LOG_LEVEL", () => {
             it("should return value of process.env.CORE_LOG_LEVEL if defined", async () => {
                 process.env.CORE_LOG_LEVEL = "dummy";
 
-                jest.resetModules();
                 const result = (serviceProvider.configSchema() as AnySchema).validate(
                     (await import("./defaults")).defaults,
                 );
 
-                expect(result.error).toBeUndefined();
-                expect(result.value.levels.console).toEqual("dummy");
+                assert.undefined(result.error);
+                assert.equal(result.value.levels.console, "dummy");
             });
         });
 
@@ -113,13 +108,12 @@ describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
             it("should return value of process.env.CORE_LOG_LEVEL_FILE if defined", async () => {
                 process.env.CORE_LOG_LEVEL_FILE = "dummy";
 
-                jest.resetModules();
                 const result = (serviceProvider.configSchema() as AnySchema).validate(
                     (await import("./defaults")).defaults,
                 );
 
-                expect(result.error).toBeUndefined();
-                expect(result.value.levels.file).toEqual("dummy");
+                assert.undefined(result.error);
+                assert.equal(result.value.levels.file, "dummy");
             });
         });
 
@@ -127,7 +121,6 @@ describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
             let defaults;
 
             beforeEach(async () => {
-                jest.resetModules();
                 defaults = (await import("./defaults")).defaults;
             });
 
@@ -135,60 +128,61 @@ describe("ServiceProvider", ({ assert, beforeEach, it, nock, loader }) => {
                 defaults.levels = false;
                 let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"levels" must be of type object');
+
+                assert.equal(result.error!.message, '"levels" must be of type object');
 
                 delete defaults.levels;
                 result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"levels" is required');
+                assert.equal(result.error!.message, '"levels" is required');
             });
 
             it("levels.console is required && is string", async () => {
                 defaults.levels.console = false;
                 let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"levels.console" must be a string');
+                assert.equal(result.error!.message, '"levels.console" must be a string');
 
                 delete defaults.levels.console;
                 result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"levels.console" is required');
+                assert.equal(result.error!.message, '"levels.console" is required');
             });
 
             it("levels.file is required && is string", async () => {
                 defaults.levels.file = false;
                 let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"levels.file" must be a string');
+                assert.equal(result.error!.message, '"levels.file" must be a string');
 
                 delete defaults.levels.file;
                 result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"levels.file" is required');
+                assert.equal(result.error!.message, '"levels.file" is required');
             });
 
             it("fileRotator is required && is object", async () => {
                 defaults.fileRotator = false;
                 let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"fileRotator" must be of type object');
+                assert.equal(result.error!.message, '"fileRotator" must be of type object');
 
                 delete defaults.fileRotator;
                 result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"fileRotator" is required');
+                assert.equal(result.error!.message, '"fileRotator" is required');
             });
 
             it("fileRotator.interval is required && is string", async () => {
                 defaults.fileRotator.interval = false;
                 let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"fileRotator.interval" must be a string');
+                assert.equal(result.error!.message, '"fileRotator.interval" must be a string');
 
                 delete defaults.fileRotator.interval;
                 result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-                expect(result.error!.message).toEqual('"fileRotator.interval" is required');
+                assert.equal(result.error!.message, '"fileRotator.interval" is required');
             });
         });
     });
