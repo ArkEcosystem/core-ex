@@ -1,7 +1,7 @@
-import { Application, Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Managers, Utils } from "@arkecosystem/crypto";
+import { Application, Container, Contracts, Utils as AppUtils } from "@packages/core-kernel";
+import { Managers, Utils } from "@packages/crypto";
 import { ServiceProvider } from "@packages/core-api/src";
-import { Sandbox } from "@packages/core-test-framework/src";
+import { Sandbox } from "@packages/core-test-framework/src"; // TODO (josip): can we omit this (and all other occurrences) reference to /src?
 import { EventEmitter } from "events";
 import { resolve } from "path";
 
