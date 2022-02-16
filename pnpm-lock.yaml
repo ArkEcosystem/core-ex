@@ -34,6 +34,7 @@ importers:
       eslint-plugin-jest: 24.4.0
       eslint-plugin-prettier: 3.4.1
       eslint-plugin-simple-import-sort: 5.0.3
+      fs-extra: 10.0.0
       get-port: 5.1.1
       hash-wasm: ^4.9.0
       husky: 4.3.8
@@ -90,6 +91,7 @@ importers:
       eslint-plugin-jest: 24.4.0_6f60aa4d7425caf7bba79ab69ef5bc63
       eslint-plugin-prettier: 3.4.1_18e66910a58232de989ec14832900b60
       eslint-plugin-simple-import-sort: 5.0.3_eslint@7.32.0
+      fs-extra: 10.0.0
       get-port: 5.1.1
       husky: 4.3.8
       jest: 26.6.3
@@ -137,6 +139,7 @@ importers:
       argon2: 0.28.2
       bip39: 3.0.4
       boxen: 4.2.0
+      cross-env: 7.0.3
       dayjs: 1.10.7
       env-paths: 2.2.1
       envfile: 5.2.0
@@ -169,6 +172,7 @@ importers:
       argon2: 0.28.2
       bip39: 3.0.4
       boxen: 4.2.0
+      cross-env: 7.0.3
       dayjs: 1.10.7
       env-paths: 2.2.1
       envfile: 5.2.0
@@ -5550,7 +5554,6 @@ packages:
     hasBin: true
     dependencies:
       cross-spawn: 7.0.3
-    dev: true
 
   /cross-spawn/6.0.5:
     resolution: {integrity: sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ==}
@@ -7001,6 +7004,15 @@ packages:
 
   /fs-constants/1.0.0:
     resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
+
+  /fs-extra/10.0.0:
+    resolution: {integrity: sha512-C5owb14u9eJwizKGdchcDUQeFtlSHHthBk8pbX9Vc1PFZrLombudjDnNns88aYslCyF6IY5SUw3Roz6xShcEIQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      graceful-fs: 4.2.9
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: true
 
   /fs-extra/6.0.1:
     resolution: {integrity: sha512-GnyIkKhhzXZUWFCaJzvyDLEEgDkPfb4/TPvJCJVuS8MWZgoSsErf++QpiAlDnKFcqhRlm+tIOcencCjyJE6ZCA==}
