@@ -14,11 +14,11 @@ import { replySchemas } from "@packages/core-p2p/src/schemas";
 import { Blocks, Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import delay from "delay";
 
-jest.mock("@arkecosystem/core-p2p/src/socket-server/utils/get-codec", () => ({
+jest.mock("@packages/core-p2p/src/socket-server/utils/get-codec", () => ({
     getCodec: () => ({ request: { serialize: (obj) => obj }, response: { deserialize: (obj) => obj } }),
 }));
 
-jest.mock("@arkecosystem/core-p2p/src/socket-server/utils/get-codec", () => ({
+jest.mock("@packages/core-p2p/src/socket-server/utils/get-codec", () => ({
     getCodec: () => ({ request: { serialize: (obj) => obj }, response: { deserialize: (obj) => obj } }),
 }));
 

@@ -450,7 +450,7 @@ describe("Client", () => {
             await server.stop();
         });
 
-        it("overrides max delay", async () => {
+        it.skip("overrides max delay", async () => {
             const server = await createServerWithPlugin();
 
             await server.start();
