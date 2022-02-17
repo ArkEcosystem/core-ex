@@ -5,10 +5,10 @@
     "license": "MIT",
     "contributors": [],
     "files": [
-        "dist"
+        "distribution"
     ],
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "distribution/index.js",
+    "types": "distribution/index.d.ts",
     "scripts": {
         "build": "pnpm run clean && tsc",
         "build:watch": "pnpm run clean && tsc -w",
