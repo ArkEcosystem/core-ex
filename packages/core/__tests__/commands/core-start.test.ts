@@ -30,8 +30,8 @@ describe("StartCommand", () => {
 
 		expect(spyStart).toHaveBeenCalledWith(
 			{
-				   "args": "core:run --network='testnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
-								env: {
+				args: "core:run --network='testnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
+				env: {
 					CORE_ENV: "production",
 					NODE_ENV: "production",
 				},
