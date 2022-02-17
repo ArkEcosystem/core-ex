@@ -6,7 +6,6 @@ import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { ServiceProvider } from "../service-provider";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { TransactionSchema } from "@arkecosystem/crypto/distribution/transactions/types/schemas";
 import ByteBuffer from "bytebuffer";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
@@ -28,7 +27,7 @@ abstract class TestTransaction extends Transactions.Transaction {
 		return undefined;
 	}
 
-	public static getSchema(): TransactionSchema {
+	public static getSchema(): Transactions.schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
 			$id: "test",
 		});
@@ -46,7 +45,7 @@ abstract class TestWithDependencyTransaction extends Transactions.Transaction {
 		return undefined;
 	}
 
-	public static getSchema(): TransactionSchema {
+	public static getSchema(): Transactions.schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
 			$id: "test_with_dependency",
 		});
@@ -257,9 +256,7 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 	it("should register a custom type with missing dependency", async (context) => {
 		context.app.bind(Container.Identifiers.TransactionHandler).to(TestWithDependencyTransactionHandler);
 
-		expect(() => {
-			context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
-		}).toThrowError();
+		assert.throws(() => context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry));
 	});
 
 	it("should be able to return handler by data", async (context) => {
@@ -284,18 +281,16 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			},
 		};
 
-		expect(await transactionHandlerRegistry.getActivatedHandlerForData(data)).toBeInstanceOf(
-			TestTransactionHandler,
-		);
+		assert.instance(await transactionHandlerRegistry.getActivatedHandlerForData(data), TestTransactionHandler);
 	});
 
 	it("should throw when registering the same key twice", async (context) => {
 		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
 		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
 
-		expect(() => {
+		assert.throws(() => {
 			context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
-		}).toThrow();
+		});
 	});
 
 	it("should return all registered core handlers", async (context) => {
@@ -303,7 +298,7 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
-		expect(transactionHandlerRegistry.getRegisteredHandlers().length).toBe(NUMBER_OF_REGISTERED_CORE_HANDLERS);
+		assert.length(transactionHandlerRegistry.getRegisteredHandlers(), NUMBER_OF_REGISTERED_CORE_HANDLERS);
 	});
 
 	it("should return all registered core and custom handlers", async (context) => {
@@ -312,7 +307,7 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
-		expect(transactionHandlerRegistry.getRegisteredHandlers().length).toBe(NUMBER_OF_REGISTERED_CORE_HANDLERS + 1);
+		assert.length(transactionHandlerRegistry.getRegisteredHandlers(), NUMBER_OF_REGISTERED_CORE_HANDLERS + 1);
 	});
 
 	it("should return all active core handlers", async (context) => {
@@ -320,12 +315,12 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
-		expect((await transactionHandlerRegistry.getActivatedHandlers()).length).toBe(
+		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE,
 		);
 
 		Managers.configManager.getMilestone().aip11 = true;
-		expect((await transactionHandlerRegistry.getActivatedHandlers()).length).toBe(
+		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE,
 		);
 	});
@@ -336,12 +331,12 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
-		expect((await transactionHandlerRegistry.getActivatedHandlers()).length).toBe(
+		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE + 1,
 		);
 
 		Managers.configManager.getMilestone().aip11 = true;
-		expect((await transactionHandlerRegistry.getActivatedHandlers()).length).toBe(
+		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE + 1,
 		);
 	});
@@ -356,8 +351,8 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			TEST_TRANSACTION_TYPE,
 			Enums.TransactionTypeGroup.Test,
 		);
-		expect(transactionHandlerRegistry.getRegisteredHandlerByType(internalTransactionType)).toBeInstanceOf(
-			TestTransactionHandler,
+		assert.instance(transactionHandlerRegistry.getRegisteredHandlerByType(internalTransactionType),
+			TestTransactionHandler
 		);
 
 		const invalidInternalTransactionType = Transactions.InternalTransactionType.from(
