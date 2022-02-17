@@ -25,7 +25,7 @@ export class AddressFactory implements Contract {
             bech32.decode(address);
 
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }

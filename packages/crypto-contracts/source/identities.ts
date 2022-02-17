@@ -14,6 +14,8 @@ export interface AddressFactory {
 
     // fromMultiSignatureAsset(asset: IMultiSignatureAsset): string;
 
+    // fromPrivateKey(privateKey: IKeyPair): string;
+
     validate(address: string): boolean;
 }
 

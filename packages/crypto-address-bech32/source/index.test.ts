@@ -55,4 +55,16 @@ describe("AddressFactory", ({ assert, it }) => {
             "mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
         );
     });
+
+    it("should validate bech32 addresses", () => {
+        const factory = new AddressFactory(
+            {
+                prefix: "mod",
+            },
+            new Secp25k61(),
+        );
+
+        assert.true(factory.validate("mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
+        assert.false(factory.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"));
+    });
 });
