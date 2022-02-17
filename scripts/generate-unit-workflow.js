@@ -35,7 +35,7 @@ for (const directory of directories) {
 			},
 		},
 		concurrency: {
-			group: `\${{ github.head_ref }}-test-${directory}`,
+			group: `\${{ github.head_ref }}-unit-${directory}`,
 			"cancel-in-progress": true,
 		},
 		steps: [
