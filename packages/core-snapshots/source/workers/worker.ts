@@ -5,11 +5,11 @@ import { Readable } from "stream";
 import { Connection, createConnection, getCustomRepository } from "typeorm";
 import { parentPort, workerData } from "worker_threads";
 
-import { JSONCodec,MessagePackCodec , StreamReader, StreamWriter } from "../codecs";
+import { JSONCodec, MessagePackCodec, StreamReader, StreamWriter } from "../codecs";
 import { Repository, Worker } from "../contracts";
 import { Identifiers } from "../ioc";
-import { BlockRepository, RoundRepository,TransactionRepository } from "../repositories";
-import { DumpWorkerAction, RestoreWorkerAction, TestWorkerAction,VerifyWorkerAction } from "./actions";
+import { BlockRepository, RoundRepository, TransactionRepository } from "../repositories";
+import { DumpWorkerAction, RestoreWorkerAction, TestWorkerAction, VerifyWorkerAction } from "./actions";
 import { Application } from "./application";
 
 let app: Application;
@@ -17,7 +17,8 @@ let action: Worker.WorkerAction;
 const _workerData: Worker.WorkerData = workerData;
 
 /* istanbul ignore next */
-const connect = async (options: any): Promise<Connection> => createConnection({
+const connect = async (options: any): Promise<Connection> =>
+	createConnection({
 		...options.connection,
 		entities: [Models.Block, Models.Transaction, Models.Round],
 		namingStrategy: new Utils.SnakeNamingStrategy(),

@@ -79,12 +79,10 @@ export class Validator {
 
 	private instantiateAjv(options: Record<string, any>) {
 		const ajv = new Ajv({
-			
-				$data: true,
-				extendRefs: true,
-				removeAdditional: true,
-				schemas
-			,
+			$data: true,
+			extendRefs: true,
+			removeAdditional: true,
+			schemas,
 			...options,
 		});
 		ajvKeywords(ajv);

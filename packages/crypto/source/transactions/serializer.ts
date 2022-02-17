@@ -1,9 +1,9 @@
 import { TransactionType, TransactionTypeGroup } from "../enums";
 import { TransactionVersionError } from "../errors";
 import { Address } from "../identities";
-import { ISerializeOptions , ITransaction, ITransactionData } from "../interfaces";
+import { ISerializeOptions, ITransaction, ITransactionData } from "../interfaces";
 import { configManager } from "../managers/config";
-import { ByteBuffer, isException , isSupportedTransactionVersion } from "../utils";
+import { ByteBuffer, isException, isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";
 
 // Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md

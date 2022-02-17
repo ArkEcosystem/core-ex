@@ -144,7 +144,6 @@ export class Socket {
 
 		let error;
 		for (const message of messages) {
-
 			const team = new Teamwork.Team();
 			this._ws.send(message, (err) => team.attend(err));
 			try {

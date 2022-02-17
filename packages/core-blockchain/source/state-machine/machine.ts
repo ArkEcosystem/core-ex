@@ -54,12 +54,11 @@ export const blockchainMachine: any = Machine({
 		 * a result of critical errors. In those cases, using the `exit` state would
 		 * be a better option
 		 */
-stopped: {
+		stopped: {
 			onEntry: ["stopped"],
 		},
-		
-		
-syncWithNetwork: {
+
+		syncWithNetwork: {
 			initial: "syncing",
 			on: {
 				SYNCFINISHED: "idle",
@@ -114,8 +113,8 @@ syncWithNetwork: {
 				},
 			},
 		},
-		
-uninitialised: {
+
+		uninitialised: {
 			on: {
 				START: "init",
 				STOP: "stopped",

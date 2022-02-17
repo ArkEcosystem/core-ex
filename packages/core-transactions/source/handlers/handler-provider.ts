@@ -65,7 +65,9 @@ export class TransactionHandlerProvider {
 		version: number,
 	) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {
-			if (otherHandlerConstructor === handlerConstructor) {continue;}
+			if (otherHandlerConstructor === handlerConstructor) {
+				continue;
+			}
 
 			const otherHandler = new otherHandlerConstructor();
 			const otherTransactionConstructor = otherHandler.getConstructor();
@@ -90,6 +92,9 @@ export class TransactionHandlerProvider {
 		handlerConstructor: TransactionHandlerConstructor,
 		dependency: TransactionHandlerConstructor,
 	) {
-		return this.handlerConstructors.some((otherHandlerConstructor) => otherHandlerConstructor !== handlerConstructor && otherHandlerConstructor === dependency);
+		return this.handlerConstructors.some(
+			(otherHandlerConstructor) =>
+				otherHandlerConstructor !== handlerConstructor && otherHandlerConstructor === dependency,
+		);
 	}
 }

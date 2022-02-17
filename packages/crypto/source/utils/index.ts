@@ -3,7 +3,6 @@ import { ITransactionData } from "../interfaces";
 import { configManager } from "../managers";
 import { BigNumber } from "./bignum";
 
-
 let genesisTransactions: { [key: string]: boolean };
 let whitelistedBlockAndTransactionIds: { [key: string]: boolean };
 let currentNetwork: number;
@@ -27,10 +26,12 @@ export const isIdException = (id: number | string | undefined): boolean => {
 	if (!whitelistedBlockAndTransactionIds || currentNetwork !== network) {
 		currentNetwork = network;
 
-		whitelistedBlockAndTransactionIds = Object.fromEntries([
-			...(configManager.get("exceptions.blocks") || []),
-			...(configManager.get("exceptions.transactions") || []),
-		].map(( curr) => [curr, true]));
+		whitelistedBlockAndTransactionIds = Object.fromEntries(
+			[
+				...(configManager.get("exceptions.blocks") || []),
+				...(configManager.get("exceptions.transactions") || []),
+			].map((curr) => [curr, true]),
+		);
 	}
 
 	return !!whitelistedBlockAndTransactionIds[id];
@@ -69,9 +70,9 @@ export const isGenesisTransaction = (id: string): boolean => {
 	if (!genesisTransactions || currentNetwork !== network) {
 		currentNetwork = network;
 
-		genesisTransactions = Object.fromEntries(configManager
-			.get("genesisBlock.transactions")
-			.map(( curr) => [curr.id, true]));
+		genesisTransactions = Object.fromEntries(
+			configManager.get("genesisBlock.transactions").map((curr) => [curr.id, true]),
+		);
 	}
 
 	return genesisTransactions[id];
@@ -99,10 +100,8 @@ export const isSupportedTransactionVersion = (version: number): boolean => {
 	return true;
 };
 
-
-
-export {Base58} from "./base58";
-export {BigNumber} from "./bignum";
-export {calculateBlockTime, isNewBlockTime} from "./block-time-calculator";
-export {ByteBuffer} from "./byte-buffer";
-export {isLocalHost, isValidPeer} from "./is-valid-peer";
+export { Base58 } from "./base58";
+export { BigNumber } from "./bignum";
+export { calculateBlockTime, isNewBlockTime } from "./block-time-calculator";
+export { ByteBuffer } from "./byte-buffer";
+export { isLocalHost, isValidPeer } from "./is-valid-peer";

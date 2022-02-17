@@ -271,13 +271,15 @@ export class TransactionFactory {
 				}
 			}
 
-			if (this.builder.constructor.name === "DelegateRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
+			if (
+				this.builder.constructor.name === "DelegateRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
 				// always remember the previous username instead generating a new one on each iteration
-				!this.builder.data.asset.delegate.username) {
-					this.builder = Transactions.BuilderFactory.delegateRegistration().usernameAsset(
-						this.getRandomUsername(),
-					);
-				}
+				!this.builder.data.asset.delegate.username
+			) {
+				this.builder = Transactions.BuilderFactory.delegateRegistration().usernameAsset(
+					this.getRandomUsername(),
+				);
+			}
 
 			if (this.version) {
 				this.builder.version(this.version);

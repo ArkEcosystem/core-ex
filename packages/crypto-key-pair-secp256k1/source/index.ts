@@ -1,5 +1,5 @@
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/crypto-contracts";
-import { secp256k1 , SHA256 } from "bcrypto";
+import { secp256k1, SHA256 } from "bcrypto";
 
 export class KeyPairFactory implements Contract {
 	public fromMnemonic(mnemonic: string, compressed = true): IKeyPair {

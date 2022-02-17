@@ -169,8 +169,8 @@ export class Block implements IBlock {
 			const constants = configManager.getMilestone(block.height);
 
 			if (block.height !== 1 && !block.previousBlock) {
-					result.errors.push("Invalid previous block");
-				}
+				result.errors.push("Invalid previous block");
+			}
 
 			if (!block.reward.isEqualTo(constants.reward)) {
 				result.errors.push(["Invalid block reward:", block.reward, "expected:", constants.reward].join(" "));
@@ -211,8 +211,8 @@ export class Block implements IBlock {
 			}
 
 			if (this.transactions.length > constants.block.maxTransactions && block.height > 1) {
-					result.errors.push("Transactions length is too high");
-				}
+				result.errors.push("Transactions length is too high");
+			}
 
 			// Checking if transactions of the block adds up to block values.
 			const appliedTransactions: Record<string, ITransactionData> = {};

@@ -19,9 +19,7 @@ export const roundCalculator = { calculateRound, isNewRound };
 export const supplyCalculator = { calculate };
 export const forgingInfoCalculator = { calculateForgingInfo, getBlockTimeLookup };
 
-
-
-export {formatTimestamp} from "./format-timestamp";
-export {isBlacklisted} from "./is-blacklisted";
-export {getBlockNotChainedErrorMessage, isBlockChained} from "./is-block-chained";
-export {isWhitelisted} from "./is-whitelisted";
+export { formatTimestamp } from "./format-timestamp";
+export { isBlacklisted } from "./is-blacklisted";
+export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained";
+export { isWhitelisted } from "./is-whitelisted";

@@ -168,10 +168,8 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	private createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
 		const pinoPretty = PinoPretty({
-			
-				levelFirst: false,
-				translateTime: "yyyy-mm-dd HH:MM:ss.l"
-			,
+			levelFirst: false,
+			translateTime: "yyyy-mm-dd HH:MM:ss.l",
 			...prettyOptions,
 		});
 

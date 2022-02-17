@@ -2,8 +2,6 @@ import { Identities } from "@arkecosystem/crypto";
 
 import passphrases from "./passphrases.json";
 
-
-
 export const addresses: string[] = passphrases.map((passphrase: string) =>
 	Identities.Address.fromPassphrase(passphrase),
 );
@@ -32,4 +30,4 @@ export const delegates: {
 	wif: Identities.WIF.fromPassphrase(passphrase),
 }));
 
-export {default as passphrases} from "./passphrases.json";
+export { default as passphrases } from "./passphrases.json";

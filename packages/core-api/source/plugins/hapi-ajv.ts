@@ -8,7 +8,8 @@ const name = "hapi-ajv";
 export const hapiAjv = {
 	name,
 	register: async (server: Hapi.Server, options: any): Promise<void> => {
-		const createErrorResponse = (request, h, errors) => Boom.badData(errors.map((error) => error.message).join(","));
+		const createErrorResponse = (request, h, errors) =>
+			Boom.badData(errors.map((error) => error.message).join(","));
 
 		server.ext({
 			method: (request, h) => {

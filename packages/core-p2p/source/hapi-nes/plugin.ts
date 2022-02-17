@@ -22,26 +22,23 @@ const internals: any = {
 
 internals.schema = Joi.object({
 	// async function (socket, message) { return data; }    // Or throw errors
-headers: Joi.array().items(Joi.string().lowercase()).min(1).allow("*", null), 
-	
-heartbeat: Joi.object({
+	headers: Joi.array().items(Joi.string().lowercase()).min(1).allow("*", null),
+
+	heartbeat: Joi.object({
 		interval: Joi.number().integer().min(1).required(),
 		timeout: Joi.number().integer().min(1).less(Joi.ref("interval")).required(),
-	}).allow(false), 
-	
+	}).allow(false),
 
-maxConnections: Joi.number().integer().min(1).allow(false), 
-	
+	maxConnections: Joi.number().integer().min(1).allow(false),
 
-maxPayload: Joi.number().integer().min(1),
-	
+	maxPayload: Joi.number().integer().min(1),
 
-onConnection: Joi.function(),
-	
-// async function (socket) {}
-onDisconnection: Joi.function(),
+	onConnection: Joi.function(),
+
+	// async function (socket) {}
+	onDisconnection: Joi.function(),
 	// function (socket) {}
-onMessage: Joi.function(),
+	onMessage: Joi.function(),
 	origin: Joi.array().items(Joi.string()).single().min(1),
 	payload: {
 		maxChunkChars: Joi.number().integer().min(1).allow(false),

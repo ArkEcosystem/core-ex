@@ -6,66 +6,52 @@ export const Identifiers = {
 	ConsolePaths: Symbol.for("Paths<Console>"),
 	Environment: Symbol.for("Environment"),
 	// Factories
-ActionFactory: Symbol.for("Factory<Action>"),
-	
+	ActionFactory: Symbol.for("Factory<Action>"),
 
-Input: Symbol.for("Input"),
-	
+	Input: Symbol.for("Input"),
 
+	ComponentFactory: Symbol.for("Factory<Component>"),
 
-ComponentFactory: Symbol.for("Factory<Component>"),
-	
+	// Input
+	InputValidator: Symbol.for("Input<Validator>"),
 
-// Input
-InputValidator: Symbol.for("Input<Validator>"),
-	
+	// Actions
+	AbortMissingProcess: Symbol.for("Action<AbortMissingProcess>"),
 
-// Actions
-AbortMissingProcess: Symbol.for("Action<AbortMissingProcess>"),
-	
+	Installer: Symbol.for("Installer"),
 
+	AbortErroredProcess: Symbol.for("Action<AbortErroredProcess>"),
 
-Installer: Symbol.for("Installer"),
-	
+	Logger: Symbol.for("Logger"),
 
+	AbortRunningProcess: Symbol.for("Action<AbortRunningProcess>"),
 
-AbortErroredProcess: Symbol.for("Action<AbortErroredProcess>"),
-	
+	Output: Symbol.for("Output"),
 
+	AbortStoppedProcess: Symbol.for("Action<AbortStoppedProcess>"),
 
-Logger: Symbol.for("Logger"),
-	
-	
+	Package: Symbol.for("Package"),
 
-AbortRunningProcess: Symbol.for("Action<AbortRunningProcess>"),
-	
-	
-Output: Symbol.for("Output"),
-	
-AbortStoppedProcess: Symbol.for("Action<AbortStoppedProcess>"),
-	
-Package: Symbol.for("Package"),
-	
-AbortUnknownProcess: Symbol.for("Action<AbortUnknownProcess>"),
-	
+	AbortUnknownProcess: Symbol.for("Action<AbortUnknownProcess>"),
+
 	PluginManager: Symbol.for("PluginManager"),
 	// Components
-AppHeader: Symbol.for("Component<AppHeader>"),
-	
-ProcessManager: Symbol.for("ProcessManager"),
-	
-Ask: Symbol.for("Component<Ask>"),
-	
-Updater: Symbol.for("Updater"),
-	
-AskDate: Symbol.for("Component<AskDate>"),
-	
-AskHidden: Symbol.for("Component<AskHidden>"),
-	
-InputFactory: Symbol.for("Factory<Input>"),
-	
-AskNumber: Symbol.for("Component<AskNumber>"),
-	
+	AppHeader: Symbol.for("Component<AppHeader>"),
+
+	ProcessManager: Symbol.for("ProcessManager"),
+
+	Ask: Symbol.for("Component<Ask>"),
+
+	Updater: Symbol.for("Updater"),
+
+	AskDate: Symbol.for("Component<AskDate>"),
+
+	AskHidden: Symbol.for("Component<AskHidden>"),
+
+	InputFactory: Symbol.for("Factory<Input>"),
+
+	AskNumber: Symbol.for("Component<AskNumber>"),
+
 	ProcessFactory: Symbol.for("Factory<Process>"),
 	AskPassword: Symbol.for("Component<AskPassword>"),
 	DaemonizeProcess: Symbol.for("Action<DaemonizeProcess>"),

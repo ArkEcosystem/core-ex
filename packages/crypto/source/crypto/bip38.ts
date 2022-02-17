@@ -17,14 +17,15 @@ import { Base58 } from "../utils/base58";
 import { HashAlgorithms } from ".";
 
 const SCRYPT_PARAMS = {
-	N: 16_384, 
+	N: 16_384,
 	p: 8,
 	// specified by BIP38
-r: 8,
+	r: 8,
 };
 const NULL = Buffer.alloc(0);
 
-const getPublicKey = (buff: Buffer, compressed: boolean): Buffer => Buffer.from(Keys.fromPrivateKey(buff, compressed).publicKey, "hex");
+const getPublicKey = (buff: Buffer, compressed: boolean): Buffer =>
+	Buffer.from(Keys.fromPrivateKey(buff, compressed).publicKey, "hex");
 
 const getAddressPrivate = (privateKey: Buffer, compressed: boolean): string => {
 	const publicKey = getPublicKey(privateKey, compressed);
@@ -227,6 +228,7 @@ const decryptRaw = (buff: Buffer, passphrase: string): IDecryptResult => {
 	};
 };
 
-export const encrypt = (privateKey: Buffer, compressed: boolean, passphrase: string): string => Base58.encodeCheck(encryptRaw(privateKey, compressed, passphrase));
+export const encrypt = (privateKey: Buffer, compressed: boolean, passphrase: string): string =>
+	Base58.encodeCheck(encryptRaw(privateKey, compressed, passphrase));
 
 export const decrypt = (bip38: string, passphrase): IDecryptResult => decryptRaw(Base58.decodeCheck(bip38), passphrase);

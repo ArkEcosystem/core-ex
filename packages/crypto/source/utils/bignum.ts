@@ -1,5 +1,1 @@
-
-
-
-
-export {BigNumber} from "@arkecosystem/utils";
+export { BigNumber } from "@arkecosystem/utils";

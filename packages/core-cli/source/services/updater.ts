@@ -5,7 +5,7 @@ import { PackageJson } from "type-fest";
 
 import { Application } from "../application";
 import { Confirm, Spinner, Warning } from "../components";
-import { Config , Updater as Contracts_Updater } from "../contracts";
+import { Config, Updater as Contracts_Updater } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 import { Installer } from "./installer";
 import { ProcessManager } from "./process-manager";

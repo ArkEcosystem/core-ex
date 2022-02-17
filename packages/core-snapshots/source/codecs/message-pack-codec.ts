@@ -68,37 +68,33 @@ export class MessagePackCodec implements Codec {
 				amount: transaction.data.amount,
 				blockHeight: blockHeight,
 				blockId: blockId,
-				
-fee: transaction.data.fee,
-				
 
-id: id,
-				
+				fee: transaction.data.fee,
 
-nonce: Utils.BigNumber.make(transaction.data.nonce || 0),
-				
+				id: id,
 
-// @ts-ignore
-asset: transaction.data.asset,
-				
-				
-// @ts-ignore
-recipientId: transaction.data.recipientId,
-				
-senderPublicKey: transaction.data.senderPublicKey,
-				
-sequence: sequence,
-				
-serialized: serialized,
-				
-version: transaction.data.version!,
-				
-timestamp: timestamp,
-				
-type: transaction.data.type,
-				
-typeGroup: transaction.data.typeGroup || 1,
-				
+				nonce: Utils.BigNumber.make(transaction.data.nonce || 0),
+
+				// @ts-ignore
+				asset: transaction.data.asset,
+
+				// @ts-ignore
+				recipientId: transaction.data.recipientId,
+
+				senderPublicKey: transaction.data.senderPublicKey,
+
+				sequence: sequence,
+
+				serialized: serialized,
+
+				version: transaction.data.version!,
+
+				timestamp: timestamp,
+
+				type: transaction.data.type,
+
+				typeGroup: transaction.data.typeGroup || 1,
+
 				vendorField: transaction.data.vendorField,
 			};
 		} catch (error) {

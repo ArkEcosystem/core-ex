@@ -129,7 +129,11 @@ export class StreamReader {
 				reject(new StreamExceptions.EndOfFile(this.path));
 			};
 
-			eventListenerPairs.push({ event: "readable", listener: onReadable }, { event: "error", listener: onError }, { event: "end", listener: onEnd });
+			eventListenerPairs.push(
+				{ event: "readable", listener: onReadable },
+				{ event: "error", listener: onError },
+				{ event: "end", listener: onEnd },
+			);
 
 			this.stream.once("readable", onReadable);
 

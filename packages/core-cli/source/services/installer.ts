@@ -1,5 +1,5 @@
 import { sync } from "execa";
-import { rcompare,satisfies } from "semver";
+import { rcompare, satisfies } from "semver";
 
 import { injectable } from "../ioc";
 

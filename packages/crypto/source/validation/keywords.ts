@@ -35,11 +35,13 @@ const transactionType = (ajv: Ajv) => {
 				if (
 					data === TransactionType.MultiPayment &&
 					parentObject &&
-					(!parentObject.typeGroup || parentObject.typeGroup === 1)
-				 && parentObject.asset && parentObject.asset.payments) {
-						const limit: number = configManager.getMilestone().multiPaymentLimit || 256;
-						return parentObject.asset.payments.length <= limit;
-					}
+					(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
+					parentObject.asset &&
+					parentObject.asset.payments
+				) {
+					const limit: number = configManager.getMilestone().multiPaymentLimit || 256;
+					return parentObject.asset.payments.length <= limit;
+				}
 
 				return data === schema;
 			};
@@ -91,12 +93,12 @@ const bignumber = (ajv: Ajv) => {
 
 				let bypassGenesis = false;
 				if (schema.bypassGenesis && parentObject.id) {
-						if (schema.block) {
-							bypassGenesis = parentObject.height === 1;
-						} else {
-							bypassGenesis = isGenesisTransaction(parentObject.id);
-						}
+					if (schema.block) {
+						bypassGenesis = parentObject.height === 1;
+					} else {
+						bypassGenesis = isGenesisTransaction(parentObject.id);
 					}
+				}
 
 				if (bignum.isLessThan(minimum) && !(bignum.isZero() && bypassGenesis)) {
 					return false;
@@ -128,9 +130,14 @@ const blockId = (ajv: Ajv) => {
 	ajv.addKeyword("blockId", {
 		compile(schema) {
 			return (data, dataPath, parentObject: any) => {
-				if (parentObject && parentObject.height === 1 && schema.allowNullWhenGenesis && (!data || Number(data) === 0)) {
-						return true;
-					}
+				if (
+					parentObject &&
+					parentObject.height === 1 &&
+					schema.allowNullWhenGenesis &&
+					(!data || Number(data) === 0)
+				) {
+					return true;
+				}
 
 				if (typeof data !== "string") {
 					return false;

@@ -56,7 +56,8 @@ export class BlockRepository extends AbstractRepository<Block> {
 		end: number,
 	): Promise<Contracts.Shared.DownloadBlock[]> {
 		const blocks = await this.findByHeightRangeWithTransactionsRaw(start, end);
-		return blocks.map((block) => this.rawToEntity(
+		return blocks.map((block) =>
+			this.rawToEntity(
 				block,
 				// @ts-ignore
 				(entity: Block & { transactions: string[] }, _, value: Buffer[] | undefined) => {
@@ -66,12 +67,14 @@ export class BlockRepository extends AbstractRepository<Block> {
 						entity.transactions = [];
 					}
 				},
-			)) as Contracts.Shared.DownloadBlock[];
+			),
+		) as Contracts.Shared.DownloadBlock[];
 	}
 
 	public async findByHeightRangeWithTransactions(start: number, end: number): Promise<Interfaces.IBlockData[]> {
 		const blocks = await this.findByHeightRangeWithTransactionsRaw(start, end);
-		return blocks.map((block) => this.rawToEntity(
+		return blocks.map((block) =>
+			this.rawToEntity(
 				block,
 				// @ts-ignore
 				(entity: Block & { transactions: Interfaces.ITransactionData[] }, _, value: Buffer[] | undefined) => {
@@ -83,7 +86,8 @@ export class BlockRepository extends AbstractRepository<Block> {
 						entity.transactions = [];
 					}
 				},
-			));
+			),
+		);
 	}
 
 	public async getStatistics(): Promise<{
@@ -181,7 +185,9 @@ export class BlockRepository extends AbstractRepository<Block> {
 	}
 
 	public async deleteBlocks(blocks: Interfaces.IBlockData[]): Promise<void> {
-		const continuousChunk = blocks.every((block, i, arr) => i === 0 ? true : block.height - arr[i - 1].height === 1);
+		const continuousChunk = blocks.every((block, i, arr) =>
+			i === 0 ? true : block.height - arr[i - 1].height === 1,
+		);
 
 		if (!continuousChunk) {
 			throw new Error("Blocks chunk to delete isn't continuous");

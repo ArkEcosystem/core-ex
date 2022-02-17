@@ -8,7 +8,7 @@ import { Database } from "../database";
 import { Identifiers } from "../identifiers";
 import { Webhook } from "../interfaces";
 import { whitelist } from "./plugins/whitelist";
-import { destroy,show, store, update } from "./schema";
+import { destroy, show, store, update } from "./schema";
 import { respondWithResource } from "./utils";
 
 @Container.injectable()
@@ -77,23 +77,21 @@ export class Server {
 		delete options.whitelist;
 
 		return {
-			
-				router: {
-					stripTrailingSlash: true,
+			router: {
+				stripTrailingSlash: true,
+			},
+			routes: {
+				payload: {
+					async failAction(request, h, err) {
+						return badData(err.message);
+					},
 				},
-				routes: {
-					payload: {
-						async failAction(request, h, err) {
-							return badData(err.message);
-						},
+				validate: {
+					async failAction(request, h, err) {
+						return badData(err.message);
 					},
-					validate: {
-						async failAction(request, h, err) {
-							return badData(err.message);
-						},
-					},
-				}
-			,
+				},
+			},
 			...options,
 		};
 	}
@@ -118,12 +116,12 @@ export class Server {
 
 		this.server.route({
 			handler: (request) => ({
-					data: request.server.app.database.all().map((webhook) => {
-						webhook = { ...webhook };
-						delete webhook.token;
-						return webhook;
-					}),
+				data: request.server.app.database.all().map((webhook) => {
+					webhook = { ...webhook };
+					delete webhook.token;
+					return webhook;
 				}),
+			}),
 			method: "GET",
 			path: "/api/webhooks",
 		});
@@ -137,9 +135,9 @@ export class Server {
 						respondWithResource({
 							...request.server.app.database.create({
 								...request.payload,
-								 token: token.substring(0, 32) ,
+								token: token.substring(0, 32),
 							}),
-							 token ,
+							token,
 						}),
 					)
 					.code(201);

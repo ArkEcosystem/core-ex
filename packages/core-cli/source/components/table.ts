@@ -10,10 +10,8 @@ export class Table {
 
 	public render(head: string[], callback: any, opts: object = {}): void {
 		const table = new Table3({
-			
-				chars: { "left-mid": "", mid: "", "mid-mid": "", "right-mid": "" },
-				head
-			,
+			chars: { "left-mid": "", mid: "", "mid-mid": "", "right-mid": "" },
+			head,
 			...opts,
 		});
 

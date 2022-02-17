@@ -30,25 +30,25 @@ export class WorkerWrapper extends EventEmitter {
 		return new Promise<void>((resolve, reject) => {
 			this.once("*", (data) => {
 				switch (data.name) {
-				case "started": {
-					resolve();
-				
-				break;
-				}
-				case "exit": {
-					resolve();
-				
-				break;
-				}
-				case "exception": 
-				case "error": {
-					reject(data.data);
-				
-				break;
-				}
-				default: {
-					reject();
-				}
+					case "started": {
+						resolve();
+
+						break;
+					}
+					case "exit": {
+						resolve();
+
+						break;
+					}
+					case "exception":
+					case "error": {
+						reject(data.data);
+
+						break;
+					}
+					default: {
+						reject();
+					}
 				}
 			});
 
@@ -65,25 +65,25 @@ export class WorkerWrapper extends EventEmitter {
 
 			this.once("*", (data) => {
 				switch (data.name) {
-				case "synchronized": {
-					resolve(data.data);
-				
-				break;
-				}
-				case "exit": {
-					resolve();
-				
-				break;
-				}
-				case "exception": 
-				case "error": {
-					reject(data.data);
-				
-				break;
-				}
-				default: {
-					reject();
-				}
+					case "synchronized": {
+						resolve(data.data);
+
+						break;
+					}
+					case "exit": {
+						resolve();
+
+						break;
+					}
+					case "exception":
+					case "error": {
+						reject(data.data);
+
+						break;
+					}
+					default: {
+						reject();
+					}
 				}
 			});
 

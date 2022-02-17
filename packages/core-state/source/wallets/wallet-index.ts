@@ -36,7 +36,7 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 	}
 
 	public get(key: string): Contracts.State.Wallet {
-		return this.walletByKey.get(key) ;
+		return this.walletByKey.get(key);
 	}
 
 	public set(key: string, wallet: Contracts.State.Wallet): void {

@@ -171,7 +171,8 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 			.take(limit)
 			.getRawMany();
 
-		return transactions.map((transaction) => this.rawToEntity(
+		return transactions.map((transaction) =>
+			this.rawToEntity(
 				transaction,
 				// @ts-ignore
 				(entity: any, key: string, value: number | string) => {
@@ -181,6 +182,7 @@ export class TransactionRepository extends AbstractRepository<Transaction> {
 						entity[key] = value;
 					}
 				},
-			)) as any;
+			),
+		) as any;
 	}
 }

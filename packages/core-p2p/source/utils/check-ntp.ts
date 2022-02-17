@@ -5,7 +5,8 @@ export const checkNTP = (
 	app: Contracts.Kernel.Application,
 	hosts: string[],
 	timeout = 1000,
-): Promise<{ time: TimeOptions; host: string }> => new Promise(async (resolve, reject) => {
+): Promise<{ time: TimeOptions; host: string }> =>
+	new Promise(async (resolve, reject) => {
 		for (const host of Utils.shuffle(hosts)) {
 			try {
 				const time: Sntp.TimeOptions = await Sntp.time({

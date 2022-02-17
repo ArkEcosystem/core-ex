@@ -142,22 +142,21 @@ export class Client {
 		if (options.reconnect !== false) {
 			// Defaults to true
 			this._reconnection = {
-				
 				delay: options.delay || 1000,
-				
-// 1 second
-maxDelay: options.maxDelay || 5000, 
-				
-// 5 seconds
-retries: options.retries || Infinity, 
-				
-// Unlimited
-settings: {
+
+				// 1 second
+				maxDelay: options.maxDelay || 5000,
+
+				// 5 seconds
+				retries: options.retries || Infinity,
+
+				// Unlimited
+				settings: {
 					auth: options.auth,
 					timeout: options.timeout,
-				}, 
+				},
 				// Options: reconnect, delay, maxDelay
-wait: 0,
+				wait: 0,
 			};
 		} else {
 			this._reconnection = null;
@@ -266,7 +265,7 @@ wait: 0,
 
 		const timeout = options.timeout ? setTimeout(timeoutHandler, options.timeout) : null;
 
-		ws.addEventListener('open', () => {
+		ws.addEventListener("open", () => {
 			if (timeout) {
 				clearTimeout(timeout);
 			}
@@ -282,7 +281,7 @@ wait: 0,
 				});
 		});
 
-		ws.addEventListener('error', (event) => {
+		ws.addEventListener("error", (event) => {
 			/* istanbul ignore next */
 			if (timeout) {
 				clearTimeout(timeout);
@@ -297,7 +296,7 @@ wait: 0,
 			return finalize(error);
 		});
 
-		ws.addEventListener('close', reconnect);
+		ws.addEventListener("close", reconnect);
 
 		ws.onmessage = (message) => this._onMessage(message);
 
@@ -342,7 +341,7 @@ wait: 0,
 
 			ws.onopen = null;
 			ws.onclose = null;
-			ws.addEventListener('error', ignore);
+			ws.addEventListener("error", ignore);
 			ws.onmessage = null;
 		}
 
