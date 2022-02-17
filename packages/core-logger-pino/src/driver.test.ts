@@ -54,50 +54,50 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it}) =
         assert.undefined(message);
     });
 
-    it("should modify the message if it is not a string", () => {
-        logger.info(["Hello World"]);
+	it("should modify the message if it is not a string", () => {
+		logger.info(["Hello World"]);
 
         assert.match(message.trim(), "[ 'Hello World' ]");
     });
 
-    it("should log a message with the [emergency] level", () => {
-        logger.emergency("emergency_message");
+	it("should log a message with the [emergency] level", () => {
+		logger.emergency("emergency_message");
 
 
         assert.match(message, /emergency/);
         assert.match(message, /emergency_message/);
     });
 
-    it("should log a message with the [alert] level", () => {
-        logger.alert("alert_message");
+	it("should log a message with the [alert] level", () => {
+		logger.alert("alert_message");
 
         assert.match(message, /alert/);
         assert.match(message, /alert_message/);
     });
 
-    it("should log a message with the [critical] level", () => {
-        logger.critical("critical_message");
+	it("should log a message with the [critical] level", () => {
+		logger.critical("critical_message");
 
         assert.match(message, /critical/);
         assert.match(message, /critical_message/);
     });
 
-    it("should log a message with the [error] level", () => {
-        logger.error("error_message");
+	it("should log a message with the [error] level", () => {
+		logger.error("error_message");
 
         assert.match(message, /error/);
         assert.match(message, /error_message/);
     });
 
-    it("should log a message with the [warning] level", () => {
-        logger.warning("warning_message");
+	it("should log a message with the [warning] level", () => {
+		logger.warning("warning_message");
 
         assert.match(message, /warning/);
         assert.match(message, /warning_message/);
     });
 
-    it("should log a message with the [notice] level", () => {
-        logger.notice("notice_message");
+	it("should log a message with the [notice] level", () => {
+		logger.notice("notice_message");
 
         assert.match(message, /notice/);
         assert.match(message, /notice_message/);
