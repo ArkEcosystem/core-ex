@@ -98,5 +98,9 @@
 		"typesync": "0.8.0",
 		"ultra-runner": "^3.10.5",
 		"uuid": "8.3.2"
+	},
+	"dependencies": {
+		"@sindresorhus/slugify": "^1.0.0",
+		"yaml": "^1.10.2"
 	}
 }
