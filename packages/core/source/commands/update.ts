@@ -7,9 +7,9 @@ export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Updater)
 	private readonly updater!: Contracts.Updater;
 
-	public signature: string = "update";
+	public signature = "update";
 
-	public description: string = "Update the Core installation.";
+	public description = "Update the Core installation.";
 
 	public configure(): void {
 		this.definition
