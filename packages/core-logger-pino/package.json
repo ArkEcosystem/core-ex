@@ -11,14 +11,10 @@
 		"dist"
 	],
 	"scripts": {
-	  "build": "pnpm run clean && pnpm run compile",
-	  "build:docs": "../../node_modules/typedoc/bin/typedoc --out docs src",
-	  "build:watch": "pnpm run clean && pnpm run compile -- -w",
-	  "clean": "rimraf dist",
-	  "compile": "node ../../node_modules/typescript/bin/tsc",
-	  "prepublishOnly": "pnpm run build",
-	  "pretest": "bash ../../scripts/pre-test.sh",
-	  "test": "uvu -r tsm src .test.ts"
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "rimraf dist",
+		"test": "uvu -r tsm src .test.ts"
 	},
 	"dependencies": {
 		"@arkecosystem/core-kernel": "workspace:*",
