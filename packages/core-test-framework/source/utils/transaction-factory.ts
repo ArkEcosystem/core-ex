@@ -40,7 +40,7 @@ export class TransactionFactory {
 
 	public transfer(recipientId?: string, amount: number = 2 * 1e8, vendorField?: string): TransactionFactory {
 		const builder = Transactions.BuilderFactory.transfer()
-			.amount(Utils.BigNumber.make(amount).toFixed(0))
+			.amount(Utils.BigNumber.make(amount).toFixed())
 			.recipientId(recipientId || Identities.Address.fromPassphrase(defaultPassphrase));
 
 		if (vendorField) {
@@ -291,7 +291,7 @@ export class TransactionFactory {
 			}
 
 			if (this.fee) {
-				this.builder.fee(this.fee.toFixed(0));
+				this.builder.fee(this.fee.toFixed());
 			}
 
 			if (this.timestamp) {

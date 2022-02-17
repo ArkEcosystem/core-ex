@@ -87,6 +87,6 @@ export class Signer {
 	}
 
 	private toSatoshi(value): string {
-		return Utils.BigNumber.make(value * 1e8).toFixed(0);
+		return Utils.BigNumber.make(value * 1e8).toFixed();
 	}
 }
