@@ -9,13 +9,10 @@ import { JsonObject } from "../types";
 
 @injectable()
 export class PluginConfiguration {
-
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
-
 	private items: JsonObject = {};
-
 
 	public from(name: string, config: JsonObject): this {
 		this.items = config;
@@ -24,7 +21,6 @@ export class PluginConfiguration {
 
 		return this;
 	}
-
 
 	public discover(name: string, packageId: string): this {
 		try {
@@ -38,7 +34,6 @@ export class PluginConfiguration {
 		return this;
 	}
 
-
 	public merge(values: JsonObject | undefined): this {
 		if (values) {
 			this.items = deepmerge(this.items, values, {
@@ -49,11 +44,9 @@ export class PluginConfiguration {
 		return this;
 	}
 
-
 	public all(): JsonObject {
 		return this.items;
 	}
-
 
 	public get<T>(key: string, defaultValue?: T): T | undefined {
 		if (typeof defaultValue !== "undefined") {
@@ -63,7 +56,6 @@ export class PluginConfiguration {
 		return get(this.items, key);
 	}
 
-
 	public getRequired<T>(key: string): T {
 		if (!this.has(key)) {
 			throw new Error(`Missing required ${key} configuration value`);
@@ -71,7 +63,6 @@ export class PluginConfiguration {
 
 		return get(this.items, key) as T;
 	}
-
 
 	public getOptional<T>(key: string, defaultValue: T): T {
 		if (!this.has(key)) {
@@ -81,13 +72,11 @@ export class PluginConfiguration {
 		return get(this.items, key) as T;
 	}
 
-
 	public set<T>(key: string, value: T): boolean {
 		set(this.items, key, value);
 
 		return this.has(key);
 	}
-
 
 	public unset<T>(key: string): boolean {
 		unset(this.items, key);
@@ -95,11 +84,9 @@ export class PluginConfiguration {
 		return this.has(key);
 	}
 
-
 	public has(key: string): boolean {
 		return has(this.items, key);
 	}
-
 
 	private mergeWithGlobal(name: string): void {
 		// @todo: better name for storing pluginOptions

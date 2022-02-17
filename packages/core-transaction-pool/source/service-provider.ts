@@ -22,26 +22,21 @@ import { Worker } from "./worker";
 import { WorkerPool } from "./worker-pool";
 import { ProcessorDynamicFeeExtension } from "./processor-dynamic-fee-extension";
 
-
 export class ServiceProvider extends Providers.ServiceProvider {
-
 	public async register(): Promise<void> {
 		this.registerServices();
 		this.registerActions();
 	}
-
 
 	public async boot(): Promise<void> {
 		this.app.get<Storage>(Container.Identifiers.TransactionPoolStorage).boot();
 		await this.app.get<Service>(Container.Identifiers.TransactionPoolService).boot();
 	}
 
-
 	public async dispose(): Promise<void> {
 		this.app.get<Service>(Container.Identifiers.TransactionPoolService).dispose();
 		this.app.get<Storage>(Container.Identifiers.TransactionPoolStorage).dispose();
 	}
-
 
 	public async required(): Promise<boolean> {
 		return true;

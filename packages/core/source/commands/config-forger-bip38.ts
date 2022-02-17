@@ -6,18 +6,13 @@ import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
 import wif from "wif";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "config:forger:bip38";
-
 
 	public description: string = "Configure the forging delegate (BIP38).";
 
-
 	public isHidden: boolean = true;
-
 
 	public configure(): void {
 		this.definition
@@ -27,7 +22,6 @@ export class Command extends Commands.Command {
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
-
 
 	public async execute(): Promise<void> {
 		if (this.hasFlag("bip39") && this.hasFlag("password")) {
@@ -73,7 +67,6 @@ export class Command extends Commands.Command {
 
 		return this.performConfiguration({ ...this.getFlags(), ...response });
 	}
-
 
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
 		let decodedWIF;

@@ -2,11 +2,8 @@ import assert from "assert";
 
 type ProbeCallback = (indexesToProbe: number[]) => Promise<number | undefined>;
 
-
 export class NSect {
-
 	constructor(private readonly nAry: number, private readonly probe: ProbeCallback) {}
-
 
 	public async find(low: number, high: number): Promise<number | undefined> {
 		let highestMatching: number | undefined;
@@ -77,7 +74,6 @@ export class NSect {
 
 		return highestMatching;
 	}
-
 
 	private calcProbes(low: number, high: number): number[] {
 		assert(low <= high, `${low} <= ${high}`);

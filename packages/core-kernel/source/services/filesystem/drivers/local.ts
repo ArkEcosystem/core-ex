@@ -16,24 +16,19 @@ import { resolve } from "path";
 import { Filesystem } from "../../../contracts/kernel/filesystem";
 import { injectable } from "../../../ioc";
 
-
 @injectable()
 export class LocalFilesystem implements Filesystem {
-
 	public async make(): Promise<Filesystem> {
 		return this;
 	}
-
 
 	public async exists(path: string): Promise<boolean> {
 		return pathExists(path);
 	}
 
-
 	public async get(path: string): Promise<Buffer> {
 		return readFile(path);
 	}
-
 
 	public async put(path: string, contents: string): Promise<boolean> {
 		try {
@@ -45,7 +40,6 @@ export class LocalFilesystem implements Filesystem {
 		}
 	}
 
-
 	public async delete(path: string): Promise<boolean> {
 		try {
 			await remove(path);
@@ -55,7 +49,6 @@ export class LocalFilesystem implements Filesystem {
 			return false;
 		}
 	}
-
 
 	public async copy(from: string, to: string): Promise<boolean> {
 		try {
@@ -67,7 +60,6 @@ export class LocalFilesystem implements Filesystem {
 		}
 	}
 
-
 	public async move(from: string, to: string): Promise<boolean> {
 		try {
 			await move(from, to);
@@ -78,16 +70,13 @@ export class LocalFilesystem implements Filesystem {
 		}
 	}
 
-
 	public async size(path: string): Promise<number> {
 		return (await stat(path)).size;
 	}
 
-
 	public async lastModified(path: string): Promise<number> {
 		return +(await stat(path)).mtime;
 	}
-
 
 	public async files(directory: string): Promise<string[]> {
 		directory = resolve(directory);
@@ -97,7 +86,6 @@ export class LocalFilesystem implements Filesystem {
 			.filter(async (item: string) => (await lstat(item)).isFile());
 	}
 
-
 	public async directories(directory: string): Promise<string[]> {
 		directory = resolve(directory);
 
@@ -105,7 +93,6 @@ export class LocalFilesystem implements Filesystem {
 			.map((item: string) => `${directory}/${item}`)
 			.filter(async (item: string) => (await lstat(item)).isDirectory());
 	}
-
 
 	public async makeDirectory(path): Promise<boolean> {
 		try {
@@ -116,7 +103,6 @@ export class LocalFilesystem implements Filesystem {
 			return false;
 		}
 	}
-
 
 	public async deleteDirectory(directory: string): Promise<boolean> {
 		try {

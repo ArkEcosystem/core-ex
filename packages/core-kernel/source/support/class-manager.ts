@@ -4,13 +4,10 @@ import { Identifiers, inject, injectable } from "../ioc";
 // import { Class } from "../types";
 import { pascalCase } from "../utils";
 
-
 @injectable()
 export abstract class ClassManager {
-
 	@inject(Identifiers.Application)
 	protected readonly app!: Kernel.Application;
-
 
 	private defaultDriver: string;
 
@@ -18,11 +15,9 @@ export abstract class ClassManager {
 	//
 	// private drivers: Map<string, Class> = new Map<string, Class>();
 
-
 	public constructor() {
 		this.defaultDriver = this.getDefaultDriver();
 	}
-
 
 	public async driver<T>(name?: string): Promise<T> {
 		return this.createDriver<T>(name || this.defaultDriver);
@@ -34,7 +29,6 @@ export abstract class ClassManager {
 	//     this.drivers.set(name, driver);
 	// }
 
-
 	public setDefaultDriver(name: string): void {
 		this.defaultDriver = name;
 	}
@@ -45,7 +39,6 @@ export abstract class ClassManager {
 	//     return Object.values(this.drivers);
 	// }
 
-
 	private async createDriver<T>(name: string): Promise<T> {
 		const creatorFunction = `create${pascalCase(name)}Driver`;
 
@@ -55,7 +48,6 @@ export abstract class ClassManager {
 
 		return this[creatorFunction]();
 	}
-
 
 	protected abstract getDefaultDriver(): string;
 }

@@ -11,24 +11,18 @@ import { whitelist } from "./plugins/whitelist";
 import * as schema from "./schema";
 import * as utils from "./utils";
 
-
 @Container.injectable()
 export class Server {
-
 	@Container.inject(Container.Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
-
 
 	@Container.inject(Identifiers.Database)
 	private readonly database!: Database;
 
-
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-
 	private server: HapiServer;
-
 
 	public async register(optionsServer: Types.JsonObject): Promise<void> {
 		this.server = new HapiServer(this.getServerOptions(optionsServer));
@@ -48,7 +42,6 @@ export class Server {
 		await this.registerRoutes();
 	}
 
-
 	public async boot(): Promise<void> {
 		try {
 			await this.server.start();
@@ -58,7 +51,6 @@ export class Server {
 			await this.app.terminate(`Failed to start Webhook Server!`, error);
 		}
 	}
-
 
 	public async dispose(): Promise<void> {
 		try {
@@ -70,11 +62,9 @@ export class Server {
 		}
 	}
 
-
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
 		return this.server.inject(options);
 	}
-
 
 	private getServerOptions(options: Record<string, any>): object {
 		options = {
@@ -108,7 +98,6 @@ export class Server {
 		};
 	}
 
-
 	private async registerPlugins(config: Types.JsonObject): Promise<void> {
 		await this.server.register({
 			plugin: whitelist,
@@ -117,7 +106,6 @@ export class Server {
 			},
 		});
 	}
-
 
 	private registerRoutes(): void {
 		this.server.route({

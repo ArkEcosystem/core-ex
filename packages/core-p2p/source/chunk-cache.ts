@@ -8,9 +8,7 @@ interface ChunkData {
 
 @Container.injectable()
 export class ChunkCache implements Contracts.P2P.ChunkCache {
-
 	private downloadedChunksCache: ChunkData[] = [];
-
 
 	private downloadedChunksCacheMax: number = 100;
 

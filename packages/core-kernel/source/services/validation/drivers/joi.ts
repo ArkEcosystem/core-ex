@@ -4,18 +4,13 @@ import { Validator } from "../../../contracts/kernel/validation";
 import { injectable } from "../../../ioc";
 import { JsonObject } from "../../../types";
 
-
 @injectable()
 export class JoiValidator implements Validator {
-
 	private data!: JsonObject;
-
 
 	private resultValue: JsonObject | undefined;
 
-
 	private resultError: ValidationErrorItem[] | undefined;
-
 
 	public validate(data: JsonObject, schema: object): void {
 		this.data = data;
@@ -29,31 +24,25 @@ export class JoiValidator implements Validator {
 		}
 	}
 
-
 	public passes(): boolean {
 		return !this.resultError;
 	}
-
 
 	public fails(): boolean {
 		return !this.passes();
 	}
 
-
 	public failed(): Record<string, string[]> {
 		return this.groupErrors("type");
 	}
-
 
 	public errors(): Record<string, string[]> {
 		return this.groupErrors("message");
 	}
 
-
 	public valid(): JsonObject | undefined {
 		return this.resultValue;
 	}
-
 
 	public invalid(): JsonObject {
 		const errors: JsonObject = {};
@@ -72,11 +61,9 @@ export class JoiValidator implements Validator {
 		return errors;
 	}
 
-
 	public attributes(): JsonObject {
 		return this.data;
 	}
-
 
 	private groupErrors(attribute: string): Record<string, string[]> {
 		const errors: Record<string, string[]> = {};

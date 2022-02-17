@@ -50,7 +50,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return this;
 	}
 
-
 	public async checkState(
 		claimedState: Contracts.P2P.PeerState,
 		deadline: number,
@@ -144,7 +143,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return height;
 	}
 
-
 	private async weHavePeersHighestBlock(claimedState: any, ourHeight: number): Promise<boolean> {
 		const claimedHeight = Number(claimedState.header.height);
 
@@ -199,7 +197,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		return false;
 	}
-
 
 	private async findHighestCommonBlockHeight(
 		claimedHeight: number,
@@ -291,7 +288,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return highestCommonBlockHeight;
 	}
 
-
 	private async verifyPeerBlocks(startHeight: number, claimedHeight: number, deadline: number): Promise<boolean> {
 		const roundInfo = Utils.roundCalculator.calculateRound(startHeight);
 		const { maxDelegates, roundHeight } = roundInfo;
@@ -331,7 +327,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return true;
 	}
 
-
 	private async getDelegatesByRound(
 		roundInfo: Contracts.Shared.RoundInfo,
 	): Promise<Record<string, Contracts.State.Wallet>> {
@@ -357,7 +352,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		}
 		return delegatesByPublicKey;
 	}
-
 
 	private async fetchBlocksFromHeight({
 		height,
@@ -405,7 +399,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return true;
 	}
 
-
 	private verifyPeerBlock(
 		blockData: Interfaces.IBlockData,
 		expectedHeight: number,
@@ -452,7 +445,6 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return false;
 	}
 
-
 	private throwIfPastDeadline(deadline: number): number {
 		const now = new Date().getTime();
 
@@ -464,11 +456,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return deadline - now;
 	}
 
-
 	private anyToString(val: any): string {
 		return inspect(val, { sorted: true, breakLength: Infinity });
 	}
-
 
 	private log(severity: Severity, msg: string): void {
 		const fullMsg = `${this.logPrefix} ${msg}`;

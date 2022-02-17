@@ -1,4 +1,3 @@
-
 export class ForgerError extends Error {
 	public constructor(message: string) {
 		super(message);
@@ -17,13 +16,11 @@ export class ForgerError extends Error {
 	}
 }
 
-
 export class RelayCommunicationError extends ForgerError {
 	public constructor(endpoint: string, message: string) {
 		super(`Request to ${endpoint} failed, because of '${message}'.`);
 	}
 }
-
 
 export class HostNoResponseError extends ForgerError {
 	public constructor(host: string) {

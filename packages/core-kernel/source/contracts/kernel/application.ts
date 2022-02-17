@@ -4,96 +4,65 @@ import { Container } from "./container";
 
 // todo: remove this interface as it serves no purpose. Every package depends on core-kernel so it can import the application directly.
 export interface Application {
-
 	readonly container: Container.Container;
-
 
 	bootstrap({ flags, plugins }: { flags: JsonObject; plugins?: JsonObject }): Promise<void>;
 
-
 	boot(): void;
-
 
 	reboot(): void;
 
-
 	config<T = any>(key: string, value?: T): T | undefined;
-
 
 	namespace(): string;
 
-
 	version(): string;
-
 
 	token(): string;
 
-
 	network(): string;
-
 
 	useNetwork(value: string): void;
 
-
 	dataPath(path?: string): string;
-
 
 	useDataPath(path: string): void;
 
-
 	configPath(path?: string): string;
-
 
 	useConfigPath(path: string): void;
 
-
 	cachePath(path?: string): string;
-
 
 	useCachePath(path: string): void;
 
-
 	logPath(path?: string): string;
-
 
 	useLogPath(path: string): void;
 
-
 	tempPath(path?: string): string;
-
 
 	useTempPath(path: string): void;
 
-
 	environmentFile(): string;
-
 
 	environment(): string;
 
-
 	useEnvironment(value: string): void;
-
 
 	isProduction(): boolean;
 
-
 	isDevelopment(): boolean;
-
 
 	runningTests(): boolean;
 
-
 	isBooted(): boolean;
-
 
 	enableMaintenance(): void;
 
-
 	disableMaintenance(): void;
 
-
 	isDownForMaintenance(): boolean;
-
 
 	terminate(reason?: string, error?: Error): Promise<void>;
 
@@ -112,22 +81,16 @@ export interface Application {
 	resolve<T>(constructorFunction: Container.Newable<T>): T;
 }
 
-
 export interface PluginDependency {
-
 	name: string;
 
-
 	version?: string;
-
 
 	required?: boolean | (() => Promise<boolean>);
 }
 
 export interface ExceptionHandler {
-
 	report(exception: Exception);
-
 
 	shouldReport(exception: Exception);
 }

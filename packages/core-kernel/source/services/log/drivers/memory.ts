@@ -13,7 +13,6 @@ dayjs.extend(utc);
 
 @injectable()
 export class MemoryLogger implements Logger {
-
 	private readonly levelStyles: Record<string, Chalk> = {
 		emergency: chalk.bgRed,
 		alert: chalk.red,
@@ -25,65 +24,51 @@ export class MemoryLogger implements Logger {
 		debug: chalk.magenta,
 	};
 
-
 	private silentConsole: boolean = false;
 
-
 	private lastTimestamp: Dayjs = dayjs().utc();
-
 
 	public async make(options?: any): Promise<Logger> {
 		return this;
 	}
 
-
 	public emergency(message: any): void {
 		this.log("emergency", message);
 	}
-
 
 	public alert(message: any): void {
 		this.log("alert", message);
 	}
 
-
 	public critical(message: any): void {
 		this.log("critical", message);
 	}
-
 
 	public error(message: any): void {
 		this.log("error", message);
 	}
 
-
 	public warning(message: any): void {
 		this.log("warning", message);
 	}
-
 
 	public notice(message: any): void {
 		this.log("notice", message);
 	}
 
-
 	public info(message: any): void {
 		this.log("info", message);
 	}
-
 
 	public debug(message: any): void {
 		this.log("debug", message);
 	}
 
-
 	public suppressConsoleOutput(suppress: boolean): void {
 		this.silentConsole = suppress;
 	}
 
-
 	public async dispose(): Promise<void> {}
-
 
 	private log(level: any, message: any): void {
 		if (this.silentConsole) {
@@ -105,7 +90,6 @@ export class MemoryLogger implements Logger {
 
 		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);
 	}
-
 
 	private getTimestampDiff(): string {
 		const diff: number = dayjs().diff(this.lastTimestamp);

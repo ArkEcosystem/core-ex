@@ -4,11 +4,9 @@ import { Resource } from "../interfaces";
 
 @Container.injectable()
 export class FeeStatisticsResource implements Resource {
-
 	public raw(resource): object {
 		return resource;
 	}
-
 
 	public transform(resource): object {
 		return {
