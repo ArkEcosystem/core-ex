@@ -2,7 +2,7 @@ import { Application, Container, Contracts, Exceptions, Services } from "@arkeco
 import { Stores, Wallets } from "@packages/core-state";
 import { Factories, Generators } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
+import { getWalletAttributeSet } from "@packages/core-test-framework";
 import { Mempool } from "@packages/core-transaction-pool";
 import {
 	InsufficientBalanceError,

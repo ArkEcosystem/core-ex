@@ -1,35 +1,26 @@
 import { Application, Container, Contracts, Providers, Services } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/source/ioc";
-import { NullEventDispatcher } from "@packages/core-kernel/source/services/events/drivers/null";
-import { Wallets } from "@packages/core-state";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import {
-	addressesIndexer,
-	publicKeysIndexer,
-	usernamesIndexer,
-} from "@packages/core-state/source/wallets/indexers/indexers";
-import { Factories, Mocks } from "@packages/core-test-framework";
+import { Stores, Wallets } from "@packages/core-state";
+import { Factories, getWalletAttributeSet, Mocks } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
-import { Collator } from "@packages/core-transaction-pool/source";
 import {
+	Collator,
 	ApplyTransactionAction,
+	DynamicFeeMatcher,
+	ExpirationService,
+	Mempool,
+	Query,
 	RevertTransactionAction,
+	SenderMempool,
+	SenderState,
 	ThrowIfCannotEnterPoolAction,
 	VerifyTransactionAction,
-} from "@packages/core-transaction-pool/source/actions";
-import { DynamicFeeMatcher } from "@packages/core-transaction-pool/source/dynamic-fee-matcher";
-import { ExpirationService } from "@packages/core-transaction-pool/source/expiration-service";
-import { Mempool } from "@packages/core-transaction-pool/source/mempool";
-import { Query } from "@packages/core-transaction-pool/source/query";
-import { SenderMempool } from "@packages/core-transaction-pool/source/sender-mempool";
-import { SenderState } from "@packages/core-transaction-pool/source/sender-state";
-import { One, Two } from "@packages/core-transactions/source/handlers";
-import { TransactionHandlerProvider } from "@packages/core-transactions/source/handlers/handler-provider";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
-import { ServiceProvider } from "@packages/core-transactions/source/service-provider";
-import { Identities, Utils } from "@packages/crypto";
-import { IMultiSignatureAsset } from "@packages/crypto/source/interfaces";
+} from "@packages/core-transaction-pool";
+import * as One from "../one";
+import * as Two from "../two";
+import { TransactionHandlerProvider } from "../../handlers/handler-provider";
+import { TransactionHandlerRegistry } from "../../handlers/handler-registry";
+import { ServiceProvider } from "../../service-provider";
+import { Identities, Interfaces, Utils } from "@packages/crypto";
 
 const logger = {
 	notice: jest.fn(),
@@ -39,38 +30,38 @@ const logger = {
 
 export const initApp = (): Application => {
 	const app: Application = new Application(new Container.Container());
-	app.bind(Identifiers.ApplicationNamespace).toConstantValue("testnet");
+	app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("testnet");
 
-	app.bind(Identifiers.LogService).toConstantValue(logger);
+	app.bind(Container.Identifiers.LogService).toConstantValue(logger);
 
-	app.bind<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
+	app.bind<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
 		.to(Services.Attributes.AttributeSet)
 		.inSingletonScope();
 
-	app.bind<Contracts.State.WalletIndexerIndex>(Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
+	app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
 		name: Contracts.State.WalletIndexes.Addresses,
-		indexer: addressesIndexer,
+		indexer: Wallets.addressesIndexer,
 		autoIndex: true,
 	});
 
 	app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
 		name: Contracts.State.WalletIndexes.PublicKeys,
-		indexer: publicKeysIndexer,
+		indexer: Wallets.publicKeysIndexer,
 		autoIndex: true,
 	});
 
 	app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
 		name: Contracts.State.WalletIndexes.Usernames,
-		indexer: usernamesIndexer,
+		indexer: Wallets.usernamesIndexer,
 		autoIndex: true,
 	});
 
-	app.bind(Identifiers.WalletFactory).toFactory<Contracts.State.Wallet>(
+	app.bind(Container.Identifiers.WalletFactory).toFactory<Contracts.State.Wallet>(
 		(context: Container.interfaces.Context) => (address: string) =>
 			new Wallets.Wallet(
 				address,
 				new Services.Attributes.AttributeMap(
-					context.container.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes),
+					context.container.get<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes),
 				),
 			),
 	);
@@ -87,11 +78,11 @@ export const initApp = (): Application => {
 		300,
 	);
 
-	app.bind(Container.Identifiers.StateStore).to(StateStore).inTransientScope();
+	app.bind(Container.Identifiers.StateStore).to(Stores.StateStore).inTransientScope();
 
-	app.bind(Identifiers.TransactionPoolMempool).to(Mempool).inSingletonScope();
+	app.bind(Container.Identifiers.TransactionPoolMempool).to(Mempool).inSingletonScope();
 
-	app.bind(Identifiers.TransactionPoolQuery).to(Query).inSingletonScope();
+	app.bind(Container.Identifiers.TransactionPoolQuery).to(Query).inSingletonScope();
 
 	app.bind(Container.Identifiers.TransactionPoolCollator).to(Collator);
 	app.bind(Container.Identifiers.TransactionPoolDynamicFeeMatcher).to(DynamicFeeMatcher);
@@ -103,28 +94,28 @@ export const initApp = (): Application => {
 	);
 	app.bind(Container.Identifiers.TransactionPoolSenderState).to(SenderState);
 
-	app.bind(Identifiers.WalletRepository).to(Wallets.WalletRepository).inSingletonScope();
+	app.bind(Container.Identifiers.WalletRepository).to(Wallets.WalletRepository).inSingletonScope();
 
-	app.bind(Identifiers.EventDispatcherService).to(NullEventDispatcher).inSingletonScope();
+	app.bind(Container.Identifiers.EventDispatcherService).to(Services.Events.NullEventDispatcher).inSingletonScope();
 
-	app.bind(Identifiers.DatabaseBlockRepository).toConstantValue(Mocks.BlockRepository.instance);
+	app.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(Mocks.BlockRepository.instance);
 
-	app.bind(Identifiers.DatabaseTransactionRepository).toConstantValue(Mocks.TransactionRepository.instance);
+	app.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue(Mocks.TransactionRepository.instance);
 
-	app.bind(Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
-	app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
 
-	app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
-	app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
-	app.bind(Identifiers.TransactionHandlerConstructors).toDynamicValue(
+	app.bind(Container.Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
+	app.bind(Container.Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
+	app.bind(Container.Identifiers.TransactionHandlerConstructors).toDynamicValue(
 		ServiceProvider.getTransactionHandlerConstructorsBinding(),
 	);
 
@@ -180,7 +171,7 @@ export const buildRecipientWallet = (factoryBuilder: Factories.FactoryBuilder): 
 };
 
 export const buildMultiSignatureWallet = (): Wallets.Wallet => {
-	const multiSignatureAsset: IMultiSignatureAsset = {
+	const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
 		publicKeys: [
 			Identities.PublicKey.fromPassphrase(passphrases[0]),
 			Identities.PublicKey.fromPassphrase(passphrases[1]),

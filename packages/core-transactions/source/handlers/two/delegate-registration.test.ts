@@ -1,9 +1,8 @@
 import { Application, Container, Contracts, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
-import { Wallets } from "@packages/core-state";
-import { StateStore } from "@packages/core-state/source/stores/state";
+import { Stores, Wallets } from "@packages/core-state";
 import { Mocks, Generators, Factories } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { Mempool } from "@packages/core-transaction-pool/source/mempool";
+import { Mempool } from "@packages/core-transaction-pool";
 import {
 	InsufficientBalanceError,
 	NotSupportedForMultiSignatureWalletError,
@@ -26,7 +25,7 @@ let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
+Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 const transactionHistoryService = {

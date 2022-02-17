@@ -1,5 +1,5 @@
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state/distribution";
+import { Stores, Wallets } from "@packages/core-state";
 import { Mapper, Mocks } from "@packages/core-test-framework";
 import { Factories, Generators } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";

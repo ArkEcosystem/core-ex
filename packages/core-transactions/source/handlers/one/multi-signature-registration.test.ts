@@ -3,7 +3,7 @@ import { Stores, Wallets } from "@packages/core-state";
 import { Factories, Generators, Mocks } from "@packages/core-test-framework";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
+import { getWalletAttributeSet } from "@packages/core-test-framework";
 import { LegacyMultiSignatureError, MultiSignatureAlreadyRegisteredError } from "../../errors";
 import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
