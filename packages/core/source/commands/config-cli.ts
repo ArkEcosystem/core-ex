@@ -1,22 +1,16 @@
 import { Commands, Container, Services } from "@arkecosystem/core-cli";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	@Container.inject(Container.Identifiers.Installer)
 	private readonly installer!: Services.Installer;
 
-
 	public signature: string = "config:cli";
-
 
 	public description: string = "Update the CLI configuration.";
 
-
 	public requiresNetwork: boolean = false;
-
 
 	public configure(): void {
 		this.definition
@@ -27,7 +21,6 @@ export class Command extends Commands.Command {
 				Joi.string().valid(...["next", "latest"]),
 			);
 	}
-
 
 	public async execute(): Promise<void> {
 		if (this.hasFlag("token")) {

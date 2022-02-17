@@ -7,16 +7,12 @@ import { Identifiers, inject, injectable } from "../../ioc";
 import { Job } from "./interfaces";
 import { ExecuteCallbackWhenReady } from "./listeners";
 
-
 @injectable()
 export class BlockJob implements Job {
-
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: EventDispatcher;
 
-
 	protected blockCount: number = 1;
-
 
 	public execute(callback: Function): void {
 		const onCallback = async () => {
@@ -33,38 +29,31 @@ export class BlockJob implements Job {
 		this.events.listen(BlockEvent.Received, new ExecuteCallbackWhenReady(onCallback, this.blockCount));
 	}
 
-
 	public cron(blockCount: number): this {
 		this.blockCount = blockCount;
 
 		return this;
 	}
 
-
 	public everyBlock(): this {
 		return this.cron(1);
 	}
-
 
 	public everyFiveBlocks(): this {
 		return this.cron(5);
 	}
 
-
 	public everyTenBlocks(): this {
 		return this.cron(10);
 	}
-
 
 	public everyFifteenBlocks(): this {
 		return this.cron(15);
 	}
 
-
 	public everyThirtyBlocks(): this {
 		return this.cron(30);
 	}
-
 
 	public everyRound(): this {
 		return this.cron(Managers.configManager.getMilestone().activeDelegates);

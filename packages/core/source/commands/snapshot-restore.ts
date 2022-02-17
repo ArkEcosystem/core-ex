@@ -4,15 +4,11 @@ import { ProgressRenderer } from "@arkecosystem/core-snapshots";
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "snapshot:restore";
 
-
 	public description: string = "Import data from specified snapshot.";
-
 
 	public configure(): void {
 		this.definition
@@ -22,7 +18,6 @@ export class Command extends Commands.Command {
 			.setFlag("truncate", "Empty all tables before running import.", Joi.boolean())
 			.setFlag("verify", "Verify signatures of specified snapshot.", Joi.boolean());
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

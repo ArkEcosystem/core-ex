@@ -2,19 +2,14 @@ import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
 import { Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	@Container.inject(Container.Identifiers.Updater)
 	private readonly updater!: Contracts.Updater;
 
-
 	public signature: string = "update";
 
-
 	public description: string = "Update the Core installation.";
-
 
 	public configure(): void {
 		this.definition
@@ -26,7 +21,6 @@ export class Command extends Commands.Command {
 			.setFlag("restartRelay", "Restart the Relay process.", Joi.boolean())
 			.setFlag("restartForger", "Restart the Forger process.", Joi.boolean());
 	}
-
 
 	public async execute(): Promise<void> {
 		const hasNewVersion: boolean = await this.updater.check();
@@ -61,7 +55,6 @@ export class Command extends Commands.Command {
 			this.components.success(`You already have the latest version (${this.pkg.version})`);
 		}
 	}
-
 
 	private hasRestartFlag(): boolean {
 		return Utils.hasSomeProperty(this.getFlags(), ["restart", "restartCore", "restartRelay", "restartForger"]);

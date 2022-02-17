@@ -29,5 +29,4 @@ const createFactory = memoize((): FactoryBuilder => {
 	return factory;
 });
 
-
 export const factory = (name: string): Factory => createFactory().get(name);

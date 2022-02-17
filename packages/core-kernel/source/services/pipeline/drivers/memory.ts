@@ -1,12 +1,9 @@
 import { Pipeline, Stage } from "../../../contracts/kernel";
 import { injectable } from "../../../ioc";
 
-
 @injectable()
 export class MemoryPipeline implements Pipeline {
-
 	public constructor(private readonly stages: Array<Function | Stage> = []) {}
-
 
 	public pipe(stage: Function | Stage): Pipeline {
 		const stages: Array<Function | Stage> = [...this.stages];
@@ -15,7 +12,6 @@ export class MemoryPipeline implements Pipeline {
 
 		return new MemoryPipeline(stages);
 	}
-
 
 	public async process<T>(payload: T): Promise<T | undefined> {
 		for (const stage of this.stages) {
@@ -28,7 +24,6 @@ export class MemoryPipeline implements Pipeline {
 
 		return payload;
 	}
-
 
 	public processSync<T>(payload: T): T | undefined {
 		for (const stage of this.stages) {

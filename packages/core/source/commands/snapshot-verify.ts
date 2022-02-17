@@ -4,15 +4,11 @@ import { ProgressRenderer } from "@arkecosystem/core-snapshots";
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "snapshot:verify";
 
-
 	public description: string = "Check validity of specified snapshot.";
-
 
 	public configure(): void {
 		this.definition
@@ -20,7 +16,6 @@ export class Command extends Commands.Command {
 			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
 			.setFlag("blocks", "Blocks to verify, correlates to folder name.", Joi.string().required());
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

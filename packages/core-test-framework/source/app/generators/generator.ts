@@ -4,9 +4,7 @@ import { generateMnemonic } from "bip39";
 import passphrases from "../../internal/passphrases.json";
 import { SandboxOptions, Wallet } from "../contracts";
 
-
 export abstract class Generator {
-
 	protected options: SandboxOptions = {
 		core: {},
 		crypto: {
@@ -29,13 +27,11 @@ export abstract class Generator {
 		},
 	};
 
-
 	public constructor(options?: SandboxOptions) {
 		if (options) {
 			this.options = { ...this.options, ...options };
 		}
 	}
-
 
 	protected generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Wallet[] {
 		const wallets: Wallet[] = [];
@@ -49,7 +45,6 @@ export abstract class Generator {
 
 		return wallets;
 	}
-
 
 	protected createWallet(pubKeyHash: number, passphrase?: string): Wallet {
 		if (!passphrase) {

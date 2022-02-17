@@ -50,7 +50,6 @@ export class DatabaseInterceptor {
 		return blocks;
 	}
 
-
 	public async getBlocksByHeight(heights: number[]): Promise<Interfaces.IBlockData[]> {
 		const blocks: Interfaces.IBlockData[] = [];
 

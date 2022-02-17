@@ -13,9 +13,7 @@ export interface StateStore {
 
 	setBlockchain(blockchain: any): void;
 
-
 	getGenesisBlock(): Interfaces.IBlock;
-
 
 	setGenesisBlock(block: Interfaces.IBlock): void;
 
@@ -61,53 +59,37 @@ export interface StateStore {
 
 	reset(blockchainMachine): void;
 
-
 	isWakeUpTimeoutSet(): boolean;
-
 
 	setWakeUpTimeout(callback: Function, timeout: number): void;
 
-
 	clearWakeUpTimeout(): void;
-
 
 	getMaxLastBlocks(): number;
 
-
 	getLastHeight(): number;
-
 
 	getLastBlock(): Interfaces.IBlock;
 
-
 	setLastBlock(block: Interfaces.IBlock): void;
-
 
 	getLastBlocks(): Interfaces.IBlock[];
 
-
 	getLastBlockIds(): string[];
-
 
 	getLastBlocksByHeight(start: number, end?: number, headersOnly?: boolean): Interfaces.IBlockData[];
 
-
 	getCommonBlocks(ids: string[]): Interfaces.IBlockData[];
-
 
 	cacheTransactions(transactions: Interfaces.ITransactionData[]): {
 		[key in "added" | "notAdded"]: Interfaces.ITransactionData[];
 	};
 
-
 	clearCachedTransactionIds(): void;
-
 
 	getCachedTransactionIds(): string[];
 
-
 	pingBlock(incomingBlock: Interfaces.IBlockData): boolean;
-
 
 	pushPingBlock(block: Interfaces.IBlockData, fromForger?: boolean): void;
 }

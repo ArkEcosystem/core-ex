@@ -4,10 +4,8 @@ import prompts from "prompts";
 
 import { injectable } from "../ioc";
 
-
 @injectable()
 export class DiscoverNetwork {
-
 	public async discover(path: string, usePrompts: boolean = true): Promise<string> {
 		if (!existsSync(path)) {
 			throw new Error(`The [${path}] directory does not exist.`);
@@ -31,7 +29,6 @@ export class DiscoverNetwork {
 
 		return this.discoverWithPrompt(folders);
 	}
-
 
 	public async discoverWithPrompt(folders: string[]): Promise<string> {
 		const response = await prompts([

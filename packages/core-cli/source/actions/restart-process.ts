@@ -3,17 +3,13 @@ import { Spinner } from "../components";
 import { Identifiers, inject, injectable } from "../ioc";
 import { ProcessManager } from "../services";
 
-
 @injectable()
 export class RestartProcess {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
-
 
 	public execute(processName: string): void {
 		let spinner;

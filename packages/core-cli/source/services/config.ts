@@ -4,19 +4,14 @@ import { PackageJson } from "type-fest";
 import { Application } from "../contracts";
 import { Identifiers, inject, injectable, postConstruct } from "../ioc";
 
-
 @injectable()
 export class Config {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-
 	private file!: string;
 
-
 	private store: object = {};
-
 
 	@postConstruct()
 	public initialize(): void {
@@ -27,16 +22,13 @@ export class Config {
 		this.load();
 	}
 
-
 	public all(): object {
 		return this.store;
 	}
 
-
 	public get<T>(key: string): T {
 		return this.store[key];
 	}
-
 
 	public set<T>(key: string, value: T): void {
 		this.store[key] = value;
@@ -44,18 +36,15 @@ export class Config {
 		this.save();
 	}
 
-
 	public forget(key: string): void {
 		delete this.store[key];
 
 		this.save();
 	}
 
-
 	public has(key: string): boolean {
 		return Object.keys(this.store).includes(key);
 	}
-
 
 	public load(): any {
 		try {
@@ -67,13 +56,11 @@ export class Config {
 		}
 	}
 
-
 	public save(): void {
 		ensureFileSync(this.file);
 
 		writeJsonSync(this.file, this.store);
 	}
-
 
 	public restoreDefaults(): void {
 		if (this.store.constructor !== Object) {
@@ -94,7 +81,6 @@ export class Config {
 
 		this.save();
 	}
-
 
 	private getRegistryChannel(version: string): string {
 		const channels: string[] = ["next"];

@@ -24,7 +24,6 @@ export class Serializer {
 		}
 	}
 
-
 	public static serialize(transaction: ITransaction, options: ISerializeOptions = {}): Buffer {
 		const buff: ByteBuffer = new ByteBuffer(
 			Buffer.alloc(configManager.getMilestone(configManager.getHeight()).block?.maxPayload ?? 8192),
@@ -48,7 +47,6 @@ export class Serializer {
 
 		return bufferBuffer;
 	}
-
 
 	private static getBytesV1(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
 		let assetSize = 0;

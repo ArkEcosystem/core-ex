@@ -13,35 +13,26 @@ import * as Contracts from "../contracts";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
-
 @injectable()
 export class Updater implements Contracts.Updater {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
-
 
 	@inject(Identifiers.Config)
 	private readonly config!: Config;
 
-
 	@inject(Identifiers.Package)
 	private readonly pkg!: PackageJson;
-
 
 	@inject(Identifiers.Installer)
 	private readonly installer!: Installer;
 
-
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-
 	private updateCheckInterval: any = ONE_DAY;
 
-
 	private latestVersion: string | undefined;
-
 
 	public async check(): Promise<boolean> {
 		this.latestVersion = this.config.get("latestVersion");
@@ -68,7 +59,6 @@ export class Updater implements Contracts.Updater {
 
 		return true;
 	}
-
 
 	public async update(updateProcessManager: boolean = false, force: boolean = false): Promise<boolean> {
 		if (this.latestVersion === undefined) {
@@ -103,7 +93,6 @@ export class Updater implements Contracts.Updater {
 
 		return true;
 	}
-
 
 	public async getLatestVersion(): Promise<string | undefined> {
 		try {

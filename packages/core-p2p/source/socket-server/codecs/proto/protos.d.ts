@@ -12,7 +12,6 @@ export namespace blocks {
 
 	/** Represents a PostBlockRequest. */
 	class PostBlockRequest implements IPostBlockRequest {
-
 		constructor(properties?: blocks.IPostBlockRequest);
 
 		/** PostBlockRequest block. */
@@ -21,33 +20,24 @@ export namespace blocks {
 		/** PostBlockRequest headers. */
 		public headers?: shared.IHeaders | null;
 
-
 		public static create(properties?: blocks.IPostBlockRequest): blocks.PostBlockRequest;
-
 
 		public static encode(message: blocks.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: blocks.IPostBlockRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): blocks.PostBlockRequest;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): blocks.PostBlockRequest;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): blocks.PostBlockRequest;
-
 
 		public static toObject(
 			message: blocks.PostBlockRequest,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -63,7 +53,6 @@ export namespace blocks {
 
 	/** Represents a PostBlockResponse. */
 	class PostBlockResponse implements IPostBlockResponse {
-
 		constructor(properties?: blocks.IPostBlockResponse);
 
 		/** PostBlockResponse status. */
@@ -72,33 +61,24 @@ export namespace blocks {
 		/** PostBlockResponse height. */
 		public height: number;
 
-
 		public static create(properties?: blocks.IPostBlockResponse): blocks.PostBlockResponse;
-
 
 		public static encode(message: blocks.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: blocks.IPostBlockResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): blocks.PostBlockResponse;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): blocks.PostBlockResponse;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): blocks.PostBlockResponse;
-
 
 		public static toObject(
 			message: blocks.PostBlockResponse,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -123,7 +103,6 @@ export namespace blocks {
 
 	/** Represents a GetBlocksRequest. */
 	class GetBlocksRequest implements IGetBlocksRequest {
-
 		constructor(properties?: blocks.IGetBlocksRequest);
 
 		/** GetBlocksRequest lastBlockHeight. */
@@ -141,33 +120,24 @@ export namespace blocks {
 		/** GetBlocksRequest headers. */
 		public headers?: shared.IHeaders | null;
 
-
 		public static create(properties?: blocks.IGetBlocksRequest): blocks.GetBlocksRequest;
-
 
 		public static encode(message: blocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: blocks.IGetBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): blocks.GetBlocksRequest;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): blocks.GetBlocksRequest;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): blocks.GetBlocksRequest;
-
 
 		public static toObject(
 			message: blocks.GetBlocksRequest,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -180,39 +150,29 @@ export namespace blocks {
 
 	/** Represents a GetBlocksResponse. */
 	class GetBlocksResponse implements IGetBlocksResponse {
-
 		constructor(properties?: blocks.IGetBlocksResponse);
 
 		/** GetBlocksResponse blocks. */
 		public blocks: Uint8Array;
 
-
 		public static create(properties?: blocks.IGetBlocksResponse): blocks.GetBlocksResponse;
-
 
 		public static encode(message: blocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: blocks.IGetBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): blocks.GetBlocksResponse;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): blocks.GetBlocksResponse;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): blocks.GetBlocksResponse;
-
 
 		public static toObject(
 			message: blocks.GetBlocksResponse,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -271,7 +231,6 @@ export namespace blocks {
 
 		/** Represents a BlockHeader. */
 		class BlockHeader implements IBlockHeader {
-
 			constructor(properties?: blocks.GetBlocksResponse.IBlockHeader);
 
 			/** BlockHeader id. */
@@ -322,44 +281,35 @@ export namespace blocks {
 			/** BlockHeader transactions. */
 			public transactions: Uint8Array;
 
-
 			public static create(
 				properties?: blocks.GetBlocksResponse.IBlockHeader,
 			): blocks.GetBlocksResponse.BlockHeader;
-
 
 			public static encode(
 				message: blocks.GetBlocksResponse.IBlockHeader,
 				writer?: $protobuf.Writer,
 			): $protobuf.Writer;
 
-
 			public static encodeDelimited(
 				message: blocks.GetBlocksResponse.IBlockHeader,
 				writer?: $protobuf.Writer,
 			): $protobuf.Writer;
-
 
 			public static decode(
 				reader: $protobuf.Reader | Uint8Array,
 				length?: number,
 			): blocks.GetBlocksResponse.BlockHeader;
 
-
 			public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): blocks.GetBlocksResponse.BlockHeader;
-
 
 			public static verify(message: { [k: string]: any }): string | null;
 
-
 			public static fromObject(object: { [k: string]: any }): blocks.GetBlocksResponse.BlockHeader;
-
 
 			public static toObject(
 				message: blocks.GetBlocksResponse.BlockHeader,
 				options?: $protobuf.IConversionOptions,
 			): { [k: string]: any };
-
 
 			public toJSON(): { [k: string]: any };
 		}
@@ -376,39 +326,29 @@ export namespace peer {
 
 	/** Represents a GetPeersRequest. */
 	class GetPeersRequest implements IGetPeersRequest {
-
 		constructor(properties?: peer.IGetPeersRequest);
 
 		/** GetPeersRequest headers. */
 		public headers?: shared.IHeaders | null;
 
-
 		public static create(properties?: peer.IGetPeersRequest): peer.GetPeersRequest;
-
 
 		public static encode(message: peer.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: peer.IGetPeersRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetPeersRequest;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetPeersRequest;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): peer.GetPeersRequest;
-
 
 		public static toObject(
 			message: peer.GetPeersRequest,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -421,39 +361,29 @@ export namespace peer {
 
 	/** Represents a GetPeersResponse. */
 	class GetPeersResponse implements IGetPeersResponse {
-
 		constructor(properties?: peer.IGetPeersResponse);
 
 		/** GetPeersResponse peers. */
 		public peers: peer.GetPeersResponse.IPeer[];
 
-
 		public static create(properties?: peer.IGetPeersResponse): peer.GetPeersResponse;
-
 
 		public static encode(message: peer.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: peer.IGetPeersResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetPeersResponse;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetPeersResponse;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): peer.GetPeersResponse;
-
 
 		public static toObject(
 			message: peer.GetPeersResponse,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -470,7 +400,6 @@ export namespace peer {
 
 		/** Represents a Peer. */
 		class Peer implements IPeer {
-
 			constructor(properties?: peer.GetPeersResponse.IPeer);
 
 			/** Peer ip. */
@@ -479,36 +408,27 @@ export namespace peer {
 			/** Peer port. */
 			public port: number;
 
-
 			public static create(properties?: peer.GetPeersResponse.IPeer): peer.GetPeersResponse.Peer;
 
-
 			public static encode(message: peer.GetPeersResponse.IPeer, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 			public static encodeDelimited(
 				message: peer.GetPeersResponse.IPeer,
 				writer?: $protobuf.Writer,
 			): $protobuf.Writer;
 
-
 			public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetPeersResponse.Peer;
-
 
 			public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetPeersResponse.Peer;
 
-
 			public static verify(message: { [k: string]: any }): string | null;
 
-
 			public static fromObject(object: { [k: string]: any }): peer.GetPeersResponse.Peer;
-
 
 			public static toObject(
 				message: peer.GetPeersResponse.Peer,
 				options?: $protobuf.IConversionOptions,
 			): { [k: string]: any };
-
 
 			public toJSON(): { [k: string]: any };
 		}
@@ -525,7 +445,6 @@ export namespace peer {
 
 	/** Represents a GetCommonBlocksRequest. */
 	class GetCommonBlocksRequest implements IGetCommonBlocksRequest {
-
 		constructor(properties?: peer.IGetCommonBlocksRequest);
 
 		/** GetCommonBlocksRequest ids. */
@@ -534,36 +453,27 @@ export namespace peer {
 		/** GetCommonBlocksRequest headers. */
 		public headers?: shared.IHeaders | null;
 
-
 		public static create(properties?: peer.IGetCommonBlocksRequest): peer.GetCommonBlocksRequest;
 
-
 		public static encode(message: peer.IGetCommonBlocksRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static encodeDelimited(
 			message: peer.IGetCommonBlocksRequest,
 			writer?: $protobuf.Writer,
 		): $protobuf.Writer;
 
-
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetCommonBlocksRequest;
-
 
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetCommonBlocksRequest;
 
-
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): peer.GetCommonBlocksRequest;
-
 
 		public static toObject(
 			message: peer.GetCommonBlocksRequest,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -576,42 +486,32 @@ export namespace peer {
 
 	/** Represents a GetCommonBlocksResponse. */
 	class GetCommonBlocksResponse implements IGetCommonBlocksResponse {
-
 		constructor(properties?: peer.IGetCommonBlocksResponse);
 
 		/** GetCommonBlocksResponse common. */
 		public common?: peer.GetCommonBlocksResponse.ICommon | null;
 
-
 		public static create(properties?: peer.IGetCommonBlocksResponse): peer.GetCommonBlocksResponse;
 
-
 		public static encode(message: peer.IGetCommonBlocksResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static encodeDelimited(
 			message: peer.IGetCommonBlocksResponse,
 			writer?: $protobuf.Writer,
 		): $protobuf.Writer;
 
-
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetCommonBlocksResponse;
-
 
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetCommonBlocksResponse;
 
-
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): peer.GetCommonBlocksResponse;
-
 
 		public static toObject(
 			message: peer.GetCommonBlocksResponse,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -628,7 +528,6 @@ export namespace peer {
 
 		/** Represents a Common. */
 		class Common implements ICommon {
-
 			constructor(properties?: peer.GetCommonBlocksResponse.ICommon);
 
 			/** Common height. */
@@ -637,44 +536,35 @@ export namespace peer {
 			/** Common id. */
 			public id: string;
 
-
 			public static create(
 				properties?: peer.GetCommonBlocksResponse.ICommon,
 			): peer.GetCommonBlocksResponse.Common;
-
 
 			public static encode(
 				message: peer.GetCommonBlocksResponse.ICommon,
 				writer?: $protobuf.Writer,
 			): $protobuf.Writer;
 
-
 			public static encodeDelimited(
 				message: peer.GetCommonBlocksResponse.ICommon,
 				writer?: $protobuf.Writer,
 			): $protobuf.Writer;
-
 
 			public static decode(
 				reader: $protobuf.Reader | Uint8Array,
 				length?: number,
 			): peer.GetCommonBlocksResponse.Common;
 
-
 			public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetCommonBlocksResponse.Common;
-
 
 			public static verify(message: { [k: string]: any }): string | null;
 
-
 			public static fromObject(object: { [k: string]: any }): peer.GetCommonBlocksResponse.Common;
-
 
 			public static toObject(
 				message: peer.GetCommonBlocksResponse.Common,
 				options?: $protobuf.IConversionOptions,
 			): { [k: string]: any };
-
 
 			public toJSON(): { [k: string]: any };
 		}
@@ -688,39 +578,29 @@ export namespace peer {
 
 	/** Represents a GetStatusRequest. */
 	class GetStatusRequest implements IGetStatusRequest {
-
 		constructor(properties?: peer.IGetStatusRequest);
 
 		/** GetStatusRequest headers. */
 		public headers?: shared.IHeaders | null;
 
-
 		public static create(properties?: peer.IGetStatusRequest): peer.GetStatusRequest;
-
 
 		public static encode(message: peer.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: peer.IGetStatusRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetStatusRequest;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetStatusRequest;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): peer.GetStatusRequest;
-
 
 		public static toObject(
 			message: peer.GetStatusRequest,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -736,7 +616,6 @@ export namespace peer {
 
 	/** Represents a GetStatusResponse. */
 	class GetStatusResponse implements IGetStatusResponse {
-
 		constructor(properties?: peer.IGetStatusResponse);
 
 		/** GetStatusResponse state. */
@@ -745,33 +624,24 @@ export namespace peer {
 		/** GetStatusResponse config. */
 		public config?: peer.GetStatusResponse.IConfig | null;
 
-
 		public static create(properties?: peer.IGetStatusResponse): peer.GetStatusResponse;
-
 
 		public static encode(message: peer.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: peer.IGetStatusResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetStatusResponse;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetStatusResponse;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse;
-
 
 		public static toObject(
 			message: peer.GetStatusResponse,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -794,7 +664,6 @@ export namespace peer {
 
 		/** Represents a State. */
 		class State implements IState {
-
 			constructor(properties?: peer.GetStatusResponse.IState);
 
 			/** State height. */
@@ -809,36 +678,27 @@ export namespace peer {
 			/** State header. */
 			public header?: peer.GetStatusResponse.State.IBlockHeader | null;
 
-
 			public static create(properties?: peer.GetStatusResponse.IState): peer.GetStatusResponse.State;
 
-
 			public static encode(message: peer.GetStatusResponse.IState, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 			public static encodeDelimited(
 				message: peer.GetStatusResponse.IState,
 				writer?: $protobuf.Writer,
 			): $protobuf.Writer;
 
-
 			public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetStatusResponse.State;
-
 
 			public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetStatusResponse.State;
 
-
 			public static verify(message: { [k: string]: any }): string | null;
 
-
 			public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.State;
-
 
 			public static toObject(
 				message: peer.GetStatusResponse.State,
 				options?: $protobuf.IConversionOptions,
 			): { [k: string]: any };
-
 
 			public toJSON(): { [k: string]: any };
 		}
@@ -894,7 +754,6 @@ export namespace peer {
 
 			/** Represents a BlockHeader. */
 			class BlockHeader implements IBlockHeader {
-
 				constructor(properties?: peer.GetStatusResponse.State.IBlockHeader);
 
 				/** BlockHeader id. */
@@ -942,46 +801,37 @@ export namespace peer {
 				/** BlockHeader blockSignature. */
 				public blockSignature: string;
 
-
 				public static create(
 					properties?: peer.GetStatusResponse.State.IBlockHeader,
 				): peer.GetStatusResponse.State.BlockHeader;
-
 
 				public static encode(
 					message: peer.GetStatusResponse.State.IBlockHeader,
 					writer?: $protobuf.Writer,
 				): $protobuf.Writer;
 
-
 				public static encodeDelimited(
 					message: peer.GetStatusResponse.State.IBlockHeader,
 					writer?: $protobuf.Writer,
 				): $protobuf.Writer;
-
 
 				public static decode(
 					reader: $protobuf.Reader | Uint8Array,
 					length?: number,
 				): peer.GetStatusResponse.State.BlockHeader;
 
-
 				public static decodeDelimited(
 					reader: $protobuf.Reader | Uint8Array,
 				): peer.GetStatusResponse.State.BlockHeader;
 
-
 				public static verify(message: { [k: string]: any }): string | null;
 
-
 				public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.State.BlockHeader;
-
 
 				public static toObject(
 					message: peer.GetStatusResponse.State.BlockHeader,
 					options?: $protobuf.IConversionOptions,
 				): { [k: string]: any };
-
 
 				public toJSON(): { [k: string]: any };
 			}
@@ -1001,7 +851,6 @@ export namespace peer {
 
 		/** Represents a Config. */
 		class Config implements IConfig {
-
 			constructor(properties?: peer.GetStatusResponse.IConfig);
 
 			/** Config version. */
@@ -1013,36 +862,27 @@ export namespace peer {
 			/** Config plugins. */
 			public plugins: { [k: string]: peer.GetStatusResponse.Config.IPlugin };
 
-
 			public static create(properties?: peer.GetStatusResponse.IConfig): peer.GetStatusResponse.Config;
 
-
 			public static encode(message: peer.GetStatusResponse.IConfig, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 			public static encodeDelimited(
 				message: peer.GetStatusResponse.IConfig,
 				writer?: $protobuf.Writer,
 			): $protobuf.Writer;
 
-
 			public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): peer.GetStatusResponse.Config;
-
 
 			public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): peer.GetStatusResponse.Config;
 
-
 			public static verify(message: { [k: string]: any }): string | null;
 
-
 			public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config;
-
 
 			public static toObject(
 				message: peer.GetStatusResponse.Config,
 				options?: $protobuf.IConversionOptions,
 			): { [k: string]: any };
-
 
 			public toJSON(): { [k: string]: any };
 		}
@@ -1068,7 +908,6 @@ export namespace peer {
 
 			/** Represents a Network. */
 			class Network implements INetwork {
-
 				constructor(properties?: peer.GetStatusResponse.Config.INetwork);
 
 				/** Network name. */
@@ -1086,46 +925,37 @@ export namespace peer {
 				/** Network version. */
 				public version: number;
 
-
 				public static create(
 					properties?: peer.GetStatusResponse.Config.INetwork,
 				): peer.GetStatusResponse.Config.Network;
-
 
 				public static encode(
 					message: peer.GetStatusResponse.Config.INetwork,
 					writer?: $protobuf.Writer,
 				): $protobuf.Writer;
 
-
 				public static encodeDelimited(
 					message: peer.GetStatusResponse.Config.INetwork,
 					writer?: $protobuf.Writer,
 				): $protobuf.Writer;
-
 
 				public static decode(
 					reader: $protobuf.Reader | Uint8Array,
 					length?: number,
 				): peer.GetStatusResponse.Config.Network;
 
-
 				public static decodeDelimited(
 					reader: $protobuf.Reader | Uint8Array,
 				): peer.GetStatusResponse.Config.Network;
 
-
 				public static verify(message: { [k: string]: any }): string | null;
 
-
 				public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config.Network;
-
 
 				public static toObject(
 					message: peer.GetStatusResponse.Config.Network,
 					options?: $protobuf.IConversionOptions,
 				): { [k: string]: any };
-
 
 				public toJSON(): { [k: string]: any };
 			}
@@ -1142,7 +972,6 @@ export namespace peer {
 
 				/** Represents a Token. */
 				class Token implements IToken {
-
 					constructor(properties?: peer.GetStatusResponse.Config.Network.IToken);
 
 					/** Token name. */
@@ -1151,46 +980,37 @@ export namespace peer {
 					/** Token symbol. */
 					public symbol: string;
 
-
 					public static create(
 						properties?: peer.GetStatusResponse.Config.Network.IToken,
 					): peer.GetStatusResponse.Config.Network.Token;
-
 
 					public static encode(
 						message: peer.GetStatusResponse.Config.Network.IToken,
 						writer?: $protobuf.Writer,
 					): $protobuf.Writer;
 
-
 					public static encodeDelimited(
 						message: peer.GetStatusResponse.Config.Network.IToken,
 						writer?: $protobuf.Writer,
 					): $protobuf.Writer;
-
 
 					public static decode(
 						reader: $protobuf.Reader | Uint8Array,
 						length?: number,
 					): peer.GetStatusResponse.Config.Network.Token;
 
-
 					public static decodeDelimited(
 						reader: $protobuf.Reader | Uint8Array,
 					): peer.GetStatusResponse.Config.Network.Token;
 
-
 					public static verify(message: { [k: string]: any }): string | null;
 
-
 					public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config.Network.Token;
-
 
 					public static toObject(
 						message: peer.GetStatusResponse.Config.Network.Token,
 						options?: $protobuf.IConversionOptions,
 					): { [k: string]: any };
-
 
 					public toJSON(): { [k: string]: any };
 				}
@@ -1210,7 +1030,6 @@ export namespace peer {
 
 			/** Represents a Plugin. */
 			class Plugin implements IPlugin {
-
 				constructor(properties?: peer.GetStatusResponse.Config.IPlugin);
 
 				/** Plugin port. */
@@ -1222,46 +1041,37 @@ export namespace peer {
 				/** Plugin estimateTotalCount. */
 				public estimateTotalCount: boolean;
 
-
 				public static create(
 					properties?: peer.GetStatusResponse.Config.IPlugin,
 				): peer.GetStatusResponse.Config.Plugin;
-
 
 				public static encode(
 					message: peer.GetStatusResponse.Config.IPlugin,
 					writer?: $protobuf.Writer,
 				): $protobuf.Writer;
 
-
 				public static encodeDelimited(
 					message: peer.GetStatusResponse.Config.IPlugin,
 					writer?: $protobuf.Writer,
 				): $protobuf.Writer;
-
 
 				public static decode(
 					reader: $protobuf.Reader | Uint8Array,
 					length?: number,
 				): peer.GetStatusResponse.Config.Plugin;
 
-
 				public static decodeDelimited(
 					reader: $protobuf.Reader | Uint8Array,
 				): peer.GetStatusResponse.Config.Plugin;
 
-
 				public static verify(message: { [k: string]: any }): string | null;
 
-
 				public static fromObject(object: { [k: string]: any }): peer.GetStatusResponse.Config.Plugin;
-
 
 				public static toObject(
 					message: peer.GetStatusResponse.Config.Plugin,
 					options?: $protobuf.IConversionOptions,
 				): { [k: string]: any };
-
 
 				public toJSON(): { [k: string]: any };
 			}
@@ -1279,36 +1089,26 @@ export namespace shared {
 
 	/** Represents a Headers. */
 	class Headers implements IHeaders {
-
 		constructor(properties?: shared.IHeaders);
 
 		/** Headers version. */
 		public version: string;
 
-
 		public static create(properties?: shared.IHeaders): shared.Headers;
-
 
 		public static encode(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
 
-
 		public static encodeDelimited(message: shared.IHeaders, writer?: $protobuf.Writer): $protobuf.Writer;
-
 
 		public static decode(reader: $protobuf.Reader | Uint8Array, length?: number): shared.Headers;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): shared.Headers;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): shared.Headers;
 
-
 		public static toObject(message: shared.Headers, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -1327,7 +1127,6 @@ export namespace transactions {
 
 	/** Represents a PostTransactionsRequest. */
 	class PostTransactionsRequest implements IPostTransactionsRequest {
-
 		constructor(properties?: transactions.IPostTransactionsRequest);
 
 		/** PostTransactionsRequest transactions. */
@@ -1336,42 +1135,33 @@ export namespace transactions {
 		/** PostTransactionsRequest headers. */
 		public headers?: shared.IHeaders | null;
 
-
 		public static create(properties?: transactions.IPostTransactionsRequest): transactions.PostTransactionsRequest;
-
 
 		public static encode(
 			message: transactions.IPostTransactionsRequest,
 			writer?: $protobuf.Writer,
 		): $protobuf.Writer;
 
-
 		public static encodeDelimited(
 			message: transactions.IPostTransactionsRequest,
 			writer?: $protobuf.Writer,
 		): $protobuf.Writer;
-
 
 		public static decode(
 			reader: $protobuf.Reader | Uint8Array,
 			length?: number,
 		): transactions.PostTransactionsRequest;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): transactions.PostTransactionsRequest;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): transactions.PostTransactionsRequest;
-
 
 		public static toObject(
 			message: transactions.PostTransactionsRequest,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}
@@ -1384,50 +1174,40 @@ export namespace transactions {
 
 	/** Represents a PostTransactionsResponse. */
 	class PostTransactionsResponse implements IPostTransactionsResponse {
-
 		constructor(properties?: transactions.IPostTransactionsResponse);
 
 		/** PostTransactionsResponse accept. */
 		public accept: string[];
 
-
 		public static create(
 			properties?: transactions.IPostTransactionsResponse,
 		): transactions.PostTransactionsResponse;
-
 
 		public static encode(
 			message: transactions.IPostTransactionsResponse,
 			writer?: $protobuf.Writer,
 		): $protobuf.Writer;
 
-
 		public static encodeDelimited(
 			message: transactions.IPostTransactionsResponse,
 			writer?: $protobuf.Writer,
 		): $protobuf.Writer;
-
 
 		public static decode(
 			reader: $protobuf.Reader | Uint8Array,
 			length?: number,
 		): transactions.PostTransactionsResponse;
 
-
 		public static decodeDelimited(reader: $protobuf.Reader | Uint8Array): transactions.PostTransactionsResponse;
-
 
 		public static verify(message: { [k: string]: any }): string | null;
 
-
 		public static fromObject(object: { [k: string]: any }): transactions.PostTransactionsResponse;
-
 
 		public static toObject(
 			message: transactions.PostTransactionsResponse,
 			options?: $protobuf.IConversionOptions,
 		): { [k: string]: any };
-
 
 		public toJSON(): { [k: string]: any };
 	}

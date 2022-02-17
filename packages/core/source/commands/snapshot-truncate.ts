@@ -3,22 +3,17 @@ import { Container as KernelContainer, Contracts as KernelContracts } from "@ark
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "snapshot:truncate";
 
-
 	public description: string = "Truncate blockchain database.";
-
 
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
 			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)));
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

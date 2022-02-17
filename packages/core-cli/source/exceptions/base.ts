@@ -1,6 +1,4 @@
-
 export class Exception extends Error {
-
 	public constructor(message: string, code?: string) {
 		super(message);
 

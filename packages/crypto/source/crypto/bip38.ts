@@ -1,5 +1,3 @@
-
-
 import assert from "assert";
 import { secp256k1 } from "bcrypto";
 import aes from "browserify-aes";

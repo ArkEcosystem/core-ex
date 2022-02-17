@@ -1,15 +1,11 @@
 import { Commands, Container } from "@arkecosystem/core-cli";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "forger:log";
 
-
 	public description: string = "Display the Forger process log.";
-
 
 	public configure(): void {
 		this.definition
@@ -17,7 +13,6 @@ export class Command extends Commands.Command {
 			.setFlag("error", "Only display the error output.", Joi.boolean())
 			.setFlag("lines", "The number of lines to output.", Joi.number().default(15));
 	}
-
 
 	public async execute(): Promise<void> {
 		await this.app

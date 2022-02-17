@@ -2,18 +2,13 @@ import { Commands, Container } from "@arkecosystem/core-cli";
 import Joi from "joi";
 import ngrok from "ngrok";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "relay:share";
-
 
 	public description: string = "Share the Relay via ngrok.";
 
-
 	public requiresNetwork: boolean = false;
-
 
 	public configure(): void {
 		this.definition
@@ -24,7 +19,6 @@ export class Command extends Commands.Command {
 			.setFlag("authtoken", "Your authtoken from ngrok.com.", Joi.string())
 			.setFlag("region", "Choose one of the ngrok regions (us|eu|au|ap).", Joi.string().default("eu"));
 	}
-
 
 	public async execute(): Promise<void> {
 		const url: string = await ngrok.connect({

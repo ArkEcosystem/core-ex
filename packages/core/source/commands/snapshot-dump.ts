@@ -4,15 +4,11 @@ import { ProgressRenderer } from "@arkecosystem/core-snapshots";
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "snapshot:dump";
 
-
 	public description: string = "Create a full snapshot of the database.";
-
 
 	public configure(): void {
 		this.definition
@@ -23,7 +19,6 @@ export class Command extends Commands.Command {
 			.setFlag("start", "The start network height to export.", Joi.number())
 			.setFlag("end", "The end network height to export.", Joi.number());
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

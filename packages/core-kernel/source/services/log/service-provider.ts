@@ -3,7 +3,6 @@ import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { LogManager } from "./manager";
 
 export class ServiceProvider extends BaseServiceProvider {
-
 	public async register(): Promise<void> {
 		this.app.bind<LogManager>(Identifiers.LogManager).to(LogManager).inSingletonScope();
 

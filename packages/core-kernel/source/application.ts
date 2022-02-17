@@ -14,11 +14,8 @@ import { ServiceProvider as EventServiceProvider } from "./services/events/servi
 import { JsonObject, KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
 
-
 export class Application implements Contracts.Kernel.Application {
-
 	private booted: boolean = false;
-
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
 		// todo: enable this after solving the event emitter limit issues
@@ -33,7 +30,6 @@ export class Application implements Contracts.Kernel.Application {
 			.inSingletonScope();
 	}
 
-
 	public async bootstrap(options: { flags: JsonObject; plugins?: JsonObject }): Promise<void> {
 		this.bind<KeyValuePair>(Identifiers.ConfigFlags).toConstantValue(options.flags);
 		this.bind<KeyValuePair>(Identifiers.ConfigPlugins).toConstantValue(options.plugins || {});
@@ -43,20 +39,17 @@ export class Application implements Contracts.Kernel.Application {
 		await this.bootstrapWith("app");
 	}
 
-
 	public async boot(): Promise<void> {
 		await this.bootstrapWith("serviceProviders");
 
 		this.booted = true;
 	}
 
-
 	public async reboot(): Promise<void> {
 		await this.disposeServiceProviders();
 
 		await this.boot();
 	}
-
 
 	public config<T = any>(key: string, value?: T): T | undefined {
 		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.ConfigRepository);
@@ -68,121 +61,97 @@ export class Application implements Contracts.Kernel.Application {
 		return config.get(key);
 	}
 
-
 	public dirPrefix(): string {
 		return this.get(Identifiers.ApplicationDirPrefix);
 	}
-
 
 	public namespace(): string {
 		return this.get(Identifiers.ApplicationNamespace);
 	}
 
-
 	public version(): string {
 		return this.get(Identifiers.ApplicationVersion);
 	}
-
 
 	public token(): string {
 		return this.get(Identifiers.ApplicationToken);
 	}
 
-
 	public network(): string {
 		return this.get(Identifiers.ApplicationNetwork);
 	}
-
 
 	public useNetwork(value: string): void {
 		this.rebind<string>(Identifiers.ApplicationNetwork).toConstantValue(value);
 	}
 
-
 	public dataPath(path = ""): string {
 		return join(this.getPath("data"), path);
 	}
-
 
 	public useDataPath(path: string): void {
 		this.usePath("data", path);
 	}
 
-
 	public configPath(path = ""): string {
 		return join(this.getPath("config"), path);
 	}
-
 
 	public useConfigPath(path: string): void {
 		this.usePath("config", path);
 	}
 
-
 	public cachePath(path = ""): string {
 		return join(this.getPath("cache"), path);
 	}
-
 
 	public useCachePath(path: string): void {
 		this.usePath("cache", path);
 	}
 
-
 	public logPath(path = ""): string {
 		return join(this.getPath("log"), path);
 	}
-
 
 	public useLogPath(path: string): void {
 		this.usePath("log", path);
 	}
 
-
 	public tempPath(path = ""): string {
 		return join(this.getPath("temp"), path);
 	}
-
 
 	public useTempPath(path: string): void {
 		this.usePath("temp", path);
 	}
 
-
 	public environmentFile(): string {
 		return this.configPath(".env");
 	}
-
 
 	public environment(): string {
 		return this.get(Identifiers.ApplicationEnvironment);
 	}
 
-
 	public useEnvironment(value: string): void {
 		this.rebind<string>(Identifiers.ApplicationEnvironment).toConstantValue(value);
 	}
-
 
 	public isProduction(): boolean {
 		return this.environment() === "production" || this.network() === "mainnet";
 	}
 
-
 	public isDevelopment(): boolean {
 		return this.environment() === "development" || ["devnet", "testnet"].includes(this.network());
 	}
-
 
 	public runningTests(): boolean {
 		return this.environment() === "test" || this.network() === "testnet";
 	}
 
-
 	public isBooted(): boolean {
 		return this.booted;
 	}
-
 
 	public enableMaintenance(): void {
 		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: +new Date() }));
@@ -195,7 +164,6 @@ export class Application implements Contracts.Kernel.Application {
 		);
 	}
 
-
 	public disableMaintenance(): void {
 		removeSync(this.tempPath("maintenance"));
 
@@ -207,11 +175,9 @@ export class Application implements Contracts.Kernel.Application {
 		);
 	}
 
-
 	public isDownForMaintenance(): boolean {
 		return existsSync(this.tempPath("maintenance"));
 	}
-
 
 	public async terminate(reason?: string, error?: Error): Promise<void> {
 		this.booted = false;
@@ -227,13 +193,11 @@ export class Application implements Contracts.Kernel.Application {
 		await this.disposeServiceProviders();
 	}
 
-
 	public bind<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
 	): Contracts.Kernel.Container.BindingToSyntax<T> {
 		return this.container.bind(serviceIdentifier);
 	}
-
 
 	public rebind<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
@@ -245,16 +209,13 @@ export class Application implements Contracts.Kernel.Application {
 		return this.container.bind(serviceIdentifier);
 	}
 
-
 	public unbind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): void {
 		return this.container.unbind(serviceIdentifier);
 	}
 
-
 	public get<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): T {
 		return this.container.get(serviceIdentifier);
 	}
-
 
 	public getTagged<T>(
 		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
@@ -264,16 +225,13 @@ export class Application implements Contracts.Kernel.Application {
 		return this.container.getTagged(serviceIdentifier, key, value);
 	}
 
-
 	public isBound<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): boolean {
 		return this.container.isBound(serviceIdentifier);
 	}
 
-
 	public resolve<T>(constructorFunction: Contracts.Kernel.Container.Newable<T>): T {
 		return this.container.resolve(constructorFunction);
 	}
-
 
 	private async bootstrapWith(type: string): Promise<void> {
 		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers[type]);
@@ -288,11 +246,9 @@ export class Application implements Contracts.Kernel.Application {
 		}
 	}
 
-
 	private async registerEventDispatcher(): Promise<void> {
 		await this.resolve(EventServiceProvider).register();
 	}
-
 
 	private async disposeServiceProviders(): Promise<void> {
 		const serviceProviders: ServiceProvider[] = this.get<ServiceProviderRepository>(
@@ -308,7 +264,6 @@ export class Application implements Contracts.Kernel.Application {
 		}
 	}
 
-
 	private getPath(type: string): string {
 		const path: string = this.get<string>(`path.${type}`);
 
@@ -318,7 +273,6 @@ export class Application implements Contracts.Kernel.Application {
 
 		return path;
 	}
-
 
 	private usePath(type: string, path: string): void {
 		if (!existsSync(path)) {

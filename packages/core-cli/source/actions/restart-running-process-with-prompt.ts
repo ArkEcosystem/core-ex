@@ -4,17 +4,13 @@ import { Identifiers, inject, injectable } from "../ioc";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 
-
 @injectable()
 export class RestartRunningProcessWithPrompt {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
-
 
 	public async execute(processName: string): Promise<void> {
 		if (this.processManager.isOnline(processName)) {

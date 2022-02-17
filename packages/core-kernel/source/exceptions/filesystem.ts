@@ -1,8 +1,6 @@
 import { RuntimeException } from "./runtime";
 
-
 export class FileException extends RuntimeException {}
-
 
 export class AccessDenied extends FileException {
 	public constructor(path: string) {
@@ -10,12 +8,9 @@ export class AccessDenied extends FileException {
 	}
 }
 
-
 export class CannotWriteFile extends FileException {}
 
-
 export class DirectoryCannotBeFound extends FileException {
-
 	public constructor(value: string) {
 		super(`Directory [${value}] could not be found.`);
 	}

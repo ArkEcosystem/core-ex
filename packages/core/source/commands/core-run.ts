@@ -4,15 +4,11 @@ import Joi from "joi";
 
 import { buildBIP38 } from "../internal/crypto";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "core:run";
 
-
 	public description: string = "Run the Core process in foreground. Exiting the process will stop it from running.";
-
 
 	public configure(): void {
 		this.definition
@@ -29,7 +25,6 @@ export class Command extends Commands.Command {
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag("skipPrompts", "Skip prompts.", Joi.boolean().default(false));
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

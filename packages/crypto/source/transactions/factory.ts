@@ -27,7 +27,6 @@ export class TransactionFactory {
 		return this.fromSerialized(buff.toString("hex"), strict, options);
 	}
 
-
 	public static fromBytesUnsafe(buff: Buffer, id?: string): ITransaction {
 		try {
 			const options: IDeserializeOptions | ISerializeOptions = { acceptLegacyVersion: true };

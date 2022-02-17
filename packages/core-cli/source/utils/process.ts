@@ -11,25 +11,19 @@ import { ProcessDescription } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 import { ProcessManager } from "../services";
 
-
 @injectable()
 export class Process {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
-
 
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-
 	private processName!: string;
-
 
 	public initialize(token: string, suffix: string): void {
 		this.processName = `${token}-${suffix}`;
 	}
-
 
 	public stop(daemon: boolean): void {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
@@ -45,7 +39,6 @@ export class Process {
 		spinner.succeed();
 	}
 
-
 	public restart(): void {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
 		this.app.get<AbortStoppedProcess>(Identifiers.AbortStoppedProcess).execute(this.processName);
@@ -58,7 +51,6 @@ export class Process {
 
 		spinner.succeed();
 	}
-
 
 	public status(): void {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);
@@ -81,7 +73,6 @@ export class Process {
 				]);
 			});
 	}
-
 
 	public async log(showErrors: boolean, lines: number): Promise<void> {
 		this.app.get<AbortMissingProcess>(Identifiers.AbortMissingProcess).execute(this.processName);

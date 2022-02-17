@@ -24,7 +24,6 @@ interface Assert {
 	transaction(value: unknown): asserts value is Transactions.Transaction;
 }
 
-
 export const assert: Assert = {
 	array: <T>(value: unknown): asserts value is Array<T> => {
 		return assertType(Array.isArray(value), "array");

@@ -19,7 +19,6 @@ export const calculateApproval = (delegate: Wallet, height: number = 1): number 
 	return toDecimal(voteBalance, totalSupply);
 };
 
-
 export const calculateForgedTotal = (wallet: Wallet): string => {
 	const delegate: WalletDelegateAttributes = wallet.getAttribute("delegate");
 	const forgedFees: BigNumber = BigNumber.make(delegate.forgedFees);

@@ -15,7 +15,6 @@ export class StateMachine {
 	@Container.inject(Container.Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-
 	public transition(event) {
 		const nextState = blockchainMachine.transition(this.stateStore.getBlockchain(), event);
 

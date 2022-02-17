@@ -1,30 +1,23 @@
 import { Commands, Container, Services } from "@arkecosystem/core-cli";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	@Container.inject(Container.Identifiers.Installer)
 	private readonly installer!: Services.Installer;
 
 	@Container.inject(Container.Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
-
 	public signature: string = "reinstall";
-
 
 	public description: string = "Reinstall the Core installation";
 
-
 	public requiresNetwork: boolean = false;
-
 
 	public configure(): void {
 		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean());
 	}
-
 
 	public async execute(): Promise<void> {
 		if (this.getFlag("force")) {
@@ -38,7 +31,6 @@ export class Command extends Commands.Command {
 
 		this.components.fatal("You'll need to confirm the reinstall to continue.");
 	}
-
 
 	private async performInstall(): Promise<void> {
 		const spinner = this.components.spinner(`Reinstalling ${this.pkg.version}`);

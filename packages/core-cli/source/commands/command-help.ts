@@ -5,17 +5,13 @@ import { AppHeader } from "../components";
 import { Application } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 
-
 @injectable()
 export class CommandHelp {
-
 	@inject(Identifiers.Application)
 	protected readonly app!: Application;
 
-
 	@inject(Identifiers.Package)
 	protected readonly pkg!: PackageJson;
-
 
 	public render(command): string {
 		let helpMessage: string = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
@@ -40,7 +36,6 @@ ${flags}`;
 		return helpMessage;
 	}
 
-
 	private buildArguments(command): string {
 		const args = command.definition.getArguments();
 
@@ -58,7 +53,6 @@ ${flags}`;
 		return output.join("\n");
 	}
 
-
 	private buildFlags(command): string {
 		const flags = command.definition.getFlags();
 
@@ -75,7 +69,6 @@ ${flags}`;
 
 		return output.join("\n");
 	}
-
 
 	private buildProperties<T>(properties: T) {
 		const options: string[] = [];

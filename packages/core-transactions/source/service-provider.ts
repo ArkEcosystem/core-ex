@@ -30,7 +30,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		};
 	}
 
-
 	public async register(): Promise<void> {
 		this.app
 			.bind<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
@@ -64,7 +63,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Container.Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry);
 	}
-
 
 	public async required(): Promise<boolean> {
 		return true;

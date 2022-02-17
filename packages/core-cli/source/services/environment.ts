@@ -5,10 +5,8 @@ import { resolve } from "path";
 
 import { injectable } from "../ioc";
 
-
 @injectable()
 export class Environment {
-
 	public getPaths(token: string, network: string): Paths {
 		let paths: Paths = envPaths(token, { suffix: "core" });
 
@@ -32,7 +30,6 @@ export class Environment {
 
 		return paths;
 	}
-
 
 	public updateVariables(envFile: string, variables: Record<string, string | number>): void {
 		if (!existsSync(envFile)) {

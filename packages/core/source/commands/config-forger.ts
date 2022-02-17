@@ -5,15 +5,11 @@ import Joi from "joi";
 import { Command as BIP38Command } from "./config-forger-bip38";
 import { Command as BIP39Command } from "./config-forger-bip39";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "config:forger";
 
-
 	public description: string = "Configure the forging delegate.";
-
 
 	public configure(): void {
 		this.definition
@@ -29,7 +25,6 @@ export class Command extends Commands.Command {
 			)
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
-
 
 	public async execute(): Promise<void> {
 		if (this.getFlag("method") === "bip38") {

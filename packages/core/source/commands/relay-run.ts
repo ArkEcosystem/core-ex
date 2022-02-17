@@ -2,15 +2,11 @@ import { Commands, Container, Utils } from "@arkecosystem/core-cli";
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "relay:run";
 
-
 	public description: string = "Run the Relay process in foreground. Exiting the process will stop it from running.";
-
 
 	public configure(): void {
 		this.definition
@@ -23,7 +19,6 @@ export class Command extends Commands.Command {
 			.setFlag("ignoreMinimumNetworkReach", "Ignore the minimum network reach on start.", Joi.boolean())
 			.setFlag("launchMode", "The mode the relay will be launched in (seed only at the moment).", Joi.string());
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags = { ...this.getFlags() };

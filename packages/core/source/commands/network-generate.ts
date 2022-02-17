@@ -94,18 +94,14 @@ interface Options {
 	force: boolean;
 }
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
-
 	public signature: string = "network:generate";
 
-
 	public description: string = "Generates a new network configuration.";
-
 
 	public requiresNetwork: boolean = false;
 
@@ -309,7 +305,6 @@ export class Command extends Commands.Command {
 	];
 	/*eslint-enable */
 
-
 	public configure(): void {
 		for (const flag of this.flagSettings) {
 			const flagSchema: Joi.Schema = flag.schema;
@@ -323,7 +318,6 @@ export class Command extends Commands.Command {
 			this.definition.setFlag(flag.name, flag.description, flag.schema);
 		}
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = this.getFlags();

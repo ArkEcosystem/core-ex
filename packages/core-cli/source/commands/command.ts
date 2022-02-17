@@ -14,55 +14,40 @@ import { CommandHelp } from "./command-help";
 import { DiscoverConfig } from "./discover-config";
 import { DiscoverNetwork } from "./discover-network";
 
-
 @injectable()
 export abstract class Command {
-
 	@inject(Identifiers.Application)
 	protected readonly app!: Application;
-
 
 	@inject(Identifiers.Environment)
 	protected readonly env!: Environment;
 
-
 	@inject(Identifiers.Output)
 	protected readonly output!: Output;
-
 
 	@inject(Identifiers.Config)
 	protected readonly config!: Config;
 
-
 	@inject(Identifiers.Package)
 	protected readonly pkg!: PackageJson;
-
 
 	@inject(Identifiers.ActionFactory)
 	protected readonly actions!: ActionFactory;
 
-
 	@inject(Identifiers.ComponentFactory)
 	protected readonly components!: ComponentFactory;
 
-
 	public signature!: string;
-
 
 	public description: string | undefined;
 
-
 	public isHidden: boolean = false;
-
 
 	public requiresNetwork: boolean = true;
 
-
 	protected definition: InputDefinition = new InputDefinition();
 
-
 	protected input!: Input;
-
 
 	/* istanbul ignore next */
 	@postConstruct()
@@ -70,7 +55,6 @@ export abstract class Command {
 	public configure(): void {
 		// Do nothing...
 	}
-
 
 	public register(argv: string[]) {
 		try {
@@ -87,16 +71,13 @@ export abstract class Command {
 		}
 	}
 
-
 	public async initialize(): Promise<void> {
 		// Do nothing...
 	}
 
-
 	public async interact(): Promise<void> {
 		// Do nothing...
 	}
-
 
 	public async run(): Promise<void> {
 		try {
@@ -127,46 +108,37 @@ export abstract class Command {
 		}
 	}
 
-
 	public showHelp(): void {
 		this.app.get<Box>(Identifiers.Box).render(this.app.resolve(CommandHelp).render(this));
 	}
-
 
 	public getArguments(): Record<string, any> {
 		return this.input.getArguments();
 	}
 
-
 	public getArgument(name: string) {
 		return this.input.getArgument(name);
 	}
-
 
 	public setArgument(name: string, value: InputValue): void {
 		return this.input.setArgument(name, value);
 	}
 
-
 	public hasArgument(name: string): boolean {
 		return this.input.hasArgument(name);
 	}
-
 
 	public getFlags(): Record<string, any> {
 		return this.input.getFlags();
 	}
 
-
 	public getFlag(name: string) {
 		return this.input.getFlag(name);
 	}
 
-
 	public setFlag(name: string, value: InputValue): void {
 		return this.input.setFlag(name, value);
 	}
-
 
 	public hasFlag(name: string): boolean {
 		return this.input.hasFlag(name);
@@ -183,7 +155,6 @@ export abstract class Command {
 		}
 	}
 
-
 	private async detectNetwork(): Promise<void> {
 		const requiresNetwork: boolean = Object.keys(this.definition.getFlags()).includes("network");
 
@@ -198,7 +169,6 @@ export abstract class Command {
 			);
 		}
 	}
-
 
 	public abstract execute(): Promise<void>;
 }

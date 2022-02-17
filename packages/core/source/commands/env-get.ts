@@ -4,15 +4,11 @@ import Joi from "joi";
 import { parseFileSync } from "envfile";
 import { existsSync } from "fs-extra";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "env:get";
 
-
 	public description: string = "Get the value of an environment variable.";
-
 
 	public configure(): void {
 		this.definition
@@ -24,7 +20,6 @@ export class Command extends Commands.Command {
 				Joi.string().required(),
 			);
 	}
-
 
 	public async execute(): Promise<void> {
 		const envFile: string = this.app.getCorePath("config", ".env");

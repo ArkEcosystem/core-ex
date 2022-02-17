@@ -9,9 +9,7 @@ import { CryptoConfigPaths, Wallet } from "../contracts";
 import { Generator } from "./generator";
 
 export class CryptoGenerator extends Generator {
-
 	private destination!: string;
-
 
 	public generate(): CryptoConfigPaths {
 		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.flags.network}`);
@@ -330,7 +328,6 @@ export class CryptoGenerator extends Generator {
 		return byteBuffer.toBuffer();
 	}
 
-
 	private writeExceptions(): void {
 		const filePath: string = resolve(this.destination, "exceptions.json");
 
@@ -341,7 +338,6 @@ export class CryptoGenerator extends Generator {
 		}
 	}
 
-
 	private writeGenesisBlock(genesisBlock: Types.JsonObject): void {
 		const filePath: string = resolve(this.destination, "genesisBlock.json");
 
@@ -351,7 +347,6 @@ export class CryptoGenerator extends Generator {
 			writeJSONSync(filePath, genesisBlock, { spaces: 4 });
 		}
 	}
-
 
 	private writeMilestones(genesisBlock: Types.JsonObject): void {
 		const filePath: string = resolve(this.destination, "milestones.json");
@@ -373,7 +368,6 @@ export class CryptoGenerator extends Generator {
 			);
 		}
 	}
-
 
 	private writeNetwork(payloadHash: string): void {
 		const filePath: string = resolve(this.destination, "network.json");

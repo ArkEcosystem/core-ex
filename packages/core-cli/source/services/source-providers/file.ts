@@ -4,17 +4,14 @@ import { extract } from "tar";
 import { AbstractSource } from "./abstract-source";
 import { MissingPackageFolder } from "./errors";
 
-
 export class File extends AbstractSource {
 	public constructor(paths: { data: string; temp: string }) {
 		super(paths);
 	}
 
-
 	public async exists(value: string): Promise<boolean> {
 		return existsSync(value);
 	}
-
 
 	public async update(value: string): Promise<void> {
 		await this.install(value);

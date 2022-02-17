@@ -14,18 +14,14 @@ import {
 import { generateCoreConfig, generateCryptoConfig } from "./generators";
 
 export class Sandbox {
-
 	public readonly app: Application;
 
-
 	private readonly container: Container.interfaces.Container;
-
 
 	private paths!: {
 		core: CoreConfigPaths;
 		crypto: CryptoConfigPaths;
 	};
-
 
 	private readonly options: SandboxOptions = {
 		core: {},
@@ -49,7 +45,6 @@ export class Sandbox {
 		},
 	};
 
-
 	public constructor() {
 		setGracefulCleanup();
 
@@ -58,20 +53,17 @@ export class Sandbox {
 		this.app = new Application(this.container);
 	}
 
-
 	public withCoreOptions(options: CoreOptions): this {
 		this.options.core = { ...this.options.core, ...options };
 
 		return this;
 	}
 
-
 	public withCryptoOptions(options: CryptoOptions): this {
 		this.options.crypto = { ...this.options.crypto, ...options };
 
 		return this;
 	}
-
 
 	public async boot(callback?: SandboxCallback): Promise<void> {
 		// Generate Configurations
@@ -115,7 +107,6 @@ export class Sandbox {
 		}
 	}
 
-
 	public async dispose(callback?: SandboxCallback): Promise<void> {
 		try {
 			await this.app.terminate();
@@ -131,11 +122,9 @@ export class Sandbox {
 		}
 	}
 
-
 	public snapshot(): void {
 		this.container.snapshot();
 	}
-
 
 	public restore(): void {
 		try {
@@ -144,7 +133,6 @@ export class Sandbox {
 			// No snapshot available to restore.
 		}
 	}
-
 
 	public registerServiceProvider({
 		name,

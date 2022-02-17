@@ -3,22 +3,17 @@ import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 import { removeSync } from "fs-extra";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "pool:clear";
 
-
 	public description: string = "Clear the transaction pool.";
-
 
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
 			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)));
 	}
-
 
 	public async execute(): Promise<void> {
 		this.actions.abortRunningProcess(`${this.getFlag("token")}-core`);
@@ -41,7 +36,6 @@ export class Command extends Commands.Command {
 			this.components.fatal(err.message);
 		}
 	}
-
 
 	private removeFiles() {
 		removeSync(this.app.getCorePath("data", "transaction-pool"));

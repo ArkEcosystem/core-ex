@@ -63,30 +63,21 @@ export interface Wallet {
 
 	getData(): WalletData;
 
-
 	getAttributes(): Record<string, any>;
-
 
 	getAttribute<T = any>(key: string, defaultValue?: T): T;
 
-
 	setAttribute<T = any>(key: string, value: T): boolean;
-
 
 	forgetAttribute(key: string): boolean;
 
-
 	hasAttribute(key: string): boolean;
-
 
 	isDelegate(): boolean;
 
-
 	hasVoted(): boolean;
 
-
 	hasMultiSignature(): boolean;
-
 
 	clone(): Wallet;
 }

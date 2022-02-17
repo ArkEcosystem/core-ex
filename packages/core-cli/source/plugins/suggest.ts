@@ -6,13 +6,10 @@ import { JsonObject } from "type-fest";
 import { Application } from "../application";
 import { Identifiers, inject, injectable } from "../ioc";
 
-
 @injectable()
 export class SuggestCommand {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
-
 
 	public async execute(context: JsonObject): Promise<string | undefined> {
 		const signature: string = context.signature as string;

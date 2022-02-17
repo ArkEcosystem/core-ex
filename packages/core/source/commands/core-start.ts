@@ -5,15 +5,11 @@ import { resolve } from "path";
 
 import { buildBIP38 } from "../internal/crypto";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "core:start";
 
-
 	public description: string = "Start the Core process.";
-
 
 	public configure(): void {
 		this.definition
@@ -31,7 +27,6 @@ export class Command extends Commands.Command {
 			.setFlag("daemon", "Start the Core process as a daemon.", Joi.boolean().default(true))
 			.setFlag("skipPrompts", "Skip prompts.", Joi.boolean().default(false));
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

@@ -1,4 +1,3 @@
-
 export enum KernelEvent {
 	Booted = "kernel.booted",
 	Booting = "kernel.booting",
@@ -9,7 +8,6 @@ export enum KernelEvent {
 	ServiceProviderRegistered = "kernel.serviceProvider.registered",
 }
 
-
 export enum CacheEvent {
 	Flushed = "cache.flushed",
 	Forgotten = "cache.forgotten",
@@ -18,11 +16,9 @@ export enum CacheEvent {
 	Written = "cache.written",
 }
 
-
 export enum CryptoEvent {
 	MilestoneChanged = "crypto.milestone.changed",
 }
-
 
 export enum BlockEvent {
 	Applied = "block.applied",
@@ -31,7 +27,6 @@ export enum BlockEvent {
 	Received = "block.received",
 	Reverted = "block.reverted",
 }
-
 
 export enum DelegateEvent {
 	Registered = "delegate.registered",
@@ -43,13 +38,11 @@ export enum VoteEvent {
 	Unvote = "wallet.unvote",
 }
 
-
 export enum ForgerEvent {
 	Failed = "forger.failed",
 	Missing = "forger.missing",
 	Started = "forger.started",
 }
-
 
 export enum PeerEvent {
 	Added = "peer.added",
@@ -59,20 +52,17 @@ export enum PeerEvent {
 	Removed = "peer.removed",
 }
 
-
 export enum RoundEvent {
 	Applied = "round.applied",
 	Created = "round.created",
 	Missed = "round.missed",
 }
 
-
 export enum StateEvent {
 	BuilderFinished = "state.builder.finished",
 	Started = "state.started",
 	Starting = "state.starting",
 }
-
 
 export enum TransactionEvent {
 	AddedToPool = "transaction.pool.added",
@@ -84,12 +74,10 @@ export enum TransactionEvent {
 	Reverted = "transaction.reverted",
 }
 
-
 export enum ScheduleEvent {
 	BlockJobFinished = "schedule.blockJob.finished",
 	CronJobFinished = "schedule.cronJob.finished",
 }
-
 
 export enum QueueEvent {
 	Finished = "queue.finished",

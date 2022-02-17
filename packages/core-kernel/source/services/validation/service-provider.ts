@@ -3,7 +3,6 @@ import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { ValidationManager } from "./manager";
 
 export class ServiceProvider extends BaseServiceProvider {
-
 	public async register(): Promise<void> {
 		this.app.bind<ValidationManager>(Identifiers.ValidationManager).to(ValidationManager).inSingletonScope();
 

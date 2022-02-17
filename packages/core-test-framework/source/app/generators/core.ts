@@ -6,11 +6,8 @@ import { dirSync } from "tmp";
 import { CoreConfigPaths } from "../contracts";
 import { Generator } from "./generator";
 
-
 export class CoreGenerator extends Generator {
-
 	private destination!: string;
-
 
 	public generate(): CoreConfigPaths {
 		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.network}`);
@@ -40,7 +37,6 @@ export class CoreGenerator extends Generator {
 		};
 	}
 
-
 	private writePeers(): void {
 		const filePath: string = resolve(this.destination, "peers.json");
 
@@ -50,7 +46,6 @@ export class CoreGenerator extends Generator {
 			writeJSONSync(filePath, { list: [] }, { spaces: 4 });
 		}
 	}
-
 
 	private writeDelegates(delegates): void {
 		const filePath: string = resolve(this.destination, "delegates.json");
@@ -62,7 +57,6 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-
 	private writeEnvironment(): void {
 		const filePath: string = resolve(this.destination, ".env");
 
@@ -73,7 +67,6 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-
 	private writeApplication(): void {
 		const filePath: string = resolve(this.destination, "app.json");
 
@@ -83,7 +76,6 @@ export class CoreGenerator extends Generator {
 			copyFileSync(require.resolve("@arkecosystem/core/bin/config/testnet/app.json"), filePath);
 		}
 	}
-
 
 	private generateEnvironment(environment: Types.JsonObject): string {
 		let result = "";

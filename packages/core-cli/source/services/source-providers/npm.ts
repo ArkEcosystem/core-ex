@@ -6,12 +6,10 @@ import { promisify } from "util";
 
 import { AbstractSource } from "./abstract-source";
 
-
 export class NPM extends AbstractSource {
 	public constructor(paths: { data: string; temp: string }) {
 		super(paths);
 	}
-
 
 	public async exists(value: string, version?: string): Promise<boolean> {
 		try {
@@ -22,7 +20,6 @@ export class NPM extends AbstractSource {
 			return false;
 		}
 	}
-
 
 	public async update(value: string): Promise<void> {
 		await this.install(value);
@@ -37,7 +34,6 @@ export class NPM extends AbstractSource {
 
 		await this.extractPackage(name, tarballPath);
 	}
-
 
 	private async getPackage(value: string, version?: string): Promise<{ name: string; tarball: string }> {
 		const registry = process.env.CORE_NPM_REGISTRY || "https://registry.npmjs.org";
@@ -58,7 +54,6 @@ export class NPM extends AbstractSource {
 		};
 	}
 
-
 	private async downloadPackage(source: string, dest: string): Promise<void> {
 		removeSync(dest);
 
@@ -66,7 +61,6 @@ export class NPM extends AbstractSource {
 
 		await promisify(stream.pipeline)(got.stream(source), createWriteStream(dest));
 	}
-
 
 	private async extractPackage(name: string, file: string): Promise<void> {
 		await extract({

@@ -1,10 +1,7 @@
 import { Application, ApplicationFactory, Commands, Container, Services, Utils } from "@arkecosystem/core-cli";
 
-
 export class Console {
-
 	public app: Application;
-
 
 	public pkg = {
 		name: "@arkecosystem/core",
@@ -12,17 +9,13 @@ export class Console {
 		version: "3.0.0-next.0",
 	};
 
-
 	public args;
 
-
 	public flags;
-
 
 	public constructor(private useDefaultFlags = true) {
 		this.app = this.createApplication();
 	}
-
 
 	public withArgs(args: string[]): this {
 		this.args = [""];
@@ -31,13 +24,11 @@ export class Console {
 		return this;
 	}
 
-
 	public withFlags(flags: object): this {
 		this.flags = { ...this.flags, ...flags };
 
 		return this;
 	}
-
 
 	public async execute(command): Promise<void> {
 		this.app
@@ -62,12 +53,10 @@ export class Console {
 		this.reset();
 	}
 
-
 	private reset(): void {
 		this.args = [];
 		this.flags = this.useDefaultFlags ? { token: "ark", network: "testnet" } : {};
 	}
-
 
 	private createApplication(): Application {
 		const app = ApplicationFactory.make(new Container.Container(), this.pkg);

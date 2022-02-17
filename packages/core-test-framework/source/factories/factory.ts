@@ -3,14 +3,10 @@ import { strictEqual } from "assert";
 
 import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types";
 
-
 export class Factory {
-
 	private readonly states: Map<string, FactoryFunction> = new Map<string, FactoryFunction>();
 
-
 	private readonly hooks: Map<string, Set<HookFunction>> = new Map<string, Set<HookFunction>>();
-
 
 	private readonly modifiers: {
 		states: Set<string>;
@@ -22,25 +18,21 @@ export class Factory {
 		options: {},
 	};
 
-
 	public state(state: string, fn: FactoryFunction): boolean {
 		this.states.set(state, fn);
 
 		return this.states.has(state);
 	}
 
-
 	public afterMaking(fn: HookFunction): void {
 		this.afterMakingState("default", fn);
 	}
-
 
 	public afterMakingState(state: string, fn: HookFunction): void {
 		this.assertKnownState(state);
 
 		this.registerHook(state, fn);
 	}
-
 
 	public withStates(...states: string[]): this {
 		for (const state of states) {
@@ -52,20 +44,17 @@ export class Factory {
 		return this;
 	}
 
-
 	public withAttributes(attributes: object): this {
 		this.modifiers.attributes = attributes;
 
 		return this;
 	}
 
-
 	public withOptions(options: FactoryFunctionOptions): this {
 		this.modifiers.options = options;
 
 		return this;
 	}
-
 
 	public make<T>(resetModifiers: boolean = true): T {
 		const states: string[] = [...this.modifiers.states.values()];
@@ -90,7 +79,6 @@ export class Factory {
 
 			Utils.assert.defined<FactoryFunction>(fn);
 
-
 			result = fn({
 				entity: result,
 				options: this.modifiers.options,
@@ -111,7 +99,6 @@ export class Factory {
 		return result;
 	}
 
-
 	public makeMany<T>(count: number): T[] {
 		const entities: T[] = [];
 
@@ -123,7 +110,6 @@ export class Factory {
 
 		return entities;
 	}
-
 
 	private registerHook(state: string, fn: HookFunction): void {
 		if (!this.hooks.has(state)) {
@@ -139,11 +125,9 @@ export class Factory {
 		this.hooks.set(state, hooks);
 	}
 
-
 	private assertKnownState(state: string): void {
 		strictEqual(this.states.has(state), true, `The [${state}] state is unknown.`);
 	}
-
 
 	private applyHooks<T>(state: string, value: T): void {
 		const hooks: Set<HookFunction> | undefined = this.hooks.get(state);
@@ -154,7 +138,6 @@ export class Factory {
 			}
 		}
 	}
-
 
 	private resetModifiers(): void {
 		this.modifiers.states.clear();

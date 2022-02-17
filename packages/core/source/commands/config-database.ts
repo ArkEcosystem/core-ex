@@ -2,22 +2,16 @@ import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-
 	public signature: string = "config:database";
-
 
 	public description: string = "Update the Database configuration.";
 
-
 	private readonly validFlags: string[] = ["host", "port", "database", "username", "password"];
-
 
 	public configure(): void {
 		this.definition
@@ -29,7 +23,6 @@ export class Command extends Commands.Command {
 			.setFlag("username", "The name of the database user.", Joi.string())
 			.setFlag("password", "The password of the database user.", Joi.string());
 	}
-
 
 	public async execute(): Promise<void> {
 		const envFile = this.app.getCorePath("config", ".env");
@@ -86,7 +79,6 @@ export class Command extends Commands.Command {
 
 		this.environment.updateVariables(envFile, this.confirm(response));
 	}
-
 
 	private confirm(flags: Contracts.AnyObject): Contracts.AnyObject {
 		const variables: Contracts.AnyObject = {};

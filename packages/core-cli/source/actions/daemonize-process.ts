@@ -8,17 +8,13 @@ import { ProcessManager } from "../services";
 import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";
 
-
 @injectable()
 export class DaemonizeProcess {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
-
 
 	public execute(options: ProcessOptions, flags): void {
 		const processName: string = options.name;

@@ -2,22 +2,17 @@ import { Commands, Container } from "@arkecosystem/core-cli";
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "env:paths";
 
-
 	public description: string = "Get all of the environment paths.";
-
 
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
 			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)));
 	}
-
 
 	public async execute(): Promise<void> {
 		this.components.table(["Type", "Path"], (table) => {

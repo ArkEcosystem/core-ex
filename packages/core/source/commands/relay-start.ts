@@ -3,15 +3,11 @@ import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 import { resolve } from "path";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	public signature: string = "relay:start";
 
-
 	public description: string = "Start the Relay process.";
-
 
 	public configure(): void {
 		this.definition
@@ -25,7 +21,6 @@ export class Command extends Commands.Command {
 			.setFlag("launchMode", "The mode the relay will be launched in (seed only at the moment).", Joi.string())
 			.setFlag("daemon", "Start the Relay process as a daemon.", Joi.boolean().default(true));
 	}
-
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

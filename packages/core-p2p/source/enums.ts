@@ -1,5 +1,4 @@
 export enum Severity {
-
 	DEBUG_EXTRA,
 
 	/** One such message per successful peer verification is printed. */

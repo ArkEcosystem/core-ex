@@ -25,21 +25,16 @@ const processSchema = {
 		.required(),
 };
 
-
 @injectable()
 export class LocalConfigLoader implements ConfigLoader {
-
 	@inject(Identifiers.Application)
 	protected readonly app!: Application;
-
 
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
-
 	@inject(Identifiers.ValidationService)
 	private readonly validationService!: Validator;
-
 
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
@@ -55,7 +50,6 @@ export class LocalConfigLoader implements ConfigLoader {
 		}
 	}
 
-
 	public async loadConfiguration(): Promise<void> {
 		try {
 			this.loadApplication();
@@ -69,7 +63,6 @@ export class LocalConfigLoader implements ConfigLoader {
 			throw new ApplicationConfigurationCannotBeLoaded(error.message);
 		}
 	}
-
 
 	private loadApplication(): void {
 		const processType: string = this.app.get<KeyValuePair>(Identifiers.ConfigFlags).processType;
@@ -94,7 +87,6 @@ export class LocalConfigLoader implements ConfigLoader {
 
 		this.configRepository.set("app.plugins", get(this.validationService.valid(), `${processType}.plugins`, []));
 	}
-
 
 	private loadPeers(): void {
 		this.validationService.validate(
@@ -121,7 +113,6 @@ export class LocalConfigLoader implements ConfigLoader {
 		this.configRepository.set("peers", this.validationService.valid());
 	}
 
-
 	private loadDelegates(): void {
 		this.validationService.validate(
 			this.loadFromLocation(["delegates.json"]),
@@ -138,7 +129,6 @@ export class LocalConfigLoader implements ConfigLoader {
 		this.configRepository.set("delegates", this.validationService.valid());
 	}
 
-
 	private loadCryptography(): void {
 		const files: string[] = ["genesisBlock", "exceptions", "milestones", "network"];
 
@@ -152,7 +142,6 @@ export class LocalConfigLoader implements ConfigLoader {
 			this.configRepository.set(`crypto.${file}`, this.loadFromLocation([`crypto/${file}.json`]));
 		}
 	}
-
 
 	private loadFromLocation(files: string[]): KeyValuePair {
 		for (const file of files) {

@@ -4,22 +4,16 @@ import Joi from "joi";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import { resolve } from "path";
 
-
 @Container.injectable()
 export class Command extends Commands.Command {
-
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-
 	public signature: string = "config:publish";
-
 
 	public description: string = "Publish the configuration.";
 
-
 	public requiresNetwork: boolean = false;
-
 
 	public configure(): void {
 		this.definition
@@ -27,7 +21,6 @@ export class Command extends Commands.Command {
 			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
 			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
 	}
-
 
 	public async execute(): Promise<void> {
 		if (this.hasFlag("network")) {
@@ -58,7 +51,6 @@ export class Command extends Commands.Command {
 
 		await this.performPublishment({ ...response, ...this.getFlags() });
 	}
-
 
 	private async performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app

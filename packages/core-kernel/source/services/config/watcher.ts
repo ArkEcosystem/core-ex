@@ -3,16 +3,12 @@ import nsfw, { ActionType, NSFW } from "nsfw";
 import { Application } from "../../contracts/kernel";
 import { Identifiers, inject, injectable } from "../../ioc";
 
-
 @injectable()
 export class Watcher {
-
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-
 	private watcher!: NSFW;
-
 
 	public async boot(): Promise<void> {
 		const configFiles: string[] = [".env", "delegates.json", "peers.json", "plugins.js", "plugins.json"];
@@ -29,7 +25,6 @@ export class Watcher {
 
 		await this.watcher.start();
 	}
-
 
 	public async dispose(): Promise<void> {
 		return this.watcher.stop();

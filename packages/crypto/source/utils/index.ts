@@ -11,13 +11,6 @@ let genesisTransactions: { [key: string]: boolean };
 let whitelistedBlockAndTransactionIds: { [key: string]: boolean };
 let currentNetwork: number;
 
-
-
-
-
-
-
-
 export const formatSatoshi = (amount: BigNumber): string => {
 	const localeString = (+amount / SATOSHI).toLocaleString("en", {
 		minimumFractionDigits: 0,
@@ -26,7 +19,6 @@ export const formatSatoshi = (amount: BigNumber): string => {
 
 	return `${localeString} ${configManager.get("network.client.symbol")}`;
 };
-
 
 export const isIdException = (id: number | string | undefined): boolean => {
 	if (!id) {
