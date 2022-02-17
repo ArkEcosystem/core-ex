@@ -1,6 +1,6 @@
 import { sleep } from "@arkecosystem/utils";
-import { Application } from "@packages/core-kernel";
-import { Container, Contracts } from "@packages/core-kernel";
+import { Application } from "@arkecosystem/core-kernel";
+import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { PinoLogger } from "./driver";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
