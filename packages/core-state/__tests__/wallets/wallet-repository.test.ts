@@ -2,15 +2,15 @@
 /* eslint-disable jest/expect-expect */
 import "jest-extended";
 
-import { Container, Contracts } from "@packages/core-kernel/src";
-import { Wallet, WalletRepository } from "@packages/core-state/src/wallets";
+import { Container, Contracts } from "@packages/core-kernel/source";
+import { Wallet, WalletRepository } from "@packages/core-state/source/wallets";
 import {
 	addressesIndexer,
 	publicKeysIndexer,
 	resignationsIndexer,
 	usernamesIndexer,
-} from "@packages/core-state/src/wallets/indexers/indexers";
-import { Utils } from "@packages/crypto/src";
+} from "@packages/core-state/source/wallets/indexers/indexers";
+import { Utils } from "@packages/crypto/source";
 
 import { setUp } from "../setup";
 
