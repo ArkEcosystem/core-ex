@@ -20,8 +20,8 @@
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/crypto": "workspace:*"
 	},
 	"devDependencies": {
