@@ -434,9 +434,13 @@ export class Command extends Commands.Command {
 						{ spaces: 4 },
 					);
 
-					writeJSONSync(resolve(cryptoConfigDestination, "milestones.json"), this.generateCryptoMilestones(flags), {
-						spaces: 4,
-					});
+					writeJSONSync(
+						resolve(cryptoConfigDestination, "milestones.json"),
+						this.generateCryptoMilestones(flags),
+						{
+							spaces: 4,
+						},
+					);
 
 					writeJSONSync(resolve(cryptoConfigDestination, "genesisBlock.json"), genesisBlock, { spaces: 4 });
 
@@ -459,7 +463,9 @@ export class Command extends Commands.Command {
 			},
 			{
 				task: async () => {
-					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), { spaces: 4 });
+					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), {
+						spaces: 4,
+					});
 
 					writeJSONSync(
 						resolve(coreConfigDestination, "delegates.json"),
@@ -803,25 +809,24 @@ export class Command extends Commands.Command {
 		const payloadHash: Buffer = Crypto.HashAlgorithms.sha256(Buffer.concat(allBytes));
 
 		const block: any = {
+			blockSignature: undefined,
 
-blockSignature: undefined,
+			// @ts-ignore
+			generatorPublicKey: keys.publicKey.toString("hex"),
 
-// @ts-ignore
-generatorPublicKey: keys.publicKey.toString("hex"),
+			height: 1,
 
-height: 1,
+			id: undefined,
 
-id: undefined,
+			numberOfTransactions: transactions.length,
 
-numberOfTransactions: transactions.length,
+			payloadHash: payloadHash.toString("hex"),
 
-payloadHash: payloadHash.toString("hex"),
+			payloadLength,
 
-payloadLength,
+			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 
-previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-
-reward: "0",
+			reward: "0",
 
 			timestamp,
 			totalAmount: totalAmount.toString(),

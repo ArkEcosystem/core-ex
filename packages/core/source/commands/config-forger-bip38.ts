@@ -1,5 +1,5 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
-import { Crypto, Identities, Managers , Networks } from "@arkecosystem/crypto";
+import { Crypto, Identities, Managers, Networks } from "@arkecosystem/crypto";
 import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
