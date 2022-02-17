@@ -723,9 +723,9 @@ importers:
     dependencies:
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/crypto': link:../crypto
     devDependencies:
-      '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/core-test': link:../core-test
       '@arkecosystem/core-test-framework': link:../core-test-framework
       bytebuffer: 5.0.1
