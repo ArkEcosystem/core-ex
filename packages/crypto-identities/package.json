@@ -6,11 +6,11 @@
 	"contributors": [
 		"Brian Faust <brian@ark.io>"
 	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"files": [
 		"dist"
 	],
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
