@@ -6,7 +6,6 @@ import { FactoryFunctionOptions } from "../types";
 
 const sign = ({ entity, options }: FactoryFunctionOptions) => entity.sign(options.passphrase || secrets[0]);
 
-const secondSign = ({ entity, options }: FactoryFunctionOptions) => entity.secondSign(options.passphrase || secrets[1]);
 
 const multiSign = ({ entity, options }: FactoryFunctionOptions) => {
     Managers.configManager.getMilestone().aip11 = true; // todo: remove this after reworking the crypto package
@@ -63,20 +62,7 @@ export const registerTransferFactory = (factory: FactoryBuilder): void => {
         .state("vendorField", ({ entity, options }) => entity.vendorField(options.vendorField || "Hello World"));
 
     factory.get("Transfer").state("sign", sign);
-    factory.get("Transfer").state("secondSign", secondSign);
     factory.get("Transfer").state("multiSign", multiSign);
-};
-
-export const registerSecondSignatureFactory = (factory: FactoryBuilder): void => {
-    factory.set("SecondSignature", ({ options }) =>
-        applyModifiers(
-            Transactions.BuilderFactory.secondSignature().signatureAsset(options.passphrase || secrets[1]),
-            options,
-        ),
-    );
-
-    factory.get("SecondSignature").state("sign", sign);
-    factory.get("SecondSignature").state("secondSign", secondSign);
 };
 
 export const registerDelegateRegistrationFactory = (factory: FactoryBuilder): void => {
@@ -87,7 +73,6 @@ export const registerDelegateRegistrationFactory = (factory: FactoryBuilder): vo
     );
 
     factory.get("DelegateRegistration").state("sign", sign);
-    factory.get("DelegateRegistration").state("secondSign", secondSign);
 };
 
 export const registerDelegateResignationFactory = (factory: FactoryBuilder): void => {
@@ -95,7 +80,6 @@ export const registerDelegateResignationFactory = (factory: FactoryBuilder): voi
 
     factory.set("DelegateResignation", () => Transactions.BuilderFactory.delegateResignation());
     factory.get("DelegateResignation").state("sign", sign);
-    factory.get("DelegateResignation").state("secondSign", secondSign);
 };
 
 export const registerVoteFactory = (factory: FactoryBuilder): void => {
@@ -109,7 +93,6 @@ export const registerVoteFactory = (factory: FactoryBuilder): void => {
     );
 
     factory.get("Vote").state("sign", sign);
-    factory.get("Vote").state("secondSign", secondSign);
     factory.get("Vote").state("multiSign", multiSign);
 };
 
@@ -124,7 +107,6 @@ export const registerUnvoteFactory = (factory: FactoryBuilder): void => {
     );
 
     factory.get("Unvote").state("sign", sign);
-    factory.get("Unvote").state("secondSign", secondSign);
     factory.get("Unvote").state("multiSign", multiSign);
 };
 
@@ -164,14 +146,11 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder): void => {
     );
 
     factory.get("MultiPayment").state("sign", sign);
-    factory.get("MultiPayment").state("secondSign", secondSign);
     factory.get("MultiPayment").state("multiSign", multiSign);
 };
 
 export const registerTransactionFactory = (factory: FactoryBuilder): void => {
     registerTransferFactory(factory);
-
-    registerSecondSignatureFactory(factory);
 
     registerDelegateRegistrationFactory(factory);
 

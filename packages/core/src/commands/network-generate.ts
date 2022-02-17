@@ -28,7 +28,6 @@ interface DynamicFees {
     minFeeBroadcast?: number;
     addonBytes: {
         transfer?: number;
-        secondSignature?: number;
         delegateRegistration?: number;
         vote?: number;
         multiSignature?: number;
@@ -57,7 +56,6 @@ interface Options {
 
     // Static Fee
     feeStaticTransfer: number;
-    feeStaticSecondSignature: number;
     feeStaticDelegateRegistration: number;
     feeStaticVote: number;
     feeStaticMultiSignature: number;
@@ -69,7 +67,6 @@ interface Options {
     feeDynamicMinFeePool?: number;
     feeDynamicMinFeeBroadcast?: number;
     feeDynamicBytesTransfer?: number;
-    feeDynamicBytesSecondSignature?: number;
     feeDynamicBytesDelegateRegistration?: number;
     feeDynamicBytesVote?: number;
     feeDynamicBytesMultiSignature?: number;
@@ -243,12 +240,6 @@ export class Command extends Commands.Command {
             default: 10000000,
         },
         {
-            name: "feeStaticSecondSignature",
-            description: "Fee for second signature transactions.",
-            schema: Joi.number(),
-            default: 500000000,
-        },
-        {
             name: "feeStaticDelegateRegistration",
             description: "Fee for delegate registration transactions.",
             schema: Joi.number(),
@@ -281,11 +272,6 @@ export class Command extends Commands.Command {
         {
             name: "feeDynamicBytesTransfer",
             description: "Dynamic fee for transfer transactions.",
-            schema: Joi.number(),
-        },
-        {
-            name: "feeDynamicBytesSecondSignature",
-            description: "Dynamic fee for second signature transactions.",
             schema: Joi.number(),
         },
         {
@@ -567,7 +553,6 @@ export class Command extends Commands.Command {
                 fees: {
                     staticFees: {
                         transfer: options.feeStaticTransfer,
-                        secondSignature: options.feeStaticSecondSignature,
                         delegateRegistration: options.feeStaticDelegateRegistration,
                         vote: options.feeStaticVote,
                         multiSignature: options.feeStaticMultiSignature,
@@ -685,14 +670,6 @@ export class Command extends Commands.Command {
         }
         if (options.feeDynamicBytesTransfer) {
             dynamicFees.addonBytes.transfer = options.feeDynamicBytesTransfer;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesSecondSignature) {
-            dynamicFees.addonBytes.secondSignature = options.feeDynamicBytesSecondSignature;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesSecondSignature) {
-            dynamicFees.addonBytes.secondSignature = options.feeDynamicBytesSecondSignature;
             includeDynamicFees = true;
         }
         if (options.feeDynamicBytesDelegateRegistration) {

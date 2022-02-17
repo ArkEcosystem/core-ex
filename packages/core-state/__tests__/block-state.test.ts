@@ -536,11 +536,6 @@ describe("BlockState", () => {
             .sign("delegatePassphrase")
             .build();
 
-        const secondSign = factory
-            .get("Transfer")
-            .withOptions({ amount: 10000000, senderPublicKey: sender.publicKey, recipientId: recipientWallet.address })
-            .make();
-
         const vote = factory
             .get("Vote")
             .withOptions({
@@ -566,7 +561,6 @@ describe("BlockState", () => {
             type                      | transaction
             ${"transfer"}             | ${transfer}
             ${"delegateRegistration"} | ${delegateReg}
-            ${"2nd sign"}             | ${secondSign}
             ${"vote"}                 | ${vote}
             ${"delegateResignation"}  | ${delegateRes}
         `("when the transaction is a $type", ({ transaction }) => {
