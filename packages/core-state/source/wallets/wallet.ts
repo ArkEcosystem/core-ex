@@ -28,10 +28,10 @@ export class Wallet implements Contracts.State.Wallet {
 		this.publicKey = publicKey;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: "publicKey",
-			value: publicKey,
 			previousValue,
+			publicKey: this.publicKey,
+			value: publicKey,
 			wallet: this,
 		});
 	}
@@ -46,10 +46,10 @@ export class Wallet implements Contracts.State.Wallet {
 		this.balance = balance;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: "balance",
-			value: balance,
 			previousValue,
+			publicKey: this.publicKey,
+			value: balance,
 			wallet: this,
 		});
 	}
@@ -64,10 +64,10 @@ export class Wallet implements Contracts.State.Wallet {
 		this.nonce = nonce;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: "nonce",
-			value: nonce,
 			previousValue,
+			publicKey: this.publicKey,
+			value: nonce,
 			wallet: this,
 		});
 	}
@@ -95,45 +95,27 @@ export class Wallet implements Contracts.State.Wallet {
 	public getData(): Contracts.State.WalletData {
 		return {
 			address: this.address,
-			publicKey: this.publicKey,
+			attributes: this.attributes,
 			balance: this.balance,
 			nonce: this.nonce,
-			attributes: this.attributes,
+			publicKey: this.publicKey,
 		};
 	}
 
-	/**
-	 * @returns {Record<string, any>}
-	 * @memberof Wallet
-	 */
 	public getAttributes(): Record<string, any> {
 		return this.attributes.all();
 	}
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} [defaultValue]
-	 * @returns {T}
-	 * @memberof Wallet
-	 */
 	public getAttribute<T>(key: string, defaultValue?: T): T {
 		return this.attributes.get<T>(key, defaultValue);
 	}
 
-	/**
-	 * @template T
-	 * @param {string} key
-	 * @param {T} value
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public setAttribute<T = any>(key: string, value: T): boolean {
 		const wasSet = this.attributes.set<T>(key, value);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key: key,
+			publicKey: this.publicKey,
 			value,
 			wallet: this,
 		});
@@ -141,63 +123,37 @@ export class Wallet implements Contracts.State.Wallet {
 		return wasSet;
 	}
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public forgetAttribute(key: string): boolean {
 		const na = Symbol();
 		const previousValue = this.attributes.get(key, na);
 		const wasSet = this.attributes.forget(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			publicKey: this.publicKey,
 			key,
 			previousValue: previousValue === na ? undefined : previousValue,
+			publicKey: this.publicKey,
 			wallet: this,
 		});
 
 		return wasSet;
 	}
 
-	/**
-	 * @param {string} key
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public hasAttribute(key: string): boolean {
 		return this.attributes.has(key);
 	}
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public isDelegate(): boolean {
 		return this.hasAttribute("delegate");
 	}
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public hasVoted(): boolean {
 		return this.hasAttribute("vote");
 	}
 
-	/**
-	 * @returns {boolean}
-	 * @memberof Wallet
-	 */
 	public hasMultiSignature(): boolean {
 		return this.hasAttribute("multiSignature");
 	}
 
-	/**
-	 * @returns {Contracts.State.Wallet}
-	 * @memberof Wallet
-	 */
 	public clone(): Contracts.State.Wallet {
 		const cloned = new Wallet(this.address, this.attributes.clone());
 		cloned.publicKey = this.publicKey;

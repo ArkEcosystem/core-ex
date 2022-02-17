@@ -5,35 +5,12 @@ import Joi from "joi";
 import { Command as BIP38Command } from "./config-forger-bip38";
 import { Command as BIP39Command } from "./config-forger-bip39";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public signature: string = "config:forger";
+	public signature = "config:forger";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public description: string = "Configure the forging delegate.";
+	public description = "Configure the forging delegate.";
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -44,17 +21,11 @@ export class Command extends Commands.Command {
 			.setFlag(
 				"method",
 				"The configuration method to use (BIP38 or BIP39).",
-				Joi.string().valid(...["bip38", "bip39"]),
+				Joi.string().valid("bip38", "bip39"),
 			)
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		if (this.getFlag("method") === "bip38") {
 			return await this.initializeAndExecute(BIP38Command);
@@ -66,13 +37,13 @@ export class Command extends Commands.Command {
 
 		let response = await this.components.prompt([
 			{
-				type: "select",
-				name: "method",
-				message: "Please select how you wish to store your delegate passphrase?",
 				choices: [
 					{ title: "Encrypted BIP38 (Recommended)", value: "bip38" },
 					{ title: "Plain BIP39", value: "bip39" },
 				],
+				message: "Please select how you wish to store your delegate passphrase?",
+				name: "method",
+				type: "select",
 			},
 		]);
 

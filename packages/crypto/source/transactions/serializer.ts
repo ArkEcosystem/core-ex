@@ -1,11 +1,9 @@
 import { TransactionType, TransactionTypeGroup } from "../enums";
 import { TransactionVersionError } from "../errors";
 import { Address } from "../identities";
-import { ISerializeOptions } from "../interfaces";
-import { ITransaction, ITransactionData } from "../interfaces";
+import { ISerializeOptions, ITransaction, ITransactionData } from "../interfaces";
 import { configManager } from "../managers/config";
-import { isException } from "../utils";
-import { ByteBuffer, isSupportedTransactionVersion } from "../utils";
+import { ByteBuffer, isException, isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";
 
 // Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
@@ -24,9 +22,6 @@ export class Serializer {
 		}
 	}
 
-	/**
-	 * Serializes the given transaction according to AIP11.
-	 */
 	public static serialize(transaction: ITransaction, options: ISerializeOptions = {}): Buffer {
 		const buff: ByteBuffer = new ByteBuffer(
 			Buffer.alloc(configManager.getMilestone(configManager.getHeight()).block?.maxPayload ?? 8192),
@@ -51,9 +46,6 @@ export class Serializer {
 		return bufferBuffer;
 	}
 
-	/**
-	 * Serializes the given transaction prior to AIP11 (legacy).
-	 */
 	private static getBytesV1(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
 		let assetSize = 0;
 		let assetBytes: Buffer | Uint8Array | undefined;

@@ -8,34 +8,14 @@ import { ProcessManager } from "../services";
 import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";
 
-/**
- * @export
- * @class DaemonizeProcess
- */
 @injectable()
 export class DaemonizeProcess {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof Command
-	 */
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {ProcessManager}
-	 * @memberof Command
-	 */
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	/**
-	 * @static
-	 * @param {ProcessOptions} options
-	 * @param {*} flags
-	 * @memberof DaemonizeProcess
-	 */
 	public execute(options: ProcessOptions, flags): void {
 		const processName: string = options.name;
 
@@ -49,8 +29,8 @@ export class DaemonizeProcess {
 			spinner = this.app.get<Spinner>(Identifiers.Spinner).render(`Starting ${processName}`);
 
 			const flagsProcess: Record<string, boolean | number | string> = {
+				"kill-timeout": 30_000,
 				"max-restarts": 5,
-				"kill-timeout": 30000,
 			};
 
 			if (flags.daemon !== true) {
@@ -64,13 +44,12 @@ export class DaemonizeProcess {
 			this.processManager.start(
 				{
 					...options,
-					...{
-						env: {
-							NODE_ENV: "production",
-							CORE_ENV: flags.env,
-						},
-						node_args: potato ? { max_old_space_size: 500 } : undefined,
+
+					env: {
+						CORE_ENV: flags.env,
+						NODE_ENV: "production",
 					},
+					node_args: potato ? { max_old_space_size: 500 } : undefined,
 				},
 				flagsProcess,
 			);

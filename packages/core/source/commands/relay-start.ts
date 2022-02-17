@@ -3,35 +3,12 @@ import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 import { resolve } from "path";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public signature: string = "relay:start";
+	public signature = "relay:start";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public description: string = "Start the Relay process.";
+	public description = "Start the Relay process.";
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -45,12 +22,6 @@ export class Command extends Commands.Command {
 			.setFlag("daemon", "Start the Relay process as a daemon.", Joi.boolean().default(true));
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
@@ -58,9 +29,9 @@ export class Command extends Commands.Command {
 
 		await this.actions.daemonizeProcess(
 			{
+				args: `relay:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 				name: `${flags.token}-relay`,
 				script: resolve(__dirname, "../../bin/run"),
-				args: `relay:run ${Utils.castFlagsToString(flags, ["daemon"])}`,
 			},
 			flags,
 		);
