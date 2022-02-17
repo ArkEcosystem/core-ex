@@ -9,11 +9,11 @@ export class AskPassword {
 
 	public async render(message: string, opts: object = {}): Promise<string> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
-			...{
-				type: "password",
-				name: "value",
+			
 				message,
-			},
+				name: "value",
+				type: "password"
+			,
 			...opts,
 		});
 

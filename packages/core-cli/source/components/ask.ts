@@ -9,11 +9,11 @@ export class Ask {
 
 	public async render(message: string, opts: object = {}): Promise<string> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
-			...{
-				type: "text",
-				name: "value",
+			
 				message,
-			},
+				name: "value",
+				type: "text"
+			,
 			...opts,
 		});
 

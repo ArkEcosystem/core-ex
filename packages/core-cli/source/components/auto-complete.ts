@@ -9,12 +9,12 @@ export class AutoComplete {
 
 	public async render(message: string, choices: any[], opts: object = {}): Promise<string> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
-			...{
-				type: "autocomplete",
-				name: "value",
-				message,
+			
 				choices,
-			},
+				message,
+				name: "value",
+				type: "autocomplete"
+			,
 			...opts,
 		});
 

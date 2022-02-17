@@ -9,11 +9,11 @@ export class Toggle {
 
 	public async render(message: string, opts: object = {}): Promise<boolean> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
-			...{
-				type: "toggle",
-				name: "value",
+			
 				message,
-			},
+				name: "value",
+				type: "toggle"
+			,
 			...opts,
 		});
 

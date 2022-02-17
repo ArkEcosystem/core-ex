@@ -1,28 +1,86 @@
 import { Machine } from "xstate";
 
 export const blockchainMachine: any = Machine({
-	key: "blockchain",
 	initial: "uninitialised",
+	key: "blockchain",
 	states: {
-		uninitialised: {
-			on: {
-				START: "init",
-				STOP: "stopped",
-			},
+		exit: {
+			onEntry: ["exitApp"],
 		},
-		init: {
-			onEntry: ["init"],
+		fork: {
 			on: {
-				NETWORKSTART: "idle",
-				STARTED: "syncWithNetwork",
-				ROLLBACK: "rollback",
 				FAILURE: "exit",
 				STOP: "stopped",
+				SUCCESS: "syncWithNetwork",
+			},
+			onEntry: ["startForkRecovery"],
+		},
+		idle: {
+			on: {
+				FORK: "fork",
+				NEWBLOCK: "newBlock",
+				STOP: "stopped",
+				WAKEUP: "syncWithNetwork",
+			},
+			onEntry: ["checkLater", "blockchainReady"],
+		},
+		init: {
+			on: {
+				FAILURE: "exit",
+				NETWORKSTART: "idle",
+				ROLLBACK: "rollback",
+				STARTED: "syncWithNetwork",
+				STOP: "stopped",
+			},
+			onEntry: ["init"],
+		},
+		newBlock: {
+			on: {
+				FORK: "fork",
+				PROCESSFINISHED: "idle",
+				STOP: "stopped",
 			},
 		},
-		syncWithNetwork: {
+		rollback: {
+			on: {
+				FAILURE: "exit",
+				STOP: "stopped",
+				SUCCESS: "init",
+			},
+			onEntry: ["rollbackDatabase"],
+		},
+		/**
+		 * This state should be used for stopping the blockchain on purpose, not as
+		 * a result of critical errors. In those cases, using the `exit` state would
+		 * be a better option
+		 */
+stopped: {
+			onEntry: ["stopped"],
+		},
+		
+		
+syncWithNetwork: {
 			initial: "syncing",
+			on: {
+				SYNCFINISHED: "idle",
+				FORK: "fork",
+				TEST: "idle",
+				STOP: "stopped",
+			},
 			states: {
+				idle: {
+					on: {
+						DOWNLOADED: "downloadBlocks",
+					},
+				},
+				downloadBlocks: {
+					on: {
+						DOWNLOADED: "syncing",
+						NOBLOCK: "syncing",
+						PROCESSFINISHED: "downloadFinished",
+					},
+					onEntry: ["downloadBlocks"],
+				},
 				syncing: {
 					onEntry: ["checkLastDownloadedBlockSynced"],
 					on: {
@@ -32,91 +90,36 @@ export const blockchainMachine: any = Machine({
 						NETWORKHALTED: "end",
 					},
 				},
-				idle: {
-					on: {
-						DOWNLOADED: "downloadBlocks",
-					},
-				},
-				downloadBlocks: {
-					onEntry: ["downloadBlocks"],
-					on: {
-						DOWNLOADED: "syncing",
-						NOBLOCK: "syncing",
-						PROCESSFINISHED: "downloadFinished",
-					},
-				},
 				downloadFinished: {
-					onEntry: ["downloadFinished"],
 					on: {
 						PROCESSFINISHED: "processFinished",
 					},
+					onEntry: ["downloadFinished"],
 				},
 				downloadPaused: {
-					onEntry: ["downloadPaused"],
 					on: {
 						PROCESSFINISHED: "processFinished",
 					},
-				},
-				processFinished: {
-					onEntry: ["checkLastBlockSynced"],
-					on: {
-						SYNCED: "end",
-						NOTSYNCED: "downloadBlocks",
-					},
+					onEntry: ["downloadPaused"],
 				},
 				end: {
 					onEntry: ["syncingComplete"],
 				},
+				processFinished: {
+					on: {
+						SYNCED: "end",
+						NOTSYNCED: "downloadBlocks",
+					},
+					onEntry: ["checkLastBlockSynced"],
+				},
 			},
+		},
+		
+uninitialised: {
 			on: {
-				TEST: "idle",
-				SYNCFINISHED: "idle",
-				FORK: "fork",
+				START: "init",
 				STOP: "stopped",
 			},
-		},
-		idle: {
-			onEntry: ["checkLater", "blockchainReady"],
-			on: {
-				WAKEUP: "syncWithNetwork",
-				NEWBLOCK: "newBlock",
-				STOP: "stopped",
-				FORK: "fork",
-			},
-		},
-		newBlock: {
-			on: {
-				PROCESSFINISHED: "idle",
-				FORK: "fork",
-				STOP: "stopped",
-			},
-		},
-		fork: {
-			onEntry: ["startForkRecovery"],
-			on: {
-				SUCCESS: "syncWithNetwork",
-				FAILURE: "exit",
-				STOP: "stopped",
-			},
-		},
-		rollback: {
-			onEntry: ["rollbackDatabase"],
-			on: {
-				SUCCESS: "init",
-				FAILURE: "exit",
-				STOP: "stopped",
-			},
-		},
-		/**
-		 * This state should be used for stopping the blockchain on purpose, not as
-		 * a result of critical errors. In those cases, using the `exit` state would
-		 * be a better option
-		 */
-		stopped: {
-			onEntry: ["stopped"],
-		},
-		exit: {
-			onEntry: ["exitApp"],
 		},
 	},
 });

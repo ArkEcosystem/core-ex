@@ -9,11 +9,11 @@ export class AskHidden {
 
 	public async render(message: string, opts: object = {}): Promise<string> {
 		const { value } = await this.app.get<Prompt>(Identifiers.Prompt).render({
-			...{
-				type: "invisible",
-				name: "value",
+			
 				message,
-			},
+				name: "value",
+				type: "invisible"
+			,
 			...opts,
 		});
 
