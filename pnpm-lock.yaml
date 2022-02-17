@@ -852,7 +852,7 @@ importers:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
 
-  packages/crypto-signature-schnorr-legacy:
+  packages/crypto-signature-schnorr:
     specifiers:
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
@@ -860,7 +860,7 @@ importers:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
 
-  packages/crypto-signatures-schnorr:
+  packages/crypto-signature-schnorr-legacy:
     specifiers:
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
