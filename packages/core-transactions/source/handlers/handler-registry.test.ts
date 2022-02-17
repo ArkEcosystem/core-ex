@@ -107,7 +107,7 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 
 describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, stub }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container());
+		const app = new Application(new Container.Container());
 		app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.bind(Container.Identifiers.LogService).toConstantValue({});
