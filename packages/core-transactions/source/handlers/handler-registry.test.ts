@@ -148,8 +148,9 @@ describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 	});
 
 	it("should register core transaction types", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry =
-			context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+			Container.Identifiers.TransactionHandlerRegistry,
+		);
 
 		await assert.resolves(() =>
 			Promise.all([
