@@ -1,11 +1,8 @@
 import { SATOSHI } from "../constants";
 import { ITransactionData } from "../interfaces";
 import { configManager } from "../managers";
-import { Base58 } from "./base58";
 import { BigNumber } from "./bignum";
-import { calculateBlockTime, isNewBlockTime } from "./block-time-calculator";
-import { ByteBuffer } from "./byte-buffer";
-import { isLocalHost, isValidPeer } from "./is-valid-peer";
+
 
 let genesisTransactions: { [key: string]: boolean };
 let whitelistedBlockAndTransactionIds: { [key: string]: boolean };
@@ -13,8 +10,8 @@ let currentNetwork: number;
 
 export const formatSatoshi = (amount: BigNumber): string => {
 	const localeString = (+amount / SATOSHI).toLocaleString("en", {
-		minimumFractionDigits: 0,
 		maximumFractionDigits: 8,
+		minimumFractionDigits: 0,
 	});
 
 	return `${localeString} ${configManager.get("network.client.symbol")}`;
@@ -30,10 +27,10 @@ export const isIdException = (id: number | string | undefined): boolean => {
 	if (!whitelistedBlockAndTransactionIds || currentNetwork !== network) {
 		currentNetwork = network;
 
-		whitelistedBlockAndTransactionIds = [
+		whitelistedBlockAndTransactionIds = Object.fromEntries([
 			...(configManager.get("exceptions.blocks") || []),
 			...(configManager.get("exceptions.transactions") || []),
-		].reduce((acc, curr) => Object.assign(acc, { [curr]: true }), {});
+		].map(( curr) => [curr, true]));
 	}
 
 	return !!whitelistedBlockAndTransactionIds[id];
@@ -56,8 +53,8 @@ export const isException = (blockOrTransaction: { id?: string; transactions?: IT
 
 		blockExceptionTxIds.sort();
 		const blockToCheckTxIds = blockTransactions.map((tx) => tx.id).sort();
-		for (let i = 0; i < blockExceptionTxIds.length; i++) {
-			if (blockToCheckTxIds[i] !== blockExceptionTxIds[i]) {
+		for (const [i, blockExceptionTxId] of blockExceptionTxIds.entries()) {
+			if (blockToCheckTxIds[i] !== blockExceptionTxId) {
 				return false;
 			}
 		}
@@ -72,9 +69,9 @@ export const isGenesisTransaction = (id: string): boolean => {
 	if (!genesisTransactions || currentNetwork !== network) {
 		currentNetwork = network;
 
-		genesisTransactions = configManager
+		genesisTransactions = Object.fromEntries(configManager
 			.get("genesisBlock.transactions")
-			.reduce((acc, curr) => Object.assign(acc, { [curr.id]: true }), {});
+			.map(( curr) => [curr.id, true]));
 	}
 
 	return genesisTransactions[id];
@@ -102,4 +99,10 @@ export const isSupportedTransactionVersion = (version: number): boolean => {
 	return true;
 };
 
-export { Base58, BigNumber, ByteBuffer, isValidPeer, isLocalHost, calculateBlockTime, isNewBlockTime };
+
+
+export {Base58} from "./base58";
+export {BigNumber} from "./bignum";
+export {calculateBlockTime, isNewBlockTime} from "./block-time-calculator";
+export {ByteBuffer} from "./byte-buffer";
+export {isLocalHost, isValidPeer} from "./is-valid-peer";

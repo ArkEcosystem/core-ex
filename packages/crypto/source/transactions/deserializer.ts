@@ -144,11 +144,9 @@ export class Deserializer {
 	}
 
 	private static deserializeSchnorr(transaction: ITransactionData, buf: ByteBuffer): void {
-		const canReadNonMultiSignature = () => {
-			return (
+		const canReadNonMultiSignature = () => (
 				buf.getRemainderLength() && (buf.getRemainderLength() % 64 === 0 || buf.getRemainderLength() % 65 !== 0)
 			);
-		};
 
 		if (canReadNonMultiSignature()) {
 			transaction.signature = buf.readBuffer(64).toString("hex");

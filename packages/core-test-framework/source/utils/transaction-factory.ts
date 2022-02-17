@@ -40,7 +40,7 @@ export class TransactionFactory {
 
 	public transfer(recipientId?: string, amount: number = 2 * 1e8, vendorField?: string): TransactionFactory {
 		const builder = Transactions.BuilderFactory.transfer()
-			.amount(Utils.BigNumber.make(amount).toFixed())
+			.amount(Utils.BigNumber.make(amount).toFixed(0))
 			.recipientId(recipientId || Identities.Address.fromPassphrase(defaultPassphrase));
 
 		if (vendorField) {
@@ -99,8 +99,8 @@ export class TransactionFactory {
 		];
 
 		this.builder = Transactions.BuilderFactory.multiSignature().multiSignatureAsset({
-			publicKeys: participants,
 			min: min || participants.length,
+			publicKeys: participants,
 		});
 
 		if (passphrases) {
@@ -271,15 +271,13 @@ export class TransactionFactory {
 				}
 			}
 
-			if (this.builder.constructor.name === "DelegateRegistrationBuilder") {
-				// @FIXME: when we use any of the "withPassphrase*" methods the builder will
+			if (this.builder.constructor.name === "DelegateRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
 				// always remember the previous username instead generating a new one on each iteration
-				if (!this.builder.data.asset.delegate.username) {
+				!this.builder.data.asset.delegate.username) {
 					this.builder = Transactions.BuilderFactory.delegateRegistration().usernameAsset(
 						this.getRandomUsername(),
 					);
 				}
-			}
 
 			if (this.version) {
 				this.builder.version(this.version);
@@ -291,7 +289,7 @@ export class TransactionFactory {
 			}
 
 			if (this.fee) {
-				this.builder.fee(this.fee.toFixed());
+				this.builder.fee(this.fee.toFixed(0));
 			}
 
 			if (this.timestamp) {
@@ -308,7 +306,7 @@ export class TransactionFactory {
 
 			this.builder.senderPublicKey(this.senderPublicKey);
 
-			const isDevelop: boolean = !["mainnet", "devnet"].includes(Managers.configManager.get("network.name"));
+			const isDevelop = !["mainnet", "devnet"].includes(Managers.configManager.get("network.name"));
 
 			const aip11: boolean = Managers.configManager.getMilestone().aip11;
 

@@ -31,5 +31,5 @@
 		"typeRoots": ["reflect-metadata", "node_modules/@types"],
 		"useUnknownInCatchVariables": false
 	},
-	"exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
+	"exclude": ["distribution", "node_modules", "**/*.spec.ts", "**/*.test.ts"]
 }
