@@ -382,7 +382,8 @@ describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 			TEST_TRANSACTION_TYPE,
 			Enums.TransactionTypeGroup.Test,
 		);
-		assert.instance(await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType),
+		assert.instance(
+			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType),
 			TestTransactionHandler,
 		);
 
@@ -390,10 +391,10 @@ describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 			999,
 			Enums.TransactionTypeGroup.Test,
 		);
-		await assert.rejects(() =>
-			transactionHandlerRegistry.getActivatedHandlerByType(invalidInternalTransactionType),
-				"InvalidTransactionTypeError"
-		)
+		await assert.rejects(
+			() => transactionHandlerRegistry.getActivatedHandlerByType(invalidInternalTransactionType),
+			"InvalidTransactionTypeError",
+		);
 	});
 
 	it("should not return deactivated custom handler", async (context) => {
@@ -406,12 +407,14 @@ describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 		);
 
 		Managers.configManager.getMilestone().aip11 = false;
-		await assert.rejects(() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
+		await assert.rejects(
+			() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
 			"DeactivatedTransactionHandlerError",
 		);
 
 		Managers.configManager.getMilestone().aip11 = true;
-		assert.instance(await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
+		assert.instance(
+			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
 			Two.DelegateResignationTransactionHandler,
 		);
 	});
