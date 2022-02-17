@@ -31,8 +31,6 @@ export const transactionBaseSchema: Record<string, any> = {
         fee: { bignumber: { minimum: 0, bypassGenesis: true } },
         senderPublicKey: { $ref: "publicKey" },
         signature: { $ref: "alphanumeric" },
-        secondSignature: { $ref: "alphanumeric" },
-        signSignature: { $ref: "alphanumeric" },
         signatures: {
             type: "array",
             minItems: 1,
@@ -70,32 +68,6 @@ export const transfer = extend(transactionBaseSchema, {
         vendorField: { anyOf: [{ type: "null" }, { type: "string", format: "vendorField" }] },
         recipientId: { $ref: "address" },
         expiration: { type: "integer", minimum: 0 },
-    },
-});
-
-export const secondSignature = extend(transactionBaseSchema, {
-    $id: "secondSignature",
-    required: ["asset"],
-    properties: {
-        type: { transactionType: TransactionType.SecondSignature },
-        amount: { bignumber: { minimum: 0, maximum: 0 } },
-        fee: { bignumber: { minimum: 1 } },
-        secondSignature: { type: "null" },
-        asset: {
-            type: "object",
-            required: ["signature"],
-            properties: {
-                signature: {
-                    type: "object",
-                    required: ["publicKey"],
-                    properties: {
-                        publicKey: {
-                            $ref: "publicKey",
-                        },
-                    },
-                },
-            },
-        },
     },
 });
 
@@ -238,84 +210,6 @@ export const multiSignatureLegacy = extend(transactionBaseSchemaNoSignatures, {
             maxItems: 1,
             additionalItems: false,
             items: { $ref: "alphanumeric" },
-        },
-    },
-});
-
-export const htlcLock = extend(transactionBaseSchema, {
-    $id: "htlcLock",
-    required: ["recipientId"],
-    properties: {
-        type: { transactionType: TransactionType.HtlcLock },
-        amount: { bignumber: { minimum: 1 } },
-        fee: { bignumber: { minimum: 1 } },
-        recipientId: { $ref: "address" },
-        vendorField: { anyOf: [{ type: "null" }, { type: "string", format: "vendorField" }] },
-        asset: {
-            type: "object",
-            required: ["lock"],
-            properties: {
-                lock: {
-                    type: "object",
-                    required: ["secretHash", "expiration"],
-                    properties: {
-                        secretHash: { allOf: [{ minLength: 64, maxLength: 64 }, { $ref: "hex" }] },
-                        expiration: {
-                            type: "object",
-                            required: ["type", "value"],
-                            properties: {
-                                type: { enum: [1, 2] },
-                                value: { type: "integer", minimum: 0 },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    },
-});
-
-export const htlcClaim = extend(transactionBaseSchema, {
-    $id: "htlcClaim",
-    properties: {
-        type: { transactionType: TransactionType.HtlcClaim },
-        amount: { bignumber: { minimum: 0, maximum: 0 } },
-        fee: { bignumber: { minimum: 0, maximum: 0 } },
-        asset: {
-            type: "object",
-            required: ["claim"],
-            properties: {
-                claim: {
-                    type: "object",
-                    required: ["lockTransactionId", "unlockSecret"],
-                    properties: {
-                        lockTransactionId: { $ref: "transactionId" },
-                        unlockSecret: { allOf: [{ minLength: 64, maxLength: 64 }, { $ref: "hex" }] },
-                    },
-                },
-            },
-        },
-    },
-});
-
-export const htlcRefund = extend(transactionBaseSchema, {
-    $id: "htlcRefund",
-    properties: {
-        type: { transactionType: TransactionType.HtlcRefund },
-        amount: { bignumber: { minimum: 0, maximum: 0 } },
-        fee: { bignumber: { minimum: 0, maximum: 0 } },
-        asset: {
-            type: "object",
-            required: ["refund"],
-            properties: {
-                refund: {
-                    type: "object",
-                    required: ["lockTransactionId"],
-                    properties: {
-                        lockTransactionId: { $ref: "transactionId" },
-                    },
-                },
-            },
         },
     },
 });

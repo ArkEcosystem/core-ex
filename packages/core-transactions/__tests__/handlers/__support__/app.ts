@@ -5,7 +5,6 @@ import { Wallets } from "@packages/core-state";
 import { StateStore } from "@packages/core-state/src/stores/state";
 import {
     addressesIndexer,
-    locksIndexer,
     publicKeysIndexer,
     usernamesIndexer,
 } from "@packages/core-state/src/wallets/indexers/indexers";
@@ -29,9 +28,9 @@ import { SenderState } from "@packages/core-transaction-pool/src/sender-state";
 import { One, Two } from "@packages/core-transactions/src/handlers";
 import { TransactionHandlerProvider } from "@packages/core-transactions/src/handlers/handler-provider";
 import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
+import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
 import { Identities, Utils } from "@packages/crypto";
 import { IMultiSignatureAsset } from "@packages/crypto/src/interfaces";
-import { ServiceProvider } from "@packages/core-transactions/src/service-provider";
 
 const logger = {
     notice: jest.fn(),
@@ -64,12 +63,6 @@ export const initApp = (): Application => {
     app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
         name: Contracts.State.WalletIndexes.Usernames,
         indexer: usernamesIndexer,
-        autoIndex: true,
-    });
-
-    app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-        name: Contracts.State.WalletIndexes.Locks,
-        indexer: locksIndexer,
         autoIndex: true,
     });
 
@@ -121,8 +114,6 @@ export const initApp = (): Application => {
 
     app.bind(Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(One.SecondSignatureRegistrationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.SecondSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
@@ -131,9 +122,6 @@ export const initApp = (): Application => {
     app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
     app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcLockTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcClaimTransactionHandler);
-    app.bind(Identifiers.TransactionHandler).to(Two.HtlcRefundTransactionHandler);
 
     app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
     app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
@@ -190,21 +178,6 @@ export const buildRecipientWallet = (factoryBuilder: FactoryBuilder): Wallets.Wa
             passphrase: "passphrase2",
         })
         .make();
-};
-
-export const buildSecondSignatureWallet = (factoryBuilder: FactoryBuilder): Wallets.Wallet => {
-    const wallet: Wallets.Wallet = factoryBuilder
-        .get("Wallet")
-        .withOptions({
-            passphrase: passphrases[1],
-            nonce: 0,
-        })
-        .make();
-
-    wallet.setBalance(Utils.BigNumber.make(7527654310));
-    wallet.setAttribute("secondPublicKey", "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17");
-
-    return wallet;
 };
 
 export const buildMultiSignatureWallet = (): Wallets.Wallet => {

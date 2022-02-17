@@ -16,15 +16,11 @@ beforeAll(() => {
 
 describe.each([
     BuilderFactory.transfer,
-    BuilderFactory.secondSignature,
     BuilderFactory.delegateRegistration,
     BuilderFactory.vote,
     BuilderFactory.multiSignature,
     BuilderFactory.multiPayment,
     BuilderFactory.delegateResignation,
-    BuilderFactory.htlcLock,
-    BuilderFactory.htlcClaim,
-    BuilderFactory.htlcRefund,
 ])("%s", (provider) => {
     describe("TransactionBuilder", () => {
         let identity;
@@ -205,35 +201,6 @@ describe.each([
                 expect(spySign).toHaveBeenCalledWith((builder as any).getSigningObject(), identity.keys, {
                     disableVersionCheck: false,
                 });
-            });
-        });
-
-        describe("secondSign", () => {
-            it("should second sign the transaction", () => {
-                const builder = provider();
-
-                const spyKeys = jest.spyOn(Keys, "fromPassphrase").mockReturnValueOnce(identitySecond.keys);
-                const spySecondSign = jest.spyOn(Signer, "secondSign").mockImplementationOnce(jest.fn());
-
-                builder.secondSign(identitySecond.bip39);
-
-                expect(spyKeys).toHaveBeenCalledWith(identitySecond.bip39);
-                expect(spySecondSign).toHaveBeenCalledWith((builder as any).getSigningObject(), identitySecond.keys);
-            });
-        });
-
-        describe("secondSignWithWif", () => {
-            it("signs this transaction with the keys of a second wif", () => {
-                const spyKeys = jest.spyOn(Keys, "fromWIF").mockReturnValueOnce(identitySecond.keys);
-                const spySecondSign = jest.spyOn(Signer, "secondSign").mockImplementationOnce(jest.fn());
-
-                const builder = provider();
-                builder.secondSignWithWif(identitySecond.bip39, undefined);
-
-                expect(spyKeys).toHaveBeenCalledWith(identitySecond.bip39, {
-                    wif: 186,
-                });
-                expect(spySecondSign).toHaveBeenCalledWith((builder as any).getSigningObject(), identitySecond.keys);
             });
         });
 

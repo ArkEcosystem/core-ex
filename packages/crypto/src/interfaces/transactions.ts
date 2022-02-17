@@ -1,6 +1,5 @@
 import { ErrorObject } from "ajv";
 
-import { HtlcLockExpirationType } from "../enums";
 import { BigNumber, ByteBuffer } from "../utils";
 
 export interface ITransaction {
@@ -41,9 +40,6 @@ export interface ITransactionAsset {
     multiSignatureLegacy?: IMultiSignatureLegacyAsset;
     multiSignature?: IMultiSignatureAsset;
     payments?: IMultiPaymentItem[];
-    lock?: IHtlcLockAsset;
-    claim?: IHtlcClaimAsset;
-    refund?: IHtlcRefundAsset;
 }
 
 export interface ITransactionData {
@@ -67,8 +63,6 @@ export interface ITransactionData {
 
     id?: string;
     signature?: string;
-    secondSignature?: string;
-    signSignature?: string;
     signatures?: string[];
 
     blockId?: string;
@@ -98,8 +92,6 @@ export interface ITransactionJson {
 
     id?: string;
     signature?: string;
-    secondSignature?: string;
-    signSignature?: string;
     signatures?: string[];
 
     blockId?: string;
@@ -128,37 +120,6 @@ export interface IMultiSignatureAsset {
     publicKeys: string[];
 }
 
-export interface IHtlcLockAsset {
-    secretHash: string;
-    expiration: {
-        type: HtlcLockExpirationType;
-        value: number;
-    };
-}
-
-export interface IHtlcClaimAsset {
-    lockTransactionId: string;
-    unlockSecret: string;
-}
-
-export interface IHtlcRefundAsset {
-    lockTransactionId: string;
-}
-
-export interface IHtlcLock extends IHtlcLockAsset {
-    amount: BigNumber;
-    recipientId: string | undefined;
-    timestamp: number;
-    vendorField: string | undefined;
-}
-
-export type IHtlcLocks = Record<string, IHtlcLock>;
-
-export interface IHtlcExpiration {
-    type: HtlcLockExpirationType;
-    value: number;
-}
-
 export interface IDeserializeOptions {
     acceptLegacyVersion?: boolean;
     disableVersionCheck?: boolean;
@@ -172,7 +133,6 @@ export interface ISerializeOptions {
     acceptLegacyVersion?: boolean;
     disableVersionCheck?: boolean;
     excludeSignature?: boolean;
-    excludeSecondSignature?: boolean;
     excludeMultiSignature?: boolean;
 
     // WORKAROUND: A handful of mainnet transactions have an invalid

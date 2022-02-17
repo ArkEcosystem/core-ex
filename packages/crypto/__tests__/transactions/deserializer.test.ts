@@ -18,7 +18,6 @@ import { Deserializer } from "@packages/crypto/src/transactions/deserializer";
 import { Serializer } from "@packages/crypto/src/transactions/serializer";
 import ByteBuffer from "bytebuffer";
 
-import { htlcSecretHashHex, htlcSecretHex } from "./__fixtures__/htlc";
 import { legacyMultiSignatureRegistration } from "./__fixtures__/transaction";
 
 describe("Transaction serializer / deserializer", () => {
@@ -108,28 +107,6 @@ describe("Transaction serializer / deserializer", () => {
                     const serialized = TransactionUtils.toBytes(transferWithLongVendorfield);
                     TransactionFactory.fromBytes(serialized);
                 }).toThrow(TransactionSchemaError);
-            });
-        });
-
-        describe("ser/deserialize - second signature", () => {
-            it("should ser/deserialize giving back original fields", () => {
-                const secondSignature = BuilderFactory.secondSignature()
-                    .signatureAsset("signature")
-                    .fee("50000000")
-                    .timestamp(148354645)
-                    .network(30)
-                    .sign("dummy passphrase")
-                    .getStruct();
-
-                const serialized = TransactionFactory.fromData(secondSignature).serialized.toString("hex");
-                expect(serialized).toEqual(
-                    "ff011e0155b6d70802a47a2f594635737d2ce9898680812ff7fa6aaa64ddea1360474c110e9985a08780f0fa02000000000002314387e7f065bc95bb23197b39179f6fb8b9a23771e228a65326604f2c9860a13044022066b9d53702e38f2cf416fed043d30da6fa1adc140d144bfd563ba0be48f2de16022007c82133bc9c23a81390c4ed2237865a57c662bd536e5f1fcab2a3ae14f06287",
-                );
-                const deserialized = Deserializer.deserialize(serialized);
-
-                checkCommonFields(deserialized, secondSignature);
-
-                expect(deserialized.data.asset).toEqual(secondSignature.asset);
             });
         });
 
@@ -341,139 +318,6 @@ describe("Transaction serializer / deserializer", () => {
                 ).toThrow(InvalidTransactionBytesError);
             });
         });
-
-        describe("ser/deserialize - htlc lock", () => {
-            const htlcLockAsset = {
-                secretHash: htlcSecretHashHex,
-                expiration: {
-                    type: Enums.HtlcLockExpirationType.EpochTimestamp,
-                    value: Math.floor(Date.now() / 1000),
-                },
-            };
-
-            beforeAll(() => {
-                // todo: completely wrap this into a function to hide the generation and setting of the config?
-                configManager.setConfig(Generators.generateCryptoConfigRaw());
-            });
-
-            it("should ser/deserialize giving back original fields", () => {
-                const htlcLock = BuilderFactory.htlcLock()
-                    .recipientId("AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff")
-                    .amount("10000")
-                    .fee("50000000")
-                    .network(23)
-                    .vendorField("HTLC")
-                    .htlcLockAsset(htlcLockAsset)
-                    .sign("dummy passphrase")
-                    .getStruct();
-
-                const serialized = TransactionFactory.fromData(htlcLock).serialized.toString("hex");
-                const deserialized = Deserializer.deserialize(serialized);
-
-                checkCommonFields(deserialized, htlcLock);
-
-                expect(deserialized.data.asset).toEqual(htlcLock.asset);
-            });
-
-            it("should fail to verify", () => {
-                const htlcLock = BuilderFactory.htlcLock()
-                    .recipientId("AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff")
-                    .amount("10000")
-                    .fee("50000000")
-                    .network(23)
-                    .htlcLockAsset(htlcLockAsset)
-                    .sign("dummy passphrase")
-                    .build();
-
-                configManager.getMilestone().aip11 = false;
-                expect(htlcLock.verify()).toBeFalse();
-                configManager.getMilestone().aip11 = true;
-                expect(htlcLock.verify()).toBeTrue();
-            });
-        });
-
-        describe("ser/deserialize - htlc claim", () => {
-            const htlcClaimAsset = {
-                lockTransactionId: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
-                unlockSecret: htlcSecretHex,
-            };
-
-            beforeAll(() => {
-                // todo: completely wrap this into a function to hide the generation and setting of the config?
-                configManager.setConfig(Generators.generateCryptoConfigRaw());
-            });
-
-            it("should ser/deserialize giving back original fields", () => {
-                const htlcClaim = BuilderFactory.htlcClaim()
-                    .fee("0")
-                    .network(23)
-                    .htlcClaimAsset(htlcClaimAsset)
-                    .sign("dummy passphrase")
-                    .getStruct();
-
-                const serialized = TransactionFactory.fromData(htlcClaim).serialized.toString("hex");
-                const deserialized = Deserializer.deserialize(serialized);
-
-                checkCommonFields(deserialized, htlcClaim);
-
-                expect(deserialized.data.asset).toEqual(htlcClaim.asset);
-            });
-
-            it("should fail to verify", () => {
-                const htlcClaim = BuilderFactory.htlcClaim()
-                    .fee("0")
-                    .network(23)
-                    .htlcClaimAsset(htlcClaimAsset)
-                    .sign("dummy passphrase")
-                    .build();
-
-                configManager.getMilestone().aip11 = false;
-                expect(htlcClaim.verify()).toBeFalse();
-                configManager.getMilestone().aip11 = true;
-                expect(htlcClaim.verify()).toBeTrue();
-            });
-        });
-
-        describe("ser/deserialize - htlc refund", () => {
-            const htlcRefundAsset = {
-                lockTransactionId: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
-            };
-
-            beforeAll(() => {
-                // todo: completely wrap this into a function to hide the generation and setting of the config?
-                configManager.setConfig(Generators.generateCryptoConfigRaw());
-            });
-
-            it("should ser/deserialize giving back original fields", () => {
-                const htlcRefund = BuilderFactory.htlcRefund()
-                    .fee("0")
-                    .network(23)
-                    .htlcRefundAsset(htlcRefundAsset)
-                    .sign("dummy passphrase")
-                    .getStruct();
-
-                const serialized = TransactionFactory.fromData(htlcRefund).serialized.toString("hex");
-                const deserialized = Deserializer.deserialize(serialized);
-
-                checkCommonFields(deserialized, htlcRefund);
-
-                expect(deserialized.data.asset).toEqual(htlcRefund.asset);
-            });
-
-            it("should fail to verify", () => {
-                const htlcRefund = BuilderFactory.htlcRefund()
-                    .fee("0")
-                    .network(23)
-                    .htlcRefundAsset(htlcRefundAsset)
-                    .sign("dummy passphrase")
-                    .build();
-
-                configManager.getMilestone().aip11 = false;
-                expect(htlcRefund.verify()).toBeFalse();
-                configManager.getMilestone().aip11 = true;
-                expect(htlcRefund.verify()).toBeTrue();
-            });
-        });
     });
 
     describe("deserialize - others", () => {
@@ -520,7 +364,6 @@ describe("Transaction serializer / deserializer", () => {
 
         const builderWith = (
             hasher: (buffer: Buffer, keys: IKeyPair) => string,
-            hasher2?: (buffer: Buffer, keys: IKeyPair) => string,
         ) => {
             const keys = Keys.fromPassphrase("secret");
 
@@ -532,19 +375,9 @@ describe("Transaction serializer / deserializer", () => {
 
             const buffer = TransactionUtils.toHash(builder.data, {
                 excludeSignature: true,
-                excludeSecondSignature: true,
             });
 
             builder.data.signature = hasher(buffer, keys);
-
-            if (hasher2) {
-                const keys = Keys.fromPassphrase("secret 2");
-                const buffer = TransactionUtils.toHash(builder.data, {
-                    excludeSecondSignature: true,
-                });
-
-                builder.data.secondSignature = hasher2(buffer, keys);
-            }
 
             return builder;
         };
@@ -566,18 +399,6 @@ describe("Transaction serializer / deserializer", () => {
             expect(builder.data.signature).not.toHaveLength(64);
             expect(() => (transaction = builder.build())).not.toThrow();
             expect(transaction!.verify()).toBeTrue();
-        });
-
-        it("should deserialize a V2 transaction when signed with Schnorr/Schnorr", () => {
-            const builder = builderWith(Hash.signSchnorr, Hash.signSchnorr);
-
-            let transaction: ITransaction;
-            expect(builder.data.version).toBe(2);
-            expect(() => (transaction = builder.build())).not.toThrow();
-
-            expect(transaction!.verify()).toBeTrue();
-            expect(Verifier.verifySecondSignature(transaction!.data, PublicKey.fromPassphrase("secret 2"))).toBeTrue();
-            expect(Verifier.verifySecondSignature(transaction!.data, PublicKey.fromPassphrase("secret 3"))).toBeFalse();
         });
 
         it("should throw when V2 transaction is signed with Schnorr and ECDSA", () => {
@@ -606,7 +427,6 @@ describe("Transaction serializer / deserializer", () => {
             const builder = builderWith(Hash.signSchnorr);
             const buffer = TransactionUtils.toHash(builder.data, {
                 excludeSignature: true,
-                excludeSecondSignature: true,
             });
 
             builder.data.signature = builder.data.signature = Hash.signSchnorr(buffer, Keys.fromPassphrase("secret"));
@@ -678,24 +498,6 @@ describe("Transaction serializer / deserializer", () => {
             );
         });
 
-        // it('should return Buffer of transaction with second signature and buffer must be 420 length', () => {
-        //   const transaction = {
-        //     type: 0,
-        //     amount: 1000,
-        //     fee: 2000,
-        //     recipientId: 'AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff',
-        //     timestamp: 141738,
-        //     asset: {},
-        //     senderPublicKey: '5d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09',
-        //     signature: '618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a',
-        //     secondSignature: '618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a'
-        //   }
-        //
-        //   bytes = crypto.getBytes(transaction)
-        //   expect(bytes).toBeObject()
-        //   expect(bytes.toString('hex') + transaction.signature + transaction.secondSignature).toHaveLength(420)
-        // })
-
         it("should return Buffer of transaction with second signature and buffer must be 266 length", () => {
             const transaction = {
                 version: 1,
@@ -707,8 +509,6 @@ describe("Transaction serializer / deserializer", () => {
                 asset: {},
                 senderPublicKey: "5d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09",
                 signature:
-                    "618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-                secondSignature:
                     "618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
                 id: "13987348420913138422",
             };
@@ -732,8 +532,6 @@ describe("Transaction serializer / deserializer", () => {
                 asset: {},
                 senderPublicKey: "5d036a858ce89f844491762eb89e2bfbd50a4a0a0da658e4b2628b25b117ae09",
                 signature:
-                    "618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
-                secondSignature:
                     "618a54975212ead93df8c881655c625544bce8ed7ccdfe6f08a42eecfb1adebd051307be5014bb051617baf7815d50f62129e70918190361e5d4dd4796541b0a",
                 id: "13987348420913138422",
             };

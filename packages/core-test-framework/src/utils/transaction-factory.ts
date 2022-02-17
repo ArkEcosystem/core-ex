@@ -8,7 +8,6 @@ const defaultPassphrase: string = secrets[0];
 
 interface IPassphrasePair {
     passphrase: string;
-    secondPassphrase: string;
 }
 
 // todo: replace this by the use of real factories
@@ -22,7 +21,6 @@ export class TransactionFactory {
     private fee: Utils.BigNumber | undefined;
     private timestamp: number | undefined;
     private passphrase: string = defaultPassphrase;
-    private secondPassphrase: string | undefined;
     private passphraseList: string[] | undefined;
     private passphrasePairs: IPassphrasePair[] | undefined;
     private version: number | undefined;
@@ -50,14 +48,6 @@ export class TransactionFactory {
         }
 
         this.builder = builder;
-
-        return this;
-    }
-
-    public secondSignature(secondPassphrase?: string): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.secondSignature().signatureAsset(
-            secondPassphrase || defaultPassphrase,
-        );
 
         return this;
     }
@@ -118,33 +108,6 @@ export class TransactionFactory {
         }
 
         this.withSenderPublicKey(participants[0]);
-
-        return this;
-    }
-
-    public htlcLock(
-        lockAsset: Interfaces.IHtlcLockAsset,
-        recipientId?: string,
-        amount: number = 2 * 1e8,
-    ): TransactionFactory {
-        const builder = Transactions.BuilderFactory.htlcLock()
-            .htlcLockAsset(lockAsset)
-            .amount(Utils.BigNumber.make(amount).toFixed())
-            .recipientId(recipientId || Identities.Address.fromPassphrase(defaultPassphrase));
-
-        this.builder = builder;
-
-        return this;
-    }
-
-    public htlcClaim(claimAsset: Interfaces.IHtlcClaimAsset): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.htlcClaim().htlcClaimAsset(claimAsset);
-
-        return this;
-    }
-
-    public htlcRefund(refundAsset: Interfaces.IHtlcRefundAsset): TransactionFactory {
-        this.builder = Transactions.BuilderFactory.htlcRefund().htlcRefundAsset(refundAsset);
 
         return this;
     }
@@ -227,12 +190,6 @@ export class TransactionFactory {
         return this;
     }
 
-    public withSecondPassphrase(secondPassphrase: string): TransactionFactory {
-        this.secondPassphrase = secondPassphrase;
-
-        return this;
-    }
-
     public withPassphraseList(passphrases: string[]): TransactionFactory {
         this.passphraseList = passphrases;
 
@@ -241,7 +198,6 @@ export class TransactionFactory {
 
     public withPassphrasePair(passphrases: IPassphrasePair): TransactionFactory {
         this.passphrase = passphrases.passphrase;
-        this.secondPassphrase = passphrases.secondPassphrase;
 
         return this;
     }
@@ -280,7 +236,6 @@ export class TransactionFactory {
             return this.passphrasePairs.map(
                 (passphrasePair: IPassphrasePair) =>
                     this.withPassphrase(passphrasePair.passphrase)
-                        .withSecondPassphrase(passphrasePair.secondPassphrase)
                         .sign<T>(quantity, method)[0],
             );
         }
@@ -357,14 +312,11 @@ export class TransactionFactory {
             const isDevelop: boolean = !["mainnet", "devnet"].includes(Managers.configManager.get("network.name"));
 
             const aip11: boolean = Managers.configManager.getMilestone().aip11;
-            const htlcEnabled: boolean = Managers.configManager.getMilestone().htlcEnabled;
 
             if (this.builder.data.version === 1 && aip11) {
                 Managers.configManager.getMilestone().aip11 = false;
-                Managers.configManager.getMilestone().htlcEnabled = false;
             } /* istanbul ignore else */ else if (isDevelop) {
                 Managers.configManager.getMilestone().aip11 = true;
-                Managers.configManager.getMilestone().htlcEnabled = htlcEnabled;
             }
 
             let sign = true;
@@ -379,10 +331,6 @@ export class TransactionFactory {
 
             if (sign) {
                 this.builder.sign(this.passphrase);
-
-                if (this.secondPassphrase) {
-                    this.builder.secondSign(this.secondPassphrase);
-                }
             }
 
             const transaction = this.builder[method]();
@@ -390,7 +338,6 @@ export class TransactionFactory {
             /* istanbul ignore else */
             if (isDevelop) {
                 Managers.configManager.getMilestone().aip11 = true;
-                Managers.configManager.getMilestone().htlcEnabled = true;
             }
 
             transactions.push(transaction);

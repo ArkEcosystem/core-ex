@@ -9,9 +9,6 @@ describe("Constants", () => {
         expect(TransactionType.Transfer).toBeDefined();
         expect(TransactionType.Transfer).toBe(0);
 
-        expect(TransactionType.SecondSignature).toBeDefined();
-        expect(TransactionType.SecondSignature).toBe(1);
-
         expect(TransactionType.DelegateRegistration).toBeDefined();
         expect(TransactionType.DelegateRegistration).toBe(2);
 
@@ -26,14 +23,5 @@ describe("Constants", () => {
 
         expect(TransactionType.DelegateResignation).toBeDefined();
         expect(TransactionType.DelegateResignation).toBe(7);
-
-        expect(TransactionType.HtlcLock).toBeDefined();
-        expect(TransactionType.HtlcLock).toBe(8);
-
-        expect(TransactionType.HtlcClaim).toBeDefined();
-        expect(TransactionType.HtlcClaim).toBe(9);
-
-        expect(TransactionType.HtlcRefund).toBeDefined();
-        expect(TransactionType.HtlcRefund).toBe(10);
     });
 });
