@@ -29,7 +29,7 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test": "workspace:*",
-		"@arkecosystem/utils": "1.3.1",
+		"@arkecosystem/utils": "workspace:*",
 		"@types/pino": "6.3.11",
 		"@types/pump": "1.1.1",
 		"@types/readable-stream": "2.3.11",
