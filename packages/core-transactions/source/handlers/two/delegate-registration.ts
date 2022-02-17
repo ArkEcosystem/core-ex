@@ -1,5 +1,4 @@
-import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { Transactions, Utils } from "@arkecosystem/crypto";
 
 import { DelegateRegistrationTransactionHandler as One } from "../one/delegate-registration";
