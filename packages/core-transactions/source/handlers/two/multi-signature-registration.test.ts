@@ -326,7 +326,9 @@ describe("MultiSignatureRegistrationTransaction", () => {
 		});
 
 		it("should throw if transaction by sender already in pool", async () => {
-			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(multiSignatureTransaction);
+			await app
+				.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+				.addTransaction(multiSignatureTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(multiSignatureTransaction)).rejects.toThrow(
 				new Contracts.TransactionPool.PoolError(
@@ -350,7 +352,9 @@ describe("MultiSignatureRegistrationTransaction", () => {
 				.sign("random passphrase")
 				.build();
 
-			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(multiSignatureTransaction);
+			await app
+				.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+				.addTransaction(multiSignatureTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(multiSignatureTransactionWithSameAddress)).rejects.toThrow(
 				new Contracts.TransactionPool.PoolError(

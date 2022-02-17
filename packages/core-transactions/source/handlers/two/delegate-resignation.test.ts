@@ -230,7 +230,9 @@ describe("DelegateResignationTransaction", () => {
 		});
 
 		it("should throw if transaction by sender already in pool", async () => {
-			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(delegateResignationTransaction);
+			await app
+				.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+				.addTransaction(delegateResignationTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(delegateResignationTransaction)).rejects.toThrow(
 				Contracts.TransactionPool.PoolError,

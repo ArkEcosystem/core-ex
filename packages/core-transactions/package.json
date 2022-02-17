@@ -22,7 +22,7 @@
 		"@arkecosystem/crypto": "workspace:*"
 	},
 	"devDependencies": {
-	    "@arkecosystem/core-state": "workspace:*",
+		"@arkecosystem/core-state": "workspace:*",
 		"@arkecosystem/core-test": "workspace:*",
 		"@arkecosystem/core-test-framework": "workspace:*",
 		"bytebuffer": "5.0.1",

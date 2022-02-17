@@ -3,11 +3,7 @@ import { Stores, Wallets } from "@packages/core-state/distribution";
 import { Mapper, Mocks } from "@packages/core-test-framework";
 import { Factories, Generators } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import {
-	ColdWalletError,
-	InsufficientBalanceError,
-	SenderWalletMismatchError,
-} from "../../errors";
+import { ColdWalletError, InsufficientBalanceError, SenderWalletMismatchError } from "../../errors";
 import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransferTransactionHandler } from "../one";

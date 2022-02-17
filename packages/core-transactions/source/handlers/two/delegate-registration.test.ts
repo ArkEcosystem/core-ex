@@ -379,7 +379,9 @@ describe("DelegateRegistrationTransaction", () => {
 		});
 
 		it("should throw if transaction by sender already in pool", async () => {
-			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(delegateRegistrationTransaction);
+			await app
+				.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+				.addTransaction(delegateRegistrationTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
 				Contracts.TransactionPool.PoolError,

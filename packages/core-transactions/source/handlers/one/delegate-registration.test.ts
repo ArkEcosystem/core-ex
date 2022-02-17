@@ -9,7 +9,6 @@ import { describe } from "@arkecosystem/core-test";
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
 describe("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {
-
 	let senderWallet: Wallets.Wallet;
 	let multiSignatureWallet: Wallets.Wallet;
 	let recipientWallet: Wallets.Wallet;
