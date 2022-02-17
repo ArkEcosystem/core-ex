@@ -15,7 +15,7 @@ const workflow = {
 	jobs: {},
 };
 
-const directories = readdirSync(resolve("../packages"), { withFileTypes: true })
+const directories = readdirSync(resolve("packages"), { withFileTypes: true })
 	.filter((dirent) => dirent.isDirectory())
 	.map((dirent) => dirent.name)
 	.sort();
@@ -71,4 +71,4 @@ for (const directory of directories) {
 	};
 }
 
-writeFileSync(resolve("../.github/workflows/unit.yml"), YAML.stringify(workflow, { indent: 4 }));
+writeFileSync(resolve(".github/workflows/unit.yml"), YAML.stringify(workflow, { indent: 4 }));
