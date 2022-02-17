@@ -104,7 +104,7 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 	async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
 }
 
-describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, stub }) => {
+describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		const app = new Application(new Container.Container());
 		app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
@@ -229,28 +229,28 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 		);
 
 		transactionHandlerProvider.isRegistrationRequired = () => false;
-		stub(transactionHandlerProvider, "registerHandlers");
+		const stubRegisterHandlers = stub(transactionHandlerProvider, "registerHandlers");
 
 		context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
 
-		assert.true(transactionHandlerProvider.registerHandlers.neverCalled());
+		assert.true(stubRegisterHandlers.neverCalled());
 	});
 
 	it("should register a custom type", async (context) => {
 		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
 
-		expect(() => {
+		assert.not.throws(() => {
 			context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
-		}).not.toThrowError();
+		});
 	});
 
 	it("should register a custom type with dependency", async (context) => {
 		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
 		context.app.bind(Container.Identifiers.TransactionHandler).to(TestWithDependencyTransactionHandler);
 
-		expect(() => {
+		assert.not.throws(() => {
 			context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
-		}).not.toThrowError();
+		});
 	});
 
 	it("should register a custom type with missing dependency", async (context) => {
@@ -367,9 +367,9 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			Enums.TransactionTypeGroup.Test,
 		);
 
-		expect(() => {
+		assert.throws(() => {
 			transactionHandlerRegistry.getRegisteredHandlerByType(invalidInternalTransactionType);
-		}).toThrow(InvalidTransactionTypeError);
+		}, "InvalidTransactionTypeError");
 	});
 
 	it("should return a activated custom handler", async (context) => {
@@ -382,7 +382,7 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			TEST_TRANSACTION_TYPE,
 			Enums.TransactionTypeGroup.Test,
 		);
-		expect(await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType)).toBeInstanceOf(
+		assert.instance(await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType),
 			TestTransactionHandler,
 		);
 
@@ -390,9 +390,10 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			999,
 			Enums.TransactionTypeGroup.Test,
 		);
-		await expect(
+		await assert.rejects(() =>
 			transactionHandlerRegistry.getActivatedHandlerByType(invalidInternalTransactionType),
-		).rejects.toThrow(InvalidTransactionTypeError);
+				"InvalidTransactionTypeError"
+		)
 	});
 
 	it("should not return deactivated custom handler", async (context) => {
@@ -405,12 +406,12 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 		);
 
 		Managers.configManager.getMilestone().aip11 = false;
-		await expect(transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2)).rejects.toThrow(
-			DeactivatedTransactionHandlerError,
+		await assert.rejects(() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
+			"DeactivatedTransactionHandlerError",
 		);
 
 		Managers.configManager.getMilestone().aip11 = true;
-		expect(await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2)).toBeInstanceOf(
+		assert.instance(await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
 			Two.DelegateResignationTransactionHandler,
 		);
 	});

@@ -78,7 +78,7 @@ export const assert = {
 			}
 
 			if (typeof expected === "string") {
-				uvu.ok(error.message.includes(expected));
+				uvu.ok(error.message.includes(expected) || error.name.includes(expected));
 			}
 
 			uvu.ok(true);
