@@ -39,7 +39,7 @@ class TransactionRepositoryMock implements Partial<Repositories.TransactionRepos
 	}
 
 	public async findByIds(ids: any[]) {
-		return mockTransactions as Models.Transaction[];
+		return mockTransactions;
 	}
 
 	public async findReceivedTransactions(): Promise<{ recipientId: string; amount: string }[]> {
