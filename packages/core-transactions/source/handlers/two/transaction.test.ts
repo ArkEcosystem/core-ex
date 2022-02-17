@@ -2,9 +2,9 @@ import "jest-extended";
 
 import { TransactionTypeGroup } from "@arkecosystem/crypto/distribution/enums";
 import { TransactionSchema } from "@arkecosystem/crypto/distribution/transactions/types/schemas";
-import { Application, Contracts } from "@packages/core-kernel";
-import { Identifiers } from "@packages/core-kernel/source/ioc";
-import { Wallets } from "@packages/core-state";
+import { Application, Contracts } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
+import { Wallets } from "@packages/core-state/distribution";
 import { StateStore } from "@packages/core-state/source/stores/state";
 import { Generators } from "@packages/core-test-framework/source";
 import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
@@ -17,13 +17,13 @@ import {
 	SenderWalletMismatchError,
 	UnexpectedNonceError,
 	UnsupportedMultiSignatureTransactionError,
-} from "@packages/core-transactions/source/errors";
-import { TransactionHandler, TransactionHandlerConstructor } from "@packages/core-transactions/source/handlers";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
-import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@packages/crypto";
-import { BuilderFactory } from "@packages/crypto/distribution/transactions";
-import { IMultiSignatureAsset } from "@packages/crypto/source/interfaces";
-import { configManager } from "@packages/crypto/source/managers";
+} from "../../errors";
+import { TransactionHandler, TransactionHandlerConstructor } from "../index";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { BuilderFactory } from "@arkecosystem/crypto/distribution/transactions";
+import { IMultiSignatureAsset } from "@arkecosystem/crypto/distribution/interfaces";
+import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
