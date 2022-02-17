@@ -4,22 +4,16 @@ import { Signatory } from "./index";
 
 describe("Signatory", ({ assert, it }) => {
 	it("should sign", async () => {
-		const signatory = new Signatory();
-		await signatory.init();
-
-		assert.is(signatory.sign(
+		assert.is(await new Signatory().sign(
 			Buffer.from("Hello World"),
 			Buffer.from("07656fd676da43883d163f49566c72b9cbf0a5a294f26808c807700732456da7", "hex"),
-		), "0xaf69452ca3e3e3fdaeb3d72ab3a025660040f4217f4047dbdd6c118e5efeed1ece0095cf12944334bd5dd48db055c954110f04814da1263f300f355488904b30c6ebf4cee903d4fb414e3a3a70b974816da224a54aa5502b48bc7b0210faace8");
+		), "8b4156bf6d47b6d0a73805a0c264071d4d46ad406dabdfef6e9e43cb05f30aadd09d8a498d162470e40d57d89db8406f189d80a2a481b6d2fc270469bf7540faffdc00a6b8e1623559e6fda55570edbe5beb2774c76a4eed8950986625d65726");
 	});
 
 	it("should verify", async () => {
-		const signatory = new Signatory();
-		await signatory.init();
-
-		assert.true(signatory.verify(
+		assert.true(await new Signatory().verify(
 			Buffer.from("Hello World"),
-			Buffer.from("0xaf69452ca3e3e3fdaeb3d72ab3a025660040f4217f4047dbdd6c118e5efeed1ece0095cf12944334bd5dd48db055c954110f04814da1263f300f355488904b30c6ebf4cee903d4fb414e3a3a70b974816da224a54aa5502b48bc7b0210faace8", "hex"),
+			Buffer.from("8b4156bf6d47b6d0a73805a0c264071d4d46ad406dabdfef6e9e43cb05f30aadd09d8a498d162470e40d57d89db8406f189d80a2a481b6d2fc270469bf7540faffdc00a6b8e1623559e6fda55570edbe5beb2774c76a4eed8950986625d65726", "hex"),
 			Buffer.from("07656fd676da43883d163f49566c72b9cbf0a5a294f26808c807700732456da7", "hex"),
 		));
 	});

@@ -17,8 +17,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"@chainsafe/bls": "^6.0.3",
-		"@chainsafe/blst": "^0.2.3"
+		"@noble/bls12-381": "^1.2.0"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test": "workspace:^0.0.1",
