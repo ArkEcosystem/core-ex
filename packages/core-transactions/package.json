@@ -22,9 +22,9 @@
 		"@arkecosystem/crypto": "workspace:*"
 	},
 	"devDependencies": {
-	  	"@arkecosystem/core-test": "workspace:*",
+		"@arkecosystem/core-test": "workspace:*",
 		"bytebuffer": "5.0.1",
-	  	"uvu": "^0.5.3"
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

@@ -2,16 +2,8 @@ import { Services } from "@arkecosystem/core-kernel";
 import { Application } from "@arkecosystem/core-kernel/distribution/application";
 import { Container } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test";
-import {
-	DeactivatedTransactionHandlerError,
-	InvalidTransactionTypeError,
-} from "../errors";
-import {
-	One,
-	TransactionHandler,
-	TransactionHandlerConstructor,
-	Two,
-} from "./index";
+import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
+import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { ServiceProvider } from "../service-provider";
@@ -158,11 +150,9 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }
 		} catch {}
 	});
 
-
 	it("should register core transaction types", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.context.app.get<TransactionHandlerRegistry>(
-			Container.Identifiers.TransactionHandlerRegistry,
-		);
+		const transactionHandlerRegistry: TransactionHandlerRegistry =
+			context.context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
 
 		await assert.resolves(() =>
 			Promise.all([
@@ -237,7 +227,9 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }
 	});
 
 	it("should skip handler registration if provider handlerProvider is already registered", async (context) => {
-		const transactionHandlerProvider = context.app.get<TransactionHandlerProvider>(Container.Identifiers.TransactionHandlerProvider);
+		const transactionHandlerProvider = context.app.get<TransactionHandlerProvider>(
+			Container.Identifiers.TransactionHandlerProvider,
+		);
 
 		transactionHandlerProvider.isRegistrationRequired = jest.fn().mockReturnValue(false);
 		transactionHandlerProvider.registerHandlers = jest.fn();

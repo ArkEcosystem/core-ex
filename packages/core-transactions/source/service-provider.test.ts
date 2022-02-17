@@ -9,7 +9,7 @@ describe("ServiceProvider", ({ assert, afterAll, afterEach, beforeAll, beforeEac
 	});
 
 	it("should register", async (context) => {
-		await assert.resolves(() => (context.serviceProvider.register()));
+		await assert.resolves(() => context.serviceProvider.register());
 	});
 
 	it("should be required", async (context) => {
