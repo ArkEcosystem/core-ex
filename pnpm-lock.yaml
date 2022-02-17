@@ -717,6 +717,7 @@ importers:
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/core-test': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/core-transaction-pool': workspace:*
       '@arkecosystem/crypto': workspace:*
       bytebuffer: 5.0.1
       uvu: ^0.5.3
@@ -724,10 +725,11 @@ importers:
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-state': link:../core-state
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
       '@arkecosystem/crypto': link:../crypto
     devDependencies:
       '@arkecosystem/core-test': link:../core-test
-      '@arkecosystem/core-test-framework': link:../core-test-framework
       bytebuffer: 5.0.1
       uvu: 0.5.3
 

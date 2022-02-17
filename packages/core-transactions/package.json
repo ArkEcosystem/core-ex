@@ -20,11 +20,12 @@
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
+		"@arkecosystem/core-transaction-pool": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"@arkecosystem/crypto": "workspace:*"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"bytebuffer": "5.0.1",
 		"uvu": "^0.5.3"
 	},
