@@ -13,7 +13,7 @@ export const calculate = (height: number): string => {
 	const totalAmount: Utils.BigNumber = Utils.BigNumber.make(genesisBlock.totalAmount);
 
 	if (height === 0 || milestones.length === 0) {
-		return totalAmount.toFixed();
+		return totalAmount.toFixed(0);
 	}
 
 	let rewards: Utils.BigNumber = Utils.BigNumber.ZERO;
@@ -38,5 +38,5 @@ export const calculate = (height: number): string => {
 		}
 	}
 
-	return totalAmount.plus(rewards).toFixed();
+	return totalAmount.plus(rewards).toFixed(0);
 };
