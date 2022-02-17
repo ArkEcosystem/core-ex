@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"delay": "4.4.1",
 		"uvu": "^0.5.3"
 	},
