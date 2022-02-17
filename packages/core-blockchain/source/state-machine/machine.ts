@@ -107,11 +107,7 @@ export const blockchainMachine: any = Machine({
 				STOP: "stopped",
 			},
 		},
-		/**
-		 * This state should be used for stopping the blockchain on purpose, not as
-		 * a result of critical errors. In those cases, using the `exit` state would
-		 * be a better option
-		 */
+
 		stopped: {
 			onEntry: ["stopped"],
 		},

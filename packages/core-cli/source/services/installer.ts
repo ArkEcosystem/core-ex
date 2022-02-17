@@ -3,16 +3,10 @@ import * as semver from "semver";
 
 import { injectable } from "../ioc";
 
-/**
- * @export
- * @class Installer
- */
+
 @injectable()
 export class Installer {
-	/**
-	 * @param {string} pkg
-	 * @memberof Installer
-	 */
+
 	public install(pkg: string, tag: string = "latest"): void {
 		this.installPeerDependencies(pkg, tag);
 

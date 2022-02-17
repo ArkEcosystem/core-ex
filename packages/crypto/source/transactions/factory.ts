@@ -27,13 +27,7 @@ export class TransactionFactory {
 		return this.fromSerialized(buff.toString("hex"), strict, options);
 	}
 
-	/**
-	 * Deserializes a transaction from `buffer` with the given `id`. It is faster
-	 * than `fromBytes` at the cost of vital safety checks (validation, verification and id calculation).
-	 *
-	 * NOTE: Only use this internally when it is safe to assume the buffer has already been
-	 * verified.
-	 */
+
 	public static fromBytesUnsafe(buff: Buffer, id?: string): ITransaction {
 		try {
 			const options: IDeserializeOptions | ISerializeOptions = { acceptLegacyVersion: true };

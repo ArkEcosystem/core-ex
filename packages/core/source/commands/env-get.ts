@@ -4,35 +4,16 @@ import Joi from "joi";
 import { parseFileSync } from "envfile";
 import { existsSync } from "fs-extra";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
+
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
+
 	public signature: string = "env:get";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
+
 	public description: string = "Get the value of an environment variable.";
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
+
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -44,12 +25,7 @@ export class Command extends Commands.Command {
 			);
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
+
 	public async execute(): Promise<void> {
 		const envFile: string = this.app.getCorePath("config", ".env");
 

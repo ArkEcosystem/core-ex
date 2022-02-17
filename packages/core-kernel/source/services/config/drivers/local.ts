@@ -25,45 +25,22 @@ const processSchema = {
 		.required(),
 };
 
-/**
- * @export
- * @class LocalConfigLoader
- * @implements {ConfigLoader}
- */
+
 @injectable()
 export class LocalConfigLoader implements ConfigLoader {
-	/**
-	 * The application instance.
-	 *
-	 * @protected
-	 * @type {Application}
-	 * @memberof LocalConfigLoader
-	 */
+
 	@inject(Identifiers.Application)
 	protected readonly app!: Application;
 
-	/**
-	 * The application configuration.
-	 *
-	 * @private
-	 * @type {ConfigRepository}
-	 * @memberof LoadCryptography
-	 */
+
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
-	/**
-	 * @private
-	 * @type {ValidationService}
-	 * @memberof LoadCryptography
-	 */
+
 	@inject(Identifiers.ValidationService)
 	private readonly validationService!: Validator;
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof LocalConfigLoader
-	 */
+
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
 			const config: Record<string, Primitive> = dotenv.parseFile(this.app.environmentFile());
@@ -78,10 +55,7 @@ export class LocalConfigLoader implements ConfigLoader {
 		}
 	}
 
-	/**
-	 * @returns {Promise<void>}
-	 * @memberof LocalConfigLoader
-	 */
+
 	public async loadConfiguration(): Promise<void> {
 		try {
 			this.loadApplication();
@@ -96,11 +70,7 @@ export class LocalConfigLoader implements ConfigLoader {
 		}
 	}
 
-	/**
-	 * @private
-	 * @returns {void}
-	 * @memberof LocalConfigLoader
-	 */
+
 	private loadApplication(): void {
 		const processType: string = this.app.get<KeyValuePair>(Identifiers.ConfigFlags).processType;
 
@@ -125,11 +95,7 @@ export class LocalConfigLoader implements ConfigLoader {
 		this.configRepository.set("app.plugins", get(this.validationService.valid(), `${processType}.plugins`, []));
 	}
 
-	/**
-	 * @private
-	 * @returns {void}
-	 * @memberof LocalConfigLoader
-	 */
+
 	private loadPeers(): void {
 		this.validationService.validate(
 			this.loadFromLocation(["peers.json"]),
@@ -155,11 +121,7 @@ export class LocalConfigLoader implements ConfigLoader {
 		this.configRepository.set("peers", this.validationService.valid());
 	}
 
-	/**
-	 * @private
-	 * @returns {void}
-	 * @memberof LocalConfigLoader
-	 */
+
 	private loadDelegates(): void {
 		this.validationService.validate(
 			this.loadFromLocation(["delegates.json"]),
@@ -176,11 +138,7 @@ export class LocalConfigLoader implements ConfigLoader {
 		this.configRepository.set("delegates", this.validationService.valid());
 	}
 
-	/**
-	 * @private
-	 * @returns {void}
-	 * @memberof LocalConfigLoader
-	 */
+
 	private loadCryptography(): void {
 		const files: string[] = ["genesisBlock", "exceptions", "milestones", "network"];
 
@@ -195,12 +153,7 @@ export class LocalConfigLoader implements ConfigLoader {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {string[]} files
-	 * @returns {KeyValuePair}
-	 * @memberof LocalConfigLoader
-	 */
+
 	private loadFromLocation(files: string[]): KeyValuePair {
 		for (const file of files) {
 			const fullPath: string = this.app.configPath(file);

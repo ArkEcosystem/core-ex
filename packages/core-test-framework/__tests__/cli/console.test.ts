@@ -11,40 +11,20 @@ const spyOnGetArgument = jest.fn();
 
 @Container.injectable()
 class Command extends Commands.Command {
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
+
 	public signature: string = "core:test";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
+
 	public description: string = "Test command.";
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
+
 	public configure(): void {
 		this.definition.setFlag("flagName", "The test message.", Joi.string().default("flagValue"));
 
 		this.definition.setArgument("argumentName", "The test argument.", Joi.string().default("argumentValue"));
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
+
 	public async execute(): Promise<void> {
 		spyOnGetFlag(this.getFlag("flagName"));
 		spyOnGetFlagToken(this.getFlag("token"));

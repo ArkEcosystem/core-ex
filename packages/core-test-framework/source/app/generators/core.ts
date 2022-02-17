@@ -6,23 +6,12 @@ import { dirSync } from "tmp";
 import { CoreConfigPaths } from "../contracts";
 import { Generator } from "./generator";
 
-/**
- * @export
- * @class CoreGenerator
- * @extends {Generator}
- */
+
 export class CoreGenerator extends Generator {
-	/**
-	 * @private
-	 * @type {string}
-	 * @memberof CoreGenerator
-	 */
+
 	private destination!: string;
 
-	/**
-	 * @returns {CoreConfigPaths}
-	 * @memberof CoreGenerator
-	 */
+
 	public generate(): CoreConfigPaths {
 		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.network}`);
 
@@ -51,10 +40,7 @@ export class CoreGenerator extends Generator {
 		};
 	}
 
-	/**
-	 * @private
-	 * @memberof CoreGenerator
-	 */
+
 	private writePeers(): void {
 		const filePath: string = resolve(this.destination, "peers.json");
 
@@ -65,11 +51,7 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {*} delegates
-	 * @memberof CoreGenerator
-	 */
+
 	private writeDelegates(delegates): void {
 		const filePath: string = resolve(this.destination, "delegates.json");
 
@@ -80,10 +62,7 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-	/**
-	 * @private
-	 * @memberof CoreGenerator
-	 */
+
 	private writeEnvironment(): void {
 		const filePath: string = resolve(this.destination, ".env");
 
@@ -94,10 +73,7 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-	/**
-	 * @private
-	 * @memberof CoreGenerator
-	 */
+
 	private writeApplication(): void {
 		const filePath: string = resolve(this.destination, "app.json");
 
@@ -108,10 +84,7 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-	/**
-	 * @private
-	 * @memberof CoreGenerator
-	 */
+
 	private generateEnvironment(environment: Types.JsonObject): string {
 		let result = "";
 

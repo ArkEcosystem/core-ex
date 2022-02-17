@@ -5,32 +5,18 @@ import { AppHeader } from "../components";
 import { Application } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 
-/**
- * @export
- * @class CommandHelp
- */
+
 @injectable()
 export class CommandHelp {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof Command
-	 */
+
 	@inject(Identifiers.Application)
 	protected readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof DiscoverCommands
-	 */
+
 	@inject(Identifiers.Package)
 	protected readonly pkg!: PackageJson;
 
-	/**
-	 * @returns {string}
-	 * @memberof CommandHelp
-	 */
+
 	public render(command): string {
 		let helpMessage: string = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
 
@@ -54,11 +40,7 @@ ${flags}`;
 		return helpMessage;
 	}
 
-	/**
-	 * @private
-	 * @returns {string}
-	 * @memberof CommandHelp
-	 */
+
 	private buildArguments(command): string {
 		const args = command.definition.getArguments();
 
@@ -76,11 +58,7 @@ ${flags}`;
 		return output.join("\n");
 	}
 
-	/**
-	 * @private
-	 * @returns {string}
-	 * @memberof CommandHelp
-	 */
+
 	private buildFlags(command): string {
 		const flags = command.definition.getFlags();
 
@@ -98,13 +76,7 @@ ${flags}`;
 		return output.join("\n");
 	}
 
-	/**
-	 * @private
-	 * @template T
-	 * @param {T} properties
-	 * @returns
-	 * @memberof CommandHelp
-	 */
+
 	private buildProperties<T>(properties: T) {
 		const options: string[] = [];
 		const descriptions: string[] = [];
