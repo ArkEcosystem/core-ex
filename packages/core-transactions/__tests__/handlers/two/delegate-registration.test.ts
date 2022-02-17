@@ -27,7 +27,6 @@ import { configManager } from "@packages/crypto/src/managers";
 import {
     buildMultiSignatureWallet,
     buildRecipientWallet,
-    buildSecondSignatureWallet,
     buildSenderWallet,
     initApp,
 } from "../__support__/app";

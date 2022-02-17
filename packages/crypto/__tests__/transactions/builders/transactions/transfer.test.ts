@@ -44,7 +44,6 @@ describe("Transfer Transaction", () => {
                 .amount("1")
                 .vendorField("dummy")
                 .sign("dummy passphrase")
-                .secondSign("dummy passphrase");
 
             expect(actual.build().verified).toBeTrue();
             expect(actual.verify()).toBeTrue();

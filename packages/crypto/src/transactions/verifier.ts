@@ -30,7 +30,6 @@ export class Verifier {
 
         const hash: Buffer = Utils.toHash(transaction, {
             excludeSignature: true,
-            excludeSecondSignature: true,
             excludeMultiSignature: true,
         });
 
@@ -78,7 +77,6 @@ export class Verifier {
         const hash: Buffer = Utils.toHash(data, {
             disableVersionCheck,
             excludeSignature: true,
-            excludeSecondSignature: true,
         });
 
         return this.internalVerifySignature(hash, signature, senderPublicKey);

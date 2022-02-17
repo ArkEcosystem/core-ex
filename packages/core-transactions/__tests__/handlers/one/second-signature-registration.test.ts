@@ -14,7 +14,6 @@ import { configManager } from "@packages/crypto/src/managers";
 import {
     buildMultiSignatureWallet,
     buildRecipientWallet,
-    buildSecondSignatureWallet,
     buildSenderWallet,
     initApp,
 } from "../__support__/app";
@@ -72,7 +71,7 @@ describe("DelegateRegistrationTransaction V1", () => {
 
         handler = transactionHandlerRegistry.getRegisteredHandlerByType(
             Transactions.InternalTransactionType.from(
-                Enums.TransactionType.SecondSignature,
+                Enums.TransactionType.DelegateRegistration,
                 Enums.TransactionTypeGroup.Core,
             ),
             1,
@@ -96,7 +95,7 @@ describe("DelegateRegistrationTransaction V1", () => {
 
     describe("getConstructor", () => {
         it("should return v1 constructor", async () => {
-            expect(handler.getConstructor()).toBe(Transactions.One.SecondSignatureRegistrationTransaction);
+            expect(handler.getConstructor()).toBe(Transactions.One.DelegateRegistrationTransaction);
         });
     });
 

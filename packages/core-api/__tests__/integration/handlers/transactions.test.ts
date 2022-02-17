@@ -463,7 +463,6 @@ describe("API 2.0 - Transactions", () => {
             expect(response.data.data).toEqual({
                 1: {
                     Transfer: 0,
-                    SecondSignature: 1,
                     DelegateRegistration: 2,
                     Vote: 3,
                     MultiSignature: 4,

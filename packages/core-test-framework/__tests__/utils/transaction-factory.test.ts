@@ -227,14 +227,6 @@ describe("TransactionFactory", () => {
         });
     });
 
-    describe("withSecondPassphrase", () => {
-        it("should return transaction factory", async () => {
-            const entity = transactionFactory.transfer().withSecondPassphrase(passphrases[0]);
-
-            expect(entity).toBeInstanceOf(TransactionFactory);
-        });
-    });
-
     describe("withPassphraseList", () => {
         it("should return transaction factory", async () => {
             const entity = transactionFactory.transfer().withPassphraseList([passphrases[0], passphrases[1]]);

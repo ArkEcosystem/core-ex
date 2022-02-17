@@ -34,7 +34,6 @@ const createRandomTx = (type) => {
                 .amount("10000000000000")
                 .vendorField(Math.random().toString(36))
                 .sign(Math.random().toString(36))
-                .secondSign(Math.random().toString(36))
                 .build();
             break;
         }
@@ -156,7 +155,6 @@ describe("Transaction", () => {
                 .vendorField(Math.random().toString(36))
                 .nonce("1")
                 .sign(Math.random().toString(36))
-                .secondSign(Math.random().toString(36))
                 .build();
 
             let hex = transaction.serialized.toString("hex");

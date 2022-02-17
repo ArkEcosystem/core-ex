@@ -509,7 +509,6 @@ describe("Transaction serializer / deserializer", () => {
 
             const buffer = TransactionUtils.toHash(builder.data, {
                 excludeSignature: true,
-                excludeSecondSignature: true,
             });
 
             builder.data.signature = hasher(buffer, keys);
@@ -534,18 +533,6 @@ describe("Transaction serializer / deserializer", () => {
             expect(builder.data.signature).not.toHaveLength(64);
             expect(() => (transaction = builder.build())).not.toThrow();
             expect(transaction!.verify()).toBeTrue();
-        });
-
-        it("should deserialize a V2 transaction when signed with Schnorr/Schnorr", () => {
-            const builder = builderWith(Hash.signSchnorr, Hash.signSchnorr);
-
-            let transaction: ITransaction;
-            expect(builder.data.version).toBe(2);
-            expect(() => (transaction = builder.build())).not.toThrow();
-
-            expect(transaction!.verify()).toBeTrue();
-            expect(Verifier.verifySecondSignature(transaction!.data, PublicKey.fromPassphrase("secret 2"))).toBeTrue();
-            expect(Verifier.verifySecondSignature(transaction!.data, PublicKey.fromPassphrase("secret 3"))).toBeFalse();
         });
 
         it("should throw when V2 transaction is signed with Schnorr and ECDSA", () => {
@@ -574,7 +561,6 @@ describe("Transaction serializer / deserializer", () => {
             const builder = builderWith(Hash.signSchnorr);
             const buffer = TransactionUtils.toHash(builder.data, {
                 excludeSignature: true,
-                excludeSecondSignature: true,
             });
 
             builder.data.signature = builder.data.signature = Hash.signSchnorr(buffer, Keys.fromPassphrase("secret"));

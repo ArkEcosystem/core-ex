@@ -168,7 +168,6 @@ export interface ISerializeOptions {
     acceptLegacyVersion?: boolean;
     disableVersionCheck?: boolean;
     excludeSignature?: boolean;
-    excludeSecondSignature?: boolean;
     excludeMultiSignature?: boolean;
 
     // WORKAROUND: A handful of mainnet transactions have an invalid

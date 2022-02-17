@@ -82,32 +82,4 @@ describe("Verifier", () => {
             });
         });
     });
-
-    describe("verifySecondSignature", () => {
-        const keys2 = Keys.fromPassphrase("secret two");
-
-        const transaction = TransactionFactory.initialize()
-            .transfer("AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff", 1000)
-            .withVersion(2)
-            .withFee(2000)
-            .withPassphrase("secret")
-            .withSecondPassphrase("secret two")
-            .createOne();
-
-        it("should return true on a valid signature", () => {
-            configManager.getMilestone().aip11 = true;
-            expect(Verifier.verifySecondSignature(transaction, keys2.publicKey)).toBeTrue();
-        });
-
-        it("should fail this.getHash for transaction version > 1", () => {
-            const transactionV2 = Object.assign({}, transaction, { version: 2 });
-            configManager.getMilestone().aip11 = false;
-
-            expect(() => Verifier.verifySecondSignature(transactionV2, keys2.publicKey)).toThrow(
-                TransactionVersionError,
-            );
-
-            configManager.getMilestone().aip11 = true;
-        });
-    });
 });

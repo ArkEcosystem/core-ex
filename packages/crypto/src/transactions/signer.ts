@@ -5,8 +5,8 @@ import { Utils } from "./utils";
 
 export class Signer {
     public static sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): string {
-        if (!options || (options.excludeSignature === undefined && options.excludeSecondSignature === undefined)) {
-            options = { excludeSignature: true, excludeSecondSignature: true, ...options };
+        if (!options || options.excludeSignature === undefined) {
+            options = { excludeSignature: true, ...options };
         }
 
         const hash: Buffer = Utils.toHash(transaction, options);
@@ -29,7 +29,6 @@ export class Signer {
 
         const hash: Buffer = Utils.toHash(transaction, {
             excludeSignature: true,
-            excludeSecondSignature: true,
             excludeMultiSignature: true,
         });
 

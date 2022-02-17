@@ -7,13 +7,11 @@ import {
     ColdWalletError,
     InsufficientBalanceError,
     InvalidMultiSignaturesError,
-    InvalidSecondSignatureError,
     LegacyMultiSignatureError,
     LegacyMultiSignatureRegistrationError,
     MissingMultiSignatureOnSenderError,
     SenderWalletMismatchError,
     UnexpectedNonceError,
-    UnexpectedSecondSignatureError,
     UnsupportedMultiSignatureTransactionError,
 } from "../errors";
 

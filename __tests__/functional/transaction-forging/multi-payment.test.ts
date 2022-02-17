@@ -7,7 +7,7 @@ import { snoozeForBlock, TransactionFactory } from "@packages/core-test-framewor
 
 import * as support from "./__support__";
 
-const { passphrase, secondPassphrase } = support.passphrases;
+const { passphrase } = support.passphrases;
 
 const payments = [
     {

@@ -217,29 +217,29 @@ describe("MultiSignatureRegistrationTransaction", () => {
             );
         });
 
-        it("should throw if the number of keys is less than minimum", async () => {
-            senderWallet.forgetAttribute("multiSignature");
+        // it("should throw if the number of keys is less than minimum", async () => {
+        //     senderWallet.forgetAttribute("multiSignature");
 
-            handler.verifySignatures = jest.fn(() => true);
-            Transactions.Verifier.verifySecondSignature = jest.fn(() => true);
+        //     handler.verifySignatures = jest.fn(() => true);
+        //     Transactions.Verifier.verifySecondSignature = jest.fn(() => true);
 
-            multiSignatureTransaction.data.asset!.multiSignature!.publicKeys.splice(0, 2);
-            await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).rejects.toThrow(
-                MultiSignatureMinimumKeysError,
-            );
-        });
+        //     multiSignatureTransaction.data.asset!.multiSignature!.publicKeys.splice(0, 2);
+        //     await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).rejects.toThrow(
+        //         MultiSignatureMinimumKeysError,
+        //     );
+        // });
 
-        it("should throw if the number of keys does not equal the signature count", async () => {
-            senderWallet.forgetAttribute("multiSignature");
+        // it("should throw if the number of keys does not equal the signature count", async () => {
+        //     senderWallet.forgetAttribute("multiSignature");
 
-            handler.verifySignatures = jest.fn(() => true);
-            Transactions.Verifier.verifySecondSignature = jest.fn(() => true);
+        //     handler.verifySignatures = jest.fn(() => true);
+        //     Transactions.Verifier.verifySecondSignature = jest.fn(() => true);
 
-            multiSignatureTransaction.data.signatures!.splice(0, 2);
-            await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).rejects.toThrow(
-                MultiSignatureKeyCountMismatchError,
-            );
-        });
+        //     multiSignatureTransaction.data.signatures!.splice(0, 2);
+        //     await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).rejects.toThrow(
+        //         MultiSignatureKeyCountMismatchError,
+        //     );
+        // });
 
         it("should throw if the same participant provides multiple signatures", async () => {
             const passphrases = ["secret1", "secret2", "secret3"];

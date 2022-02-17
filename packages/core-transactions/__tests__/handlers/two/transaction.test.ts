@@ -12,12 +12,10 @@ import passphrases from "@packages/core-test-framework/src/internal/passphrases.
 import {
     InsufficientBalanceError,
     InvalidMultiSignaturesError,
-    InvalidSecondSignatureError,
     LegacyMultiSignatureError,
     MissingMultiSignatureOnSenderError,
     SenderWalletMismatchError,
     UnexpectedNonceError,
-    UnexpectedSecondSignatureError,
     UnsupportedMultiSignatureTransactionError,
 } from "@packages/core-transactions/src/errors";
 import { TransactionHandler, TransactionHandlerConstructor } from "@packages/core-transactions/src/handlers";
@@ -30,7 +28,6 @@ import { configManager } from "@packages/crypto/src/managers";
 import {
     buildMultiSignatureWallet,
     buildRecipientWallet,
-    buildSecondSignatureWallet,
     buildSenderWallet,
     initApp,
 } from "../__support__/app";
@@ -129,7 +126,6 @@ afterEach(() => {
 
 describe("General Tests", () => {
     let transferTransaction: Interfaces.ITransaction;
-    let transactionWithSecondSignature: Interfaces.ITransaction;
     let multiSignatureTransferTransaction: Interfaces.ITransaction;
     let handler: TestTransactionHandler;
 
@@ -147,14 +143,6 @@ describe("General Tests", () => {
             .amount("10000000")
             .nonce("1")
             .sign(passphrases[0])
-            .build();
-
-        transactionWithSecondSignature = BuilderFactory.transfer()
-            .recipientId(recipientWallet.getAddress())
-            .amount("10000000")
-            .nonce("1")
-            .sign(passphrases[0])
-            .secondSign(passphrases[1])
             .build();
 
         multiSignatureTransferTransaction = BuilderFactory.transfer()
@@ -192,35 +180,6 @@ describe("General Tests", () => {
             transferTransaction.data.senderPublicKey = "a".repeat(66);
             await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrowError(
                 SenderWalletMismatchError,
-            );
-        });
-
-        it("should not throw if the transaction has a second signature and should ignore second signaure field", async () => {
-            Managers.configManager.getMilestone().ignoreInvalidSecondSignatureField = true;
-            // @ts-ignore
-            Managers.configManager.config.network.name = "devnet";
-
-            await expect(handler.throwIfCannotBeApplied(transactionWithSecondSignature, senderWallet)).toResolve();
-
-            // @ts-ignore
-            Managers.configManager.config.network.name = "testnet";
-            Managers.configManager.getMilestone().ignoreInvalidSecondSignatureField = false;
-        });
-
-        it("should throw if the transaction has a second signature but wallet does not", async () => {
-            await expect(
-                handler.throwIfCannotBeApplied(transactionWithSecondSignature, senderWallet),
-            ).rejects.toThrowError(UnexpectedSecondSignatureError);
-        });
-
-        it("should throw if the sender has a second signature, but stored walled has not", async () => {
-            const secondSigWallet = buildSenderWallet(factoryBuilder);
-            secondSigWallet.setAttribute(
-                "secondPublicKey",
-                "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
-            );
-            await expect(handler.throwIfCannotBeApplied(transferTransaction, secondSigWallet)).rejects.toThrowError(
-                UnexpectedSecondSignatureError,
             );
         });
 
@@ -298,13 +257,6 @@ describe("General Tests", () => {
             ];
             await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrowError(
                 UnsupportedMultiSignatureTransactionError,
-            );
-        });
-
-        it("should throw if wallet and transaction second signatures does not match", async () => {
-            senderWallet.setAttribute("secondPublicKey", "invalid-public-key");
-            await expect(handler.throwIfCannotBeApplied(transactionWithSecondSignature, senderWallet)).rejects.toThrow(
-                InvalidSecondSignatureError,
             );
         });
 

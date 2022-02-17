@@ -58,18 +58,6 @@ export class Serializer {
         let assetSize = 0;
         let assetBytes: Buffer | Uint8Array | undefined;
 
-        if (transaction.type === TransactionType.SecondSignature && transaction.asset) {
-            const { signature } = transaction.asset;
-            const bytebuffer = new ByteBuffer(Buffer.alloc(33));
-
-            if (signature && signature.publicKey) {
-                bytebuffer.writeBuffer(Buffer.from(signature.publicKey, "hex"));
-            }
-
-            assetBytes = bytebuffer.getResult();
-            assetSize = assetBytes.length;
-        }
-
         if (
             transaction.type === TransactionType.DelegateRegistration &&
             transaction.asset &&

@@ -154,10 +154,6 @@ export class Deserializer {
             transaction.signature = buf.readBuffer(64).toString("hex");
         }
 
-        if (canReadNonMultiSignature()) {
-            transaction.secondSignature = buf.readBuffer(64).toString("hex");
-        }
-
         if (buf.getRemainderLength()) {
             if (buf.getRemainderLength() % 65 === 0) {
                 transaction.signatures = [];

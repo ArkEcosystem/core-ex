@@ -35,7 +35,6 @@ describe("Signer", () => {
             recipient: Identities.Address.fromPassphrase(passphrases[2]),
             amount: "100",
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
             vendorField: "dummy",
         };
 
@@ -63,27 +62,12 @@ describe("Signer", () => {
             delegateFee: "5",
             username: "dummy",
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeDelegate(options);
 
         expect(entity.signature).toBeDefined();
         expect(entity.asset?.delegate?.username).toBeString();
-    });
-
-    it("should make second signature", async () => {
-        const options = {
-            signatureFee: "5",
-            username: "dummy",
-            passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
-        };
-
-        const entity: Interfaces.ITransactionData = signer.makeSecondSignature(options);
-
-        expect(entity.signature).toBeDefined();
-        expect(entity.asset?.signature?.publicKey).toBeString();
     });
 
     it("should make vote", async () => {
@@ -104,7 +88,6 @@ describe("Signer", () => {
             voteFee: "5",
             delegate: Identities.PublicKey.fromPassphrase(passphrases[3]),
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeVote(options);
@@ -139,7 +122,6 @@ describe("Signer", () => {
             )},${Identities.PublicKey.fromPassphrase(passphrases[2])}`,
             passphrases: `${passphrases[0]},${passphrases[1]},${passphrases[2]}`,
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeMultiSignatureRegistration(options);
@@ -186,7 +168,6 @@ describe("Signer", () => {
                 },
             ],
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeMultipayment(options);
@@ -230,7 +211,6 @@ describe("Signer", () => {
             amount: "100",
             recipient: Identities.Address.fromPassphrase(passphrases[0]),
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeHtlcLock(options);
@@ -265,7 +245,6 @@ describe("Signer", () => {
                 unlockSecret: "dummy unlock secret",
             },
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeHtlcClaim(options);
@@ -297,7 +276,6 @@ describe("Signer", () => {
                 lockTransactionId: "12345",
             },
             passphrase: passphrases[0],
-            secondPassphrase: passphrases[1],
         };
 
         const entity: Interfaces.ITransactionData = signer.makeHtlcRefund(options);
