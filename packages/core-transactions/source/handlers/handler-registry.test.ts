@@ -149,7 +149,7 @@ describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 
 	it("should register core transaction types", async (context) => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry =
-			context.context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
+			context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
 
 		await assert.resolves(() =>
 			Promise.all([
@@ -231,9 +231,9 @@ describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 		transactionHandlerProvider.isRegistrationRequired = () => false;
 		const stubRegisterHandlers = stub(transactionHandlerProvider, "registerHandlers");
 
-		context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
+		await context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
 
-		assert.true(stubRegisterHandlers.neverCalled());
+		stubRegisterHandlers.neverCalled();
 	});
 
 	it("should register a custom type", async (context) => {
