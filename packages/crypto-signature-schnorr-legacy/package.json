@@ -1,5 +1,5 @@
 {
-    "name": "@arkecosystem/crypto-signatures-schnorr-legacy",
+    "name": "@arkecosystem/crypto-signature-schnorr-legacy",
     "version": "3.1.1",
     "description": "Schnorr (BCH)",
     "license": "MIT",

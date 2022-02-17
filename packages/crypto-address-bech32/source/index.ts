@@ -1,11 +1,13 @@
-import { AddressFactory as Contract, IKeyPair, KeyPairFactory } from "@arkecosystem/crypto-contracts";
+/* eslint-disable @typescript-eslint/explicit-member-accessibility */
+import { AddressFactory as Contract, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
 import { bech32 } from "@scure/base";
 
 export class AddressFactory implements Contract {
     readonly #network: any;
-    readonly #keyPairFactory: KeyPairFactory;
+    readonly #keyPairFactory: IKeyPairFactory;
 
-    public constructor(network: any, keyPairFactory: KeyPairFactory) {
+    // @TODO: network type once final structure is known
+    public constructor(network: any, keyPairFactory: IKeyPairFactory) {
         this.#network = network;
         this.#keyPairFactory = keyPairFactory;
     }
@@ -16,10 +18,6 @@ export class AddressFactory implements Contract {
 
     public fromPublicKey(publicKey: string): string {
         return bech32.encode(this.#network.prefix, bech32.toWords(Buffer.from(publicKey, "hex")));
-    }
-
-    public fromPrivateKey(privateKey: IKeyPair): string {
-        return this.fromPublicKey(privateKey.publicKey);
     }
 
     public validate(address: string): boolean {

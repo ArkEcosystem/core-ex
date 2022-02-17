@@ -14,11 +14,11 @@ export interface AddressFactory {
 
     // fromMultiSignatureAsset(asset: IMultiSignatureAsset): string;
 
-    fromPrivateKey(privateKey: IKeyPair): string;
-
     validate(address: string): boolean;
 }
 
-export interface KeyPairFactory {
-    fromMnemonic(passphrase: string): IKeyPair;
+export interface IKeyPairFactory {
+    fromMnemonic(mnemonic: string, compressed?: boolean): IKeyPair;
+
+    fromPrivateKey(privateKey: Buffer | string, compressed?: boolean): IKeyPair;
 }
