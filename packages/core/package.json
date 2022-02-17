@@ -76,9 +76,6 @@
         "pm2": "^4.5.0"
     },
     "engines": {
-        "node": ">=10.x"
-    },
-    "publishConfig": {
-        "access": "public"
+        "node": ">=16.x"
     }
 }

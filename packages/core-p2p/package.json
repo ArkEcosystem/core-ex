@@ -55,10 +55,7 @@
         "@types/semver": "6.2.3"
     },
     "engines": {
-        "node": ">=10.x"
-    },
-    "publishConfig": {
-        "access": "public"
+        "node": ">=16.x"
     },
     "arkecosystem": {
         "core": {
