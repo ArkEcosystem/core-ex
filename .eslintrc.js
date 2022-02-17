@@ -1,11 +1,11 @@
-{
-	"parser": "@typescript-eslint/parser",
-	"parserOptions": {
-		"project": "../../tsconfig.eslint.json",
-		"extraFileExtensions": [".json"],
-		"projectFolderIgnoreList": ["build", "coverage", "node_modules", "public"]
+module.exports = {
+	parser: "@typescript-eslint/parser",
+	parserOptions: {
+		project: "tsconfig.eslint.json",
+		extraFileExtensions: [".json"],
+		projectFolderIgnoreList: ["build", "coverage", "node_modules", "public"],
 	},
-	"plugins": [
+	plugins: [
 		"@typescript-eslint",
 		"prettier",
 		"promise",
@@ -14,9 +14,9 @@
 		"sort-keys-fix",
 		"testing-library",
 		"unicorn",
-		"unused-imports"
+		"unused-imports",
 	],
-	"extends": [
+	extends: [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/eslint-recommended",
 		"plugin:@typescript-eslint/recommended-requiring-type-checking",
@@ -28,9 +28,9 @@
 		"plugin:promise/recommended",
 		"plugin:sonarjs/recommended",
 		"plugin:unicorn/recommended",
-		"prettier"
+		"prettier",
 	],
-	"rules": {
+	rules: {
 		"@typescript-eslint/ban-ts-comment": "off",
 		"@typescript-eslint/ban-types": "off",
 		"@typescript-eslint/explicit-module-boundary-types": "off",
@@ -52,7 +52,7 @@
 		"@typescript-eslint/restrict-plus-operands": "off",
 		"@typescript-eslint/restrict-template-expressions": "off",
 		"arrow-body-style": ["warn", "as-needed"],
-		"curly": "warn",
+		curly: "warn",
 		"import/default": "warn",
 		"import/export": "warn",
 		"import/exports-last": "warn",
@@ -85,14 +85,14 @@
 		"prefer-const": [
 			"warn",
 			{
-				"destructuring": "all"
-			}
+				destructuring: "all",
+			},
 		],
 		"prettier/prettier": [
 			"off",
 			{
-				"endOfLine": "auto"
-			}
+				endOfLine: "auto",
+			},
 		],
 		"promise/param-names": "warn",
 		"simple-import-sort/exports": "warn",
@@ -110,8 +110,8 @@
 			"warn",
 			"asc",
 			{
-				"caseSensitive": true
-			}
+				caseSensitive: true,
+			},
 		],
 		"unicorn/consistent-destructuring": "warn",
 		"unicorn/consistent-function-scoping": "warn",
@@ -141,6 +141,12 @@
 		"unicorn/prefer-top-level-await": "warn",
 		"unicorn/prevent-abbreviations": "warn",
 		"unused-imports/no-unused-imports-ts": "warn",
-		"tsdoc/syntax": "off"
-	}
-}
+		"unicorn/prefer-object-from-entries": "warn",
+		"@typescript-eslint/no-floating-promises": "warn",
+		"@typescript-eslint/await-thenable": "warn",
+		"unicorn/prefer-default-parameters": "warn",
+		"unicorn/prefer-add-event-listener": "warn",
+		"no-empty": "warn",
+		"sonarjs/no-nested-template-literals": "warn",
+	},
+};

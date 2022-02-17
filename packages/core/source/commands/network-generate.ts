@@ -1,10 +1,10 @@
+import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { Blocks, Crypto, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import { generateMnemonic } from "bip39";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
-import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
@@ -326,10 +326,10 @@ export class Command extends Commands.Command {
 			.filter((flag) => flag.promptType)
 			.find((flag) => flags[flag.name] === undefined);
 
-		const defaults = this.flagSettings.reduce<any>((acc: any, flag: Flag) => {
-			acc[flag.name] = flag.default;
+		const defaults = this.flagSettings.reduce<any>((accumulator: any, flag: Flag) => {
+			accumulator[flag.name] = flag.default;
 
-			return acc;
+			return accumulator;
 		}, {});
 
 		let options = {
@@ -393,8 +393,8 @@ export class Command extends Commands.Command {
 		const paths = envPaths(flags.token, { suffix: "core" });
 		const configPath = flags.configPath ? flags.configPath : paths.config;
 
-		const coreConfigDest = join(configPath, flags.network);
-		const cryptoConfigDest = join(coreConfigDest, "crypto");
+		const coreConfigDestination = join(configPath, flags.network);
+		const cryptoConfigDestination = join(coreConfigDestination, "crypto");
 
 		const delegates: any[] = this.generateCoreDelegates(flags.delegates, flags.pubKeyHash);
 
@@ -404,23 +404,23 @@ export class Command extends Commands.Command {
 			{
 				task: async () => {
 					if (!flags.overwriteConfig) {
-						if (existsSync(coreConfigDest)) {
-							throw new Error(`${coreConfigDest} already exists.`);
+						if (existsSync(coreConfigDestination)) {
+							throw new Error(`${coreConfigDestination} already exists.`);
 						}
 
-						if (existsSync(cryptoConfigDest)) {
-							throw new Error(`${cryptoConfigDest} already exists.`);
+						if (existsSync(cryptoConfigDestination)) {
+							throw new Error(`${cryptoConfigDestination} already exists.`);
 						}
 					}
 
-					ensureDirSync(coreConfigDest);
-					ensureDirSync(cryptoConfigDest);
+					ensureDirSync(coreConfigDestination);
+					ensureDirSync(cryptoConfigDestination);
 				},
 				title: `Prepare directories.`,
 			},
 			{
 				task: async () => {
-					writeJSONSync(resolve(coreConfigDest, "genesis-wallet.json"), genesisWallet, { spaces: 4 });
+					writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, { spaces: 4 });
 				},
 				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
 			},
@@ -429,21 +429,21 @@ export class Command extends Commands.Command {
 					const genesisBlock = this.generateCryptoGenesisBlock(genesisWallet, delegates, flags);
 
 					writeJSONSync(
-						resolve(cryptoConfigDest, "network.json"),
+						resolve(cryptoConfigDestination, "network.json"),
 						this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
 						{ spaces: 4 },
 					);
 
-					writeJSONSync(resolve(cryptoConfigDest, "milestones.json"), this.generateCryptoMilestones(flags), {
+					writeJSONSync(resolve(cryptoConfigDestination, "milestones.json"), this.generateCryptoMilestones(flags), {
 						spaces: 4,
 					});
 
-					writeJSONSync(resolve(cryptoConfigDest, "genesisBlock.json"), genesisBlock, { spaces: 4 });
+					writeJSONSync(resolve(cryptoConfigDestination, "genesisBlock.json"), genesisBlock, { spaces: 4 });
 
-					writeJSONSync(resolve(cryptoConfigDest, "exceptions.json"), {});
+					writeJSONSync(resolve(cryptoConfigDestination, "exceptions.json"), {});
 
 					writeFileSync(
-						resolve(cryptoConfigDest, "index.ts"),
+						resolve(cryptoConfigDestination, "index.ts"),
 						[
 							'import exceptions from "./exceptions.json";',
 							'import genesisBlock from "./genesisBlock.json";',
@@ -459,23 +459,23 @@ export class Command extends Commands.Command {
 			},
 			{
 				task: async () => {
-					writeJSONSync(resolve(coreConfigDest, "peers.json"), this.generatePeers(flags), { spaces: 4 });
+					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), { spaces: 4 });
 
 					writeJSONSync(
-						resolve(coreConfigDest, "delegates.json"),
+						resolve(coreConfigDestination, "delegates.json"),
 						{ secrets: delegates.map((d) => d.passphrase) },
 						{ spaces: 4 },
 					);
 
-					writeFileSync(resolve(coreConfigDest, ".env"), this.generateEnvironmentVariables(flags));
+					writeFileSync(resolve(coreConfigDestination, ".env"), this.generateEnvironmentVariables(flags));
 
-					writeJSONSync(resolve(coreConfigDest, "app.json"), this.generateApp(flags), { spaces: 4 });
+					writeJSONSync(resolve(coreConfigDestination, "app.json"), this.generateApp(flags), { spaces: 4 });
 				},
 				title: "Generate Core network configuration.",
 			},
 		]);
 
-		this.logger.info(`Configuration generated on location: ${coreConfigDest}`);
+		this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
 	}
 
 	private generateCryptoNetwork(nethash: string, options: Options) {
@@ -604,7 +604,7 @@ export class Command extends Commands.Command {
 
 				return {
 					ip,
-					port: Number.isNaN(parseInt(port)) ? options.coreP2PPort : parseInt(port),
+					port: Number.isNaN(Number.parseInt(port)) ? options.coreP2PPort : Number.parseInt(port),
 				};
 			});
 
@@ -658,7 +658,7 @@ export class Command extends Commands.Command {
 			includeDynamicFees = true;
 		}
 
-		if (!Object.keys(dynamicFees.addonBytes).length) {
+		if (Object.keys(dynamicFees.addonBytes).length === 0) {
 			// @ts-ignore
 			delete dynamicFees.addonBytes;
 		}
@@ -680,9 +680,9 @@ export class Command extends Commands.Command {
 
 	private generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Wallet[] {
 		const wallets: Wallet[] = [];
-		for (let i = 0; i < activeDelegates; i++) {
+		for (let index = 0; index < activeDelegates; index++) {
 			const delegateWallet: Wallet = this.createWallet(pubKeyHash);
-			delegateWallet.username = `genesis_${i + 1}`;
+			delegateWallet.username = `genesis_${index + 1}`;
 
 			wallets.push(delegateWallet);
 		}
@@ -803,29 +803,31 @@ export class Command extends Commands.Command {
 		const payloadHash: Buffer = Crypto.HashAlgorithms.sha256(Buffer.concat(allBytes));
 
 		const block: any = {
-			numberOfTransactions: transactions.length,
-			// @ts-ignore
-generatorPublicKey: keys.publicKey.toString("hex"),
-			
-payloadHash: payloadHash.toString("hex"),
-			
-height: 1,
-			
-payloadLength,
-			
+
 blockSignature: undefined,
-			
-reward: "0",
-			
+
+// @ts-ignore
+generatorPublicKey: keys.publicKey.toString("hex"),
+
+height: 1,
+
 id: undefined,
-			
-totalAmount: totalAmount.toString(),
-			
-			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-			version: 0,
+
+numberOfTransactions: transactions.length,
+
+payloadHash: payloadHash.toString("hex"),
+
+payloadLength,
+
+previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+
+reward: "0",
+
 			timestamp,
+			totalAmount: totalAmount.toString(),
 			totalFee: totalFee.toString(),
 			transactions,
+			version: 0,
 		};
 
 		block.id = Blocks.Block.getId(block);

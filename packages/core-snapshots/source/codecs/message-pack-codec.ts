@@ -87,7 +87,7 @@ export class MessagePackCodec implements Codec {
 
 				serialized: serialized,
 
-				version: transaction.data.version!,
+				version: transaction.data.version,
 
 				timestamp: timestamp,
 
