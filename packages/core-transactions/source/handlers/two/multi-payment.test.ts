@@ -1,5 +1,3 @@
-import "jest-extended";
-
 import { Application, Contracts, Exceptions } from "@arkecosystem/core-kernel";
 import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
 import { Wallets } from "@packages/core-state/distribution";

@@ -1,5 +1,3 @@
-import "jest-extended";
-
 import { Application, Contracts, Exceptions } from "@arkecosystem/core-kernel";
 import { DelegateEvent } from "@arkecosystem/core-kernel/distribution/enums";
 import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";

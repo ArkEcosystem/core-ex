@@ -1,66 +1,60 @@
-import "jest-extended";
-
-import { Application, Contracts } from "@arkecosystem/core-kernel";
+import { Contracts } from "@arkecosystem/core-kernel";
 import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
-import { TransactionHandler } from "../index";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Generators } from "@arkecosystem/core-test-framework";
+import { Factories, FactoryBuilder } from "@arkecosystem/core-test-framework/source/factories";
+import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import { configManager } from "@arkecosystem/crypto/distribution/managers";
+import { describe } from "@arkecosystem/core-test";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
-let app: Application;
-let senderWallet: Wallets.Wallet;
-let multiSignatureWallet: Wallets.Wallet;
-let recipientWallet: Wallets.Wallet;
-let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+describe("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
-const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
-mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
-
-const transactionHistoryService = {
-	streamByCriteria: jest.fn(),
-};
-
-beforeEach(() => {
-	transactionHistoryService.streamByCriteria.mockReset();
-
-	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
-	Managers.configManager.setConfig(config);
-	configManager.getMilestone().aip11 = false;
-	Managers.configManager.getMilestone().aip11 = false;
-
-	app = initApp();
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
-
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
-
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
-
-	senderWallet = buildSenderWallet(factoryBuilder);
-	multiSignatureWallet = buildMultiSignatureWallet();
-	recipientWallet = buildRecipientWallet(factoryBuilder);
-
-	walletRepository.index(senderWallet);
-	walletRepository.index(multiSignatureWallet);
-	walletRepository.index(recipientWallet);
-});
-
-describe("DelegateRegistrationTransaction V1", () => {
+	let senderWallet: Wallets.Wallet;
+	let multiSignatureWallet: Wallets.Wallet;
+	let recipientWallet: Wallets.Wallet;
+	let walletRepository: Contracts.State.WalletRepository;
 	let handler: TransactionHandler;
 
-	beforeEach(async () => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+	beforeEach(async (context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+		const mockGetLastBlock = jest.fn();
+		Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
+		mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
+
+		const transactionHistoryService = {
+			streamByCriteria: jest.fn(),
+		};
+
+		transactionHistoryService.streamByCriteria.mockReset();
+
+		const config = Generators.generateCryptoConfigRaw();
+		configManager.setConfig(config);
+		Managers.configManager.setConfig(config);
+		configManager.getMilestone().aip11 = false;
+		Managers.configManager.getMilestone().aip11 = false;
+
+		context.app = initApp();
+		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+
+		walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+
+		let factoryBuilder = new FactoryBuilder();
+		Factories.registerWalletFactory(factoryBuilder);
+		Factories.registerTransactionFactory(factoryBuilder);
+
+		senderWallet = buildSenderWallet(factoryBuilder);
+		multiSignatureWallet = buildMultiSignatureWallet();
+		recipientWallet = buildRecipientWallet(factoryBuilder);
+
+		walletRepository.index(senderWallet);
+		walletRepository.index(multiSignatureWallet);
+		walletRepository.index(recipientWallet);
+
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
