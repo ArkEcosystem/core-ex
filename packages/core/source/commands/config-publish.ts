@@ -1,54 +1,20 @@
+import { resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { Networks } from "@arkecosystem/crypto";
-import Joi from "joi";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
-import { resolve } from "path";
+import Joi from "joi";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * @private
-	 * @type {Environment}
-	 * @memberof Command
-	 */
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public signature: string = "config:publish";
+	public signature = "config:publish";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public description: string = "Publish the configuration.";
+	public description = "Publish the configuration.";
 
-	/**
-	 * Indicates whether the command requires a network to be present.
-	 *
-	 * @type {boolean}
-	 * @memberof Command
-	 */
-	public requiresNetwork: boolean = false;
+	public requiresNetwork = false;
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -56,12 +22,6 @@ export class Command extends Commands.Command {
 			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		if (this.hasFlag("network")) {
 			return this.performPublishment(this.getFlags());
@@ -69,15 +29,15 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				type: "select",
-				name: "network",
-				message: "Please select which network you want to operate on",
 				choices: Object.keys(Networks).map((network) => ({ title: network, value: network })),
+				message: "Please select which network you want to operate on",
+				name: "network",
+				type: "select",
 			},
 			{
-				type: "confirm",
-				name: "confirm",
 				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
 			},
 		]);
 
@@ -92,12 +52,6 @@ export class Command extends Commands.Command {
 		await this.performPublishment({ ...response, ...this.getFlags() });
 	}
 
-	/**
-	 * @private
-	 * @param {Contracts.AnyObject} flags
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	private async performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app
 			.rebind(Container.Identifiers.ApplicationPaths)
@@ -108,7 +62,6 @@ export class Command extends Commands.Command {
 
 		await this.components.taskList([
 			{
-				title: "Prepare directories",
 				task: () => {
 					if (flags.reset) {
 						removeSync(configDest);
@@ -124,9 +77,9 @@ export class Command extends Commands.Command {
 
 					ensureDirSync(configDest);
 				},
+				title: "Prepare directories",
 			},
 			{
-				title: "Publish environment",
 				task: () => {
 					if (!existsSync(`${configSrc}/.env`)) {
 						this.components.fatal(`Couldn't find the environment file at ${configSrc}/.env.`);
@@ -134,8 +87,9 @@ export class Command extends Commands.Command {
 
 					copySync(`${configSrc}/.env`, `${configDest}/.env`);
 				},
+				title: "Publish environment",
 			},
-			{ title: "Publish configuration", task: () => copySync(configSrc, configDest) },
+			{ task: () => copySync(configSrc, configDest), title: "Publish configuration" },
 		]);
 	}
 }

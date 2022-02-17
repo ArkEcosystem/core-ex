@@ -5,34 +5,16 @@ import { AppHeader } from "../components";
 import { Application } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 
-/**
- * @export
- * @class CommandHelp
- */
 @injectable()
 export class CommandHelp {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof Command
-	 */
 	@inject(Identifiers.Application)
 	protected readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof DiscoverCommands
-	 */
 	@inject(Identifiers.Package)
 	protected readonly pkg!: PackageJson;
 
-	/**
-	 * @returns {string}
-	 * @memberof CommandHelp
-	 */
 	public render(command): string {
-		let helpMessage: string = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
+		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
 
 ${blue().bold("Description")}
 ${command.description}`;
@@ -54,11 +36,6 @@ ${flags}`;
 		return helpMessage;
 	}
 
-	/**
-	 * @private
-	 * @returns {string}
-	 * @memberof CommandHelp
-	 */
 	private buildArguments(command): string {
 		const args = command.definition.getArguments();
 
@@ -69,18 +46,13 @@ ${flags}`;
 		const { options, descriptions, longestProperty } = this.buildProperties(args);
 
 		const output: string[] = [];
-		for (let i = 0; i < options.length; i++) {
-			output.push(`${options[i].padEnd(longestProperty, " ")}    ${descriptions[i]}`);
+		for (const [i, option] of options.entries()) {
+			output.push(`${option.padEnd(longestProperty, " ")}    ${descriptions[i]}`);
 		}
 
 		return output.join("\n");
 	}
 
-	/**
-	 * @private
-	 * @returns {string}
-	 * @memberof CommandHelp
-	 */
 	private buildFlags(command): string {
 		const flags = command.definition.getFlags();
 
@@ -91,20 +63,13 @@ ${flags}`;
 		const { options, descriptions, longestProperty } = this.buildProperties(flags);
 
 		const output: string[] = [];
-		for (let i = 0; i < options.length; i++) {
-			output.push(`--${options[i].padEnd(longestProperty, " ")}    ${descriptions[i]}`);
+		for (const [i, option] of options.entries()) {
+			output.push(`--${option.padEnd(longestProperty, " ")}    ${descriptions[i]}`);
 		}
 
 		return output.join("\n");
 	}
 
-	/**
-	 * @private
-	 * @template T
-	 * @param {T} properties
-	 * @returns
-	 * @memberof CommandHelp
-	 */
 	private buildProperties<T>(properties: T) {
 		const options: string[] = [];
 		const descriptions: string[] = [];
@@ -115,9 +80,9 @@ ${flags}`;
 		}
 
 		return {
-			options,
 			descriptions,
 			longestProperty: options.reduce((a, b) => (a.length > b.length ? a : b)).length,
+			options,
 		};
 	}
 }

@@ -1,82 +1,38 @@
 import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";
-import * as semver from "semver";
+import { lte } from "semver";
 import { PackageJson } from "type-fest";
 
 import { Application } from "../application";
 import { Confirm, Spinner, Warning } from "../components";
-import { Config } from "../contracts";
+import { Config, Updater as Contracts_Updater } from "../contracts";
 import { Identifiers, inject, injectable } from "../ioc";
 import { Installer } from "./installer";
 import { ProcessManager } from "./process-manager";
-import * as Contracts from "../contracts";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
-/**
- * @export
- * @class Updater
- */
 @injectable()
-export class Updater implements Contracts.Updater {
-	/**
-	 * @private
-	 * @type {Application}
-	 * @memberof Updater
-	 */
+export class Updater implements Contracts_Updater {
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
-	/**
-	 * @private
-	 * @type {Config}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.Config)
 	private readonly config!: Config;
 
-	/**
-	 * @private
-	 * @type {PackageJson}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.Package)
 	private readonly pkg!: PackageJson;
 
-	/**
-	 * @private
-	 * @type {Installer}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.Installer)
 	private readonly installer!: Installer;
 
-	/**
-	 * @private
-	 * @type {ProcessManager}
-	 * @memberof Updater
-	 */
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	/**
-	 * @private
-	 * @type {*}
-	 * @memberof Updater
-	 */
 	private updateCheckInterval: any = ONE_DAY;
 
-	/**
-	 * @private
-	 * @type {(string | undefined)}
-	 * @memberof Updater
-	 */
 	private latestVersion: string | undefined;
 
-	/**
-	 * @returns {Promise<boolean>}
-	 * @memberof Updater
-	 */
 	public async check(): Promise<boolean> {
 		this.latestVersion = this.config.get("latestVersion");
 
@@ -103,13 +59,7 @@ export class Updater implements Contracts.Updater {
 		return true;
 	}
 
-	/**
-	 * @param {boolean} [updateProcessManager=false]
-	 * @param {boolean} [force=false]
-	 * @returns {Promise<boolean>}
-	 * @memberof Updater
-	 */
-	public async update(updateProcessManager: boolean = false, force: boolean = false): Promise<boolean> {
+	public async update(updateProcessManager = false, force = false): Promise<boolean> {
 		if (this.latestVersion === undefined) {
 			return false;
 		}
@@ -143,18 +93,13 @@ export class Updater implements Contracts.Updater {
 		return true;
 	}
 
-	/**
-	 * @private
-	 * @returns {(Promise<string | undefined>)}
-	 * @memberof Updater
-	 */
 	public async getLatestVersion(): Promise<string | undefined> {
 		try {
 			const latest: string | undefined = await latestVersion(this.packageName, {
 				version: this.packageChannel,
 			});
 
-			if (semver.lte(latest, this.packageVersion)) {
+			if (lte(latest, this.packageVersion)) {
 				return undefined;
 			}
 
@@ -169,11 +114,11 @@ export class Updater implements Contracts.Updater {
 	}
 
 	private get packageName(): string {
-		return this.pkg.name!;
+		return this.pkg.name;
 	}
 
 	private get packageVersion(): string {
-		return this.pkg.version!;
+		return this.pkg.version;
 	}
 
 	private get packageChannel(): string {

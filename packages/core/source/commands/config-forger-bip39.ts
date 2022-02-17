@@ -4,43 +4,14 @@ import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
 
-/**
- * @export
- * @class Command
- * @extends {Commands.Command}
- */
 @Container.injectable()
 export class Command extends Commands.Command {
-	/**
-	 * The console command signature.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public signature: string = "config:forger:bip39";
+	public signature = "config:forger:bip39";
 
-	/**
-	 * The console command description.
-	 *
-	 * @type {string}
-	 * @memberof Command
-	 */
-	public description: string = "Configure the forging delegate (BIP39).";
+	public description = "Configure the forging delegate (BIP39).";
 
-	/**
-	 * Indicates whether the command should be shown in the command list.
-	 *
-	 * @type {boolean}
-	 * @memberof Command
-	 */
-	public isHidden: boolean = true;
+	public isHidden = true;
 
-	/**
-	 * Configure the console command.
-	 *
-	 * @returns {void}
-	 * @memberof Command
-	 */
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
@@ -49,12 +20,6 @@ export class Command extends Commands.Command {
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	public async execute(): Promise<void> {
 		if (this.hasFlag("bip39")) {
 			return this.performConfiguration(this.getFlags());
@@ -62,18 +27,18 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				type: "password",
-				name: "bip39",
 				message: "Please enter your delegate plain text passphrase. Referred to as BIP39.",
+				name: "bip39",
+				type: "password",
 				validate: /* istanbul ignore next */ (value) =>
 					!validateMnemonic(value) && !this.getFlag("skipValidation")
 						? `Failed to verify the given passphrase as BIP39 compliant.`
 						: true,
 			},
 			{
-				type: "confirm",
-				name: "confirm",
 				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
 			},
 		]);
 
@@ -82,24 +47,17 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	/**
-	 * @private
-	 * @param {Contracts.AnyObject} flags
-	 * @returns {Promise<void>}
-	 * @memberof Command
-	 */
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
 		await this.components.taskList([
 			{
-				title: "Validating passphrase is BIP39 compliant.",
 				task: () => {
 					if (!flags.bip39 || (!validateMnemonic(flags.bip39) && !flags.skipValidation)) {
 						throw new Error(`Failed to verify the given passphrase as BIP39 compliant.`);
 					}
 				},
+				title: "Validating passphrase is BIP39 compliant.",
 			},
 			{
-				title: "Writing BIP39 passphrase to configuration.",
 				task: () => {
 					const delegatesConfig = this.app.getCorePath("config", "delegates.json");
 
@@ -109,6 +67,7 @@ export class Command extends Commands.Command {
 
 					writeJSONSync(delegatesConfig, delegates);
 				},
+				title: "Writing BIP39 passphrase to configuration.",
 			},
 		]);
 	}

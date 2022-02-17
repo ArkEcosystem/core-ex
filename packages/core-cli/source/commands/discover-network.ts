@@ -4,19 +4,9 @@ import prompts from "prompts";
 
 import { injectable } from "../ioc";
 
-/**
- * @export
- * @class DiscoverNetwork
- */
 @injectable()
 export class DiscoverNetwork {
-	/**
-	 * @param {string} path
-	 * @param skipPrompts
-	 * @returns {Promise<string>}
-	 * @memberof DiscoverNetwork
-	 */
-	public async discover(path: string, usePrompts: boolean = true): Promise<string> {
+	public async discover(path: string, usePrompts = true): Promise<string> {
 		if (!existsSync(path)) {
 			throw new Error(`The [${path}] directory does not exist.`);
 		}
@@ -40,25 +30,20 @@ export class DiscoverNetwork {
 		return this.discoverWithPrompt(folders);
 	}
 
-	/**
-	 * @param {string[]} folders
-	 * @returns {Promise<string>}
-	 * @memberof DiscoverNetwork
-	 */
 	public async discoverWithPrompt(folders: string[]): Promise<string> {
 		const response = await prompts([
 			{
-				type: "select",
-				name: "network",
-				message: "What network do you want to operate on?",
 				choices: folders
 					.filter((folder) => this.isValidNetwork(folder))
 					.map((folder) => ({ title: folder, value: folder })),
+				message: "What network do you want to operate on?",
+				name: "network",
+				type: "select",
 			},
 			{
-				type: "confirm",
-				name: "confirm",
 				message: "Can you confirm?",
+				name: "confirm",
+				type: "confirm",
 			},
 		]);
 
