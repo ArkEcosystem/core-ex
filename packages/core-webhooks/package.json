@@ -13,6 +13,7 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del dist",
 		"test": "uvu -r tsm source .test.ts",
+		"test:file": "uvu -r tsm source",
 		"test:coverage": "c8 -r html pnpm run test"
 	},
 	"dependencies": {
