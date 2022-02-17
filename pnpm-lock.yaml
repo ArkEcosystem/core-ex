@@ -975,63 +975,6 @@ importers:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
 
-  packages/crypto-transactions:
-    specifiers:
-      '@arkecosystem/crypto-identities': workspace:*
-      '@arkecosystem/utils': workspace:*
-      '@types/tmp': ^0.2.0
-      '@types/uuid': ^8.0.0
-      '@types/wif': ^2.0.1
-      ajv: ^6.10.2
-      ajv-keywords: ^3.4.1
-      bcrypto: ^5.3.0
-      big-integer: ^1.6.48
-      bip32: ^2.0.4
-      bip39: ^3.0.2
-      browserify-aes: ^1.2.0
-      bstring: ^0.3.9
-      buffer-xor: ^2.0.2
-      builtin-modules: ^3.1.0
-      bytebuffer: ^5.0.1
-      dayjs: ^1.8.17
-      deepmerge: ^4.2.2
-      fast-memoize: ^2.5.1
-      ipaddr.js: ^2.0.0
-      lodash.get: ^4.4.2
-      lodash.set: ^4.3.2
-      tmp: ^0.2.0
-      util: ^0.12.3
-      uuid: ^8.0.0
-      wif: ^2.0.6
-    dependencies:
-      '@arkecosystem/crypto-identities': link:../crypto-identities
-      '@arkecosystem/utils': link:../utils
-      ajv: 6.12.6
-      ajv-keywords: 3.5.2_ajv@6.12.6
-      bcrypto: 5.4.0
-      bip32: 2.0.6
-      bip39: 3.0.4
-      browserify-aes: 1.2.0
-      bstring: 0.3.9
-      buffer-xor: 2.0.2
-      builtin-modules: 3.2.0
-      bytebuffer: 5.0.1
-      dayjs: 1.10.7
-      deepmerge: 4.2.2
-      fast-memoize: 2.5.2
-      ipaddr.js: 2.0.1
-      lodash.get: 4.4.2
-      lodash.set: 4.3.2
-      wif: 2.0.6
-    devDependencies:
-      '@types/tmp': 0.2.3
-      '@types/uuid': 8.3.1
-      '@types/wif': 2.0.2
-      big-integer: 1.6.51
-      tmp: 0.2.1
-      util: 0.12.4
-      uuid: 8.3.2
-
   packages/utils:
     specifiers:
       '@faustbrian/benchmarker': ^0.1.2
@@ -4238,6 +4181,7 @@ packages:
       ajv: ^6.9.1
     dependencies:
       ajv: 6.12.6
+    dev: true
 
   /ajv/6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
