@@ -1,24 +1,19 @@
 {
 	"name": "@arkecosystem/core-p2p",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "P2P API for ARK Core",
 	"license": "MIT",
-	"contributors": [
-		"François-Xavier Thoorens <fx@ark.io>",
-		"Kristjan Košič <kristjan@ark.io>",
-		"Brian Faust <brian@ark.io>",
-		"Alex Barnsley <alex@ark.io>"
-	],
-	"main": "dist/index",
-	"types": "dist/index",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:proto": "pnpm run pbjs && pnpm run pbts",
-		"build:watch": "pnpm run clean && tsc -- -w",
-		"clean": "rimraf dist",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
 		"pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
 		"pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
 		"test": "cross-env CORE_ENV=test jest --forceExit"

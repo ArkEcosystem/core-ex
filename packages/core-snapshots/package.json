@@ -1,20 +1,18 @@
 {
 	"name": "@arkecosystem/core-snapshots",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "Provides live local streamed snapshots functionality for ARK Core",
 	"license": "MIT",
-	"contributors": [
-		"Sebastijan Kužner <sebastijan@ark.io>"
-	],
-	"main": "dist/index",
-	"types": "dist/index",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
-		"clean": "rimraf dist",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {

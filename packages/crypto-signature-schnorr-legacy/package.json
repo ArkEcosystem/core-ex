@@ -1,6 +1,6 @@
 {
 	"name": "@arkecosystem/crypto-signature-schnorr-legacy",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "Schnorr (BCH)",
 	"license": "MIT",
 	"contributors": [],
@@ -12,7 +12,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "rimraf dist"
+		"clean": "del dist"
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",

@@ -1,14 +1,14 @@
 import "jest-extended";
 
 import { Contracts } from "@packages/core-kernel";
-import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from "@packages/core-state/src/wallets";
+import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from "@packages/core-state/source/wallets";
 import {
 	addressesIndexer,
 	publicKeysIndexer,
 	resignationsIndexer,
 	usernamesIndexer,
-} from "@packages/core-state/src/wallets/indexers/indexers";
-import { Utils } from "@packages/crypto/src";
+} from "@packages/core-state/source/wallets/indexers/indexers";
+import { Utils } from "@packages/crypto/source";
 
 import { setUp } from "../setup";
 
@@ -34,7 +34,7 @@ describe("Wallet Repository Copy On Write", () => {
 	});
 
 	it("should be able to look up indexers", () => {
-		const expected = ["addresses", "publicKeys", "usernames", "resignations", "locks"];
+		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
 		expect(walletRepoCopyOnWrite.getIndexNames()).toEqual(expected);
 		expect(walletRepoCopyOnWrite.getIndex("addresses").indexer).toEqual(addressesIndexer);
 		expect(walletRepoCopyOnWrite.getIndex("publicKeys").indexer).toEqual(publicKeysIndexer);

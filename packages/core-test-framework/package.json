@@ -1,21 +1,17 @@
 {
 	"name": "@arkecosystem/core-test-framework",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "Test Framework for ARK Core",
 	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>",
-		"Erwann Gentric <erwann@ark.io>",
-		"Joshua Noack <joshua@ark.io>"
-	],
-	"main": "dist/index",
+	"contributors": [],
+	"main": "distribution/index.js",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
-		"clean": "rimraf dist",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
 		"test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
 		"test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
 	},

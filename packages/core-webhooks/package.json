@@ -1,19 +1,17 @@
 {
 	"name": "@arkecosystem/core-webhooks",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "Webhooks for ARK Core",
 	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>"
-	],
-	"main": "dist/index",
+	"contributors": [],
+	"main": "distribution/index.js",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
-		"clean": "rimraf dist",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {

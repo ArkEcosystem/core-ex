@@ -1,20 +1,18 @@
 {
 	"name": "@arkecosystem/core-cli",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "Core of the ARK Blockchain",
 	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>"
-	],
-	"main": "dist/index",
-	"types": "dist/index",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
-		"/dist"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
-		"clean": "rimraf dist",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {

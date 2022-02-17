@@ -1,23 +1,19 @@
 {
 	"name": "@arkecosystem/core-api",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "Public API for ARK Core",
 	"license": "MIT",
-	"contributors": [
-		"Kristjan Košič <kristjan@ark.io>",
-		"Brian Faust <brian@ark.io>"
-	],
-	"main": "dist/index",
-	"types": "dist/index",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
-		"dist"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
-		"clean": "rimraf dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\"",
-		"test:integration": "cross-env CORE_ENV=test jest --forceExit --testPathPattern=\"__tests__/integration/*\""
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
+		"test": "cross-env CORE_ENV=test jest --forceExit --modulePathIgnorePatterns=\"__tests__/integration\""
 	},
 	"dependencies": {
 		"@arkecosystem/core-database": "workspace:*",
