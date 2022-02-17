@@ -56,7 +56,8 @@ module.exports = {
 		"import/default": "warn",
 		"import/export": "warn",
 		"import/exports-last": "warn",
-		"import/extensions": ["warn", "always"],
+		// "import/extensions": ["warn", "always"],
+		"import/extensions": "off",
 		"import/first": "warn",
 		"import/group-exports": "off",
 		"import/namespace": "warn",
@@ -150,5 +151,6 @@ module.exports = {
 		"unicorn/prefer-add-event-listener": "warn",
 		"no-empty": "warn",
 		"sonarjs/no-nested-template-literals": "warn",
+		"unicorn/require-number-to-fixed-digits-argument": "off",
 	},
 };

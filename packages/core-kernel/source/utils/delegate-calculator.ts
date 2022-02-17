@@ -24,5 +24,5 @@ export const calculateForgedTotal = (wallet: Wallet): string => {
 	const forgedFees: BigNumber = BigNumber.make(delegate.forgedFees);
 	const forgedRewards: BigNumber = BigNumber.make(delegate.forgedRewards);
 
-	return forgedFees.plus(forgedRewards).toFixed(0);
+	return forgedFees.plus(forgedRewards).toFixed();
 };
