@@ -1,12 +1,9 @@
-import { Application, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Application, Container, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@packages/core-state";
+import { Factories, Generators } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
-import { Mempool } from "@packages/core-transaction-pool/source/mempool";
+import { Mempool } from "@packages/core-transaction-pool";
 import {
 	InsufficientBalanceError,
 	InvalidMultiSignatureError,
@@ -15,12 +12,9 @@ import {
 	// MultiSignatureKeyCountMismatchError,
 	// MultiSignatureMinimumKeysError,
 } from "../../errors";
-import { TransactionHandler } from "../index";
+import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Errors, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { BuilderFactory } from "@arkecosystem/crypto/distribution/transactions";
-import { IMultiSignatureAsset, IMultiSignatureLegacyAsset } from "@arkecosystem/crypto/distribution/interfaces";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -28,12 +22,12 @@ let app: Application;
 let senderWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 
 const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
+Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 const transactionHistoryService = {
@@ -44,17 +38,16 @@ beforeEach(() => {
 	transactionHistoryService.streamByCriteria.mockReset();
 
 	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
 	Managers.configManager.setConfig(config);
 
 	app = initApp();
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new Factories.FactoryBuilder();
+	Factories.Factories.registerWalletFactory(factoryBuilder);
+	Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 	senderWallet = buildSenderWallet(factoryBuilder);
 	recipientWallet = buildRecipientWallet(factoryBuilder);
@@ -65,12 +58,12 @@ beforeEach(() => {
 
 describe("MultiSignatureRegistrationTransaction", () => {
 	let multiSignatureTransaction: Interfaces.ITransaction;
-	let multiSignatureAsset: IMultiSignatureAsset;
+	let multiSignatureAsset: Interfaces.IMultiSignatureAsset;
 	let handler: TransactionHandler;
 
 	beforeEach(async () => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
@@ -98,7 +91,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 
 		walletRepository.index(recipientWallet);
 
-		multiSignatureTransaction = BuilderFactory.multiSignature()
+		multiSignatureTransaction = Transactions.BuilderFactory.multiSignature()
 			.multiSignatureAsset(multiSignatureAsset)
 			.senderPublicKey(senderWallet.getPublicKey()!)
 			.nonce("1")
@@ -178,7 +171,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 		});
 
 		it("should throw with aip11 set to false and transaction is legacy", async () => {
-			const legacyAssset: IMultiSignatureLegacyAsset = {
+			const legacyAssset: Interfaces.IMultiSignatureLegacyAsset = {
 				keysgroup: [
 					"+039180ea4a8a803ee11ecb462bb8f9613fcdb5fe917e292dbcc73409f0e98f8f22",
 					"+028d3611c4f32feca3e6713992ae9387e18a0e01954046511878fe078703324dc0",
@@ -250,7 +243,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			const participantWallet = walletRepository.findByPublicKey(participants[0]);
 			participantWallet.setBalance(Utils.BigNumber.make(1e8 * 100));
 
-			multiSignatureTransaction = BuilderFactory.multiSignature()
+			multiSignatureTransaction = Transactions.BuilderFactory.multiSignature()
 				.multiSignatureAsset({
 					publicKeys: participants,
 					min: 2,
@@ -333,7 +326,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 		});
 
 		it("should throw if transaction by sender already in pool", async () => {
-			await app.get<Mempool>(Identifiers.TransactionPoolMempool).addTransaction(multiSignatureTransaction);
+			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(multiSignatureTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(multiSignatureTransaction)).rejects.toThrow(
 				new Contracts.TransactionPool.PoolError(
@@ -346,7 +339,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 		it("should throw if transaction with same address already in pool", async () => {
 			const anotherSenderWallet = buildSenderWallet(factoryBuilder, "random passphrase");
 
-			const multiSignatureTransactionWithSameAddress = BuilderFactory.multiSignature()
+			const multiSignatureTransactionWithSameAddress = Transactions.BuilderFactory.multiSignature()
 				.multiSignatureAsset(multiSignatureAsset)
 				.senderPublicKey(anotherSenderWallet.getPublicKey()!)
 				.nonce("1")
@@ -357,7 +350,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 				.sign("random passphrase")
 				.build();
 
-			await app.get<Mempool>(Identifiers.TransactionPoolMempool).addTransaction(multiSignatureTransaction);
+			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(multiSignatureTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(multiSignatureTransactionWithSameAddress)).rejects.toThrow(
 				new Contracts.TransactionPool.PoolError(

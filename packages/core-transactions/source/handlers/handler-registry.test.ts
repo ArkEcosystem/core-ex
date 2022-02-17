@@ -1,6 +1,5 @@
 import { Application, Container, Services } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test";
-import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
 import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";

@@ -1,22 +1,17 @@
-import { Application, Contracts } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { Mapper, Mocks } from "@packages/core-test-framework/distribution";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@packages/core-state/distribution";
+import { Mapper, Mocks } from "@packages/core-test-framework";
+import { Factories, Generators } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 import {
 	ColdWalletError,
 	InsufficientBalanceError,
 	SenderWalletMismatchError,
 } from "../../errors";
-import { TransactionHandler } from "../index";
+import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransferTransactionHandler } from "../one";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { BuilderFactory } from "@arkecosystem/crypto/distribution/transactions";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -25,27 +20,26 @@ let senderWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 
 const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
+Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 beforeEach(() => {
 	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
 	Managers.configManager.setConfig(config);
 
 	app = initApp();
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
+	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new Factories.FactoryBuilder();
+	Factories.Factories.registerWalletFactory(factoryBuilder);
+	Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 	senderWallet = buildSenderWallet(factoryBuilder);
 	multiSignatureWallet = buildMultiSignatureWallet();
@@ -69,21 +63,21 @@ describe("TransferTransaction", () => {
 	beforeEach(async () => {
 		pubKeyHash = Managers.configManager.get("network.pubKeyHash");
 		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(Enums.TransactionType.Transfer, Enums.TransactionTypeGroup.Core),
 			2,
 		);
 
-		transferTransaction = BuilderFactory.transfer()
+		transferTransaction = Transactions.BuilderFactory.transfer()
 			.recipientId(recipientWallet.getAddress())
 			.amount("10000000")
 			.sign(passphrases[0])
 			.nonce("1")
 			.build();
 
-		multiSignatureTransferTransaction = BuilderFactory.transfer()
+		multiSignatureTransferTransaction = Transactions.BuilderFactory.transfer()
 			.senderPublicKey(multiSignatureWallet.getPublicKey()!)
 			.recipientId(recipientWallet.getAddress())
 			.amount("1")
@@ -147,7 +141,7 @@ describe("TransferTransaction", () => {
 
 			coldWallet.setBalance(Utils.BigNumber.ZERO);
 
-			transferTransaction = BuilderFactory.transfer()
+			transferTransaction = Transactions.BuilderFactory.transfer()
 				.amount("10000000")
 				.recipientId(recipientWallet.getAddress())
 				.nonce("1")
@@ -170,7 +164,7 @@ describe("TransferTransaction", () => {
 
 			coldWallet.setBalance(Utils.BigNumber.ZERO);
 
-			transferTransaction = BuilderFactory.transfer()
+			transferTransaction = Transactions.BuilderFactory.transfer()
 				.amount("10000000")
 				.recipientId(coldWallet.getAddress())
 				.nonce("1")

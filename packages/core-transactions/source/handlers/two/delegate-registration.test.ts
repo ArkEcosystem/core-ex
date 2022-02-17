@@ -1,11 +1,7 @@
-import { Application, Contracts, Exceptions } from "@arkecosystem/core-kernel";
-import { DelegateEvent } from "@arkecosystem/core-kernel/distribution/enums";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
+import { Application, Container, Contracts, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
+import { Wallets } from "@packages/core-state";
 import { StateStore } from "@packages/core-state/source/stores/state";
-import { Mocks } from "@packages/core-test-framework/distribution";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Mocks, Generators, Factories } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 import { Mempool } from "@packages/core-transaction-pool/source/mempool";
 import {
@@ -18,9 +14,6 @@ import {
 import { TransactionHandler } from "../index";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { BuilderFactory } from "@arkecosystem/crypto/distribution/transactions";
-import { IMultiSignatureAsset } from "@arkecosystem/crypto/distribution/interfaces";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -29,7 +22,7 @@ let senderWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 const mockGetLastBlock = jest.fn();
@@ -44,17 +37,16 @@ beforeEach(() => {
 	transactionHistoryService.streamByCriteria.mockReset();
 
 	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
 	Managers.configManager.setConfig(config);
 
 	app = initApp();
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new Factories.FactoryBuilder();
+	Factories.Factories.registerWalletFactory(factoryBuilder);
+	Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 	senderWallet = buildSenderWallet(factoryBuilder);
 	multiSignatureWallet = buildMultiSignatureWallet();
@@ -75,7 +67,7 @@ describe("DelegateRegistrationTransaction", () => {
 
 	beforeEach(async () => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
@@ -85,7 +77,7 @@ describe("DelegateRegistrationTransaction", () => {
 			2,
 		);
 
-		delegateRegistrationTransaction = BuilderFactory.delegateRegistration()
+		delegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
 			.usernameAsset("dummy")
 			.nonce("1")
 			.sign(passphrases[0])
@@ -265,14 +257,14 @@ describe("DelegateRegistrationTransaction", () => {
 	describe("emitEvents", () => {
 		it("should dispatch", async () => {
 			const emitter: Contracts.Kernel.EventDispatcher = app.get<Contracts.Kernel.EventDispatcher>(
-				Identifiers.EventDispatcherService,
+				Container.Identifiers.EventDispatcherService,
 			);
 
 			const spy = jest.spyOn(emitter, "dispatch");
 
 			handler.emitEvents(delegateRegistrationTransaction, emitter);
 
-			expect(spy).toHaveBeenCalledWith(DelegateEvent.Registered, expect.anything());
+			expect(spy).toHaveBeenCalledWith(KernelEnums.DelegateEvent.Registered, expect.anything());
 		});
 	});
 
@@ -286,7 +278,7 @@ describe("DelegateRegistrationTransaction", () => {
 		});
 
 		it("should throw if wallet has a multi signature", async () => {
-			const multiSignatureAsset: IMultiSignatureAsset = {
+			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
 				min: 2,
 				publicKeys: [
 					Identities.PublicKey.fromPassphrase(passphrases[21]),
@@ -387,7 +379,7 @@ describe("DelegateRegistrationTransaction", () => {
 		});
 
 		it("should throw if transaction by sender already in pool", async () => {
-			await app.get<Mempool>(Identifiers.TransactionPoolMempool).addTransaction(delegateRegistrationTransaction);
+			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(delegateRegistrationTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
 				Contracts.TransactionPool.PoolError,
@@ -407,14 +399,14 @@ describe("DelegateRegistrationTransaction", () => {
 
 			walletRepository.index(anotherWallet);
 
-			const anotherDelegateRegistrationTransaction = BuilderFactory.delegateRegistration()
+			const anotherDelegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
 				.usernameAsset("dummy")
 				.nonce("1")
 				.sign(passphrases[2])
 				.build();
 
 			await app
-				.get<Mempool>(Identifiers.TransactionPoolMempool)
+				.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
 				.addTransaction(anotherDelegateRegistrationTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(

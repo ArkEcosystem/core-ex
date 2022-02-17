@@ -1,11 +1,8 @@
-import { Application, Contracts, Enums as AppEnums, Exceptions } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Application, Container, Contracts, Enums as AppEnums, Exceptions } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@packages/core-state";
+import { Factories, Generators } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { Mempool } from "@packages/core-transaction-pool/source/mempool";
+import { Mempool } from "@packages/core-transaction-pool";
 import {
 	AlreadyVotedError,
 	InsufficientBalanceError,
@@ -13,11 +10,9 @@ import {
 	UnvoteMismatchError,
 	VotedForNonDelegateError,
 } from "../../errors";
-import { TransactionHandler } from "../index";
+import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { BuilderFactory } from "@arkecosystem/crypto/distribution/transactions";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -26,12 +21,12 @@ let senderWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 
 const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
+Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 const transactionHistoryService = {
@@ -42,17 +37,16 @@ beforeEach(() => {
 	transactionHistoryService.streamByCriteria.mockReset();
 
 	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
 	Managers.configManager.setConfig(config);
 
 	app = initApp();
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new Factories.FactoryBuilder();
+	Factories.Factories.registerWalletFactory(factoryBuilder);
+	Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 	senderWallet = buildSenderWallet(factoryBuilder);
 	multiSignatureWallet = buildMultiSignatureWallet();
@@ -78,7 +72,7 @@ describe("VoteTransaction", () => {
 
 	beforeEach(async () => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(Enums.TransactionType.Vote, Enums.TransactionTypeGroup.Core),
@@ -105,13 +99,13 @@ describe("VoteTransaction", () => {
 		delegateWallet2.setAttribute("delegate", { username: "test2" });
 		walletRepository.index(delegateWallet2);
 
-		voteTransaction = BuilderFactory.vote()
+		voteTransaction = Transactions.BuilderFactory.vote()
 			.votesAsset(["+" + delegateWallet1.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
-		multiSignatureVoteTransaction = BuilderFactory.vote()
+		multiSignatureVoteTransaction = Transactions.BuilderFactory.vote()
 			.senderPublicKey(multiSignatureWallet.getPublicKey()!)
 			.votesAsset(["+" + delegateWallet1.getPublicKey()!])
 			.nonce("1")
@@ -120,13 +114,13 @@ describe("VoteTransaction", () => {
 			.multiSign(passphrases[2], 2)
 			.build();
 
-		unvoteTransaction = BuilderFactory.vote()
+		unvoteTransaction = Transactions.BuilderFactory.vote()
 			.votesAsset(["-" + delegateWallet1.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
-		multiSignatureUnvoteTransaction = BuilderFactory.vote()
+		multiSignatureUnvoteTransaction = Transactions.BuilderFactory.vote()
 			.senderPublicKey(multiSignatureWallet.getPublicKey()!)
 			.votesAsset(["-" + delegateWallet1.getPublicKey()!])
 			.nonce("1")
@@ -135,25 +129,25 @@ describe("VoteTransaction", () => {
 			.multiSign(passphrases[2], 2)
 			.build();
 
-		voteUnvoteTransaction = BuilderFactory.vote()
+		voteUnvoteTransaction = Transactions.BuilderFactory.vote()
 			.votesAsset(["+" + delegateWallet1.getPublicKey()!, "-" + delegateWallet1.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
-		unvoteVoteTransaction = BuilderFactory.vote()
+		unvoteVoteTransaction = Transactions.BuilderFactory.vote()
 			.votesAsset(["-" + delegateWallet1.getPublicKey()!, "+" + delegateWallet2.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
-		voteVoteTransaction = BuilderFactory.vote()
+		voteVoteTransaction = Transactions.BuilderFactory.vote()
 			.votesAsset(["+" + delegateWallet1.getPublicKey()!, "+" + delegateWallet2.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
-		unvoteUnvoteTransaction = BuilderFactory.vote()
+		unvoteUnvoteTransaction = Transactions.BuilderFactory.vote()
 			.votesAsset(["-" + delegateWallet1.getPublicKey()!, "-" + delegateWallet2.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
@@ -211,7 +205,7 @@ describe("VoteTransaction", () => {
 	describe("emitEvents", () => {
 		it("should dispatch", async () => {
 			const emitter: Contracts.Kernel.EventDispatcher = app.get<Contracts.Kernel.EventDispatcher>(
-				Identifiers.EventDispatcherService,
+				Container.Identifiers.EventDispatcherService,
 			);
 
 			const spy = jest.spyOn(emitter, "dispatch");
@@ -236,7 +230,7 @@ describe("VoteTransaction", () => {
 
 		it("should throw if asset.votes is undefined", async () => {
 			const emitter: Contracts.Kernel.EventDispatcher = app.get<Contracts.Kernel.EventDispatcher>(
-				Identifiers.EventDispatcherService,
+				Container.Identifiers.EventDispatcherService,
 			);
 
 			voteTransaction.data.asset.votes = undefined;
@@ -248,7 +242,7 @@ describe("VoteTransaction", () => {
 
 		it("should throw if asset is undefined", async () => {
 			const emitter: Contracts.Kernel.EventDispatcher = app.get<Contracts.Kernel.EventDispatcher>(
-				Identifiers.EventDispatcherService,
+				Container.Identifiers.EventDispatcherService,
 			);
 
 			voteTransaction.data.asset = undefined;
@@ -384,7 +378,7 @@ describe("VoteTransaction", () => {
 		});
 
 		it("should throw if transaction by sender already in pool", async () => {
-			await app.get<Mempool>(Identifiers.TransactionPoolMempool).addTransaction(voteTransaction);
+			await app.get<Mempool>(Container.Identifiers.TransactionPoolMempool).addTransaction(voteTransaction);
 
 			await expect(handler.throwIfCannotEnterPool(voteTransaction)).rejects.toThrow(
 				Contracts.TransactionPool.PoolError,

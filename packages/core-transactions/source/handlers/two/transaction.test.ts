@@ -1,13 +1,6 @@
-import "jest-extended";
-
-import { TransactionTypeGroup } from "@arkecosystem/crypto/distribution/enums";
-import { TransactionSchema } from "@arkecosystem/crypto/distribution/transactions/types/schemas";
-import { Application, Contracts } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@packages/core-state";
+import { Factories, Generators } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 import {
 	InsufficientBalanceError,
@@ -18,12 +11,9 @@ import {
 	UnexpectedNonceError,
 	UnsupportedMultiSignatureTransactionError,
 } from "../../errors";
-import { TransactionHandler, TransactionHandlerConstructor } from "../index";
+import { TransactionHandler, TransactionHandlerConstructor } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { BuilderFactory } from "@arkecosystem/crypto/distribution/transactions";
-import { IMultiSignatureAsset } from "@arkecosystem/crypto/distribution/interfaces";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -32,21 +22,21 @@ let senderWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 
 const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
+Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 class TestTransaction extends Transactions.Transaction {
-	public static typeGroup: number = TransactionTypeGroup.Test;
+	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
 	public static type: number = 1;
 	public static key = "test";
 	public static version: number = 2;
 
-	public static getSchema(): TransactionSchema {
+	public static getSchema(): Transactions.schemas.TransactionSchema {
 		return {
 			$id: "test",
 		};
@@ -89,20 +79,19 @@ class TestTransactionHandler extends TransactionHandler {
 
 beforeEach(() => {
 	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
 	Managers.configManager.setConfig(config);
 
 	app = initApp();
 
-	app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
 
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
+	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new Factories.FactoryBuilder();
+	Factories.Factories.registerWalletFactory(factoryBuilder);
+	Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 	senderWallet = buildSenderWallet(factoryBuilder);
 	multiSignatureWallet = buildMultiSignatureWallet();
@@ -126,21 +115,21 @@ describe("General Tests", () => {
 
 	beforeEach(async () => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(1, Enums.TransactionTypeGroup.Test),
 			2,
 		);
 
-		transferTransaction = BuilderFactory.transfer()
+		transferTransaction = Transactions.BuilderFactory.transfer()
 			.recipientId(recipientWallet.getAddress())
 			.amount("10000000")
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
-		multiSignatureTransferTransaction = BuilderFactory.transfer()
+		multiSignatureTransferTransaction = Transactions.BuilderFactory.transfer()
 			.senderPublicKey(multiSignatureWallet.getPublicKey()!)
 			.recipientId(recipientWallet.getAddress())
 			.amount("1")
@@ -194,7 +183,7 @@ describe("General Tests", () => {
 		});
 
 		it("should throw if sender has legacy multi signature", async () => {
-			const multiSignatureAsset: IMultiSignatureAsset = {
+			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
 				publicKeys: [
 					Identities.PublicKey.fromPassphrase(passphrases[0]),
 					Identities.PublicKey.fromPassphrase(passphrases[1]),
@@ -212,7 +201,7 @@ describe("General Tests", () => {
 		});
 
 		it("should throw if sender has multi signature, but indexed wallet has not", async () => {
-			const multiSignatureAsset: IMultiSignatureAsset = {
+			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
 				publicKeys: [
 					Identities.PublicKey.fromPassphrase(passphrases[0]),
 					Identities.PublicKey.fromPassphrase(passphrases[1]),
@@ -229,7 +218,7 @@ describe("General Tests", () => {
 		});
 
 		it("should throw if sender and transaction multi signatures does not match", async () => {
-			const multiSignatureAsset: IMultiSignatureAsset = {
+			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
 				publicKeys: [
 					Identities.PublicKey.fromPassphrase(passphrases[1]),
 					Identities.PublicKey.fromPassphrase(passphrases[0]),
@@ -277,7 +266,7 @@ describe("General Tests", () => {
 	describe("dynamicFees", () => {
 		beforeEach(async () => {
 			const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-				Identifiers.TransactionHandlerRegistry,
+				Container.Identifiers.TransactionHandlerRegistry,
 			);
 			handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 				Transactions.InternalTransactionType.from(
@@ -287,7 +276,7 @@ describe("General Tests", () => {
 				2,
 			);
 
-			transferTransaction = BuilderFactory.transfer()
+			transferTransaction = Transactions.BuilderFactory.transfer()
 				.amount("10000000")
 				.recipientId(recipientWallet.getAddress())
 				.sign("secret")
@@ -331,13 +320,13 @@ describe("General Tests", () => {
 		let pubKeyHash: number;
 
 		beforeEach(() => {
-			pubKeyHash = configManager.get("network.pubKeyHash");
+			pubKeyHash = Managers.configManager.get("network.pubKeyHash");
 		});
 
 		afterEach(() => {
-			configManager.set("exceptions.transactions", []);
-			configManager.set("network.pubKeyHash", pubKeyHash);
-			configManager.getMilestone().aip11 = true;
+			Managers.configManager.set("exceptions.transactions", []);
+			Managers.configManager.set("network.pubKeyHash", pubKeyHash);
+			Managers.configManager.getMilestone().aip11 = true;
 			process.env.CORE_ENV === "test";
 		});
 
@@ -360,9 +349,9 @@ describe("General Tests", () => {
 		});
 
 		it("should resolve with V1", async () => {
-			configManager.getMilestone().aip11 = false;
+			Managers.configManager.getMilestone().aip11 = false;
 
-			transferTransaction = BuilderFactory.transfer()
+			transferTransaction = Transactions.BuilderFactory.transfer()
 				.recipientId(recipientWallet.getAddress())
 				.amount("10000000")
 				.nonce("1")
@@ -384,8 +373,8 @@ describe("General Tests", () => {
 		});
 
 		it("should resolve defined as exception", async () => {
-			configManager.set("exceptions.transactions", [transferTransaction.id]);
-			configManager.set("network.pubKeyHash", 99);
+			Managers.configManager.set("exceptions.transactions", [transferTransaction.id]);
+			Managers.configManager.set("network.pubKeyHash", 99);
 			await expect(handler.apply(transferTransaction)).toResolve();
 		});
 	});

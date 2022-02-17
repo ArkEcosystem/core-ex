@@ -8,8 +8,7 @@ import {
 	publicKeysIndexer,
 	usernamesIndexer,
 } from "@packages/core-state/source/wallets/indexers/indexers";
-import { Mocks } from "@packages/core-test-framework";
-import { FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Factories, Mocks } from "@packages/core-test-framework";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
 import { Collator } from "@packages/core-transaction-pool/source";
@@ -155,7 +154,7 @@ export const initApp = (): Application => {
 };
 
 export const buildSenderWallet = (
-	factoryBuilder: FactoryBuilder,
+	factoryBuilder: Factories.FactoryBuilder,
 	passphrase: string = passphrases[0],
 ): Wallets.Wallet => {
 	const wallet: Wallets.Wallet = factoryBuilder
@@ -171,7 +170,7 @@ export const buildSenderWallet = (
 	return wallet;
 };
 
-export const buildRecipientWallet = (factoryBuilder: FactoryBuilder): Wallets.Wallet => {
+export const buildRecipientWallet = (factoryBuilder: Factories.FactoryBuilder): Wallets.Wallet => {
 	return factoryBuilder
 		.get("Wallet")
 		.withOptions({
