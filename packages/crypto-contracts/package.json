@@ -1,7 +1,7 @@
 {
-    "name": "@arkecosystem/crypto-signatures-schnorr-legacy",
+    "name": "@arkecosystem/crypto-contracts",
     "version": "3.1.1",
-    "description": "Schnorr (BCH)",
+    "description": "Implementation Contracts for Cryptography",
     "license": "MIT",
     "contributors": [],
     "files": [
@@ -15,7 +15,6 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "@arkecosystem/crypto-contracts": "workspace:*",
-        "bcrypto": "5.4.0"
+        "ajv": "6.12.6"
     }
 }
