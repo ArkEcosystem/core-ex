@@ -117,35 +117,37 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 
 describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
-		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
-		context.app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
-		context.app.bind(Container.Identifiers.LogService).toConstantValue({});
+		const app = new Application(new Container.Container());
+		app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
+		app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+		app.bind(Container.Identifiers.LogService).toConstantValue({});
 
-		context.app.bind<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
+		app.bind<Services.Attributes.AttributeSet>(Container.Identifiers.WalletAttributes)
 			.to(Services.Attributes.AttributeSet)
 			.inSingletonScope();
-		context.app.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue({});
-		context.app.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue({});
-		context.app.bind(Container.Identifiers.WalletRepository).toConstantValue({});
-		context.app.bind(Container.Identifiers.TransactionPoolQuery).toConstantValue({});
+		app.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue({});
+		app.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue({});
+		app.bind(Container.Identifiers.WalletRepository).toConstantValue({});
+		app.bind(Container.Identifiers.TransactionPoolQuery).toConstantValue({});
 
-		context.app.bind(Container.Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
-		context.app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
+		app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
 
-		context.app.bind(Container.Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
-		context.app.bind(Container.Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
-		context.app.bind(Container.Identifiers.TransactionHandlerConstructors).toDynamicValue(
+		app.bind(Container.Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
+		app.bind(Container.Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
+		app.bind(Container.Identifiers.TransactionHandlerConstructors).toDynamicValue(
 			ServiceProvider.getTransactionHandlerConstructorsBinding(),
 		);
+
+		context.app = app;
 
 		Managers.configManager.getMilestone().aip11 = false;
 	});
