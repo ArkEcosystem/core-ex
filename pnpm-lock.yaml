@@ -442,37 +442,41 @@ importers:
   packages/core-logger-pino:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-test': workspace:*
       '@arkecosystem/utils': 1.3.1
-      '@types/pino': 6.3.11
+      '@types/pino': 7.0.5
       '@types/pump': 1.1.1
-      '@types/readable-stream': 2.3.11
-      '@types/split2': 2.1.6
+      '@types/readable-stream': 2.3.13
+      '@types/split2': 3.2.1
       chalk: 4.1.2
-      joi: 17.4.2
-      pino: 6.13.2
-      pino-pretty: 4.8.0
+      joi: 17.6.0
+      pino: 7.8.0
+      pino-pretty: 7.5.1
       pump: 3.0.0
       pumpify: 2.0.1
       readable-stream: 3.6.0
-      rotating-file-stream: 2.1.5
-      split2: 3.2.2
+      rotating-file-stream: 3.0.2
+      split2: 4.1.0
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
       chalk: 4.1.2
-      joi: 17.4.2
-      pino: 6.13.2
-      pino-pretty: 4.8.0
+      joi: 17.6.0
+      pino: 7.8.0
+      pino-pretty: 7.5.1
       pump: 3.0.0
       pumpify: 2.0.1
       readable-stream: 3.6.0
-      rotating-file-stream: 2.1.5
-      split2: 3.2.2
+      rotating-file-stream: 3.0.2
+      split2: 4.1.0
     devDependencies:
+      '@arkecosystem/core-test': link:../core-test
       '@arkecosystem/utils': link:../utils
-      '@types/pino': 6.3.11
+      '@types/pino': 7.0.5
       '@types/pump': 1.1.1
-      '@types/readable-stream': 2.3.11
-      '@types/split2': 2.1.6
+      '@types/readable-stream': 2.3.13
+      '@types/split2': 3.2.1
+      uvu: 0.5.3
 
   packages/core-p2p:
     specifiers:
@@ -3896,26 +3900,11 @@ packages:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: true
 
-  /@types/pino-pretty/4.7.5:
-    resolution: {integrity: sha512-rfHe6VIknk14DymxGqc9maGsRe8/HQSvM2u46EAz2XrS92qsAJnW16dpdFejBuZKD8cRJX6Aw6uVZqIQctMpAg==}
+  /@types/pino/7.0.5:
+    resolution: {integrity: sha512-wKoab31pknvILkxAF8ss+v9iNyhw5Iu/0jLtRkUD74cNfOOLJNnqfFKAv0r7wVaTQxRZtWrMpGfShwwBjOcgcg==}
+    deprecated: This is a stub types definition. pino provides its own type definitions, so you do not need this installed.
     dependencies:
-      '@types/node': 13.9.5
-      '@types/pino': 6.3.11
-    dev: true
-
-  /@types/pino-std-serializers/2.4.1:
-    resolution: {integrity: sha512-17XcksO47M24IVTVKPeAByWUd3Oez7EbIjXpSbzMPhXVzgjGtrOa49gKBwxH9hb8dKv58OelsWQ+A1G1l9S3wQ==}
-    dependencies:
-      '@types/node': 13.9.5
-    dev: true
-
-  /@types/pino/6.3.11:
-    resolution: {integrity: sha512-S7+fLONqSpHeW9d7TApUqO6VN47KYgOXhCNKwGBVLHObq8HhaAYlVqUNdfnvoXjCMiwE5xcPm/5R2ZUh8bgaXQ==}
-    dependencies:
-      '@types/node': 13.9.5
-      '@types/pino-pretty': 4.7.5
-      '@types/pino-std-serializers': 2.4.1
-      sonic-boom: 2.6.0
+      pino: 7.8.0
     dev: true
 
   /@types/prettier/2.3.2:
@@ -3928,10 +3917,10 @@ packages:
       '@types/node': 13.9.5
     dev: true
 
-  /@types/readable-stream/2.3.11:
-    resolution: {integrity: sha512-0z+/apYJwKFz/RHp6mOMxz/y7xOvWPYPevuCEyAY3gXsjtaac02E26RvxA+I96rfvmVH/dEMGXNvyJfViR1FSQ==}
+  /@types/readable-stream/2.3.13:
+    resolution: {integrity: sha512-4JSCx8EUzaW9Idevt+9lsRAt1lcSccoQfE+AouM1gk8sFxnnytKNIO3wTl9Dy+4m6jRJ1yXhboLHHT/LXBQiEw==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 17.0.18
       safe-buffer: 5.2.1
     dev: true
 
@@ -3964,10 +3953,10 @@ packages:
     resolution: {integrity: sha512-0kSuKjAS0TrGLJ0M/+8MaFkGsQhZpB6pxOmvS3K8FYI72K//YmdfoW9X2qPsAKh1mkwxGD5zib9s1FIFed6E8g==}
     dev: true
 
-  /@types/split2/2.1.6:
-    resolution: {integrity: sha512-ddaFSOMuy2Rp97l6q/LEteQygvTQJuEZ+SRhxFKR0uXGsdbFDqX/QF2xoGcOqLQ8XV91v01SnAv2vpgihNgW/Q==}
+  /@types/split2/3.2.1:
+    resolution: {integrity: sha512-7uz3yU+LooBq4yNOzlZD9PU9/1Eu0rTD1MjQ6apOVEoHsPrMUrFw7W8XrvWtesm2vK67SBK9AyJcOXtMpl9bgQ==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 17.0.18
     dev: true
 
   /@types/stack-utils/1.0.1:
@@ -5540,7 +5529,6 @@ packages:
 
   /colorette/2.0.16:
     resolution: {integrity: sha512-hUewv7oMjCp+wkBv5Rm0v87eJhq4woh5rSR+42YSQJKecCqgIqNkZ6lAlQms/BwHPJA5NKMRlpxPRv0n8HQW6g==}
-    dev: true
 
   /colors/1.0.3:
     resolution: {integrity: sha1-BDP0TYCWgP3rYO0mDxsMJi6CpAs=}
@@ -6259,7 +6247,6 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
       stream-shift: 1.0.1
-    dev: false
 
   /eachr/4.5.0:
     resolution: {integrity: sha512-9I664RWp6p8jvcHZIwo7bWaiSaUmA1wNSLKwNZEiaYjqiTARq3cGjyRiIunsopZv4QMmX3T5Hs17QoPAzdYxfg==}
@@ -7149,7 +7136,6 @@ packages:
   /fast-redact/3.1.0:
     resolution: {integrity: sha512-dir8LOnvialLxiXDPESMDHGp82CHi6ZEYTVkcvdn5d7psdv9ZkkButXrOeXST4aqreIRR+N7CYlsrwFuorurVg==}
     engines: {node: '>=6'}
-    dev: false
 
   /fast-safe-stringify/2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
@@ -7161,10 +7147,6 @@ packages:
 
   /fast-stringify/1.1.2:
     resolution: {integrity: sha512-SfslXjiH8km0WnRiuPfpUKwlZjW5I878qsOm+2x8x3TgqmElOOLh1rgJFb+PolNdNRK3r8urEefqx0wt7vx1dA==}
-    dev: false
-
-  /fastify-warning/0.2.0:
-    resolution: {integrity: sha512-s1EQguBw/9qtc1p/WTY4eq9WMRIACkj+HTcOIK1in4MV5aFaQC9ZCIt0dJ7pr5bIf4lPpHvAtP2ywpTNgs7hqw==}
     dev: false
 
   /fastq/1.13.0:
@@ -7325,10 +7307,6 @@ packages:
       flatted: 3.2.5
       rimraf: 3.0.2
     dev: true
-
-  /flatstr/1.0.12:
-    resolution: {integrity: sha512-4zPxDyhCyiN2wIAtSLI6gc82/EjqZc1onI4Mz/l0pWrAlsSfYH/2ZIcU+e3oA2wDwbzIWNKwa23F8rh6+DRWkw==}
-    dev: false
 
   /flatted/3.2.5:
     resolution: {integrity: sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg==}
@@ -9136,11 +9114,6 @@ packages:
     resolution: {integrity: sha1-o6vicYryQaKykE+EpiWXDzia4yo=}
     dev: true
 
-  /jmespath/0.15.0:
-    resolution: {integrity: sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=}
-    engines: {node: '>= 0.6.0'}
-    dev: false
-
   /joi/17.4.2:
     resolution: {integrity: sha512-Lm56PP+n0+Z2A2rfRvsfWVDXGEWjXxatPopkQ8qQ5mxCEhwHG+Ettgg5o98FFaxilOxozoa14cFhrE/hOzh/Nw==}
     dependencies:
@@ -9150,9 +9123,19 @@ packages:
       '@sideway/formula': 3.0.0
       '@sideway/pinpoint': 2.0.0
 
-  /joycon/2.2.5:
-    resolution: {integrity: sha512-YqvUxoOcVPnCp0VU1/56f+iKSdvIRJYPznH22BdXV3xMk75SFXhWeJkZ8C9XxUWt1b5x2X1SxuFygW1U0FmkEQ==}
-    engines: {node: '>=6'}
+  /joi/17.6.0:
+    resolution: {integrity: sha512-OX5dG6DTbcr/kbMFj0KGYxuew69HPcAE3K/sZpEV2nP6e/j/C0HV+HNiBPCASxdx5T7DMoa0s8UeHWMnb6n2zw==}
+    dependencies:
+      '@hapi/hoek': 9.2.1
+      '@hapi/topo': 5.1.0
+      '@sideway/address': 4.1.3
+      '@sideway/formula': 3.0.0
+      '@sideway/pinpoint': 2.0.0
+    dev: false
+
+  /joycon/3.1.1:
+    resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
+    engines: {node: '>=10'}
     dev: false
 
   /js-sha3/0.8.0:
@@ -10587,6 +10570,9 @@ packages:
     dependencies:
       isobject: 3.0.1
 
+  /on-exit-leak-free/0.2.0:
+    resolution: {integrity: sha512-dqaz3u44QbRXQooZLTUKU41ZrzYrcvLISVgbrzbyCMxpmSLJvZ3ZamIJIZ29P6OhZIkNIQKosdeM6t1LYbA9hg==}
+
   /on-finished/2.3.0:
     resolution: {integrity: sha1-IPEzZIGwg811M3mSoWlxqi2QaUc=}
     engines: {node: '>= 0.8'}
@@ -11071,40 +11057,47 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /pino-pretty/4.8.0:
-    resolution: {integrity: sha512-mhQfHG4rw5ZFpWL44m0Utjo4GC2+HMfdNvxyA8lLw0sIqn6fCf7uQe6dPckUcW/obly+OQHD7B/MTso6LNizYw==}
+  /pino-abstract-transport/0.5.0:
+    resolution: {integrity: sha512-+KAgmVeqXYbTtU2FScx1XS3kNyfZ5TrXY07V96QnUSFqo2gAqlvmaxH67Lj7SWazqsMabf+58ctdTcBgnOLUOQ==}
+    dependencies:
+      duplexify: 4.1.2
+      split2: 4.1.0
+
+  /pino-pretty/7.5.1:
+    resolution: {integrity: sha512-xEOUJiokdBGcZ9d0v7OY6SqEp+rrVH2drE3bHOUsK8elw44eh9V83InZqeL1dFwgD1IDnd6crUoec3hIXxfdBQ==}
     hasBin: true
     dependencies:
-      '@hapi/bourne': 2.0.0
       args: 5.0.1
-      chalk: 4.1.2
+      colorette: 2.0.16
       dateformat: 4.6.3
       fast-safe-stringify: 2.1.1
-      jmespath: 0.15.0
-      joycon: 2.2.5
+      joycon: 3.1.1
+      pino-abstract-transport: 0.5.0
       pump: 3.0.0
       readable-stream: 3.6.0
       rfdc: 1.3.0
-      split2: 3.2.2
+      secure-json-parse: 2.4.0
+      sonic-boom: 2.6.0
       strip-json-comments: 3.1.1
     dev: false
 
-  /pino-std-serializers/3.2.0:
-    resolution: {integrity: sha512-EqX4pwDPrt3MuOAAUBMU0Tk5kR/YcCM5fNPEzgCO2zJ5HfX0vbiH9HbJglnyeQsN96Kznae6MWD47pZB5avTrg==}
-    dev: false
+  /pino-std-serializers/4.0.0:
+    resolution: {integrity: sha512-cK0pekc1Kjy5w9V2/n+8MkZwusa6EyyxfeQCB799CQRhRt/CqYKiWs5adeu8Shve2ZNffvfC/7J64A2PJo1W/Q==}
 
-  /pino/6.13.2:
-    resolution: {integrity: sha512-vmD/cabJ4xKqo9GVuAoAEeQhra8XJ7YydPV/JyIP+0zDtFTu5JSKdtt8eksGVWKtTSrNGcRrzJ4/IzvUWep3FA==}
+  /pino/7.8.0:
+    resolution: {integrity: sha512-Ynw2HRVapiyj+ZGfUcpms+SRgDKFIy0ztaFUf3X6IHh+vsysMvn+tpV/Ej3gyutPp4n9tgH6ZkkCAelSvP5zmQ==}
     hasBin: true
     dependencies:
       fast-redact: 3.1.0
-      fast-safe-stringify: 2.1.1
-      fastify-warning: 0.2.0
-      flatstr: 1.0.12
-      pino-std-serializers: 3.2.0
+      on-exit-leak-free: 0.2.0
+      pino-abstract-transport: 0.5.0
+      pino-std-serializers: 4.0.0
+      process-warning: 1.0.0
       quick-format-unescaped: 4.0.4
-      sonic-boom: 1.4.1
-    dev: false
+      real-require: 0.1.0
+      safe-stable-stringify: 2.3.1
+      sonic-boom: 2.6.0
+      thread-stream: 0.13.1
 
   /pirates/4.0.5:
     resolution: {integrity: sha512-8V9+HQPupnaXMA23c5hvl69zXvTwTzyAYasnkb0Tts4XvO4CliqONMOnvlq26rkhLC3nWDFBJf73LU1e1VZLaQ==}
@@ -11311,6 +11304,9 @@ packages:
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
 
+  /process-warning/1.0.0:
+    resolution: {integrity: sha512-du4wfLyj4yCZq1VupnVSZmRsPJsNuxoDQFdCFHLaYiEbFBD7QE0a+I4D7hOxrVnh78QE/YipFAj9lXHiXocV+Q==}
+
   /progress/2.0.3:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
@@ -11476,7 +11472,6 @@ packages:
 
   /quick-format-unescaped/4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
-    dev: false
 
   /quick-lru/4.0.1:
     resolution: {integrity: sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==}
@@ -11635,6 +11630,10 @@ packages:
     dependencies:
       picomatch: 2.3.1
     dev: true
+
+  /real-require/0.1.0:
+    resolution: {integrity: sha512-r/H9MzAWtrv8aSVjPCMFpDMl5q66GqtmmRkRjpHTsp4zBAa+snZyiQNlMONiUmEJcsnaw0wCauJ2GWODr/aFkg==}
+    engines: {node: '>= 12.13.0'}
 
   /redent/3.0.0:
     resolution: {integrity: sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==}
@@ -11926,9 +11925,9 @@ packages:
       hash-base: 3.1.0
       inherits: 2.0.4
 
-  /rotating-file-stream/2.1.5:
-    resolution: {integrity: sha512-wnYazkT8oD5HXTj44WhB030aKo74OyICrPz/QKCUah59QD7Np4OhdoTC0WNZfhMx1ClsZp4lYMlAdof+DIkZ1Q==}
-    engines: {node: '>=10.0'}
+  /rotating-file-stream/3.0.2:
+    resolution: {integrity: sha512-P9PWUHjpkSk3QgDtOXKt/dE6NpjA00Yaa9kgZHf3Vq33hPjm4n42nc4TLeUqRhXsQ51X2Ywpsqtwbk7LlI9sCg==}
+    engines: {node: '>=14.0'}
     dev: false
 
   /rsvp/4.8.5:
@@ -11970,6 +11969,10 @@ packages:
     resolution: {integrity: sha1-QKNmnzsHfR6UPURinhV91IAjvy4=}
     dependencies:
       ret: 0.1.15
+
+  /safe-stable-stringify/2.3.1:
+    resolution: {integrity: sha512-kYBSfT+troD9cDA85VDnHZ1rpHC50O0g1e6WlGHVCz/g+JS+9WKLj+XwFYyR8UbrZN8ll9HUpDAAddY58MGisg==}
+    engines: {node: '>=10'}
 
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
@@ -12039,6 +12042,10 @@ packages:
     dependencies:
       invariant: 2.2.4
     dev: true
+
+  /secure-json-parse/2.4.0:
+    resolution: {integrity: sha512-Q5Z/97nbON5t/L/sH6mY2EacfjVGwrCcSi5D3btRO2GZ8pf1K1UN7Z9H5J57hjVU2Qzxr1xO+FmBhOvEkzCMmg==}
+    dev: false
 
   /semver-compare/1.0.0:
     resolution: {integrity: sha1-De4hahyUGrN+nvsXiPavxf9VN/w=}
@@ -12325,18 +12332,10 @@ packages:
       smart-buffer: 4.2.0
     dev: true
 
-  /sonic-boom/1.4.1:
-    resolution: {integrity: sha512-LRHh/A8tpW7ru89lrlkU4AszXt1dbwSjVWguGrmlxE7tawVmDBlI1PILMkXAxJTwqhgsEeTHzj36D5CmHgQmNg==}
-    dependencies:
-      atomic-sleep: 1.0.0
-      flatstr: 1.0.12
-    dev: false
-
   /sonic-boom/2.6.0:
     resolution: {integrity: sha512-6xYZFRmDEtxGqfOKcDQ4cPLrNa0SPEDI+wlzDAHowXE6YV42NeXqg9mP2KkiM8JVu3lHfZ2iQKYlGOz+kTpphg==}
     dependencies:
       atomic-sleep: 1.0.0
-    dev: true
 
   /sort-keys/4.2.0:
     resolution: {integrity: sha512-aUYIEU/UviqPgc8mHR6IW1EGxkAXpeRETYcrzg8cLAvUPZcpAlleSXHV2mY7G12GphSH6Gzv+4MMVSSkbdteHg==}
@@ -12437,16 +12436,9 @@ packages:
     dependencies:
       extend-shallow: 3.0.2
 
-  /split2/3.2.2:
-    resolution: {integrity: sha512-9NThjpgZnifTkJpzTZ7Eue85S49QwpNhZTq6GRJwObb6jnLFNGB7Qm73V5HewTROPyxD0C29xqmaI68bQtV+hg==}
-    dependencies:
-      readable-stream: 3.6.0
-    dev: false
-
   /split2/4.1.0:
     resolution: {integrity: sha512-VBiJxFkxiXRlUIeyMQi8s4hgvKCSjtknJv/LVYbrgALPwf5zSKmEwV9Lst25AkvMDnvxODugjdl6KZgwKM1WYQ==}
     engines: {node: '>= 10.x'}
-    dev: false
 
   /sprintf-js/1.0.3:
     resolution: {integrity: sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=}
@@ -12511,7 +12503,6 @@ packages:
 
   /stream-shift/1.0.1:
     resolution: {integrity: sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==}
-    dev: false
 
   /string-argv/0.3.1:
     resolution: {integrity: sha512-a1uQGz7IyVy9YwhqjZIZu1c8JO8dNIe20xBmSS6qu9kv++k3JGzCVmprbNN5Kn+BgzD5E7YYwg1CcjuJMRNsvg==}
@@ -12800,6 +12791,11 @@ packages:
     dependencies:
       any-promise: 1.3.0
     dev: false
+
+  /thread-stream/0.13.1:
+    resolution: {integrity: sha512-+KNCqNxOSwYfXLtCIRDKQq29x9jvqnOFjYCPdB38sf4pT3QanPSNc8vRqMj+Q3z4tYIctb5opNZrMK/GwmgsAQ==}
+    dependencies:
+      real-require: 0.1.0
 
   /throat/5.0.0:
     resolution: {integrity: sha512-fcwX4mndzpLQKBS1DVYhGAcYaYt7vsHNIvQV+WXMvnow5cgjPphq5CaayLaGsjRdSCKZFNGt7/GYAuXaNOiYCA==}

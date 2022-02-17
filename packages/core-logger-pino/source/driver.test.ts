@@ -1,15 +1,14 @@
 import { sleep } from "@arkecosystem/utils";
-import { Application } from "@packages/core-kernel/source/application";
-import { Logger } from "@packages/core-kernel/source/contracts/kernel/log";
-import { Container, Identifiers } from "@packages/core-kernel/source/ioc";
-import { PinoLogger } from "@packages/core-logger-pino/source/driver";
+import { Application } from "@packages/core-kernel";
+import { Container, Contracts } from "@packages/core-kernel";
+import { PinoLogger } from "./driver";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
 import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
 import { describe } from "@arkecosystem/core-test";
 
-let logger: Logger;
+let logger: Contracts.Kernel.Logger;
 let message: string;
 
 let app: Application;
@@ -35,7 +34,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.bind("path.log").toConstantValue(dirSync().name);
 
-		logger = await app.resolve<Logger>(PinoLogger).make({
+		logger = await app.resolve<Contracts.Kernel.Logger>(PinoLogger).make({
 			levels: {
 				console: process.env.CORE_LOG_LEVEL || "debug",
 				file: process.env.CORE_LOG_LEVEL_FILE || "debug",
@@ -132,7 +131,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	});
 
 	it("should log error if there is an error on file stream", async () => {
-		const logger = app.resolve<Logger>(PinoLogger);
+		const logger = app.resolve<Contracts.Kernel.Logger>(PinoLogger);
 
 		const writableMock = new Writable({
 			write(chunk, enc, cb) {
