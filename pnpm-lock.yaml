@@ -588,7 +588,7 @@ importers:
     specifiers:
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-test': workspace:^0.0.1
+      '@arkecosystem/core-test': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
       delay: 4.4.1

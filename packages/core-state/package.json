@@ -24,7 +24,7 @@
 		"joi": "17.4.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test": "workspace:^0.0.1",
+		"@arkecosystem/core-test": "workspace:*",
 		"delay": "4.4.1",
 		"uvu": "^0.5.3"
 	},
