@@ -700,6 +700,7 @@ importers:
   packages/core-webhooks:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-test': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@hapi/boom': 9.0.0
       '@hapi/hapi': 20.1.5
@@ -711,6 +712,7 @@ importers:
       joi: 17.4.2
       lowdb: 1.0.0
       uuid: 8.3.2
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/crypto': link:../crypto
@@ -721,10 +723,12 @@ importers:
       lowdb: 1.0.0
       uuid: 8.3.2
     devDependencies:
+      '@arkecosystem/core-test': link:../core-test
       '@types/fs-extra': 8.1.2
       '@types/hapi__boom': 7.4.1
       '@types/hapi__joi': 17.1.7
       '@types/uuid': 8.3.1
+      uvu: 0.5.3
 
   packages/crypto:
     specifiers:
