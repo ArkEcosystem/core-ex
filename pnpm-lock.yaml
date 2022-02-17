@@ -996,19 +996,29 @@ importers:
 
   packages/crypto-signature-ecdsa:
     specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
 
   packages/crypto-signature-schnorr:
     specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
 
   packages/crypto-signature-schnorr-legacy:
     specifiers:
