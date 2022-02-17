@@ -1,0 +1,27 @@
+{
+	"name": "@arkecosystem/crypto-signature-bls",
+	"version": "0.0.1",
+	"description": "BLS (Boneh-Lynn-Shacham) Signatures",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist",
+		"test": "uvu -r tsm source .test.ts"
+	},
+	"dependencies": {
+		"@arkecosystem/crypto-contracts": "workspace:*",
+		"@chainsafe/bls": "^6.0.3",
+		"@chainsafe/blst": "^0.2.3"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-test": "workspace:^0.0.1",
+		"uvu": "^0.5.3"
+	}
+}
