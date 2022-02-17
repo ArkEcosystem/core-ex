@@ -21,7 +21,6 @@
         "clean": "rimraf dist",
         "pbjs": "pbjs -t static-module -w commonjs src/socket-server/codecs/proto/*.proto -o src/socket-server/codecs/proto/protos.js",
         "pbts": "pbts src/socket-server/codecs/proto/protos.js -o src/socket-server/codecs/proto/protos.d.ts",
-        "pretest": "bash ../../scripts/pre-test.sh",
         "test": "cross-env CORE_ENV=test jest --forceExit"
     },
     "dependencies": {

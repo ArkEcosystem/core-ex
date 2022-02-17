@@ -14,7 +14,6 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -- -w",
 		"clean": "rimraf dist",
-		"pretest": "bash ../../scripts/pre-test.sh",
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
