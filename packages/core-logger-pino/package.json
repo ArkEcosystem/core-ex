@@ -13,7 +13,7 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del dist",
 		"test": "uvu -r tsm source .test.ts",
-	  	"test:coverage": "c8 pnpm run test"
+		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
 		"@arkecosystem/core-kernel": "workspace:*",

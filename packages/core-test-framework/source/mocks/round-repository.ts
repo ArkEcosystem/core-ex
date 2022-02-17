@@ -8,7 +8,7 @@ export const setRounds = (rounds: Partial<Models.Round>[]) => {
 
 class RoundRepositoryMock implements Partial<Repositories.RoundRepository> {
 	public async findById(id: string): Promise<Models.Round[]> {
-		return mockRounds as Models.Round[];
+		return mockRounds;
 	}
 }
 

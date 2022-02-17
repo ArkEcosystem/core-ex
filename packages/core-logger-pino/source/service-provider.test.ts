@@ -123,60 +123,60 @@ describe("ServiceProvider", ({ assert, afterEach, beforeEach, it }) => {
 				writableDefaults.levels = false;
 				let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"levels" must be of type object');
+				assert.equal(result.error.message, '"levels" must be of type object');
 
 				delete writableDefaults.levels;
 				result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"levels" is required');
+				assert.equal(result.error.message, '"levels" is required');
 			});
 
 			it("levels.console is required && is string", async () => {
 				writableDefaults.levels.console = false;
 				let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"levels.console" must be a string');
+				assert.equal(result.error.message, '"levels.console" must be a string');
 
 				delete writableDefaults.levels.console;
 				result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"levels.console" is required');
+				assert.equal(result.error.message, '"levels.console" is required');
 			});
 
 			it("levels.file is required && is string", async () => {
 				writableDefaults.levels.file = false;
 				let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"levels.file" must be a string');
+				assert.equal(result.error.message, '"levels.file" must be a string');
 
 				delete writableDefaults.levels.file;
 				result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"levels.file" is required');
+				assert.equal(result.error.message, '"levels.file" is required');
 			});
 
 			it("fileRotator is required && is object", async () => {
 				writableDefaults.fileRotator = false;
 				let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"fileRotator" must be of type object');
+				assert.equal(result.error.message, '"fileRotator" must be of type object');
 
 				delete writableDefaults.fileRotator;
 				result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"fileRotator" is required');
+				assert.equal(result.error.message, '"fileRotator" is required');
 			});
 
 			it("fileRotator.interval is required && is string", async () => {
 				writableDefaults.fileRotator.interval = false;
 				let result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"fileRotator.interval" must be a string');
+				assert.equal(result.error.message, '"fileRotator.interval" must be a string');
 
 				delete writableDefaults.fileRotator.interval;
 				result = (serviceProvider.configSchema() as AnySchema).validate(writableDefaults);
 
-				assert.equal(result.error!.message, '"fileRotator.interval" is required');
+				assert.equal(result.error.message, '"fileRotator.interval" is required');
 			});
 		});
 	});
