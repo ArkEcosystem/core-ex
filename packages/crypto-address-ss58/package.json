@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-key-pair-schnorr",
+	"name": "@arkecosystem/crypto-address-ss558",
 	"version": "0.0.1",
-	"description": "Schnorr Key Derivation",
+	"description": "ss58 Address Derivation",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -17,10 +17,13 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"bcrypto": "5.4.0"
+		"@polkadot/util": "^8.4.1",
+		"@polkadot/util-crypto": "^8.4.1"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test": "workspace:*",
+		"@arkecosystem/crypto-key-pair-schnorr": "workspace:*",
+		"@arkecosystem/crypto-key-pair-secp256k1": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }

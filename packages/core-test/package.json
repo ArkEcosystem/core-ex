@@ -1,11 +1,9 @@
 {
 	"name": "@arkecosystem/core-test",
-	"version": "3.1.1",
+	"version": "0.0.1",
 	"description": "Test utilities for the ARK Blockchain",
 	"license": "MIT",
-	"contributors": [
-		"Brian Faust <brian@ark.io>"
-	],
+	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
