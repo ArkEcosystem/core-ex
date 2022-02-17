@@ -11,13 +11,16 @@ import split from "split2";
 import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
 
+
 @Container.injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
+
 	@Container.inject(Container.Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@Container.inject(Container.Identifiers.ConfigFlags)
 	private readonly configFlags!: { processType: string };
+
 
 	private readonly levelStyles: Record<string, Chalk> = {
 		emergency: chalk.bgRed,
@@ -30,13 +33,18 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		debug: chalk.magenta,
 	};
 
+
 	private stream!: PassThrough;
+
 
 	private combinedFileStream?: Writable;
 
+
 	private logger!: pino.Logger;
 
+
 	private silentConsole: boolean = false;
+
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.stream = new PassThrough();
@@ -88,47 +96,56 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				this.getFileStream(options.fileRotator),
 			);
 
-			this.combinedFileStream.on("error", (err) => {
+			this.combinedFileStream!.on("error", (err) => {
 				console.error("File stream closed due to an error:", err);
 			});
 
-			this.stream.pipe(this.combinedFileStream);
+			this.stream.pipe(this.combinedFileStream!);
 		}
 
 		return this;
 	}
 
+
 	public emergency(message: any): void {
 		this.log("emergency", message);
 	}
+
 
 	public alert(message: any): void {
 		this.log("alert", message);
 	}
 
+
 	public critical(message: any): void {
 		this.log("critical", message);
 	}
+
 
 	public error(message: any): void {
 		this.log("error", message);
 	}
 
+
 	public warning(message: any): void {
 		this.log("warning", message);
 	}
+
 
 	public notice(message: any): void {
 		this.log("notice", message);
 	}
 
+
 	public info(message: any): void {
 		this.log("info", message);
 	}
 
+
 	public debug(message: any): void {
 		this.log("debug", message);
 	}
+
 
 	public suppressConsoleOutput(suppress: boolean): void {
 		this.silentConsole = suppress;
@@ -142,13 +159,14 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				this.combinedFileStream.end();
 
 				return new Promise<void>((resolve) => {
-					this.combinedFileStream.on("finish", () => {
+					this.combinedFileStream!.on("finish", () => {
 						resolve();
 					});
 				});
 			}
 		}
 	}
+
 
 	private log(level: string, message: any): void {
 		if (this.silentConsole) {
@@ -165,6 +183,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 		this.logger[level](message);
 	}
+
 
 	private createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
 		const pinoPretty = PinoPretty({
@@ -198,6 +217,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		});
 	}
 
+
 	private getFileStream(options: { interval: string }): Writable {
 		return createStream(
 			(time: number | Date, index?: number): string => {
@@ -228,6 +248,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			},
 		);
 	}
+
 
 	private isValidLevel(level: string): boolean {
 		return ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"].includes(level);

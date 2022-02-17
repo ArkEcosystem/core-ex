@@ -3,14 +3,18 @@ import { Container as KernelContainer, Contracts as KernelContracts } from "@ark
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
+
 @Container.injectable()
 export class Command extends Commands.Command {
 	@Container.inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
+
 	public signature: string = "snapshot:rollback";
 
+
 	public description: string = "Rollback chain to specified height.";
+
 
 	public configure(): void {
 		this.definition
@@ -19,6 +23,7 @@ export class Command extends Commands.Command {
 			.setFlag("height", "The height after the roll back.", Joi.number())
 			.setFlag("number", "The number of blocks to roll back.", Joi.number());
 	}
+
 
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };

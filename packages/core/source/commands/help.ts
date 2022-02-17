@@ -2,13 +2,18 @@ import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
 import boxen from "boxen";
 import { blue, cyan } from "kleur";
 
+
 @Container.injectable()
 export class Command extends Commands.Command {
+
 	public signature: string = "help";
+
 
 	public description: string = "Displays detailed information on all commands available via CLI.";
 
+
 	public requiresNetwork: boolean = false;
+
 
 	public async execute(): Promise<void> {
 		const commands: Contracts.CommandList = this.app.get(Container.Identifiers.Commands);

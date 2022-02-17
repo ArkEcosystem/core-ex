@@ -9,13 +9,17 @@ import { ConfigRepository } from "../../services/config";
 import { assert } from "../../utils";
 import { Bootstrapper } from "../interfaces";
 
+
 @injectable()
 export class RegisterBasePaths implements Bootstrapper {
+
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
+
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
+
 
 	public async bootstrap(): Promise<void> {
 		const paths: Array<[string, string]> = Object.entries(envPaths(this.app.token(), { suffix: "core" }));

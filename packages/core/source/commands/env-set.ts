@@ -2,14 +2,19 @@ import { Commands, Container, Services } from "@arkecosystem/core-cli";
 import { Networks } from "@arkecosystem/crypto";
 import Joi from "joi";
 
+
 @Container.injectable()
 export class Command extends Commands.Command {
+
 	@Container.inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
+
 	public signature: string = "env:set";
 
+
 	public description: string = "Set the value of an environment variable.";
+
 
 	public configure(): void {
 		this.definition
@@ -26,6 +31,7 @@ export class Command extends Commands.Command {
 				Joi.alternatives().try(Joi.string(), Joi.number()).required(),
 			);
 	}
+
 
 	public async execute(): Promise<void> {
 		this.environment.updateVariables(this.app.getCorePath("config", ".env"), {

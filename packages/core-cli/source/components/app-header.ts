@@ -4,10 +4,13 @@ import { PackageJson } from "type-fest";
 
 import { Identifiers, inject, injectable } from "../ioc";
 
+
 @injectable()
 export class AppHeader {
+
 	@inject(Identifiers.Package)
 	private readonly pkg!: PackageJson;
+
 
 	public render(): string {
 		return `${red().bold(`${this.pkg.description}`)} ${white().bold(

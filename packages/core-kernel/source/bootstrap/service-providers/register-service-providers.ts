@@ -19,11 +19,14 @@ import { Bootstrapper } from "../interfaces";
 
 @injectable()
 export class RegisterServiceProviders implements Bootstrapper {
+
 	@inject(Identifiers.Application)
 	private readonly app!: Application;
 
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Kernel.Logger;
+
 
 	public async bootstrap(): Promise<void> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
@@ -58,6 +61,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 		}
 	}
 
+
 	private async validateConfiguration(serviceProvider: ServiceProvider): Promise<void> {
 		const configSchema: object = serviceProvider.configSchema();
 
@@ -83,6 +87,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 			serviceProvider.setConfig(config.merge(/* istanbul ignore next */ validator.valid() || {}));
 		}
 	}
+
 
 	private async satisfiesDependencies(serviceProvider: ServiceProvider): Promise<boolean> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(

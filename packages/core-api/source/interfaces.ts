@@ -9,7 +9,9 @@ export interface Repository {
 }
 
 export interface Resource {
+
 	raw(resource): object;
+
 
 	transform(resource): object;
 }

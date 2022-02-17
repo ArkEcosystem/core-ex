@@ -1,7 +1,7 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { prettyBytes, prettyTime } from "@arkecosystem/utils";
-import Joi from "joi";
 import dayjs from "dayjs";
+import Joi from "joi";
 
 @Container.injectable()
 export class Command extends Commands.Command {

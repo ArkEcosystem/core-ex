@@ -4,17 +4,26 @@ import { Crypto, Interfaces } from "@arkecosystem/crypto";
 import { NetworkStateStatus } from "./enums";
 
 class QuorumDetails {
+
 	public peersQuorum = 0;
+
 
 	public peersNoQuorum = 0;
 
+
 	public peersOverHeight = 0;
+
 
 	public peersOverHeightBlockHeaders: { [id: string]: any } = {};
 
+
+
+
 	public peersForked = 0;
 
+
 	public peersDifferentSlot = 0;
+
 
 	public peersForgingNotAllowed = 0;
 

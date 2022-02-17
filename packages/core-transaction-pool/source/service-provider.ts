@@ -13,7 +13,6 @@ import { DynamicFeeMatcher } from "./dynamic-fee-matcher";
 import { ExpirationService } from "./expiration-service";
 import { Mempool } from "./mempool";
 import { Processor } from "./processor";
-import { ProcessorDynamicFeeExtension } from "./processor-dynamic-fee-extension";
 import { Query } from "./query";
 import { SenderMempool } from "./sender-mempool";
 import { SenderState } from "./sender-state";
@@ -21,22 +20,28 @@ import { Service } from "./service";
 import { Storage } from "./storage";
 import { Worker } from "./worker";
 import { WorkerPool } from "./worker-pool";
+import { ProcessorDynamicFeeExtension } from "./processor-dynamic-fee-extension";
+
 
 export class ServiceProvider extends Providers.ServiceProvider {
+
 	public async register(): Promise<void> {
 		this.registerServices();
 		this.registerActions();
 	}
+
 
 	public async boot(): Promise<void> {
 		this.app.get<Storage>(Container.Identifiers.TransactionPoolStorage).boot();
 		await this.app.get<Service>(Container.Identifiers.TransactionPoolService).boot();
 	}
 
+
 	public async dispose(): Promise<void> {
 		this.app.get<Service>(Container.Identifiers.TransactionPoolService).dispose();
 		this.app.get<Storage>(Container.Identifiers.TransactionPoolStorage).dispose();
 	}
+
 
 	public async required(): Promise<boolean> {
 		return true;

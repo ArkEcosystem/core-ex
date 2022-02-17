@@ -1,5 +1,6 @@
 import { Interfaces } from "@arkecosystem/crypto";
 
+
 export const calculateTransactionExpiration = (
 	transaction: Interfaces.ITransactionData,
 	context: {

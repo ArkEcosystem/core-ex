@@ -37,7 +37,7 @@ export class Command extends Commands.Command {
 
 		spinner.start();
 
-		this.installer.install(this.pkg.name!, this.pkg.version!);
+		this.installer.install(this.pkg.name, this.pkg.version);
 
 		this.processManager.update();
 

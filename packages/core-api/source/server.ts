@@ -8,23 +8,30 @@ import * as Schemas from "./schemas";
 // todo: review the implementation
 @Container.injectable()
 export class Server {
+
 	@Container.inject(Container.Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
+
 
 	@Container.inject(Container.Identifiers.PluginConfiguration)
 	@Container.tagged("plugin", "core-api")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+
 	private server: HapiServer;
 
+
 	private name!: string;
+
 
 	public get uri(): string {
 		return this.server.info.uri;
 	}
+
 
 	public async initialize(name: string, optionsServer: Types.JsonObject): Promise<void> {
 		this.name = name;
@@ -59,6 +66,7 @@ export class Server {
 		});
 	}
 
+
 	public async boot(): Promise<void> {
 		try {
 			await this.server.start();
@@ -68,6 +76,7 @@ export class Server {
 			await this.app.terminate(`Failed to start ${this.name} Server!`);
 		}
 	}
+
 
 	public async dispose(): Promise<void> {
 		try {
@@ -79,10 +88,12 @@ export class Server {
 		}
 	}
 
+
 	// @todo: add proper types
 	public async register(plugins: any | any[]): Promise<void> {
 		return this.server.register(plugins);
 	}
+
 
 	public async route(routes: ServerRoute | ServerRoute[]): Promise<void> {
 		return this.server.route(routes);
@@ -92,9 +103,11 @@ export class Server {
 		return this.server.table().find((route) => route.method === method.toLowerCase() && route.path === path);
 	}
 
+
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
 		return this.server.inject(options);
 	}
+
 
 	private getServerOptions(options: Record<string, any>): object {
 		options = { ...options };

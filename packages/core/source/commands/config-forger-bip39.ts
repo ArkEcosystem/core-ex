@@ -4,13 +4,18 @@ import { validateMnemonic } from "bip39";
 import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
 
+
 @Container.injectable()
 export class Command extends Commands.Command {
+
 	public signature: string = "config:forger:bip39";
+
 
 	public description: string = "Configure the forging delegate (BIP39).";
 
+
 	public isHidden: boolean = true;
+
 
 	public configure(): void {
 		this.definition
@@ -19,6 +24,7 @@ export class Command extends Commands.Command {
 			.setFlag("bip39", "A delegate plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
+
 
 	public async execute(): Promise<void> {
 		if (this.hasFlag("bip39")) {
@@ -46,6 +52,7 @@ export class Command extends Commands.Command {
 			return this.performConfiguration({ ...this.getFlags(), ...response });
 		}
 	}
+
 
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
 		await this.components.taskList([
