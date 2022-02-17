@@ -115,7 +115,7 @@
 		],
 		"unicorn/consistent-destructuring": "warn",
 		"unicorn/consistent-function-scoping": "warn",
-		"unicorn/warn-message": "warn",
+		"unicorn/error-message": "warn",
 		"unicorn/explicit-length-check": "warn",
 		"unicorn/filename-case": "warn",
 		"unicorn/import-style": "warn",
