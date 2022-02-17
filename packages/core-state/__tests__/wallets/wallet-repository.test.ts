@@ -216,7 +216,6 @@ describe("Wallet Repository", () => {
 		walletRepo.getIndex("publicKeys").set(publicKey, wallets[1]);
 		walletRepo.getIndex("usernames").set("username", wallets[2]);
 		walletRepo.getIndex("resignations").set("resign", wallets[3]);
-		walletRepo.getIndex("locks").set("lock", wallets[4]);
 
 		wallets.forEach((wallet) => walletRepo.index(wallet));
 
