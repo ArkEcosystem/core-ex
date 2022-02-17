@@ -117,12 +117,6 @@ export interface Wallet {
      * @returns {boolean}
      * @memberof Wallet
      */
-    hasSecondSignature(): boolean;
-
-    /**
-     * @returns {boolean}
-     * @memberof Wallet
-     */
     hasMultiSignature(): boolean;
 
     /**
@@ -208,17 +202,4 @@ export interface SearchContext<T = any> {
     query: Record<string, string[]>;
     entries: ReadonlyArray<T>;
     defaultOrder: string[];
-}
-
-export interface UnwrappedHtlcLock {
-    lockId: string;
-    senderPublicKey: string;
-    amount: Utils.BigNumber;
-    recipientId: string;
-    secretHash: string;
-    timestamp: number;
-    expirationType: number;
-    expirationValue: number;
-    isExpired: boolean;
-    vendorField: string;
 }

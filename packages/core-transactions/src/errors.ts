@@ -71,12 +71,6 @@ export class SenderWalletMismatchError extends TransactionError {
     }
 }
 
-export class UnexpectedSecondSignatureError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because wallet does not allow second signatures.`);
-    }
-}
-
 export class MissingMultiSignatureOnSenderError extends TransactionError {
     public constructor() {
         super(`Failed to apply transaction, because sender does not have a multi signature.`);
@@ -92,12 +86,6 @@ export class InvalidMultiSignaturesError extends TransactionError {
 export class UnsupportedMultiSignatureTransactionError extends TransactionError {
     public constructor() {
         super(`Failed to apply transaction, because the transaction does not support multi signatures.`);
-    }
-}
-
-export class InvalidSecondSignatureError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because the second signature could not be verified.`);
     }
 }
 
@@ -125,11 +113,6 @@ export class WalletUsernameAlreadyRegisteredError extends TransactionError {
     }
 }
 
-export class SecondSignatureAlreadyRegisteredError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because second signature is already enabled.`);
-    }
-}
 export class NotSupportedForMultiSignatureWalletError extends TransactionError {
     public constructor() {
         super(`Failed to apply transaction, because multi signature is enabled.`);
@@ -213,31 +196,5 @@ export class MultiSignatureKeyCountMismatchError extends TransactionError {
         super(
             `Failed to apply transaction, because the number of provided keys does not match the number of signatures.`,
         );
-    }
-}
-
-export class HtlcLockTransactionNotFoundError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because the associated HTLC lock transaction could not be found.`);
-    }
-}
-
-export class HtlcSecretHashMismatchError extends TransactionError {
-    public constructor() {
-        super(
-            `Failed to apply transaction, because the secret provided does not match the associated HTLC lock transaction secret.`,
-        );
-    }
-}
-
-export class HtlcLockNotExpiredError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because the associated HTLC lock transaction did not expire yet.`);
-    }
-}
-
-export class HtlcLockExpiredError extends TransactionError {
-    public constructor() {
-        super(`Failed to apply transaction, because the associated HTLC lock transaction expired.`);
     }
 }

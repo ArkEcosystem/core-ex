@@ -19,9 +19,6 @@ class TransactionRegistry {
         this.registerTransactionType(One.TransferTransaction);
         this.registerTransactionType(Two.TransferTransaction);
 
-        this.registerTransactionType(One.SecondSignatureRegistrationTransaction);
-        this.registerTransactionType(Two.SecondSignatureRegistrationTransaction);
-
         this.registerTransactionType(One.DelegateRegistrationTransaction);
         this.registerTransactionType(Two.DelegateRegistrationTransaction);
 
@@ -34,10 +31,6 @@ class TransactionRegistry {
         this.registerTransactionType(Two.MultiPaymentTransaction);
 
         this.registerTransactionType(Two.DelegateResignationTransaction);
-
-        this.registerTransactionType(Two.HtlcLockTransaction);
-        this.registerTransactionType(Two.HtlcClaimTransaction);
-        this.registerTransactionType(Two.HtlcRefundTransaction);
     }
 
     public registerTransactionType(constructor: TransactionConstructor): void {

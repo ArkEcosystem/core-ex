@@ -1,5 +1,4 @@
 import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { HtlcLockExpirationType } from "@packages/crypto/src/enums";
 
 export const paginationResponseMeta = {
     count: 100,
@@ -128,30 +127,11 @@ export const lockResponse = {
     isExpired: false,
 };
 
-export const htlcLockAsset = {
-    secretHash: "dummy hash",
-    expiration: {
-        type: HtlcLockExpirationType.EpochTimestamp,
-        value: 5,
-    },
-};
-
-export const htlcClaimAsset = {
-    lockTransactionId: "12345",
-    unlockSecret: "dummy unlock secret",
-};
-
-export const htlcRefundAsset = {
-    lockTransactionId: "12345",
-};
-
 export const passphrasePairsAsset = [
     {
         passphrase: passphrases[0],
-        secondPassphrase: passphrases[1],
     },
     {
         passphrase: passphrases[3],
-        secondPassphrase: passphrases[4],
     },
 ];

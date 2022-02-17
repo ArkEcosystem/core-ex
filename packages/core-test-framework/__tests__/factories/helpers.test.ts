@@ -9,15 +9,11 @@ describe("Helpers", () => {
         expect(factory("Peer")).toBeDefined();
         expect(factory("Round")).toBeDefined();
         expect(factory("Transfer")).toBeDefined();
-        expect(factory("SecondSignature")).toBeDefined();
         expect(factory("DelegateRegistration")).toBeDefined();
         expect(factory("DelegateResignation")).toBeDefined();
         expect(factory("Vote")).toBeDefined();
         expect(factory("Unvote")).toBeDefined();
         expect(factory("MultiSignature")).toBeDefined();
-        expect(factory("HtlcLock")).toBeDefined();
-        expect(factory("HtlcClaim")).toBeDefined();
-        expect(factory("HtlcRefund")).toBeDefined();
         expect(factory("MultiPayment")).toBeDefined();
         expect(factory("Wallet")).toBeDefined();
     });

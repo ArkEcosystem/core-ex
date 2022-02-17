@@ -28,15 +28,11 @@ interface DynamicFees {
     minFeeBroadcast?: number;
     addonBytes: {
         transfer?: number;
-        secondSignature?: number;
         delegateRegistration?: number;
         vote?: number;
         multiSignature?: number;
         multiPayment?: number;
         delegateResignation?: number;
-        htlcLock?: number;
-        htlcClaim?: number;
-        htlcRefund?: number;
     };
 }
 
@@ -56,35 +52,26 @@ interface Options {
     explorer: string;
     distribute: boolean;
     epoch: Date;
-    htlcEnabled?: boolean;
     vendorFieldLength: number;
 
     // Static Fee
     feeStaticTransfer: number;
-    feeStaticSecondSignature: number;
     feeStaticDelegateRegistration: number;
     feeStaticVote: number;
     feeStaticMultiSignature: number;
     feeStaticMultiPayment: number;
     feeStaticDelegateResignation: number;
-    feeStaticHtlcLock: number;
-    feeStaticHtlcClaim: number;
-    feeStaticHtlcRefund: number;
 
     // Dynamic Fee
     feeDynamicEnabled?: boolean;
     feeDynamicMinFeePool?: number;
     feeDynamicMinFeeBroadcast?: number;
     feeDynamicBytesTransfer?: number;
-    feeDynamicBytesSecondSignature?: number;
     feeDynamicBytesDelegateRegistration?: number;
     feeDynamicBytesVote?: number;
     feeDynamicBytesMultiSignature?: number;
     feeDynamicBytesMultiPayment?: number;
     feeDynamicBytesDelegateResignation?: number;
-    feeDynamicBytesHtlcLock?: number;
-    feeDynamicBytesHtlcClaim?: number;
-    feeDynamicBytesHtlcRefund?: number;
 
     // Env
     coreDBHost: string;
@@ -238,7 +225,6 @@ export class Command extends Commands.Command {
             schema: Joi.date(),
             default: new Date(Date.now()).toISOString().slice(0, 11) + "00:00:00.000Z",
         },
-        { name: "htlcEnabled", description: "Enable HTLC transactions.", schema: Joi.boolean() },
         {
             name: "vendorFieldLength",
             description: "The maximum length of transaction's vendor field",
@@ -252,12 +238,6 @@ export class Command extends Commands.Command {
             description: "Fee for transfer transactions.",
             schema: Joi.number(),
             default: 10000000,
-        },
-        {
-            name: "feeStaticSecondSignature",
-            description: "Fee for second signature transactions.",
-            schema: Joi.number(),
-            default: 500000000,
         },
         {
             name: "feeStaticDelegateRegistration",
@@ -284,24 +264,6 @@ export class Command extends Commands.Command {
             schema: Joi.number(),
             default: 2500000000,
         },
-        {
-            name: "feeStaticHtlcLock",
-            description: "Fee for HTLC lock transactions.",
-            schema: Joi.number(),
-            default: 10000000,
-        },
-        {
-            name: "feeStaticHtlcClaim",
-            description: "Fee for HTLC claim transactions.",
-            schema: Joi.number(),
-            default: 0,
-        },
-        {
-            name: "feeStaticHtlcRefund",
-            description: "Fee for HTLC refund transactions.",
-            schema: Joi.number(),
-            default: 0,
-        },
 
         // Dynamic fee
         { name: "feeDynamicEnabled", description: "Dynamic fee enabled", schema: Joi.boolean() },
@@ -310,11 +272,6 @@ export class Command extends Commands.Command {
         {
             name: "feeDynamicBytesTransfer",
             description: "Dynamic fee for transfer transactions.",
-            schema: Joi.number(),
-        },
-        {
-            name: "feeDynamicBytesSecondSignature",
-            description: "Dynamic fee for second signature transactions.",
             schema: Joi.number(),
         },
         {
@@ -336,21 +293,6 @@ export class Command extends Commands.Command {
         {
             name: "feeDynamicBytesDelegateResignation",
             description: "Dynamic fee for delegate registration transactions.",
-            schema: Joi.number(),
-        },
-        {
-            name: "feeDynamicBytesHtlcLock",
-            description: "Dynamic fee for HTLC lock transactions.",
-            schema: Joi.number(),
-        },
-        {
-            name: "feeDynamicBytesHtlcClaim",
-            description: "Dynamic fee for HTLC claim transactions.",
-            schema: Joi.number(),
-        },
-        {
-            name: "feeDynamicBytesHtlcRefund",
-            description: "Dynamic fee for HTLC refund transactions.",
             schema: Joi.number(),
         },
 
@@ -611,20 +553,15 @@ export class Command extends Commands.Command {
                 fees: {
                     staticFees: {
                         transfer: options.feeStaticTransfer,
-                        secondSignature: options.feeStaticSecondSignature,
                         delegateRegistration: options.feeStaticDelegateRegistration,
                         vote: options.feeStaticVote,
                         multiSignature: options.feeStaticMultiSignature,
                         multiPayment: options.feeStaticMultiPayment,
                         delegateResignation: options.feeStaticDelegateResignation,
-                        htlcLock: options.feeStaticHtlcLock,
-                        htlcClaim: options.feeStaticHtlcClaim,
-                        htlcRefund: options.feeStaticHtlcRefund,
                     },
                 },
                 vendorFieldLength: options.vendorFieldLength,
                 multiPaymentLimit: 256,
-                htlcEnabled: options.htlcEnabled,
                 aip11: true,
             },
             {
@@ -735,14 +672,6 @@ export class Command extends Commands.Command {
             dynamicFees.addonBytes.transfer = options.feeDynamicBytesTransfer;
             includeDynamicFees = true;
         }
-        if (options.feeDynamicBytesSecondSignature) {
-            dynamicFees.addonBytes.secondSignature = options.feeDynamicBytesSecondSignature;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesSecondSignature) {
-            dynamicFees.addonBytes.secondSignature = options.feeDynamicBytesSecondSignature;
-            includeDynamicFees = true;
-        }
         if (options.feeDynamicBytesDelegateRegistration) {
             dynamicFees.addonBytes.delegateRegistration = options.feeDynamicBytesDelegateRegistration;
             includeDynamicFees = true;
@@ -761,18 +690,6 @@ export class Command extends Commands.Command {
         }
         if (options.feeDynamicBytesDelegateResignation) {
             dynamicFees.addonBytes.delegateResignation = options.feeDynamicBytesDelegateResignation;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesHtlcLock) {
-            dynamicFees.addonBytes.htlcLock = options.feeDynamicBytesHtlcLock;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesHtlcClaim) {
-            dynamicFees.addonBytes.htlcClaim = options.feeDynamicBytesHtlcClaim;
-            includeDynamicFees = true;
-        }
-        if (options.feeDynamicBytesHtlcRefund) {
-            dynamicFees.addonBytes.htlcRefund = options.feeDynamicBytesHtlcRefund;
             includeDynamicFees = true;
         }
 
