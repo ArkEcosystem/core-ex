@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-signature-bls",
+	"name": "@arkecosystem/crypto-signature-bls12-381",
 	"version": "0.0.1",
-	"description": "BLS (Boneh-Lynn-Shacham) Signatures",
+	"description": "BLS12-381 Signatures",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

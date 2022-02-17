@@ -981,7 +981,7 @@ importers:
       util: 0.12.4
       uuid: 8.3.2
 
-  packages/crypto-signature-bls:
+  packages/crypto-signature-bls12-381:
     specifiers:
       '@arkecosystem/core-test': workspace:^0.0.1
       '@arkecosystem/crypto-contracts': workspace:*
@@ -1012,11 +1012,16 @@ importers:
 
   packages/crypto-signature-schnorr-legacy:
     specifiers:
+      '@arkecosystem/core-test': workspace:^0.0.1
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test': link:../core-test
+      uvu: 0.5.3
 
   packages/utils:
     specifiers:
