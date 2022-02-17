@@ -256,7 +256,9 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 	it("should register a custom type with missing dependency", async (context) => {
 		context.app.bind(Container.Identifiers.TransactionHandler).to(TestWithDependencyTransactionHandler);
 
-		assert.throws(() => context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry));
+		assert.throws(() =>
+			context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry),
+		);
 	});
 
 	it("should be able to return handler by data", async (context) => {
@@ -315,12 +317,14 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
-		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
+		assert.length(
+			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE,
 		);
 
 		Managers.configManager.getMilestone().aip11 = true;
-		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
+		assert.length(
+			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE,
 		);
 	});
@@ -331,12 +335,14 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
-		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
+		assert.length(
+			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE + 1,
 		);
 
 		Managers.configManager.getMilestone().aip11 = true;
-		assert.length((await transactionHandlerRegistry.getActivatedHandlers()),
+		assert.length(
+			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE + 1,
 		);
 	});
@@ -351,8 +357,9 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, 
 			TEST_TRANSACTION_TYPE,
 			Enums.TransactionTypeGroup.Test,
 		);
-		assert.instance(transactionHandlerRegistry.getRegisteredHandlerByType(internalTransactionType),
-			TestTransactionHandler
+		assert.instance(
+			transactionHandlerRegistry.getRegisteredHandlerByType(internalTransactionType),
+			TestTransactionHandler,
 		);
 
 		const invalidInternalTransactionType = Transactions.InternalTransactionType.from(
