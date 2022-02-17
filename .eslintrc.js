@@ -144,6 +144,8 @@ module.exports = {
 		"unicorn/prefer-object-from-entries": "warn",
 		"@typescript-eslint/no-floating-promises": "warn",
 		"@typescript-eslint/await-thenable": "warn",
+		"@typescript-eslint/unbound-method": "warn",
+		"promise/always-return": "warn",
 		"unicorn/prefer-default-parameters": "warn",
 		"unicorn/prefer-add-event-listener": "warn",
 		"no-empty": "warn",
