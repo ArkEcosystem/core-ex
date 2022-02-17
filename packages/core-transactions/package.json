@@ -1,31 +1,31 @@
 {
-	"name": "@arkecosystem/core-transactions",
-	"version": "3.1.1",
-	"description": "Transaction Services for ARK Core",
-	"license": "MIT",
-	"contributors": [
-		"Joshua Noack <joshua@ark.io>"
-	],
-	"main": "dist/index",
-	"types": "dist/index",
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "pnpm run clean && tsc",
-		"build:watch": "pnpm run clean && tsc -- -w",
-		"clean": "rimraf dist",
-		"test": "cross-env CORE_ENV=test jest --forceExit"
-	},
-	"dependencies": {
-		"@arkecosystem/core-database": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*"
-	},
-	"devDependencies": {
-		"bytebuffer": "5.0.1"
-	},
-	"engines": {
-		"node": ">=16.x"
-	}
+    "name": "@arkecosystem/core-transactions",
+    "version": "3.1.1",
+    "description": "Transaction Services for ARK Core",
+    "license": "MIT",
+    "contributors": [
+        "Joshua Noack <joshua@ark.io>"
+    ],
+    "main": "dist/index",
+    "types": "dist/index",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "pnpm run clean && tsc",
+        "build:watch": "pnpm run clean && tsc -w",
+        "clean": "rimraf dist",
+        "test": "cross-env CORE_ENV=test jest --forceExit"
+    },
+    "dependencies": {
+        "@arkecosystem/core-database": "workspace:*",
+        "@arkecosystem/core-kernel": "workspace:*",
+        "@arkecosystem/crypto": "workspace:*"
+    },
+    "devDependencies": {
+        "bytebuffer": "5.0.1"
+    },
+    "engines": {
+        "node": ">=16.x"
+    }
 }
