@@ -1,12 +1,9 @@
-import { Contracts } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
+import { Contracts, Container } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Generators } from "@arkecosystem/core-test-framework";
-import { Factories, FactoryBuilder } from "@arkecosystem/core-test-framework/source/factories";
+import { Generators, Factories } from "@arkecosystem/core-test-framework";
 import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 import { describe } from "@arkecosystem/core-test";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
@@ -32,19 +29,17 @@ describe("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, b
 		transactionHistoryService.streamByCriteria.mockReset();
 
 		const config = Generators.generateCryptoConfigRaw();
-		configManager.setConfig(config);
 		Managers.configManager.setConfig(config);
-		configManager.getMilestone().aip11 = false;
 		Managers.configManager.getMilestone().aip11 = false;
 
 		context.app = initApp();
-		context.app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-		walletRepository = context.app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+		walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-		let factoryBuilder = new FactoryBuilder();
-		Factories.registerWalletFactory(factoryBuilder);
-		Factories.registerTransactionFactory(factoryBuilder);
+		let factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(factoryBuilder);
+		Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 		senderWallet = buildSenderWallet(factoryBuilder);
 		multiSignatureWallet = buildMultiSignatureWallet();
@@ -55,7 +50,7 @@ describe("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, b
 		walletRepository.index(recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(

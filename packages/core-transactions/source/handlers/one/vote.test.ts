@@ -1,13 +1,10 @@
-import { Application, Contracts } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
-import { One, TransactionHandler } from "../index";
+import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@packages/core-state";
+import { Factories, Generators } from "@packages/core-test-framework";
+import { DelegateRegistrationTransactionHandler } from "../one";
+import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -16,11 +13,11 @@ let senderWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
+Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 const transactionHistoryService = {
@@ -31,19 +28,17 @@ beforeEach(() => {
 	transactionHistoryService.streamByCriteria.mockReset();
 
 	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
 	Managers.configManager.setConfig(config);
-	configManager.getMilestone().aip11 = false;
 	Managers.configManager.getMilestone().aip11 = false;
 
 	app = initApp();
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new Factories.FactoryBuilder();
+	Factories.Factories.registerWalletFactory(factoryBuilder);
+	Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 	senderWallet = buildSenderWallet(factoryBuilder);
 	multiSignatureWallet = buildMultiSignatureWallet();
@@ -59,7 +54,7 @@ describe("DelegateRegistrationTransaction V1", () => {
 
 	beforeEach(async () => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
@@ -70,7 +65,7 @@ describe("DelegateRegistrationTransaction V1", () => {
 
 	describe("dependencies", () => {
 		it("should return empty array", async () => {
-			expect(handler.dependencies()).toEqual([One.DelegateRegistrationTransactionHandler]);
+			expect(handler.dependencies()).toEqual([DelegateRegistrationTransactionHandler]);
 		});
 	});
 

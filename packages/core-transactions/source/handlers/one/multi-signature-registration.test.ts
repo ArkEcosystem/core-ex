@@ -1,22 +1,15 @@
-import { Application, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
-import { Identifiers } from "@arkecosystem/core-kernel/distribution/ioc";
-import { Wallets } from "@packages/core-state/distribution";
-import { StateStore } from "@packages/core-state/source/stores/state";
-import { Mocks } from "@packages/core-test-framework/distribution";
-import { Generators } from "@packages/core-test-framework/source";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import { Application, Container, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@packages/core-state";
+import { Factories, Generators, Mocks } from "@packages/core-test-framework";
+import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
 import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
 import {
 	LegacyMultiSignatureError,
 	MultiSignatureAlreadyRegisteredError,
 } from "../../errors";
-import { TransactionHandler } from "../index";
+import { TransactionHandler } from "../transaction";
 import { TransactionHandlerRegistry } from "../handler-registry";
-import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { BuilderFactory } from "@arkecosystem/crypto/distribution/transactions";
-import { IMultiSignatureAsset } from "@arkecosystem/crypto/distribution/interfaces";
-import { configManager } from "@arkecosystem/crypto/distribution/managers";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
@@ -25,12 +18,12 @@ let senderWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: FactoryBuilder;
+let factoryBuilder: Factories.FactoryBuilder;
 
 const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 
 const mockGetLastBlock = jest.fn();
-StateStore.prototype.getLastBlock = mockGetLastBlock;
+Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 const transactionHistoryService = {
@@ -41,19 +34,17 @@ beforeEach(() => {
 	transactionHistoryService.streamByCriteria.mockReset();
 
 	const config = Generators.generateCryptoConfigRaw();
-	configManager.setConfig(config);
 	Managers.configManager.setConfig(config);
-	configManager.getMilestone().aip11 = false;
 	Managers.configManager.getMilestone().aip11 = false;
 
 	app = initApp();
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new FactoryBuilder();
-	Factories.registerWalletFactory(factoryBuilder);
-	Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new Factories.FactoryBuilder();
+	Factories.Factories.registerWalletFactory(factoryBuilder);
+	Factories.Factories.registerTransactionFactory(factoryBuilder);
 
 	senderWallet = buildSenderWallet(factoryBuilder);
 	multiSignatureWallet = buildMultiSignatureWallet();
@@ -72,11 +63,11 @@ describe("MultiSignatureRegistrationTransaction", () => {
 	let multiSignatureTransaction: Interfaces.ITransaction;
 	let recipientWallet: Wallets.Wallet;
 	let handler: TransactionHandler;
-	let multiSignatureAsset: IMultiSignatureAsset;
+	let multiSignatureAsset: Interfaces.IMultiSignatureAsset;
 
 	beforeEach(async () => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
@@ -104,7 +95,7 @@ describe("MultiSignatureRegistrationTransaction", () => {
 
 		walletRepository.index(recipientWallet);
 
-		multiSignatureTransaction = BuilderFactory.multiSignature()
+		multiSignatureTransaction = Transactions.BuilderFactory.multiSignature()
 			.version(1)
 			.multiSignatureAsset(multiSignatureAsset)
 			.senderPublicKey(Identities.PublicKey.fromPassphrase(passphrases[0]))
@@ -185,15 +176,15 @@ describe("MultiSignatureRegistrationTransaction", () => {
 
 	describe("isActivated", () => {
 		it("should return true when aip11 is false", async () => {
-			configManager.getMilestone().aip11 = false;
+			Managers.configManager.getMilestone().aip11 = false;
 			await expect(handler.isActivated()).resolves.toBe(true);
 		});
 		it("should return true when aip11 is undefined", async () => {
-			configManager.getMilestone().aip11 = undefined;
+			Managers.configManager.getMilestone().aip11 = undefined;
 			await expect(handler.isActivated()).resolves.toBe(true);
 		});
 		it("should return false when aip11 is true", async () => {
-			configManager.getMilestone().aip11 = true;
+			Managers.configManager.getMilestone().aip11 = true;
 			await expect(handler.isActivated()).resolves.toBe(false);
 		});
 	});
@@ -202,12 +193,12 @@ describe("MultiSignatureRegistrationTransaction", () => {
 		let pubKeyHash: number;
 
 		beforeEach(() => {
-			pubKeyHash = configManager.get("network.pubKeyHash");
+			pubKeyHash = Managers.configManager.get("network.pubKeyHash");
 		});
 
 		afterEach(() => {
-			configManager.set("exceptions.transactions", []);
-			configManager.set("network.pubKeyHash", pubKeyHash);
+			Managers.configManager.set("exceptions.transactions", []);
+			Managers.configManager.set("network.pubKeyHash", pubKeyHash);
 		});
 
 		it("should throw", async () => {
@@ -217,8 +208,8 @@ describe("MultiSignatureRegistrationTransaction", () => {
 		});
 
 		it("should not throw if exception", async () => {
-			configManager.set("network.pubKeyHash", 99);
-			configManager.set("exceptions.transactions", [multiSignatureTransaction.id]);
+			Managers.configManager.set("network.pubKeyHash", 99);
+			Managers.configManager.set("exceptions.transactions", [multiSignatureTransaction.id]);
 
 			await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).toResolve();
 		});
