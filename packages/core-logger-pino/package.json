@@ -3,9 +3,7 @@
     "version": "0.0.1",
     "description": "Webhooks for ARK Core",
     "license": "MIT",
-    "contributors": [
-        "Brian Faust <brian@ark.io>"
-    ],
+    "contributors": [],
     "main": "distribution/index.js",
     "files": [
         "/distribution"
