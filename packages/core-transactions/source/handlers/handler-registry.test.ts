@@ -1,6 +1,4 @@
-import { Services } from "@arkecosystem/core-kernel";
-import { Application } from "@arkecosystem/core-kernel/distribution/application";
-import { Container } from "@arkecosystem/core-kernel";
+import { Application, Container, Services } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test";
 import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
 import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
@@ -107,9 +105,9 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 	async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
 }
 
-describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {
+describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, stub }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container.Container());
+		const app = new Application(new Container());
 		app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.bind(Container.Identifiers.LogService).toConstantValue({});
@@ -231,12 +229,12 @@ describe("Registry", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }
 			Container.Identifiers.TransactionHandlerProvider,
 		);
 
-		transactionHandlerProvider.isRegistrationRequired = jest.fn().mockReturnValue(false);
-		transactionHandlerProvider.registerHandlers = jest.fn();
+		transactionHandlerProvider.isRegistrationRequired = () => false;
+		stub(transactionHandlerProvider, "registerHandlers");
 
 		context.app.get<TransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry);
 
-		expect(transactionHandlerProvider.registerHandlers).not.toHaveBeenCalled();
+		assert.true(transactionHandlerProvider.registerHandlers.neverCalled());
 	});
 
 	it("should register a custom type", async (context) => {
