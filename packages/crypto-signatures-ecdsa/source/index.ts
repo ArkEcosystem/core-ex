@@ -1,12 +1,12 @@
-import { Contracts } from "@arkecosystem/crypto-identities";
+import { Signatory } from "@arkecosystem/crypto-contracts";
 import { secp256k1 } from "bcrypto";
 
-export class Hash {
-    public static signECDSA(hash: Buffer, keys: Contracts.KeyPair): string {
-        return secp256k1.signatureExport(secp256k1.sign(hash, Buffer.from(keys.privateKey, "hex"))).toString("hex");
+export class Hash implements Signatory {
+    public static sign(hash: Buffer, privateKey: Buffer): string {
+        return secp256k1.signatureExport(secp256k1.sign(hash, privateKey)).toString("hex");
     }
 
-    public static verifyECDSA(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): boolean {
+    public static verify(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): boolean {
         const bufferSignature = signature instanceof Buffer ? signature : Buffer.from(signature, "hex");
         const signatureRS = secp256k1.signatureImport(bufferSignature);
 
@@ -19,14 +19,18 @@ export class Hash {
         const signatureLength = bufferSignature.readUInt8(1);
         const rLength = bufferSignature.readUInt8(3);
         const sLength = bufferSignature.readUInt8(4 + rLength + 1);
-        if (bufferSignature.length !== 4 + rLength + 2 + sLength || signatureLength !== 2 + rLength + 2 + sLength) {
+        if (
+            bufferSignature.length !== 4 + rLength + 2 + sLength ||
+            signatureLength !== 2 + rLength + 2 + sLength ||
+            signatureLength > 127
+        ) {
             return false;
         }
 
         // check that first byte is positive, if it is then the whole R / S will be positive as required
         const rFirstByte = bufferSignature.readInt8(4);
         const sFirstByte = bufferSignature.readInt8(4 + rLength + 2);
-        if (rFirstByte < 0 || sFirstByte < 0) {
+        if (rFirstByte < 0 || sFirstByte < 0 || rFirstByte > 127 || sFirstByte > 127) {
             return false;
         }
 
@@ -41,18 +45,6 @@ export class Hash {
         return secp256k1.verify(
             hash,
             signatureRS,
-            publicKey instanceof Buffer ? publicKey : Buffer.from(publicKey, "hex"),
-        );
-    }
-
-    public static signSchnorr(hash: Buffer, keys: Contracts.KeyPair): string {
-        return secp256k1.schnorrSign(hash, Buffer.from(keys.privateKey, "hex")).toString("hex");
-    }
-
-    public static verifySchnorr(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): boolean {
-        return secp256k1.schnorrVerify(
-            hash,
-            signature instanceof Buffer ? signature : Buffer.from(signature, "hex"),
             publicKey instanceof Buffer ? publicKey : Buffer.from(publicKey, "hex"),
         );
     }

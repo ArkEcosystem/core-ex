@@ -9,7 +9,6 @@ import {
 } from "./contracts";
 import { Hash } from "./crypto/hash";
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";
-import { TransactionTypeFactory } from "./types/factory";
 import { isException } from "./utils";
 import { TransactionValidator } from "./validator";
 

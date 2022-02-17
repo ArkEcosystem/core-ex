@@ -19,7 +19,6 @@ import {
     TransactionSchemaError,
     TransactionVersionError,
 } from "./errors";
-import { TransactionTypeFactory } from "./types";
 import { isException } from "./utils";
 
 export class TransactionFactory {

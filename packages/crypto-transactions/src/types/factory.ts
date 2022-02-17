@@ -1,4 +1,4 @@
-import { ConfigManager } from "src/config";
+import { ConfigManager } from "../config";
 
 import { ITransaction, ITransactionData, ITransactionVerifier } from "../contracts";
 import { UnkownTransactionError } from "../errors";

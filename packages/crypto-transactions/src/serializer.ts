@@ -5,14 +5,12 @@ import { ConfigManager } from "./config";
 import { ISerializeOptions, ITransaction, ITransactionData, ITransactionTypeFactory } from "./contracts";
 import { TransactionType, TransactionTypeGroup } from "./enums";
 import { TransactionVersionError } from "./errors";
-import { TransactionTypeFactory } from "./types";
 import { isException, isSupportedTransactionVersion } from "./utils";
 import { TransactionVerifier } from "./verifier";
 
 // Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
 export class TransactionSerializer {
     readonly #config: ConfigManager;
-    readonly #verifier: TransactionVerifier;
     readonly #transactionTypeFactory: ITransactionTypeFactory;
 
     public constructor(
@@ -21,7 +19,6 @@ export class TransactionSerializer {
         transactionTypeFactory: ITransactionTypeFactory,
     ) {
         this.#config = config;
-        this.#verifier = verifier;
         this.#transactionTypeFactory = transactionTypeFactory;
     }
 

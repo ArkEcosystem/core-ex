@@ -10,14 +10,12 @@ import {
     InvalidTransactionBytesError,
     TransactionVersionError,
 } from "./errors";
-import { TransactionTypeFactory } from "./types";
 import { isSupportedTransactionVersion } from "./utils";
 import { TransactionVerifier } from "./verifier";
 
 // Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
 export class TransactionDeserializer {
     readonly #config: ConfigManager;
-    readonly #verifier: TransactionVerifier;
     readonly #transactionTypeFactory: ITransactionTypeFactory;
 
     public constructor(
@@ -26,7 +24,6 @@ export class TransactionDeserializer {
         transactionTypeFactory: ITransactionTypeFactory,
     ) {
         this.#config = config;
-        this.#verifier = verifier;
         this.#transactionTypeFactory = transactionTypeFactory;
     }
 

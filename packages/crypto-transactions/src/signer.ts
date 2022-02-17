@@ -1,4 +1,4 @@
-import { KeyPair } from "@arkecosystem/crypto-identities";
+import { Contracts } from "@arkecosystem/crypto-identities";
 
 import { ISerializeOptions, ITransactionData } from "./contracts";
 import { Hash } from "./crypto";
@@ -12,7 +12,7 @@ export class TransactionSigner {
         this.#helpers = helpers;
     }
 
-    public sign(transaction: ITransactionData, keys: KeyPair, options?: ISerializeOptions): string {
+    public sign(transaction: ITransactionData, keys: Contracts.KeyPair, options?: ISerializeOptions): string {
         if (!options || (options.excludeSignature === undefined && options.excludeSecondSignature === undefined)) {
             options = { excludeSignature: true, excludeSecondSignature: true, ...options };
         }
@@ -28,7 +28,7 @@ export class TransactionSigner {
         return signature;
     }
 
-    public secondSign(transaction: ITransactionData, keys: KeyPair): string {
+    public secondSign(transaction: ITransactionData, keys: Contracts.KeyPair): string {
         const hash: Buffer = this.#helpers.toHash(transaction, { excludeSecondSignature: true });
         const signature: string =
             transaction.version && transaction.version > 1 ? Hash.signSchnorr(hash, keys) : Hash.signECDSA(hash, keys);
@@ -40,7 +40,7 @@ export class TransactionSigner {
         return signature;
     }
 
-    public multiSign(transaction: ITransactionData, keys: KeyPair, index = -1): string {
+    public multiSign(transaction: ITransactionData, keys: Contracts.KeyPair, index = -1): string {
         if (!transaction.signatures) {
             transaction.signatures = [];
         }
