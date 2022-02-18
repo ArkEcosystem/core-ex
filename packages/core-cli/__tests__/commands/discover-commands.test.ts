@@ -1,4 +1,4 @@
-import { Console } from "@packages/core-test-framework";
+import { Console } from "@arkecosystem/core-test-framework";
 import { DiscoverCommands } from "@packages/core-cli/source/commands";
 import { resolve } from "path";
 import { setGracefulCleanup } from "tmp";

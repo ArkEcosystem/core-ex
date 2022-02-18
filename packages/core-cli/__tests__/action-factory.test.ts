@@ -1,4 +1,4 @@
-import { Console } from "@packages/core-test-framework";
+import { Console } from "@arkecosystem/core-test-framework";
 import { ActionFactory, Container } from "@packages/core-cli/source";
 
 let cli;

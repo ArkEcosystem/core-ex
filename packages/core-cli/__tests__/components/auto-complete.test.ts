@@ -1,5 +1,5 @@
 import { Container } from "@packages/core-cli";
-import { Console } from "@packages/core-test-framework";
+import { Console } from "@arkecosystem/core-test-framework";
 import { AutoComplete } from "@packages/core-cli/source/components";
 import prompts from "prompts";
 

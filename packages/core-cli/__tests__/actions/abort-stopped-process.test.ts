@@ -1,5 +1,5 @@
 import { Container } from "@packages/core-cli";
-import { Console } from "@packages/core-test-framework";
+import { Console } from "@arkecosystem/core-test-framework";
 import { AbortStoppedProcess } from "@packages/core-cli/source/actions";
 
 const processName: string = "ark-core";

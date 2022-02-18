@@ -1,4 +1,4 @@
-import { Console } from "@packages/core-test-framework";
+import { Console } from "@arkecosystem/core-test-framework";
 import { DiscoverConfig } from "@packages/core-cli/source/commands";
 import { ensureDirSync, writeJSON } from "fs-extra";
 import { join } from "path";
