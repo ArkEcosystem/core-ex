@@ -1,5 +1,5 @@
 import { IHashFactory as Contract } from "@arkecosystem/crypto-contracts";
-import { ripemd160, sha256, createSHA256, createHMAC } from 'hash-wasm';
+import { ripemd160, sha256, createSHA256, createHMAC } from "hash-wasm";
 
 export class HashFactory implements Contract {
 	public async ripemd160(data: Buffer): Promise<Buffer> {
@@ -11,7 +11,7 @@ export class HashFactory implements Contract {
 	}
 
 	public async hash256(data: Buffer): Promise<Buffer> {
-		const hmac = await createHMAC(createSHA256(), 'key');
+		const hmac = await createHMAC(createSHA256(), "key");
 		hmac.init();
 		hmac.update(data);
 
