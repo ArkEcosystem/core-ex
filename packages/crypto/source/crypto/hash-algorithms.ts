@@ -5,10 +5,6 @@ export class HashAlgorithms {
 		return RIPEMD160.digest(this.bufferize(buff));
 	}
 
-	public static sha1(buff: Buffer | string): Buffer {
-		return SHA1.digest(this.bufferize(buff));
-	}
-
 	public static sha256(buff: Buffer | string | Buffer[]): Buffer {
 		if (Array.isArray(buff)) {
 			let sha256 = SHA256.ctx;
