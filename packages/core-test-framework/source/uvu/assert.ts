@@ -77,7 +77,7 @@ export const assert = {
 				throw error;
 			}
 
-			expected.forEach(expected => {
+			expected.forEach((expected) => {
 				if (expected instanceof Error) {
 					uvu.instance(error, expected);
 				}

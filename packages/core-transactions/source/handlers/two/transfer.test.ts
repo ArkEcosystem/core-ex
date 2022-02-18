@@ -107,7 +107,7 @@ describe<{
 		await assert.rejects(
 			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
 			SenderWalletMismatchError,
-			"Failed to apply transaction, because the public key does not match the wallet."
+			"Failed to apply transaction, because the public key does not match the wallet.",
 		);
 	});
 
@@ -117,7 +117,7 @@ describe<{
 		await assert.rejects(
 			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
 			InsufficientBalanceError,
-			"Insufficient balance in the wallet."
+			"Insufficient balance in the wallet.",
 		);
 	});
 
