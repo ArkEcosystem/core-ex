@@ -1,9 +1,8 @@
-import { Application, Container, Contracts, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Factories, Generators, Mocks, passphrases } from "@arkecosystem/core-test-framework";
-import { Mempool } from "@arkecosystem/core-transaction-pool";
-import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-
+import {Application, Container, Contracts, Enums as KernelEnums, Exceptions} from "@arkecosystem/core-kernel";
+import {Stores, Wallets} from "@arkecosystem/core-state";
+import {describe, Factories, Generators, Mocks, passphrases} from "@arkecosystem/core-test-framework";
+import {Mempool} from "@arkecosystem/core-transaction-pool";
+import {Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils} from "@arkecosystem/crypto";
 import {
 	InsufficientBalanceError,
 	NotSupportedForMultiSignatureWalletError,
@@ -11,498 +10,460 @@ import {
 	WalletIsAlreadyDelegateError,
 	WalletUsernameAlreadyRegisteredError,
 } from "../../errors";
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
-import { TransactionHandlerRegistry } from "../handler-registry";
-import { TransactionHandler } from "../index";
+import {buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp} from "../../../test/app";
+import {TransactionHandlerRegistry} from "../handler-registry";
+import {TransactionHandler} from "../index";
 
-let app: Application;
-let senderWallet: Wallets.Wallet;
-let multiSignatureWallet: Wallets.Wallet;
-let recipientWallet: Wallets.Wallet;
-let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: Factories.FactoryBuilder;
+describe<{
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	handler: TransactionHandler;
+	factoryBuilder: Factories.FactoryBuilder;
+	delegateRegistrationTransaction: Interfaces.ITransaction;
+	store: any;
+	transactionHistoryService: any;
+}>("DelegateRegistrationTransaction", ({assert, afterEach, beforeEach, it, spy, stub}) => {
+	beforeEach((context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = {height: 4, timestamp: Crypto.Slots.getTime()};
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({data: mockLastBlockData});
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
-const mockGetLastBlock = jest.fn();
-Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
-mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
+		context.delegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
+			.usernameAsset("dummy")
+			.nonce("1")
+			.sign(passphrases[0])
+			.build();
 
-const transactionHistoryService = {
-	streamByCriteria: jest.fn(),
-};
+		context.transactionHistoryService = {
+			streamByCriteria: async function* () {
+				yield context.delegateRegistrationTransaction.data;
+			},
+		};
 
-beforeEach(() => {
-	transactionHistoryService.streamByCriteria.mockReset();
+		const config = Generators.generateCryptoConfigRaw();
+		Managers.configManager.setConfig(config);
 
-	const config = Generators.generateCryptoConfigRaw();
-	Managers.configManager.setConfig(config);
+		context.app = initApp();
+		context.app
+			.bind(Container.Identifiers.TransactionHistoryService)
+			.toConstantValue(context.transactionHistoryService);
 
-	app = initApp();
-	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(context.factoryBuilder);
+		Factories.Factories.registerTransactionFactory(context.factoryBuilder);
 
-	factoryBuilder = new Factories.FactoryBuilder();
-	Factories.Factories.registerWalletFactory(factoryBuilder);
-	Factories.Factories.registerTransactionFactory(factoryBuilder);
+		context.senderWallet = buildSenderWallet(context.factoryBuilder);
+		context.multiSignatureWallet = buildMultiSignatureWallet();
+		context.recipientWallet = buildRecipientWallet(context.factoryBuilder);
 
-	senderWallet = buildSenderWallet(factoryBuilder);
-	multiSignatureWallet = buildMultiSignatureWallet();
-	recipientWallet = buildRecipientWallet(factoryBuilder);
+		context.walletRepository.index(context.senderWallet);
+		context.walletRepository.index(context.multiSignatureWallet);
+		context.walletRepository.index(context.recipientWallet);
 
-	walletRepository.index(senderWallet);
-	walletRepository.index(multiSignatureWallet);
-	walletRepository.index(recipientWallet);
-});
-
-afterEach(() => {
-	jest.clearAllMocks();
-});
-
-describe("DelegateRegistrationTransaction", () => {
-	let delegateRegistrationTransaction: Interfaces.ITransaction;
-	let handler: TransactionHandler;
-
-	beforeEach(async () => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
-		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
 				Enums.TransactionType.DelegateRegistration,
 				Enums.TransactionTypeGroup.Core,
 			),
 			2,
 		);
-
-		delegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
-			.usernameAsset("dummy")
-			.nonce("1")
-			.sign(passphrases[0])
-			.build();
 	});
 
-	describe("dependencies", () => {
-		it("should return empty array", async () => {
-			expect(handler.dependencies()).toEqual([]);
+	afterEach(() => {
+		Mocks.BlockRepository.setDelegateForgedBlocks([]);
+		Mocks.BlockRepository.setLastForgedBlocks([]);
+	});
+
+	it("dependencies should return empty array", async (context) => {
+		assert.equal(context.handler.dependencies(), []);
+	});
+
+	it("walletAttributesshould return array", async (context) => {
+		const attributes = context.handler.walletAttributes();
+
+		assert.array(attributes);
+		assert.is(attributes.length, 11);
+	});
+
+	it("getConstructor should return v2 constructor", async (context) => {
+		assert.equal(context.handler.getConstructor(), Transactions.Two.DelegateRegistrationTransaction);
+	});
+
+	it("isActivated should return true", async (context) => {
+		await assert.resolves(() => context.handler.isActivated());
+		assert.true(await context.handler.isActivated());
+	});
+
+	it("bootstrap should resolve", async (context) => {
+		stub(context.transactionHistoryService, "streamByCriteria").callsFake(async function* () {
+			yield context.delegateRegistrationTransaction.data;
+		});
+
+		assert.false(context.senderWallet.hasAttribute("delegate"));
+
+		await assert.resolves(() => context.handler.bootstrap());
+
+		context.transactionHistoryService.streamByCriteria.calledWith({
+			type: Enums.TransactionType.DelegateRegistration,
+			typeGroup: Enums.TransactionTypeGroup.Core,
+		});
+		assert.true(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy"));
+		assert.true(context.senderWallet.hasAttribute("delegate"));
+		assert.equal(context.senderWallet.getAttribute("delegate"), {
+			forgedFees: Utils.BigNumber.ZERO,
+			forgedRewards: Utils.BigNumber.ZERO,
+			producedBlocks: 0,
+			rank: undefined,
+			username: "dummy",
+			voteBalance: Utils.BigNumber.ZERO,
 		});
 	});
 
-	describe("walletAttributes", () => {
-		it("should return array", async () => {
-			const attributes = handler.walletAttributes();
+	it("bootstrap should not resolve if asset.delegate.username is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate.username = undefined;
 
-			expect(attributes).toBeArray();
-			expect(attributes.length).toBe(11);
-		});
+		assert.false(context.senderWallet.hasAttribute("delegate"));
+
+		await assert.rejects(() => context.handler.bootstrap(), Exceptions.Runtime.AssertionException);
+
+		assert.false(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy"));
+		assert.false(context.senderWallet.hasAttribute("delegate"));
 	});
 
-	describe("getConstructor", () => {
-		it("should return v2 constructor", async () => {
-			expect(handler.getConstructor()).toBe(Transactions.Two.DelegateRegistrationTransaction);
-		});
+	it("bootstrap should not resolve if asset.delegate is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate = undefined;
+
+		assert.false(context.senderWallet.hasAttribute("delegate"));
+
+		await assert.rejects(() => context.handler.bootstrap(), Exceptions.Runtime.AssertionException);
+		assert.false(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy"));
+		assert.false(context.senderWallet.hasAttribute("delegate"));
 	});
 
-	describe("isActivated", () => {
-		it("should return true", async () => {
-			await expect(handler.isActivated()).resolves.toBeTrue();
-		});
+	it("bootstrap should not resolve if asset is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset = undefined;
+
+		assert.false(context.senderWallet.hasAttribute("delegate"));
+
+		await assert.rejects(() => context.handler.bootstrap(), Exceptions.Runtime.AssertionException);
+		assert.false(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy"));
+		assert.false(context.senderWallet.hasAttribute("delegate"));
 	});
 
-	describe("bootstrap", () => {
-		afterEach(() => {
-			Mocks.BlockRepository.setDelegateForgedBlocks([]);
-			Mocks.BlockRepository.setLastForgedBlocks([]);
-		});
+	it("bootstrap should resolve with bocks", async (context) => {
+		Mocks.BlockRepository.setDelegateForgedBlocks([
+			{
+				generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
+				totalFees: "2",
+				totalProduced: 1,
+				totalRewards: "2",
+			},
+		]);
 
-		it("should resolve", async () => {
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield delegateRegistrationTransaction.data;
-			});
+		const lastForgedBlock = {
+			generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
+			height: "1",
+			id: "123",
+			timestamp: 1,
+		};
 
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
+		Mocks.BlockRepository.setLastForgedBlocks([lastForgedBlock]);
 
-			await expect(handler.bootstrap()).toResolve();
+		assert.false(context.senderWallet.hasAttribute("delegate"));
 
-			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				type: Enums.TransactionType.DelegateRegistration,
-				typeGroup: Enums.TransactionTypeGroup.Core,
-			});
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeTrue();
-			expect(senderWallet.hasAttribute("delegate")).toBeTrue();
-			expect(senderWallet.getAttribute("delegate")).toEqual({
-				forgedFees: Utils.BigNumber.ZERO,
-				forgedRewards: Utils.BigNumber.ZERO,
-				producedBlocks: 0,
-				rank: undefined,
-				username: "dummy",
-				voteBalance: Utils.BigNumber.ZERO,
-			});
-		});
+		await assert.resolves(() => context.handler.bootstrap());
 
-		it("should not resolve if asset.delegate.username is undefined", async () => {
-			// @ts-ignore
-			delegateRegistrationTransaction.data.asset.delegate.username = undefined;
+		assert.true(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy"));
+		assert.true(context.senderWallet.hasAttribute("delegate"));
+		assert.equal(context.senderWallet.getAttribute("delegate.lastBlock"), lastForgedBlock);
 
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield delegateRegistrationTransaction.data;
-			});
+		const delegateAttributes: any = context.senderWallet.getAttribute("delegate");
+		assert.equal(delegateAttributes.username, "dummy");
+		assert.equal(delegateAttributes.voteBalance, Utils.BigNumber.ZERO);
+		assert.equal(delegateAttributes.forgedFees, Utils.BigNumber.make("2"));
+		assert.equal(delegateAttributes.forgedRewards, Utils.BigNumber.make("2"));
+		assert.equal(delegateAttributes.producedBlocks, 1);
+		assert.undefined(delegateAttributes.rank);
+	});
 
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
+	it("bootstrap should resolve with bocks and genesis wallet", async (context) => {
+		stub(context.transactionHistoryService, "streamByCriteria").callsFake(async function* () {});
 
-			await expect(handler.bootstrap()).rejects.toThrow(Exceptions.Runtime.AssertionException);
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeFalse();
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
-		});
+		Mocks.BlockRepository.setDelegateForgedBlocks([
+			{
+				generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
+				totalFees: "2",
+				totalProduced: 1,
+				totalRewards: "2",
+			},
+		]);
 
-		it("should not resolve if asset.delegate is undefined", async () => {
-			// @ts-ignore
-			delegateRegistrationTransaction.data.asset.delegate = undefined;
-
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield delegateRegistrationTransaction.data;
-			});
-
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
-
-			await expect(handler.bootstrap()).rejects.toThrow(Exceptions.Runtime.AssertionException);
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeFalse();
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
-		});
-
-		it("should not resolve if asset is undefined", async () => {
-			delegateRegistrationTransaction.data.asset = undefined;
-
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield delegateRegistrationTransaction.data;
-			});
-
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
-
-			await expect(handler.bootstrap()).rejects.toThrow(Exceptions.Runtime.AssertionException);
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeFalse();
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
-		});
-
-		it("should resolve with bocks", async () => {
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield delegateRegistrationTransaction.data;
-			});
-
-			Mocks.BlockRepository.setDelegateForgedBlocks([
-				{
-					generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-					totalFees: "2",
-					totalProduced: 1,
-					totalRewards: "2",
-				},
-			]);
-
-			const lastForgedBlock = {
+		Mocks.BlockRepository.setLastForgedBlocks([
+			{
 				generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
 				height: "1",
 				id: "123",
 				timestamp: 1,
-			};
+			},
+		]);
 
-			Mocks.BlockRepository.setLastForgedBlocks([lastForgedBlock]);
+		await assert.resolves(() => context.handler.bootstrap());
 
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
-
-			await expect(handler.bootstrap()).toResolve();
-
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeTrue();
-			expect(senderWallet.hasAttribute("delegate")).toBeTrue();
-			expect(senderWallet.getAttribute("delegate.lastBlock")).toEqual(lastForgedBlock);
-
-			const delegateAttributes: any = senderWallet.getAttribute("delegate");
-			expect(delegateAttributes.username).toEqual("dummy");
-			expect(delegateAttributes.voteBalance).toEqual(Utils.BigNumber.ZERO);
-			expect(delegateAttributes.forgedFees).toEqual(Utils.BigNumber.make("2"));
-			expect(delegateAttributes.forgedRewards).toEqual(Utils.BigNumber.make("2"));
-			expect(delegateAttributes.producedBlocks).toEqual(1);
-			expect(delegateAttributes.rank).toBeUndefined();
-		});
-
-		it("should resolve with bocks and genesis wallet", async () => {
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {});
-
-			Mocks.BlockRepository.setDelegateForgedBlocks([
-				{
-					generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-					totalFees: "2",
-					totalProduced: 1,
-					totalRewards: "2",
-				},
-			]);
-
-			Mocks.BlockRepository.setLastForgedBlocks([
-				{
-					generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-					height: "1",
-					id: "123",
-					timestamp: 1,
-				},
-			]);
-
-			await expect(handler.bootstrap()).toResolve();
-
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeFalse();
-			expect(senderWallet.hasAttribute("delegate")).toBeFalse();
-		});
+		assert.false(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy"));
+		assert.false(context.senderWallet.hasAttribute("delegate"));
 	});
 
-	describe("emitEvents", () => {
-		it("should dispatch", async () => {
-			const emitter: Contracts.Kernel.EventDispatcher = app.get<Contracts.Kernel.EventDispatcher>(
-				Container.Identifiers.EventDispatcherService,
-			);
+	it("emitEvents should dispatch", async (context) => {
+		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
+			Container.Identifiers.EventDispatcherService,
+		);
 
-			const spy = jest.spyOn(emitter, "dispatch");
+		const mock = spy(emitter, "dispatch");
 
-			handler.emitEvents(delegateRegistrationTransaction, emitter);
+		context.handler.emitEvents(context.delegateRegistrationTransaction, emitter);
 
-			expect(spy).toHaveBeenCalledWith(KernelEnums.DelegateEvent.Registered, expect.anything());
-		});
+		mock.calledWith(KernelEnums.DelegateEvent.Registered);
 	});
 
-	describe("throwIfCannotBeApplied", () => {
-		it("should not throw", async () => {
-			jest.spyOn(TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied should not throw", async (context) => {
+		const mock = spy(TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).toResolve();
+		await assert.resolves(
+			() => context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		);
 
-			expect(TransactionHandler.prototype.throwIfCannotBeApplied).toHaveBeenCalledTimes(1);
-		});
-
-		it("should throw if wallet has a multi signature", async () => {
-			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
-				min: 2,
-				publicKeys: [
-					Identities.PublicKey.fromPassphrase(passphrases[21]),
-					Identities.PublicKey.fromPassphrase(passphrases[22]),
-					Identities.PublicKey.fromPassphrase(passphrases[23]),
-				],
-			};
-
-			senderWallet.setAttribute("multiSignature", multiSignatureAsset);
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				NotSupportedForMultiSignatureWalletError,
-			);
-		});
-
-		it("should throw if asset.delegate.username is undefined", async () => {
-			// @ts-ignore
-			delegateRegistrationTransaction.data.asset.delegate.username = undefined;
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
-
-		it("should throw if asset.delegate is undefined", async () => {
-			delegateRegistrationTransaction.data.asset.delegate = undefined;
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
-
-		it("should throw if asset is undefined", async () => {
-			delegateRegistrationTransaction.data.asset = undefined;
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
-
-		it("should throw if wallet is delegate", async () => {
-			senderWallet.setAttribute("delegate", { username: "dummy" });
-			walletRepository.index(senderWallet);
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				WalletIsAlreadyDelegateError,
-			);
-		});
-
-		it("should throw if wallet is resigned delegate", async () => {
-			senderWallet.setAttribute("delegate", { username: "dummy" });
-			senderWallet.setAttribute("delegate.resigned", true);
-			walletRepository.index(senderWallet);
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				WalletIsAlreadyDelegateError,
-			);
-		});
-
-		it("should throw if another wallet already registered a username", async () => {
-			const delegateWallet: Wallets.Wallet = factoryBuilder
-				.get("Wallet")
-				.withOptions({
-					nonce: 0,
-					passphrase: "delegate passphrase",
-				})
-				.make();
-
-			delegateWallet.setAttribute("delegate", { username: "dummy" });
-
-			walletRepository.index(delegateWallet);
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				WalletUsernameAlreadyRegisteredError,
-			);
-		});
-
-		it("should throw if wallet has insufficient funds", async () => {
-			senderWallet.setBalance(Utils.BigNumber.ZERO);
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				InsufficientBalanceError,
-			);
-		});
-
-		it("should throw if wallet nonce is invalid", async () => {
-			senderWallet.setNonce(Utils.BigNumber.ONE);
-
-			await expect(handler.throwIfCannotBeApplied(delegateRegistrationTransaction, senderWallet)).rejects.toThrow(
-				UnexpectedNonceError,
-			);
-		});
+		assert.true(mock.calledOnce);
 	});
 
-	describe("throwIfCannotEnterPool", () => {
-		it("should not throw", async () => {
-			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).toResolve();
-		});
+	it("throwIfCannotBeApplied should throw if wallet has a multi signature", async (context) => {
+		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+			min: 2,
+			publicKeys: [
+				Identities.PublicKey.fromPassphrase(passphrases[21]),
+				Identities.PublicKey.fromPassphrase(passphrases[22]),
+				Identities.PublicKey.fromPassphrase(passphrases[23]),
+			],
+		};
 
-		it("should throw if transaction by sender already in pool", async () => {
-			await app
-				.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
-				.addTransaction(delegateRegistrationTransaction);
+		context.senderWallet.setAttribute("multiSignature", multiSignatureAsset);
 
-			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
-				Contracts.TransactionPool.PoolError,
-			);
-		});
-
-		it("should throw if transaction with same username already in pool", async () => {
-			const anotherWallet: Wallets.Wallet = factoryBuilder
-				.get("Wallet")
-				.withOptions({
-					nonce: 0,
-					passphrase: passphrases[2],
-				})
-				.make();
-
-			anotherWallet.setBalance(Utils.BigNumber.make(7_527_654_310));
-
-			walletRepository.index(anotherWallet);
-
-			const anotherDelegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
-				.usernameAsset("dummy")
-				.nonce("1")
-				.sign(passphrases[2])
-				.build();
-
-			await app
-				.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
-				.addTransaction(anotherDelegateRegistrationTransaction);
-
-			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
-				Contracts.TransactionPool.PoolError,
-			);
-		});
-
-		it("should throw if asset.delegate.username is undefined", async () => {
-			// @ts-ignore
-			delegateRegistrationTransaction.data.asset.delegate.username = undefined;
-
-			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
-
-		it("should throw if asset.delegate is undefined", async () => {
-			delegateRegistrationTransaction.data.asset.delegate = undefined;
-
-			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
-
-		it("should throw if asset is undefined", async () => {
-			delegateRegistrationTransaction.data.asset = undefined;
-
-			await expect(handler.throwIfCannotEnterPool(delegateRegistrationTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(NotSupportedForMultiSignatureWalletError);
 	});
 
-	describe("apply and revert", () => {
-		it("should resolve", async () => {
-			const walletBalance = senderWallet.getBalance();
+	it("throwIfCannotBeApplied should throw if asset.delegate.username is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate.username = undefined;
 
-			jest.spyOn(TransactionHandler.prototype, "applyToSender");
-
-			await handler.apply(delegateRegistrationTransaction);
-
-			expect(TransactionHandler.prototype.applyToSender).toHaveBeenCalledTimes(1);
-
-			expect(senderWallet.getBalance()).toEqual(walletBalance.minus(delegateRegistrationTransaction.data.fee));
-			expect(senderWallet.getNonce()).toEqual(Utils.BigNumber.ONE);
-			expect(senderWallet.getAttribute("delegate.username")).toBe("dummy");
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeTrue();
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).get("dummy")).toBe(senderWallet);
-
-			jest.spyOn(TransactionHandler.prototype, "revertForSender");
-
-			await handler.revert(delegateRegistrationTransaction);
-
-			expect(TransactionHandler.prototype.revertForSender).toHaveBeenCalledTimes(1);
-
-			expect(senderWallet.getBalance()).toEqual(walletBalance);
-			expect(senderWallet.getNonce()).toEqual(Utils.BigNumber.ZERO);
-			expect(senderWallet.hasAttribute("delegate.username")).toBeFalse();
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeFalse();
-		});
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(Exceptions.Runtime.AssertionException);
 	});
 
-	describe("applyForSender", () => {
-		it("should set username to wallet and index", async () => {
-			await handler.applyToSender(delegateRegistrationTransaction);
+	it("throwIfCannotBeApplied should throw if asset.delegate is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate = undefined;
 
-			expect(senderWallet.getAttribute("delegate.username")).toBe("dummy");
-			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeTrue();
-		});
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(Exceptions.Runtime.AssertionException);
+	});
 
-		it("should throw if asset.delegate.username is undefined", async () => {
-			// @ts-ignore
-			delegateRegistrationTransaction.data.asset.delegate.username = undefined;
-			handler.throwIfCannotBeApplied = jest.fn();
+	it("throwIfCannotBeApplied should throw if asset is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset = undefined;
 
-			await expect(handler.applyToSender(delegateRegistrationTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(Exceptions.Runtime.AssertionException);
+	});
 
-		it("should throw if asset.delegate is undefined", async () => {
-			delegateRegistrationTransaction.data.asset.delegate = undefined;
-			handler.throwIfCannotBeApplied = jest.fn();
+	it("throwIfCannotBeApplied should throw if wallet is delegate", async (context) => {
+		context.senderWallet.setAttribute("delegate", {username: "dummy"});
+		context.walletRepository.index(context.senderWallet);
 
-			await expect(handler.applyToSender(delegateRegistrationTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(WalletIsAlreadyDelegateError);
+	});
 
-		it("should throw if asset is undefined", async () => {
-			delegateRegistrationTransaction.data.asset = undefined;
-			handler.throwIfCannotBeApplied = jest.fn();
+	it("throwIfCannotBeApplied should throw if wallet is resigned delegate", async (context) => {
+		context.senderWallet.setAttribute("delegate", {username: "dummy"});
+		context.senderWallet.setAttribute("delegate.resigned", true);
+		context.walletRepository.index(context.senderWallet);
 
-			await expect(handler.applyToSender(delegateRegistrationTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(WalletIsAlreadyDelegateError);
+	});
+
+	it("throwIfCannotBeApplied should throw if another wallet already registered a username", async (context) => {
+		const delegateWallet: Wallets.Wallet = context.factoryBuilder
+			.get("Wallet")
+			.withOptions({
+				nonce: 0,
+				passphrase: "delegate passphrase",
+			})
+			.make();
+
+		delegateWallet.setAttribute("delegate", {username: "dummy"});
+
+		context.walletRepository.index(delegateWallet);
+
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(WalletUsernameAlreadyRegisteredError);
+	});
+
+	it("throwIfCannotBeApplied should throw if wallet has insufficient funds", async (context) => {
+		context.senderWallet.setBalance(Utils.BigNumber.ZERO);
+
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(InsufficientBalanceError);
+	});
+
+	it("throwIfCannotBeApplied should throw if wallet nonce is invalid", async (context) => {
+		context.senderWallet.setNonce(Utils.BigNumber.ONE);
+
+		await expect(
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		).rejects.toThrow(UnexpectedNonceError);
+	});
+
+	it("throwIfCannotEnterPool should not throw", async (context) => {
+		await expect(context.handler.throwIfCannotEnterPool(context.delegateRegistrationTransaction)).toResolve();
+	});
+
+	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
+		await context.app
+			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+			.addTransaction(context.delegateRegistrationTransaction);
+
+		await expect(context.handler.throwIfCannotEnterPool(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Contracts.TransactionPool.PoolError,
+		);
+	});
+
+	it("throwIfCannotEnterPool should throw if transaction with same username already in pool", async (context) => {
+		const anotherWallet: Wallets.Wallet = context.factoryBuilder
+			.get("Wallet")
+			.withOptions({
+				nonce: 0,
+				passphrase: passphrases[2],
+			})
+			.make();
+
+		anotherWallet.setBalance(Utils.BigNumber.make(7_527_654_310));
+
+		context.walletRepository.index(anotherWallet);
+
+		const anotherDelegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
+			.usernameAsset("dummy")
+			.nonce("1")
+			.sign(passphrases[2])
+			.build();
+
+		await context.app
+			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
+			.addTransaction(anotherDelegateRegistrationTransaction);
+
+		await expect(context.handler.throwIfCannotEnterPool(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Contracts.TransactionPool.PoolError,
+		);
+	});
+
+	it("throwIfCannotEnterPool should throw if asset.delegate.username is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate.username = undefined;
+
+		await expect(context.handler.throwIfCannotEnterPool(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Exceptions.Runtime.AssertionException,
+		);
+	});
+
+	it("throwIfCannotEnterPool should throw if asset.delegate is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate = undefined;
+
+		await expect(context.handler.throwIfCannotEnterPool(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Exceptions.Runtime.AssertionException,
+		);
+	});
+
+	it("throwIfCannotEnterPool should throw if asset is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset = undefined;
+
+		await expect(context.handler.throwIfCannotEnterPool(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Exceptions.Runtime.AssertionException,
+		);
+	});
+
+	it("apply and revert should resolve", async (context) => {
+		const walletBalance = context.senderWallet.getBalance();
+
+		jest.spyOn(TransactionHandler.prototype, "applyToSender");
+
+		await context.handler.apply(context.delegateRegistrationTransaction);
+
+		expect(TransactionHandler.prototype.applyToSender).toHaveBeenCalledTimes(1);
+
+		expect(context.senderWallet.getBalance()).toEqual(
+			walletBalance.minus(context.delegateRegistrationTransaction.data.fee),
+		);
+		expect(context.senderWallet.getNonce()).toEqual(Utils.BigNumber.ONE);
+		expect(context.senderWallet.getAttribute("delegate.username")).toBe("dummy");
+		expect(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeTrue();
+		expect(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).get("dummy")).toBe(
+			context.senderWallet,
+		);
+
+		jest.spyOn(TransactionHandler.prototype, "revertForSender");
+
+		await context.handler.revert(context.delegateRegistrationTransaction);
+
+		expect(TransactionHandler.prototype.revertForSender).toHaveBeenCalledTimes(1);
+
+		expect(context.senderWallet.getBalance()).toEqual(walletBalance);
+		expect(context.senderWallet.getNonce()).toEqual(Utils.BigNumber.ZERO);
+		expect(context.senderWallet.hasAttribute("delegate.username")).toBeFalse();
+		expect(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeFalse();
+	});
+
+	it("applyForSender should set username to wallet and index", async (context) => {
+		await context.handler.applyToSender(context.delegateRegistrationTransaction);
+
+		expect(context.senderWallet.getAttribute("delegate.username")).toBe("dummy");
+		expect(context.walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeTrue();
+	});
+
+	it("applyForSender should throw if asset.delegate.username is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate.username = undefined;
+		context.handler.throwIfCannotBeApplied = jest.fn();
+
+		await expect(context.handler.applyToSender(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Exceptions.Runtime.AssertionException,
+		);
+	});
+
+	it("applyForSender should throw if asset.delegate is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset.delegate = undefined;
+		context.handler.throwIfCannotBeApplied = jest.fn();
+
+		await expect(context.handler.applyToSender(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Exceptions.Runtime.AssertionException,
+		);
+	});
+
+	it("applyForSender should throw if asset is undefined", async (context) => {
+		context.delegateRegistrationTransaction.data.asset = undefined;
+		context.handler.throwIfCannotBeApplied = jest.fn();
+
+		await expect(context.handler.applyToSender(context.delegateRegistrationTransaction)).rejects.toThrow(
+			Exceptions.Runtime.AssertionException,
+		);
 	});
 });
