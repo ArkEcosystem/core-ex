@@ -6,7 +6,7 @@ import * as uvu from "uvu/assert";
 import { z, ZodRawShape } from "zod";
 
 interface Constructable {
-    new(...arguments_: any): any;
+	new (...arguments_: any): any;
 }
 
 export const assert = {
