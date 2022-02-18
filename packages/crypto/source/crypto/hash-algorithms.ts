@@ -1,4 +1,4 @@
-import { Hash160, Hash256, RIPEMD160, SHA1, SHA256 } from "bcrypto";
+import { Hash160, Hash256, RIPEMD160, SHA256 } from "bcrypto";
 
 export class HashAlgorithms {
 	public static ripemd160(buff: Buffer | string): Buffer {
