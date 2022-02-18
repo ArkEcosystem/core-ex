@@ -1,20 +1,18 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "@arkecosystem/core-test-framework";
-import { ColdWalletError } from "../../errors";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransferTransactionHandler } from "../one";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 
-describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
 	const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 	stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 	beforeEach(async (context) => {
-		const config = Generators.generateCryptoConfigRaw();
-		Managers.configManager.setConfig(config);
+		Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());
 
 		context.app = initApp();
 		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);

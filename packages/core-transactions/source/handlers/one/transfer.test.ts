@@ -15,8 +15,7 @@ describe("TransferTransaction V1", ({ assert, beforeEach, it, spy, stub }) => {
 	};
 
 	beforeEach((context) => {
-		const config = Generators.generateCryptoConfigRaw();
-		Managers.configManager.setConfig(config);
+		Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());
 		Managers.configManager.getMilestone().aip11 = false;
 
 		context.app = initApp();
