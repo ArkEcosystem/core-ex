@@ -932,7 +932,7 @@ importers:
 
   packages/crypto-key-pair-bls12-381:
     specifiers:
-      '@arkecosystem/core-test-framework': workspace:^0.0.1
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@noble/bls12-381': ^1.2.0
       bcrypto: ^5.4.0
@@ -995,7 +995,7 @@ importers:
 
   packages/crypto-signature-bls12-381:
     specifiers:
-      '@arkecosystem/core-test-framework': workspace:^0.0.1
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@noble/bls12-381': ^1.2.0
       uvu: ^0.5.3
@@ -1008,7 +1008,7 @@ importers:
 
   packages/crypto-signature-ecdsa:
     specifiers:
-      '@arkecosystem/core-test-framework': workspace:^0.0.1
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
       uvu: ^0.5.3
@@ -1021,7 +1021,7 @@ importers:
 
   packages/crypto-signature-ed25519:
     specifiers:
-      '@arkecosystem/core-test-framework': workspace:^0.0.1
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@noble/ed25519': ^1.6.0
       uvu: ^0.5.3
@@ -1034,7 +1034,7 @@ importers:
 
   packages/crypto-signature-schnorr:
     specifiers:
-      '@arkecosystem/core-test-framework': workspace:^0.0.1
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
       uvu: ^0.5.3
@@ -1047,7 +1047,7 @@ importers:
 
   packages/crypto-signature-schnorr-legacy:
     specifiers:
-      '@arkecosystem/core-test-framework': workspace:^0.0.1
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
       uvu: ^0.5.3
