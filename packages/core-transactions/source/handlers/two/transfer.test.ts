@@ -1,80 +1,57 @@
-import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Mapper, Mocks } from "@arkecosystem/core-test-framework";
-import { Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
-import { ColdWalletError, InsufficientBalanceError, SenderWalletMismatchError } from "../../errors";
-import { TransactionHandler } from "../transaction";
-import { TransactionHandlerRegistry } from "../handler-registry";
-import { TransferTransactionHandler } from "../one";
-import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import {Container, Contracts} from "@arkecosystem/core-kernel";
+import {Stores, Wallets} from "@arkecosystem/core-state";
+import {describe, Factories, Generators, Mapper, Mocks, passphrases} from "@arkecosystem/core-test-framework";
+import {ColdWalletError} from "../../errors";
+import {TransactionHandlerRegistry} from "../handler-registry";
+import {TransferTransactionHandler} from "../one";
+import {Crypto, Enums, Interfaces, Managers, Transactions, Utils} from "@arkecosystem/crypto";
 
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import {buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp} from "../../../test/app";
 
-let app: Application;
-let senderWallet: Wallets.Wallet;
-let multiSignatureWallet: Wallets.Wallet;
-let recipientWallet: Wallets.Wallet;
-let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: Factories.FactoryBuilder;
+describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+	const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+	stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+	beforeEach(async (context) => {
+		const config = Generators.generateCryptoConfigRaw();
+		Managers.configManager.setConfig(config);
 
-const mockGetLastBlock = jest.fn();
-Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
-mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
+		context.app = initApp();
+		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
 
-beforeEach(() => {
-	const config = Generators.generateCryptoConfigRaw();
-	Managers.configManager.setConfig(config);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	app = initApp();
-	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
+		context.factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(context.factoryBuilder);
+		Factories.Factories.registerTransactionFactory(context.factoryBuilder);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.senderWallet = buildSenderWallet(context.factoryBuilder);
+		context.multiSignatureWallet = buildMultiSignatureWallet();
+		context.recipientWallet = buildRecipientWallet(context.factoryBuilder);
 
-	factoryBuilder = new Factories.FactoryBuilder();
-	Factories.Factories.registerWalletFactory(factoryBuilder);
-	Factories.Factories.registerTransactionFactory(factoryBuilder);
+		context.walletRepository.index(context.senderWallet);
+		context.walletRepository.index(context.multiSignatureWallet);
+		context.walletRepository.index(context.recipientWallet);
 
-	senderWallet = buildSenderWallet(factoryBuilder);
-	multiSignatureWallet = buildMultiSignatureWallet();
-	recipientWallet = buildRecipientWallet(factoryBuilder);
-
-	walletRepository.index(senderWallet);
-	walletRepository.index(multiSignatureWallet);
-	walletRepository.index(recipientWallet);
-});
-
-afterEach(() => {
-	Mocks.TransactionRepository.setTransactions([]);
-});
-
-describe("TransferTransaction", () => {
-	let transferTransaction: Interfaces.ITransaction;
-	let multiSignatureTransferTransaction: Interfaces.ITransaction;
-	let handler: TransactionHandler;
-	let pubKeyHash: number;
-
-	beforeEach(async () => {
-		pubKeyHash = Managers.configManager.get("network.pubKeyHash");
-		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+		context.pubKeyHash = Managers.configManager.get("network.pubKeyHash");
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
-		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(Enums.TransactionType.Transfer, Enums.TransactionTypeGroup.Core),
 			2,
 		);
 
-		transferTransaction = Transactions.BuilderFactory.transfer()
-			.recipientId(recipientWallet.getAddress())
+		context.transferTransaction = Transactions.BuilderFactory.transfer()
+			.recipientId(context.recipientWallet.getAddress())
 			.amount("10000000")
 			.sign(passphrases[0])
 			.nonce("1")
 			.build();
 
-		multiSignatureTransferTransaction = Transactions.BuilderFactory.transfer()
-			.senderPublicKey(multiSignatureWallet.getPublicKey()!)
-			.recipientId(recipientWallet.getAddress())
+		context.multiSignatureTransferTransaction = Transactions.BuilderFactory.transfer()
+			.senderPublicKey(context.multiSignatureWallet.getPublicKey()!)
+			.recipientId(context.recipientWallet.getAddress())
 			.amount("1")
 			.nonce("1")
 			.multiSign(passphrases[0], 0)
@@ -83,50 +60,47 @@ describe("TransferTransaction", () => {
 			.build();
 	});
 
-	afterEach(async () => {
-		Managers.configManager.set("network.pubKeyHash", pubKeyHash);
+	afterEach((context) => {
+		Mocks.TransactionRepository.setTransactions([]);
+		Managers.configManager.set("network.pubKeyHash", context.pubKeyHash);
 	});
 
-	describe("bootstrap", () => {
-		it("should resolve", async () => {
-			Mocks.TransactionRepository.setTransactions([Mapper.mapTransactionToModel(transferTransaction)]);
-			await expect(handler.bootstrap()).toResolve();
+	describe("bootstrap", (context) => {
+		it("should resolve", async (context) => {
+			Mocks.TransactionRepository.setTransactions([Mapper.mapTransactionToModel(context.transferTransaction)]);
+			await assert.resolves(() => context.handler.bootstrap());
 		});
 	});
 
 	describe("hasVendorField", () => {
-		it("should return true", async () => {
-			await expect((<TransferTransactionHandler>handler).hasVendorField()).toBeTrue();
+		it("should return true", (context) => {
+			assert.true((<TransferTransactionHandler>context.handler).hasVendorField());
 		});
 	});
 
-	describe("throwIfCannotBeApplied", () => {
-		it("should not throw", async () => {
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).toResolve();
+	describe("throwIfCannotBeApplied", (context) => {
+		it("should not throw", async (context) => {
+			await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet));
 		});
 
-		it("should not throw - multi sign", async () => {
-			await expect(
-				handler.throwIfCannotBeApplied(multiSignatureTransferTransaction, multiSignatureWallet),
-			).toResolve();
+		it("should not throw - multi sign", async (context) => {
+			await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.multiSignatureTransferTransaction, context.multiSignatureWallet));
 		});
 
-		it("should throw", async () => {
-			transferTransaction.data.senderPublicKey = "a".repeat(66);
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrow(
-				SenderWalletMismatchError,
-			);
+		it("should throw", async (context) => {
+			context.transferTransaction.data.senderPublicKey = "a".repeat(66);
+
+			await assert.rejects(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet), "SenderWalletMismatchError");
 		});
 
-		it("should throw if wallet has insufficient funds for vote", async () => {
-			senderWallet.setBalance(Utils.BigNumber.ZERO);
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrow(
-				InsufficientBalanceError,
-			);
+		it("should throw if wallet has insufficient funds for vote", async (context) => {
+			context.senderWallet.setBalance(Utils.BigNumber.ZERO);
+
+			await assert.rejects(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet), "InsufficientBalanceError");
 		});
 
-		it("should throw if sender is cold wallet", async () => {
-			const coldWallet: Wallets.Wallet = factoryBuilder
+		it("should throw if sender is cold wallet", async (context) => {
+			const coldWallet: Wallets.Wallet = context.factoryBuilder
 				.get("Wallet")
 				.withOptions({
 					passphrase: passphrases[3],
@@ -136,20 +110,18 @@ describe("TransferTransaction", () => {
 
 			coldWallet.setBalance(Utils.BigNumber.ZERO);
 
-			transferTransaction = Transactions.BuilderFactory.transfer()
+			context.transferTransaction = Transactions.BuilderFactory.transfer()
 				.amount("10000000")
-				.recipientId(recipientWallet.getAddress())
+				.recipientId(context.recipientWallet.getAddress())
 				.nonce("1")
 				.sign(passphrases[3])
 				.build();
 
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, coldWallet)).rejects.toThrow(
-				ColdWalletError,
-			);
+			await assert.rejects(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, coldWallet), "ColdWalletError");
 		});
 
-		it("should not throw if recipient is cold wallet", async () => {
-			const coldWallet: Wallets.Wallet = factoryBuilder
+		it("should not throw if recipient is cold wallet", async (context) => {
+			const coldWallet: Wallets.Wallet = context.factoryBuilder
 				.get("Wallet")
 				.withOptions({
 					passphrase: passphrases[3],
@@ -159,72 +131,71 @@ describe("TransferTransaction", () => {
 
 			coldWallet.setBalance(Utils.BigNumber.ZERO);
 
-			transferTransaction = Transactions.BuilderFactory.transfer()
+			context.transferTransaction = Transactions.BuilderFactory.transfer()
 				.amount("10000000")
 				.recipientId(coldWallet.getAddress())
 				.nonce("1")
 				.sign(passphrases[0])
 				.build();
 
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).toResolve();
+			await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet));
 		});
 	});
 
 	describe("throwIfCannotEnterPool", () => {
-		it("should not throw", async () => {
-			await expect(handler.throwIfCannotEnterPool(transferTransaction)).toResolve();
+		it("should not throw", async (context) => {
+			await assert.resolves(() => context.handler.throwIfCannotEnterPool(context.transferTransaction));
 		});
 
-		it("should throw if no wallet is not recipient on the active network", async () => {
+		it("should throw if no wallet is not recipient on the active network", async (context) => {
 			Managers.configManager.set("network.pubKeyHash", 99);
 
-			await expect(handler.throwIfCannotEnterPool(transferTransaction)).rejects.toThrow(
-				Contracts.TransactionPool.PoolError,
-			);
+		await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), "Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99");
+		// await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), Contracts.TransactionPool.PoolError);
 		});
 	});
 
 	describe("apply", () => {
-		it("should be ok", async () => {
-			const senderBalance = senderWallet.getBalance();
-			const recipientBalance = recipientWallet.getBalance();
+		it("should be ok", async (context) => {
+			const senderBalance = context.senderWallet.getBalance();
+			const recipientBalance = context.recipientWallet.getBalance();
 
-			await handler.apply(transferTransaction);
+			await context.handler.apply(context.transferTransaction);
 
-			expect(senderWallet.getBalance()).toEqual(
+			assert.equal(context.senderWallet.getBalance(),
 				Utils.BigNumber.make(senderBalance)
-					.minus(transferTransaction.data.amount)
-					.minus(transferTransaction.data.fee),
+					.minus(context.transferTransaction.data.amount)
+					.minus(context.transferTransaction.data.fee),
 			);
 
-			expect(recipientWallet.getBalance()).toEqual(
-				Utils.BigNumber.make(recipientBalance).plus(transferTransaction.data.amount),
+			assert.equal(context.recipientWallet.getBalance(),
+				Utils.BigNumber.make(recipientBalance).plus(context.transferTransaction.data.amount),
 			);
 		});
 	});
 
 	describe("revert", () => {
-		it("should be ok", async () => {
-			const senderBalance = senderWallet.getBalance();
-			const recipientBalance = recipientWallet.getBalance();
+		it("should be ok", async (context) => {
+			const senderBalance = context.senderWallet.getBalance();
+			const recipientBalance = context.recipientWallet.getBalance();
 
-			await handler.apply(transferTransaction);
+			await context.handler.apply(context.transferTransaction);
 
-			expect(senderWallet.getBalance()).toEqual(
+			assert.equal(context.senderWallet.getBalance(),
 				Utils.BigNumber.make(senderBalance)
-					.minus(transferTransaction.data.amount)
-					.minus(transferTransaction.data.fee),
+					.minus(context.transferTransaction.data.amount)
+					.minus(context.transferTransaction.data.fee),
 			);
 
-			expect(recipientWallet.getBalance()).toEqual(
-				Utils.BigNumber.make(recipientBalance).plus(transferTransaction.data.amount),
+			assert.equal(context.recipientWallet.getBalance(),
+				Utils.BigNumber.make(recipientBalance).plus(context.transferTransaction.data.amount),
 			);
 
-			await handler.revert(transferTransaction);
+			await context.handler.revert(context.transferTransaction);
 
-			expect(senderWallet.getBalance()).toEqual(Utils.BigNumber.make(senderBalance));
+			assert.equal(context.senderWallet.getBalance(), Utils.BigNumber.make(senderBalance));
 
-			expect(recipientWallet.getBalance()).toEqual(recipientBalance);
+			assert.equal(context.recipientWallet.getBalance(), recipientBalance);
 		});
 	});
 });
