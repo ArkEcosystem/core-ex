@@ -1,11 +1,11 @@
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/crypto-contracts";
-import { SHA256 } from "bcrypto";
-import { deriveEIP2334Key } from "bls12-381-keygen";
+import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import { getPublicKey } from '@noble/bls12-381';
+import { mnemonicToSeedSync } from 'micro-bip39';
 
 export class KeyPairFactory implements Contract {
 	public fromMnemonic(mnemonic: string): IKeyPair {
-		return this.#fromPrivateKey(deriveEIP2334Key(SHA256.digest(Buffer.from(mnemonic, "utf8")), 'signing', 0).key);
+		return this.#fromPrivateKey(deriveChild(deriveMaster(mnemonicToSeedSync(mnemonic)), 0));
 	}
 
 	public fromPrivateKey(privateKey: Buffer): IKeyPair {
