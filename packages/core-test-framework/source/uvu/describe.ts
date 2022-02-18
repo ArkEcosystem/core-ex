@@ -10,7 +10,7 @@ import { nock } from "./nock";
 import { Stub } from "./stub";
 
 type ContextFunction = () => Context;
-type ContextCallback = (context: Context) => Promise<void>;
+type ContextCallback = (context: Context) => Promise<void> | void;
 
 interface CallbackArguments {
 	afterAll: (callback_: ContextCallback) => void;
