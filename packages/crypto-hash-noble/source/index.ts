@@ -1,6 +1,6 @@
 import { IHashFactory as Contract } from "@arkecosystem/crypto-contracts";
-import { ripemd160 } from '@noble/hashes/ripemd160';
-import { sha256 } from '@noble/hashes/sha256';
+import { ripemd160 } from "@noble/hashes/ripemd160";
+import { sha256 } from "@noble/hashes/sha256";
 
 export class HashFactory implements Contract {
 	public async ripemd160(data: Buffer): Promise<Buffer> {
