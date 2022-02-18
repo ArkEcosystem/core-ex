@@ -1,17 +1,32 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
+import {TransactionHandler} from "../transaction";
+
+interface SuiteContext {
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	factoryBuilder: Factories.FactoryBuilder;
+	store: any;
+	transferTransaction: Interfaces.ITransaction;
+	multiSignatureTransferTransaction: Interfaces.ITransaction;
+	handler: TransactionHandler;
+	pubKeyHash: number;
+}
 
 describe("TransferTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	const transactionHistoryService = {
 		streamByCriteria: spy(),
 	};
 
-	beforeEach((context) => {
+	beforeEach((context: SuiteContext) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 

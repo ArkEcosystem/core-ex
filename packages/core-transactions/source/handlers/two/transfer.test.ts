@@ -1,4 +1,4 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
@@ -6,9 +6,25 @@ import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkec
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransferTransactionHandler } from "../one";
+import { TransactionHandler } from "../transaction";
+import { ColdWalletError, InsufficientBalanceError, SenderWalletMismatchError } from "../../errors";
+
+interface SuiteContext {
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	factoryBuilder: Factories.FactoryBuilder;
+	store: any;
+	transferTransaction: Interfaces.ITransaction;
+	multiSignatureTransferTransaction: Interfaces.ITransaction;
+	handler: TransactionHandler;
+	pubKeyHash: number;
+}
 
 describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
-	beforeEach(async (context) => {
+	beforeEach(async (context: SuiteContext) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
@@ -64,7 +80,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 		context.store.restore();
 	});
 
-	describe("bootstrap", (context) => {
+	describe("bootstrap", () => {
 		it("should resolve", async (context) => {
 			Mocks.TransactionRepository.setTransactions([Mapper.mapTransactionToModel(context.transferTransaction)]);
 			await assert.resolves(() => context.handler.bootstrap());
@@ -98,7 +114,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 
 			await assert.rejects(
 				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
-				Contracts.TransactionPool.SenderWalletMismatchError,
+				SenderWalletMismatchError,
 			);
 		});
 
@@ -107,7 +123,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 
 			await assert.rejects(
 				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
-				Contracts.TransactionPool.InsufficientBalanceError,
+				InsufficientBalanceError,
 			);
 		});
 
@@ -131,7 +147,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 
 			await assert.rejects(
 				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, coldWallet),
-				Contracts.TransactionPool.ColdWalletError,
+				ColdWalletError,
 			);
 		});
 
