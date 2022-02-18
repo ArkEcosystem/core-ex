@@ -20,7 +20,7 @@ interface CallbackArguments<T> {
 	beforeEach: (callback_: ContextCallback<T>) => void;
 	dataset: unknown;
 	each: (name: string, callback: Callback<any>, datasets: unknown[]) => void;
-	it: Test;
+	it: Test<T>;
 	loader: typeof loader;
 	nock: typeof nock;
 	only: Function;
