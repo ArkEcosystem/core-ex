@@ -8,10 +8,10 @@ import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkec
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 
 describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
-	const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
-	stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
-
 	beforeEach(async (context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
+
 		Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());
 
 		context.app = initApp();
@@ -61,6 +61,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 	afterEach((context) => {
 		Mocks.TransactionRepository.setTransactions([]);
 		Managers.configManager.set("network.pubKeyHash", context.pubKeyHash);
+		context.store.restore();
 	});
 
 	describe("bootstrap", (context) => {

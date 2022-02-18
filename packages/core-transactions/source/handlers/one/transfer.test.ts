@@ -6,15 +6,15 @@ import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
 
-describe("TransferTransaction V1", ({ assert, beforeEach, it, spy, stub }) => {
-	const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
-	stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
-
+describe("TransferTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	const transactionHistoryService = {
 		streamByCriteria: spy(),
 	};
 
 	beforeEach((context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
+
 		Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());
 		Managers.configManager.getMilestone().aip11 = false;
 
@@ -43,6 +43,10 @@ describe("TransferTransaction V1", ({ assert, beforeEach, it, spy, stub }) => {
 			Transactions.InternalTransactionType.from(Enums.TransactionType.Transfer, Enums.TransactionTypeGroup.Core),
 			1,
 		);
+	});
+
+	afterEach((context) => {
+		context.store.restore();
 	});
 
 	it("should return empty array", async (context) => {
