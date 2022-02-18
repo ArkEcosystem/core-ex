@@ -5,7 +5,7 @@ import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
-import {TransactionHandler} from "../transaction";
+import { TransactionHandler } from "../transaction";
 
 interface SuiteContext {
 	app: Application;
