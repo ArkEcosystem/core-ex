@@ -16,10 +16,6 @@ const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
 const { schemas } = Transactions;
 
-interface SuiteContext {
-	app: Application;
-}
-
 abstract class TestTransaction extends Transactions.Transaction {
 	public static type: number = TEST_TRANSACTION_TYPE;
 	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
@@ -108,8 +104,10 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 	async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
 }
 
-describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
-	beforeEach((context: SuiteContext) => {
+describe<{
+	app: Application;
+}>("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
+	beforeEach((context) => {
 		const app = new Application(new Container.Container());
 		app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");

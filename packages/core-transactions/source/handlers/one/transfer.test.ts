@@ -7,7 +7,7 @@ import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, ini
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";
 
-interface SuiteContext {
+describe<{
 	app: Application;
 	senderWallet: Wallets.Wallet;
 	multiSignatureWallet: Wallets.Wallet;
@@ -19,14 +19,12 @@ interface SuiteContext {
 	multiSignatureTransferTransaction: Interfaces.ITransaction;
 	handler: TransactionHandler;
 	pubKeyHash: number;
-}
-
-describe("TransferTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("TransferTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	const transactionHistoryService = {
 		streamByCriteria: spy(),
 	};
 
-	beforeEach((context: SuiteContext) => {
+	beforeEach((context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 

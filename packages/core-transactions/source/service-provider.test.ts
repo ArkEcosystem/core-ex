@@ -3,13 +3,11 @@ import { describe } from "@arkecosystem/core-test-framework";
 
 import { ServiceProvider } from "./service-provider";
 
-interface SuiteContext {
+describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-}
-
-describe("ServiceProvider", ({ assert, beforeEach, it }) => {
-	beforeEach((context: SuiteContext) => {
+}>("ServiceProvider", ({ assert, beforeEach, it }) => {
+	beforeEach((context) => {
 		context.app = new Application(new Container.Container());
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
