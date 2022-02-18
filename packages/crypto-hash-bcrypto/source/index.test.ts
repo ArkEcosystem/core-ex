@@ -17,13 +17,6 @@ describe("HashFactory", ({ assert, it }) => {
 		);
 	});
 
-	it("should create a hash with the HASH160 method", async () => {
-		assert.is(
-			Buffer.from(await new HashFactory().hash160(Buffer.from("Hello World"))).toString("hex"),
-			"bdfb69557966d026975bebe914692bf08490d8ca",
-		);
-	});
-
 	it("should create a hash with the HASH256 method", async () => {
 		assert.is(
 			Buffer.from(await new HashFactory().hash256(Buffer.from("Hello World"))).toString("hex"),
