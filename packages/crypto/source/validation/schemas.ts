@@ -38,9 +38,9 @@ export const schemas = {
 			height: { type: "integer", minimum: 1 },
 			previousBlockHex: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
 			numberOfTransactions: { type: "integer" },
-			totalAmount: { bignumber: { bypassGenesis: true, minimum: 0, block: true } },
-			reward: { bignumber: { minimum: 0 } },
-			totalFee: { bignumber: { minimum: 0, bypassGenesis: true, block: true } },
+			totalAmount: { bignumber: { type: "number", bypassGenesis: true, minimum: 0, block: true } },
+			reward: { bignumber: { type: "number", minimum: 0 } },
+			totalFee: { bignumber: { type: "number", minimum: 0, bypassGenesis: true, block: true } },
 			payloadHash: { $ref: "hex" },
 			payloadLength: { type: "integer", minimum: 0 },
 			blockSignature: { $ref: "hex" },
@@ -52,9 +52,11 @@ export const schemas = {
 	block: {
 		$id: "block",
 		$ref: "blockHeader",
+		type: "object",
 		properties: {
 			transactions: {
 				$ref: "transactions",
+				type: "array",
 				maxItems: { $data: "1/numberOfTransactions" },
 				minItems: { $data: "1/numberOfTransactions" },
 			},
