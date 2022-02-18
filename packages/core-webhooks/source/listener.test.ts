@@ -1,15 +1,14 @@
+import { Application,Container, Utils } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test";
+import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Container, Utils, Application } from "@arkecosystem/core-kernel";
-// import { HttpOptions, HttpResponse } from "@packages/core-kernel/source/utils";
-// import * as coditions from "@packages/core-webhooks/source/conditions";
+import { dummyWebhook } from "../__tests__/__fixtures__/assets";
 import { Database } from "./database";
-// import { WebhookEvent } from "./events";
 import { Identifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
-import { dirSync, setGracefulCleanup } from "tmp";
-import { dummyWebhook } from "../__tests__/__fixtures__/assets";
+import {WebhookEvent} from "./events";
+import * as conditions from "./conditions";
 
 let app: Application;
 let database: Database;
@@ -61,7 +60,7 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 
 		database.create(webhook);
 
-		await listener.handle({ name: "event", data: "dummy_data" });
+		await listener.handle({ data: "dummy_data", name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnDebug.calledOnce();
@@ -83,7 +82,7 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 
 		database.create(webhook);
 
-		await listener.handle({ name: "event", data: "dummy_data" });
+		await listener.handle({ data: "dummy_data", name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnError.calledOnce();
@@ -93,3 +92,100 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 		// expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(WebhookEvent.Failed, expectFailedEventData());
 	});
 })
+
+describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it }) => {
+	beforeEach(() => {
+		prepareContainer();
+	})
+
+	afterAll(() => {
+		setGracefulCleanup();
+	})
+
+	it("should not broadcast if webhook is disabled", async () => {
+		const spyOnPost = stub(Utils.http, "post");
+
+		webhook.enabled = false;
+		database.create(webhook);
+
+		await listener.handle({ name: "event", data: "dummy_data" });
+
+		spyOnPost.neverCalled();
+	});
+
+	it("should not broadcast if event is webhook event", async () => {
+		const spyOnPost = stub(Utils.http, "post");
+
+		database.create(webhook);
+
+		await listener.handle({ name: WebhookEvent.Broadcasted, data: "dummy_data" });
+
+		spyOnPost.neverCalled();
+	});
+
+	it("should broadcast if webhook condition is satisfied", async () => {
+		const spyOnPost = stub(Utils.http, "post");
+		const spyOnDispatch = stub(eventDispatcher, "dispatch");
+
+		webhook.conditions = [
+			{
+				key: "test",
+				value: 1,
+				condition: "eq",
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ name: "event", data: { test: 1 } });
+
+		spyOnPost.calledOnce();
+		spyOnDispatch.calledOnce();
+
+		// TODO: Use called with
+		// expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(
+		// 	WebhookEvent.Broadcasted,
+		// 	expectFinishedEventData(),
+		// );
+	});
+
+	it("should not broadcast if webhook condition is not satisfied", async () => {
+		const spyOnPost = stub(Utils.http, "post");
+
+		webhook.conditions = [
+			{
+				key: "test",
+				value: 1,
+				condition: "eq",
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ name: "event", data: { test: 2 } });
+
+		spyOnPost.neverCalled();
+	});
+
+	// it("should not broadcast if webhook condition throws error", async () => {
+	// 	const spyOnEq = stub(conditions, "eq").callsFake(() => {
+	// 		console.log("STUB THROWS");
+	//
+	// 		throw new Error("dummy error");
+	// 	});
+	//
+	// 	const spyOnPost = stub(Utils.http, "post");
+	//
+	// 	webhook.conditions = [
+	// 		{
+	// 			key: "test",
+	// 			value: 1,
+	// 			condition: "eq",
+	// 		},
+	// 	];
+	// 	database.create(webhook);
+	//
+	// 	await listener.handle({ name: "event", data: { test: 2 } });
+	//
+	// 	spyOnEq.calledOnce();
+	// 	spyOnPost.neverCalled();
+	// });
+});
