@@ -98,7 +98,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 
 			await assert.rejects(
 				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
-				"SenderWalletMismatchError",
+				Contracts.TransactionPool.SenderWalletMismatchError,
 			);
 		});
 
@@ -107,7 +107,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 
 			await assert.rejects(
 				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
-				"InsufficientBalanceError",
+				Contracts.TransactionPool.InsufficientBalanceError,
 			);
 		});
 
@@ -131,7 +131,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 
 			await assert.rejects(
 				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, coldWallet),
-				"ColdWalletError",
+				Contracts.TransactionPool.ColdWalletError,
 			);
 		});
 
@@ -167,15 +167,10 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 		it.only("should throw if no wallet is not recipient on the active network", async (context) => {
 			Managers.configManager.set("network.pubKeyHash", 99);
 
-			// await assert.rejects(
-			// 	() => context.handler.throwIfCannotEnterPool(context.transferTransaction),
-			// 	"Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99",
-			// );
 			await assert.rejects(
 				() => context.handler.throwIfCannotEnterPool(context.transferTransaction),
 				Contracts.TransactionPool.PoolError,
 			);
-			await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), Contracts.TransactionPool.PoolError);
 		});
 	});
 
