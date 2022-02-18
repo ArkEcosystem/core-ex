@@ -1,4 +1,4 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "@arkecosystem/core-test-framework";
 import { TransactionHandlerRegistry } from "../handler-registry";
@@ -171,7 +171,7 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 				() => context.handler.throwIfCannotEnterPool(context.transferTransaction),
 				"Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99",
 			);
-			// await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), Contracts.TransactionPool.PoolError);
+			await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), Contracts.TransactionPool.PoolError);
 		});
 	});
 
