@@ -107,6 +107,7 @@ describe<{
 		await assert.rejects(
 			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
 			SenderWalletMismatchError,
+			"Failed to apply transaction, because the public key does not match the wallet."
 		);
 	});
 
@@ -116,6 +117,7 @@ describe<{
 		await assert.rejects(
 			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
 			InsufficientBalanceError,
+			"Insufficient balance in the wallet."
 		);
 	});
 
@@ -140,6 +142,7 @@ describe<{
 		await assert.rejects(
 			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, coldWallet),
 			ColdWalletError,
+			"Insufficient balance in database wallet. Wallet is not allowed to spend before funding is confirmed.",
 		);
 	});
 
@@ -176,6 +179,7 @@ describe<{
 		await assert.rejects(
 			() => context.handler.throwIfCannotEnterPool(context.transferTransaction),
 			Contracts.TransactionPool.PoolError,
+			"Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99",
 		);
 	});
 

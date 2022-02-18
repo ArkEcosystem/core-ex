@@ -67,7 +67,7 @@ export const assert = {
 	null: (value: unknown): void => uvu.ok(value === null),
 	number: (value: unknown): void => uvu.type(value, "number"),
 	object: (value: unknown): void => uvu.type(value, "object"),
-	rejects: async (callback: Function, expected?: uvu.Message | Constructable): Promise<void> => {
+	rejects: async (callback: Function, ...expected: (uvu.Message | Constructable)[]): Promise<void> => {
 		try {
 			await callback();
 
@@ -77,17 +77,19 @@ export const assert = {
 				throw error;
 			}
 
-			if (expected instanceof Error) {
-				uvu.instance(error, expected);
-			}
+			expected.forEach(expected => {
+				if (expected instanceof Error) {
+					uvu.instance(error, expected);
+				}
 
-			if (typeof expected === "function" && new expected().name === "Error") {
-				uvu.instance(error, expected);
-			}
+				if (typeof expected === "function" && new expected().name === "Error") {
+					uvu.instance(error, expected);
+				}
 
-			if (typeof expected === "string") {
-				uvu.ok(error.message.includes(expected) || error.name.includes(expected));
-			}
+				if (typeof expected === "string") {
+					uvu.ok(error.message.includes(expected) || error.name.includes(expected));
+				}
+			});
 
 			uvu.ok(true);
 		}
