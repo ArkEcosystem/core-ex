@@ -36,7 +36,7 @@ export const transactionBaseSchema: Record<string, any> = {
 			minItems: 1,
 			maxItems: 16,
 			uniqueItems: true,
-			items: { allOf: [{ minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
+			items: { allOf: [{ type: "string", minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
 		},
 	},
 };
@@ -152,7 +152,7 @@ export const multiSignature = extend(transactionBaseSchema, {
 			minItems: { $data: "1/asset/multiSignature/min" },
 			maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },
 			uniqueItems: true,
-			items: { allOf: [{ minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
+			items: { allOf: [{ type: "string", minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
 		},
 	},
 });

@@ -1,7 +1,7 @@
 export const schemas = {
 	address: {
 		$id: "address",
-		allOf: [{ maxLength: 34, minLength: 34 }, { $ref: "base58" }],
+		allOf: [{ type: "string", maxLength: 34, minLength: 34 }, { $ref: "base58" }],
 	},
 
 	alphanumeric: {
@@ -65,7 +65,7 @@ export const schemas = {
 		$id: "genericName",
 		allOf: [
 			{ pattern: "^[a-zA-Z0-9]+(( - |[ ._-])[a-zA-Z0-9]+)*[.]?$", type: "string" },
-			{ maxLength: 40, minLength: 1 },
+			{ type: "string", maxLength: 40, minLength: 1 },
 		],
 	},
 
@@ -82,24 +82,24 @@ export const schemas = {
 
 	publicKey: {
 		$id: "publicKey",
-		allOf: [{ maxLength: 66, minLength: 66 }, { $ref: "hex" }, { transform: ["toLowerCase"] }],
+		allOf: [{ type: "string", maxLength: 66, minLength: 66 }, { $ref: "hex" }, { transform: ["toLowerCase"] }],
 	},
 
 	transactionId: {
 		$id: "transactionId",
-		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
+		allOf: [{ type: "string", maxLength: 64, minLength: 64 }, { $ref: "hex" }],
 	},
 
 	uri: {
 		$id: "uri",
-		allOf: [{ format: "uri" }, { maxLength: 80, minLength: 4 }],
+		allOf: [{ format: "uri" }, { type: "string", maxLength: 80, minLength: 4 }],
 	},
 
 	username: {
 		$id: "delegateUsername",
 		allOf: [
 			{ pattern: "^[a-z0-9!@$&_.]+$", type: "string" },
-			{ maxLength: 20, minLength: 1 },
+			{ type: "string", maxLength: 20, minLength: 1 },
 			{ transform: ["toLowerCase"] },
 		],
 	},
