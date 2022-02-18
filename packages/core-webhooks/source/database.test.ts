@@ -59,7 +59,7 @@ describe("Database", ({ beforeEach, afterEach, it, assert }) => {
 	it("should find a webhook by its id", () => {
 		const webhook = database.create(dummyWebhook);
 
-		assert.equal(database.findById(webhook.id),webhook);
+		assert.equal(database.findById(webhook.id), webhook);
 	});
 
 	it("should return undefined if webhook not found", () => {
@@ -71,31 +71,31 @@ describe("Database", ({ beforeEach, afterEach, it, assert }) => {
 
 		const rows = database.findByEvent("event");
 
-		assert.length(rows,1);
+		assert.length(rows, 1);
 		assert.equal(rows[0], webhook);
 	});
 
 	it("should return an empty array if there are no webhooks for an event", () => {
-		assert.length(database.findByEvent("event"),0);
+		assert.length(database.findByEvent("event"), 0);
 	});
 
 	it("should create a new webhook", () => {
 		const webhook: Webhook = database.create(dummyWebhook);
 
-		assert.equal(database.create(webhook),webhook);
+		assert.equal(database.create(webhook), webhook);
 	});
 
 	it("should update an existing webhook", () => {
 		const webhook: Webhook = database.create(dummyWebhook);
 		const updated: Webhook = database.update(webhook.id, dummyWebhook);
 
-		assert.equal(database.findById(webhook.id),updated);
+		assert.equal(database.findById(webhook.id), updated);
 	});
 
 	it("should delete an existing webhook", () => {
 		const webhook: Webhook = database.create(dummyWebhook);
 
-		assert.equal(database.findById(webhook.id),webhook);
+		assert.equal(database.findById(webhook.id), webhook);
 
 		database.destroy(webhook.id);
 

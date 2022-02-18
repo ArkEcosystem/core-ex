@@ -112,11 +112,11 @@ describe("Server", ({ beforeEach, afterEach, afterAll, it, assert }) => {
 
 		body.data.token = undefined;
 
-		assert.equal(response.body.data,body.data);
+		assert.equal(response.body.data, body.data);
 	});
 
 	it("should fail to GET a webhook by the given id", async () => {
-		assert.equal((await request(server, "GET", `webhooks/123`)).status,404);
+		assert.equal((await request(server, "GET", `webhooks/123`)).status, 404);
 	});
 
 	it("should PUT a webhook by the given id", async () => {
@@ -126,13 +126,13 @@ describe("Server", ({ beforeEach, afterEach, afterAll, it, assert }) => {
 	});
 
 	it("should fail to PUT a webhook by the given id", async () => {
-		assert.equal((await request(server, "PUT", `webhooks/123`, postData)).status,404);
+		assert.equal((await request(server, "PUT", `webhooks/123`, postData)).status, 404);
 	});
 
 	it("should DELETE a webhook by the given id", async () => {
 		const { body } = await createWebhook(server);
 
-		assert.equal((await request(server, "DELETE", `webhooks/${body.data.id}`)).status,204);
+		assert.equal((await request(server, "DELETE", `webhooks/${body.data.id}`)).status, 204);
 	});
 
 	it("should fail to DELETE a webhook by the given id", async () => {

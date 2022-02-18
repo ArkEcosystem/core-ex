@@ -1,4 +1,4 @@
-import { Application,Container, Utils } from "@arkecosystem/core-kernel";
+import { Application, Container, Utils } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test-framework";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -7,7 +7,7 @@ import { Database } from "./database";
 import { Identifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
-import {WebhookEvent} from "./events";
+import { WebhookEvent } from "./events";
 import * as conditions from "./conditions";
 
 let app: Application;
@@ -39,23 +39,23 @@ const prepareContainer = () => {
 	listener = app.resolve<Listener>(Listener);
 
 	webhook = Object.assign({}, dummyWebhook);
-}
+};
 
 describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 	beforeEach(() => {
 		prepareContainer();
-	})
+	});
 
 	afterAll(() => {
 		setGracefulCleanup();
-	})
+	});
 
 	it("should broadcast to registered webhooks", async () => {
 		// TODO: Implement type checks
 		const spyOnPost = stub(Utils.http, "post").resolvedValue({
 			statusCode: 200,
-		})
-		const spyOnDebug = stub(logger, "debug")
+		});
+		const spyOnDebug = stub(logger, "debug");
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
 
 		database.create(webhook);
@@ -71,13 +71,13 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 		// 	WebhookEvent.Broadcasted,
 		// 	expectFinishedEventData(),
 		// );
-	})
+	});
 
 	it("should log error if broadcast is not successful", async () => {
 		const spyOnPost = stub(Utils.http, "post").callsFake(() => {
 			throw new Error("dummy error");
-		})
-		const spyOnError = stub(logger, "error")
+		});
+		const spyOnError = stub(logger, "error");
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
 
 		database.create(webhook);
@@ -91,16 +91,16 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 		// TODO: Use called with
 		// expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(WebhookEvent.Failed, expectFailedEventData());
 	});
-})
+});
 
 describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it }) => {
 	beforeEach(() => {
 		prepareContainer();
-	})
+	});
 
 	afterAll(() => {
 		setGracefulCleanup();
-	})
+	});
 
 	it("should not broadcast if webhook is disabled", async () => {
 		const spyOnPost = stub(Utils.http, "post");
