@@ -209,10 +209,9 @@ describe<{
 		);
 	});
 
-	it.skip("applyToSender should be ok", async (context) => {
-		await assert.rejects(
+	it("applyToSender should be ok", async (context) => {
+		await assert.resolves(
 			() => context.handler.applyToSender(context.multiSignatureTransaction),
-			LegacyMultiSignatureError,
 		);
 	});
 
