@@ -724,6 +724,7 @@ importers:
       '@types/hapi__joi': 17.1.7
       '@types/uuid': 8.3.1
       fs-extra: 8.1.0
+      import-fresh: 3.3.0
       joi: 17.4.2
       lowdb: 1.0.0
       tmp: 0.2.1
@@ -744,6 +745,7 @@ importers:
       '@types/hapi__boom': 7.4.1
       '@types/hapi__joi': 17.1.7
       '@types/uuid': 8.3.1
+      import-fresh: 3.3.0
       tmp: 0.2.1
       uvu: 0.5.3
 
