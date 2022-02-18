@@ -1,7 +1,6 @@
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
-import { describe } from "@arkecosystem/core-test";
-import { Factories, Generators } from "@arkecosystem/core-test-framework";
+import { describe, Factories, Generators } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";

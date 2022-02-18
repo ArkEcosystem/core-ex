@@ -1,11 +1,12 @@
 import { Application, Container, Services } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test";
-import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
-import { TransactionHandlerProvider } from "./handler-provider";
-import { TransactionHandlerRegistry } from "./handler-registry";
-import { ServiceProvider } from "../service-provider";
+import { describe } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import ByteBuffer from "bytebuffer";
+
+import { ServiceProvider } from "../service-provider";
+import { TransactionHandlerProvider } from "./handler-provider";
+import { TransactionHandlerRegistry } from "./handler-registry";
+import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
@@ -18,7 +19,7 @@ const { schemas } = Transactions;
 abstract class TestTransaction extends Transactions.Transaction {
 	public static type: number = TEST_TRANSACTION_TYPE;
 	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
-	public static key: string = "test";
+	public static key = "test";
 
 	deserialize(buf: ByteBuffer): void {}
 
@@ -36,7 +37,7 @@ abstract class TestTransaction extends Transactions.Transaction {
 abstract class TestWithDependencyTransaction extends Transactions.Transaction {
 	public static type: number = DEPENDANT_TEST_TRANSACTION_TYPE;
 	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
-	public static key: string = "test_with_dependency";
+	public static key = "test_with_dependency";
 
 	deserialize(buf: ByteBuffer): void {}
 
@@ -269,18 +270,18 @@ describe("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 
 		const keys = Identities.Keys.fromPassphrase("secret");
 		const data: Interfaces.ITransactionData = {
-			version: 1,
-			typeGroup: Enums.TransactionTypeGroup.Test,
-			type: TEST_TRANSACTION_TYPE,
-			nonce: Utils.BigNumber.ONE,
-			timestamp: Crypto.Slots.getTime(),
-			senderPublicKey: keys.publicKey,
-			fee: Utils.BigNumber.make("10000000"),
 			amount: Utils.BigNumber.make("200000000"),
-			recipientId: "APyFYXxXtUrvZFnEuwLopfst94GMY5Zkeq",
 			asset: {
 				test: 256,
 			},
+			fee: Utils.BigNumber.make("10000000"),
+			nonce: Utils.BigNumber.ONE,
+			recipientId: "APyFYXxXtUrvZFnEuwLopfst94GMY5Zkeq",
+			senderPublicKey: keys.publicKey,
+			timestamp: Crypto.Slots.getTime(),
+			type: TEST_TRANSACTION_TYPE,
+			typeGroup: Enums.TransactionTypeGroup.Test,
+			version: 1,
 		};
 
 		assert.instance(await transactionHandlerRegistry.getActivatedHandlerForData(data), TestTransactionHandler);

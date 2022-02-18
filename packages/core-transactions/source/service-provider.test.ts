@@ -1,5 +1,6 @@
 import { Application, Container } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
+
 import { ServiceProvider } from "./service-provider";
 
 describe("ServiceProvider", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {

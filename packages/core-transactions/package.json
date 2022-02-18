@@ -23,7 +23,6 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-test": "workspace:*",
 		"@arkecosystem/core-test-framework": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"bytebuffer": "5.0.1",
