@@ -1,111 +1,111 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { NodeController } from "@packages/core-api/src/controllers/node";
-import { register } from "@packages/core-api/src/routes/node";
-import { Server } from "@packages/core-api/src/server";
+import { NodeController } from "@packages/core-api/source/controllers/node";
+import { register } from "@packages/core-api/source/routes/node";
+import { Server } from "@packages/core-api/source/server";
 
 import { initApp, initServer } from "../__support__";
 import { serverDefaults } from "./__fixtures__";
 
 Container.decorate(Container.injectable(), NodeController);
-jest.mock("@packages/core-api/src/controllers/node");
+jest.mock("@packages/core-api/source/controllers/node");
 
 let app;
 let server: Server;
 
 beforeAll(async () => {
-    app = initApp();
-    server = await initServer(app, serverDefaults);
-    // @ts-ignore
-    register(server.server);
+	app = initApp();
+	server = await initServer(app, serverDefaults);
+	// @ts-ignore
+	register(server.server);
 });
 
 afterAll(async () => {
-    await server.dispose();
+	await server.dispose();
 });
 
 describe("Blockchain", () => {
-    describe("Status", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(NodeController.prototype, "status").mockResolvedValue({});
+	describe("Status", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(NodeController.prototype, "status").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/node/status",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/node/status",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Syncing", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(NodeController.prototype, "syncing").mockResolvedValue({});
+	describe("Syncing", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(NodeController.prototype, "syncing").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/node/syncing",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/node/syncing",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Configuration", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(NodeController.prototype, "configuration").mockResolvedValue({});
+	describe("Configuration", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(NodeController.prototype, "configuration").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/node/configuration",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/node/configuration",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Configuration Crypto", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(NodeController.prototype, "configurationCrypto").mockResolvedValue({});
+	describe("Configuration Crypto", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(NodeController.prototype, "configurationCrypto").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/node/configuration/crypto",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/node/configuration/crypto",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 
-    describe("Fees", () => {
-        it("should be called", async () => {
-            // @ts-ignore
-            const spyOnMethod = jest.spyOn(NodeController.prototype, "fees").mockResolvedValue({});
+	describe("Fees", () => {
+		it("should be called", async () => {
+			// @ts-ignore
+			const spyOnMethod = jest.spyOn(NodeController.prototype, "fees").mockResolvedValue({});
 
-            const injectOptions = {
-                method: "GET",
-                url: "/node/fees",
-            };
+			const injectOptions = {
+				method: "GET",
+				url: "/node/fees",
+			};
 
-            const result = await server.inject(injectOptions);
+			const result = await server.inject(injectOptions);
 
-            expect(result.statusCode).toEqual(200);
-            expect(spyOnMethod).toHaveBeenCalled();
-        });
-    });
+			expect(result.statusCode).toEqual(200);
+			expect(spyOnMethod).toHaveBeenCalled();
+		});
+	});
 });

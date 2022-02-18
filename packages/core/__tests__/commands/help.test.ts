@@ -2,35 +2,35 @@ import "jest-extended";
 
 import { Container } from "@arkecosystem/core-cli";
 import { Console } from "@packages/core-test-framework";
-import { Command } from "@packages/core/src/commands/help";
+import { Command } from "@packages/core/source/commands/help";
 
 let cli;
 beforeEach(() => {
-    cli = new Console();
+	cli = new Console();
 });
 
 describe("HelpCommand", () => {
-    it("should render a table with process information", async () => {
-        let message: string;
-        jest.spyOn(console, "log").mockImplementationOnce((m) => (message = m));
+	it("should render a table with process information", async () => {
+		let message: string;
+		jest.spyOn(console, "log").mockImplementationOnce((m) => (message = m));
 
-        const mockCommands = {
-            command1: { description: "test" },
-            command2: { description: "another test" },
-            "grouped:anotherkey": { description: "I should be grouped" },
-            "grouped:again": { description: "I'm also grouped" },
-        };
+		const mockCommands = {
+			command1: { description: "test" },
+			command2: { description: "another test" },
+			"grouped:anotherkey": { description: "I should be grouped" },
+			"grouped:again": { description: "I'm also grouped" },
+		};
 
-        cli.app.bind(Container.Identifiers.Commands).toConstantValue(mockCommands);
+		cli.app.bind(Container.Identifiers.Commands).toConstantValue(mockCommands);
 
-        await cli.execute(Command);
+		await cli.execute(Command);
 
-        expect(message).toIncludeMultiple(
-            Object.keys(mockCommands).concat(
-                Object.values(mockCommands)
-                    .map((value) => value.description)
-                    .concat(["grouped", "default", "Usage", "Flags", "Available Commands"]),
-            ),
-        );
-    });
+		expect(message).toIncludeMultiple(
+			Object.keys(mockCommands).concat(
+				Object.values(mockCommands)
+					.map((value) => value.description)
+					.concat(["grouped", "default", "Usage", "Flags", "Available Commands"]),
+			),
+		);
+	});
 });

@@ -1,17 +1,7 @@
 {
-    "extends": "@sindresorhus/tsconfig",
-    "compilerOptions": {
-        "esModuleInterop": true,
-        "lib": ["es2018"],
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "noImplicitAny": false,
-        "outDir": "dist",
-        "resolveJsonModule": true,
-        "sourceMap": true,
-        "strict": true,
-        "target": "es2018"
-    },
-    "include": ["src/**/**.ts"],
-    "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "distribution"
+	},
+	"include": ["source/**/**.ts"]
 }

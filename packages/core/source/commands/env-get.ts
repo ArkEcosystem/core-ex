@@ -1,0 +1,40 @@
+import { Commands, Container } from "@arkecosystem/core-cli";
+import { Networks } from "@arkecosystem/crypto";
+import { parseFileSync } from "envfile";
+import { existsSync } from "fs-extra";
+import Joi from "joi";
+
+@Container.injectable()
+export class Command extends Commands.Command {
+	public signature = "env:get";
+
+	public description = "Get the value of an environment variable.";
+
+	public configure(): void {
+		this.definition
+			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
+			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag(
+				"key",
+				"The name of the environment variable that you wish to get the value of.",
+				Joi.string().required(),
+			);
+	}
+
+	public async execute(): Promise<void> {
+		const envFile: string = this.app.getCorePath("config", ".env");
+
+		if (!existsSync(envFile)) {
+			this.components.fatal(`No environment file found at ${envFile}.`);
+		}
+
+		const env: object = parseFileSync(envFile);
+		const key: string = this.getFlag("key");
+
+		if (!env[key]) {
+			this.components.fatal(`The "${key}" doesn't exist.`);
+		}
+
+		this.components.log(env[key]);
+	}
+}

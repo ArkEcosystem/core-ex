@@ -1,38 +1,31 @@
 import "jest-extended";
 
 import { Application, Contracts } from "@packages/core-kernel";
-import { DelegateEvent } from "@packages/core-kernel/src/enums";
-import { Identifiers } from "@packages/core-kernel/src/ioc";
+import { DelegateEvent } from "@packages/core-kernel/source/enums";
+import { Identifiers } from "@packages/core-kernel/source/ioc";
 import { Wallets } from "@packages/core-state";
-import { StateStore } from "@packages/core-state/src/stores/state";
-import { Generators } from "@packages/core-test-framework/src";
-import { Factories, FactoryBuilder } from "@packages/core-test-framework/src/factories";
-import passphrases from "@packages/core-test-framework/src/internal/passphrases.json";
-import { Mempool } from "@packages/core-transaction-pool/src/mempool";
+import { StateStore } from "@packages/core-state/source/stores/state";
+import { Generators } from "@packages/core-test-framework/source";
+import { Factories, FactoryBuilder } from "@packages/core-test-framework/source/factories";
+import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { Mempool } from "@packages/core-transaction-pool/source/mempool";
 import {
-    InsufficientBalanceError,
-    NotEnoughDelegatesError,
-    VotedForResignedDelegateError,
-    WalletAlreadyResignedError,
-    WalletNotADelegateError,
-} from "@packages/core-transactions/src/errors";
-import { TransactionHandler } from "@packages/core-transactions/src/handlers";
-import { TransactionHandlerRegistry } from "@packages/core-transactions/src/handlers/handler-registry";
+	InsufficientBalanceError,
+	NotEnoughDelegatesError,
+	VotedForResignedDelegateError,
+	WalletAlreadyResignedError,
+	WalletNotADelegateError,
+} from "@packages/core-transactions/source/errors";
+import { TransactionHandler } from "@packages/core-transactions/source/handlers";
+import { TransactionHandlerRegistry } from "@packages/core-transactions/source/handlers/handler-registry";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@packages/crypto";
-import { BuilderFactory } from "@packages/crypto/dist/transactions";
-import { configManager } from "@packages/crypto/src/managers";
+import { BuilderFactory } from "@packages/crypto/distribution/transactions";
+import { configManager } from "@packages/crypto/source/managers";
 
-import {
-    buildMultiSignatureWallet,
-    buildRecipientWallet,
-    buildSecondSignatureWallet,
-    buildSenderWallet,
-    initApp,
-} from "../__support__/app";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
-let secondSignatureWallet: Wallets.Wallet;
 let multiSignatureWallet: Wallets.Wallet;
 let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
@@ -45,299 +38,269 @@ StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 const transactionHistoryService = {
-    streamByCriteria: jest.fn(),
+	streamByCriteria: jest.fn(),
 };
 
 beforeEach(() => {
-    transactionHistoryService.streamByCriteria.mockReset();
+	transactionHistoryService.streamByCriteria.mockReset();
 
-    const config = Generators.generateCryptoConfigRaw();
-    configManager.setConfig(config);
-    Managers.configManager.setConfig(config);
+	const config = Generators.generateCryptoConfigRaw();
+	configManager.setConfig(config);
+	Managers.configManager.setConfig(config);
 
-    app = initApp();
-    app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+	app = initApp();
+	app.bind(Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
 
-    walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
+	walletRepository = app.get<Wallets.WalletRepository>(Identifiers.WalletRepository);
 
-    factoryBuilder = new FactoryBuilder();
-    Factories.registerWalletFactory(factoryBuilder);
-    Factories.registerTransactionFactory(factoryBuilder);
+	factoryBuilder = new FactoryBuilder();
+	Factories.registerWalletFactory(factoryBuilder);
+	Factories.registerTransactionFactory(factoryBuilder);
 
-    senderWallet = buildSenderWallet(factoryBuilder);
-    secondSignatureWallet = buildSecondSignatureWallet(factoryBuilder);
-    multiSignatureWallet = buildMultiSignatureWallet();
-    recipientWallet = buildRecipientWallet(factoryBuilder);
+	senderWallet = buildSenderWallet(factoryBuilder);
+	multiSignatureWallet = buildMultiSignatureWallet();
+	recipientWallet = buildRecipientWallet(factoryBuilder);
 
-    walletRepository.index(senderWallet);
-    walletRepository.index(secondSignatureWallet);
-    walletRepository.index(multiSignatureWallet);
-    walletRepository.index(recipientWallet);
+	walletRepository.index(senderWallet);
+	walletRepository.index(multiSignatureWallet);
+	walletRepository.index(recipientWallet);
 });
 
 describe("DelegateResignationTransaction", () => {
-    let allDelegates: Wallets.Wallet[];
-    let delegateWallet: Wallets.Wallet;
-    const delegatePassphrase = "my secret passphrase";
+	let allDelegates: Wallets.Wallet[];
+	let delegateWallet: Wallets.Wallet;
+	const delegatePassphrase = "my secret passphrase";
 
-    let delegateResignationTransaction: Interfaces.ITransaction;
-    let secondSignatureDelegateResignationTransaction: Interfaces.ITransaction;
-    let handler: TransactionHandler;
-    let voteHandler: TransactionHandler;
+	let delegateResignationTransaction: Interfaces.ITransaction;
+	let handler: TransactionHandler;
+	let voteHandler: TransactionHandler;
 
-    beforeEach(async () => {
-        const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
-            Identifiers.TransactionHandlerRegistry,
-        );
-        handler = transactionHandlerRegistry.getRegisteredHandlerByType(
-            Transactions.InternalTransactionType.from(
-                Enums.TransactionType.DelegateResignation,
-                Enums.TransactionTypeGroup.Core,
-            ),
-            2,
-        );
-        voteHandler = transactionHandlerRegistry.getRegisteredHandlerByType(
-            Transactions.InternalTransactionType.from(Enums.TransactionType.Vote, Enums.TransactionTypeGroup.Core),
-            2,
-        );
+	beforeEach(async () => {
+		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+			Identifiers.TransactionHandlerRegistry,
+		);
+		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+			Transactions.InternalTransactionType.from(
+				Enums.TransactionType.DelegateResignation,
+				Enums.TransactionTypeGroup.Core,
+			),
+			2,
+		);
+		voteHandler = transactionHandlerRegistry.getRegisteredHandlerByType(
+			Transactions.InternalTransactionType.from(Enums.TransactionType.Vote, Enums.TransactionTypeGroup.Core),
+			2,
+		);
 
-        allDelegates = [];
-        for (let i = 0; i < passphrases.length; i++) {
-            const delegateWallet: Wallets.Wallet = factoryBuilder
-                .get("Wallet")
-                .withOptions({
-                    passphrase: passphrases[i],
-                    nonce: 0,
-                })
-                .make();
+		allDelegates = [];
+		for (let i = 0; i < passphrases.length; i++) {
+			const delegateWallet: Wallets.Wallet = factoryBuilder
+				.get("Wallet")
+				.withOptions({
+					passphrase: passphrases[i],
+					nonce: 0,
+				})
+				.make();
 
-            delegateWallet.setAttribute("delegate", { username: "username" + i });
+			delegateWallet.setAttribute("delegate", { username: "username" + i });
 
-            walletRepository.index(delegateWallet);
-            allDelegates.push(delegateWallet);
-        }
+			walletRepository.index(delegateWallet);
+			allDelegates.push(delegateWallet);
+		}
 
-        delegateWallet = factoryBuilder
-            .get("Wallet")
-            .withOptions({
-                passphrase: delegatePassphrase,
-                nonce: 0,
-            })
-            .make();
+		delegateWallet = factoryBuilder
+			.get("Wallet")
+			.withOptions({
+				passphrase: delegatePassphrase,
+				nonce: 0,
+			})
+			.make();
 
-        delegateWallet.setBalance(Utils.BigNumber.make(66 * 1e8));
-        delegateWallet.setAttribute("delegate", { username: "dummy" });
-        walletRepository.index(delegateWallet);
+		delegateWallet.setBalance(Utils.BigNumber.make(66 * 1e8));
+		delegateWallet.setAttribute("delegate", { username: "dummy" });
+		walletRepository.index(delegateWallet);
 
-        delegateResignationTransaction = BuilderFactory.delegateResignation()
-            .nonce("1")
-            .sign(delegatePassphrase)
-            .build();
+		delegateResignationTransaction = BuilderFactory.delegateResignation()
+			.nonce("1")
+			.sign(delegatePassphrase)
+			.build();
+	});
 
-        secondSignatureDelegateResignationTransaction = BuilderFactory.delegateResignation()
-            .nonce("1")
-            .sign(passphrases[1])
-            .secondSign(passphrases[2])
-            .build();
-    });
+	describe("bootstrap", () => {
+		// TODO: assert wallet repository
 
-    describe("bootstrap", () => {
-        // TODO: assert wallet repository
+		it("should resolve", async () => {
+			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
+				yield delegateResignationTransaction.data;
+			});
 
-        it("should resolve", async () => {
-            transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-                yield delegateResignationTransaction.data;
-            });
+			await expect(handler.bootstrap()).toResolve();
 
-            await expect(handler.bootstrap()).toResolve();
+			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
+				typeGroup: Enums.TransactionTypeGroup.Core,
+				type: Enums.TransactionType.DelegateResignation,
+			});
+		});
 
-            expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-                typeGroup: Enums.TransactionTypeGroup.Core,
-                type: Enums.TransactionType.DelegateResignation,
-            });
-        });
+		it("should resolve - simulate genesis wallet", async () => {
+			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
+				yield delegateResignationTransaction.data;
+			});
+			allDelegates[0].forgetAttribute("delegate");
+			walletRepository.index(allDelegates[0]);
 
-        it("should resolve - simulate genesis wallet", async () => {
-            transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-                yield delegateResignationTransaction.data;
-            });
-            allDelegates[0].forgetAttribute("delegate");
-            walletRepository.index(allDelegates[0]);
+			await expect(handler.bootstrap()).toResolve();
+		});
+	});
 
-            await expect(handler.bootstrap()).toResolve();
-        });
-    });
+	describe("emitEvents", () => {
+		it("should dispatch", async () => {
+			const emitter: Contracts.Kernel.EventDispatcher = app.get<Contracts.Kernel.EventDispatcher>(
+				Identifiers.EventDispatcherService,
+			);
 
-    describe("emitEvents", () => {
-        it("should dispatch", async () => {
-            const emitter: Contracts.Kernel.EventDispatcher = app.get<Contracts.Kernel.EventDispatcher>(
-                Identifiers.EventDispatcherService,
-            );
+			const spy = jest.spyOn(emitter, "dispatch");
 
-            const spy = jest.spyOn(emitter, "dispatch");
+			handler.emitEvents(delegateResignationTransaction, emitter);
 
-            handler.emitEvents(delegateResignationTransaction, emitter);
+			expect(spy).toHaveBeenCalledWith(DelegateEvent.Resigned, expect.anything());
+		});
+	});
 
-            expect(spy).toHaveBeenCalledWith(DelegateEvent.Resigned, expect.anything());
-        });
-    });
+	describe("throwIfCannotBeApplied", () => {
+		it("should not throw if wallet is a delegate", async () => {
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+		});
 
-    describe("throwIfCannotBeApplied", () => {
-        it("should not throw if wallet is a delegate", async () => {
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
-        });
+		it("should not throw if wallet is a delegate due too many delegates", async () => {
+			const anotherDelegate: Wallets.Wallet = factoryBuilder
+				.get("Wallet")
+				.withOptions({
+					passphrase: "anotherDelegate",
+					nonce: 0,
+				})
+				.make();
 
-        it("should not throw if wallet is a delegate - second sign", async () => {
-            // Add extra delegate so we don't get NotEnoughDelegatesError
-            const anotherDelegate: Wallets.Wallet = factoryBuilder
-                .get("Wallet")
-                .withOptions({
-                    passphrase: "anotherDelegate",
-                    nonce: 0,
-                })
-                .make();
+			anotherDelegate.setAttribute("delegate", { username: "another" });
+			walletRepository.index(anotherDelegate);
 
-            anotherDelegate.setAttribute("delegate", { username: "another" });
-            walletRepository.index(anotherDelegate);
-            allDelegates.push(anotherDelegate);
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+		});
 
-            secondSignatureWallet.setAttribute("delegate", { username: "dummy" });
-            walletRepository.index(secondSignatureWallet);
-            await expect(
-                handler.throwIfCannotBeApplied(secondSignatureDelegateResignationTransaction, secondSignatureWallet),
-            ).toResolve();
-        });
+		it("should throw if wallet is not a delegate", async () => {
+			delegateWallet.forgetAttribute("delegate");
+			await expect(
+				handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
+			).rejects.toThrow(WalletNotADelegateError);
+		});
 
-        it("should not throw if wallet is a delegate due too many delegates", async () => {
-            const anotherDelegate: Wallets.Wallet = factoryBuilder
-                .get("Wallet")
-                .withOptions({
-                    passphrase: "anotherDelegate",
-                    nonce: 0,
-                })
-                .make();
+		it("should throw if wallet has insufficient funds", async () => {
+			delegateWallet.setBalance(Utils.BigNumber.ZERO);
+			await expect(
+				handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
+			).rejects.toThrow(InsufficientBalanceError);
+		});
 
-            anotherDelegate.setAttribute("delegate", { username: "another" });
-            walletRepository.index(anotherDelegate);
+		it("should throw if not enough delegates", async () => {
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+			allDelegates[0].setAttribute("delegate.resigned", true);
+			await expect(
+				handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
+			).rejects.toThrow(NotEnoughDelegatesError);
+		});
 
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
-        });
+		it("should throw if not enough delegates due to already resigned delegates", async () => {
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
 
-        it("should throw if wallet is not a delegate", async () => {
-            delegateWallet.forgetAttribute("delegate");
-            await expect(
-                handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
-            ).rejects.toThrow(WalletNotADelegateError);
-        });
+			delegateWallet.setAttribute("delegate.resigned", true);
 
-        it("should throw if wallet has insufficient funds", async () => {
-            delegateWallet.setBalance(Utils.BigNumber.ZERO);
-            await expect(
-                handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
-            ).rejects.toThrow(InsufficientBalanceError);
-        });
+			await expect(
+				handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
+			).rejects.toThrow(WalletAlreadyResignedError);
+		});
 
-        it("should throw if not enough delegates", async () => {
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
-            allDelegates[0].setAttribute("delegate.resigned", true);
-            await expect(
-                handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
-            ).rejects.toThrow(NotEnoughDelegatesError);
-        });
+		// it("should throw if not enough delegates registered", async () => {
+		//     let anotherDelegateWallet: Wallets.Wallet = factoryBuilder
+		//         .get("Wallet")
+		//         .withOptions({
+		//             passphrase: "another delegate passphrase",
+		//             nonce: 0
+		//         })
+		//         .make();
+		//
+		//     delegateWallet.setAttribute("delegate", {username: "another"});
+		//
+		//     await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+		// });
+	});
 
-        it("should throw if not enough delegates due to already resigned delegates", async () => {
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+	describe("throwIfCannotEnterPool", () => {
+		it("should not throw", async () => {
+			await expect(handler.throwIfCannotEnterPool(delegateResignationTransaction)).toResolve();
+		});
 
-            delegateWallet.setAttribute("delegate.resigned", true);
+		it("should throw if transaction by sender already in pool", async () => {
+			await app.get<Mempool>(Identifiers.TransactionPoolMempool).addTransaction(delegateResignationTransaction);
 
-            await expect(
-                handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
-            ).rejects.toThrow(WalletAlreadyResignedError);
-        });
+			await expect(handler.throwIfCannotEnterPool(delegateResignationTransaction)).rejects.toThrow(
+				Contracts.TransactionPool.PoolError,
+			);
+		});
+	});
 
-        // it("should throw if not enough delegates registered", async () => {
-        //     let anotherDelegateWallet: Wallets.Wallet = factoryBuilder
-        //         .get("Wallet")
-        //         .withOptions({
-        //             passphrase: "another delegate passphrase",
-        //             nonce: 0
-        //         })
-        //         .make();
-        //
-        //     delegateWallet.setAttribute("delegate", {username: "another"});
-        //
-        //     await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
-        // });
-    });
+	describe("apply", () => {
+		it("should apply delegate resignation", async () => {
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
 
-    describe("throwIfCannotEnterPool", () => {
-        it("should not throw", async () => {
-            await expect(handler.throwIfCannotEnterPool(delegateResignationTransaction)).toResolve();
-        });
+			await handler.apply(delegateResignationTransaction);
+			expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
+		});
 
-        it("should throw if transaction by sender already in pool", async () => {
-            await app.get<Mempool>(Identifiers.TransactionPoolMempool).addTransaction(delegateResignationTransaction);
+		it("should fail when already resigned", async () => {
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
 
-            await expect(handler.throwIfCannotEnterPool(delegateResignationTransaction)).rejects.toThrow(
-                Contracts.TransactionPool.PoolError,
-            );
-        });
-    });
+			await handler.apply(delegateResignationTransaction);
+			expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
 
-    describe("apply", () => {
-        it("should apply delegate resignation", async () => {
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+			await expect(
+				handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
+			).rejects.toThrow(WalletAlreadyResignedError);
+		});
 
-            await handler.apply(delegateResignationTransaction);
-            expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
-        });
+		it("should fail when not a delegate", async () => {
+			delegateWallet.forgetAttribute("delegate");
 
-        it("should fail when already resigned", async () => {
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+			await expect(
+				handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
+			).rejects.toThrow(WalletNotADelegateError);
+		});
 
-            await handler.apply(delegateResignationTransaction);
-            expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
+		it("should fail when voting for a resigned delegate", async () => {
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
 
-            await expect(
-                handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
-            ).rejects.toThrow(WalletAlreadyResignedError);
-        });
+			await handler.apply(delegateResignationTransaction);
+			expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
 
-        it("should fail when not a delegate", async () => {
-            delegateWallet.forgetAttribute("delegate");
+			const voteTransaction = BuilderFactory.vote()
+				.votesAsset(["+" + delegateWallet.getPublicKey()])
+				.nonce("1")
+				.sign(passphrases[0])
+				.build();
 
-            await expect(
-                handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet),
-            ).rejects.toThrow(WalletNotADelegateError);
-        });
+			await expect(voteHandler.throwIfCannotBeApplied(voteTransaction, senderWallet)).rejects.toThrow(
+				VotedForResignedDelegateError,
+			);
+		});
+	});
 
-        it("should fail when voting for a resigned delegate", async () => {
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
+	describe("revert", () => {
+		it("should be ok", async () => {
+			expect(delegateWallet.hasAttribute("delegate.resigned")).toBeFalse();
+			await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
 
-            await handler.apply(delegateResignationTransaction);
-            expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
-
-            const voteTransaction = BuilderFactory.vote()
-                .votesAsset(["+" + delegateWallet.getPublicKey()])
-                .nonce("1")
-                .sign(passphrases[0])
-                .build();
-
-            await expect(voteHandler.throwIfCannotBeApplied(voteTransaction, senderWallet)).rejects.toThrow(
-                VotedForResignedDelegateError,
-            );
-        });
-    });
-
-    describe("revert", () => {
-        it("should be ok", async () => {
-            expect(delegateWallet.hasAttribute("delegate.resigned")).toBeFalse();
-            await expect(handler.throwIfCannotBeApplied(delegateResignationTransaction, delegateWallet)).toResolve();
-
-            await handler.apply(delegateResignationTransaction);
-            expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
-            await handler.revert(delegateResignationTransaction);
-            expect(delegateWallet.hasAttribute("delegate.resigned")).toBeFalse();
-        });
-    });
+			await handler.apply(delegateResignationTransaction);
+			expect(delegateWallet.getAttribute<boolean>("delegate.resigned")).toBeTrue();
+			await handler.revert(delegateResignationTransaction);
+			expect(delegateWallet.hasAttribute("delegate.resigned")).toBeFalse();
+		});
+	});
 });
