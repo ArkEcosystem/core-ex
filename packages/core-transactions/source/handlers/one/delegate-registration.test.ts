@@ -15,16 +15,14 @@ describe<{
 	walletRepository: Contracts.State.WalletRepository;
 	handler: TransactionHandler;
 	store: any;
-}>("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it, stub }) => {
+}>("DelegateRegistrationTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	beforeEach(async (context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
-		const transactionHistoryService = {
-			streamByCriteria: jest.fn(),
+		let transactionHistoryService = {
+			streamByCriteria: spy(),
 		};
-
-		transactionHistoryService.streamByCriteria.mockReset();
 
 		const config = Generators.generateCryptoConfigRaw();
 		Managers.configManager.setConfig(config);
@@ -63,36 +61,26 @@ describe<{
 		context.store.restore();
 	});
 
-	describe("dependencies", (context) => {
-		it("should return empty array", async () => {
-			expect(context.handler.dependencies()).toEqual([]);
-		});
+	it("dependencies should return empty array", async (context) => {
+		assert.equal(context.handler.dependencies(), []);
 	});
 
-	describe("walletAttributes", (context) => {
-		it("should return array", async () => {
-			const attributes = context.handler.walletAttributes();
+	it("walletAttributes should return array", async (context) => {
+		const attributes = context.handler.walletAttributes();
 
-			expect(attributes).toBeArray();
-			expect(attributes.length).toBe(11);
-		});
+		assert.array(attributes);
+		assert.is(attributes.length, 11);
 	});
 
-	describe("getConstructor", (context) => {
-		it("should return v1 constructor", async () => {
-			expect(context.handler.getConstructor()).toBe(Transactions.One.DelegateRegistrationTransaction);
-		});
+	it("getConstructor should return v1 constructor", async (context) => {
+		assert.equal(context.handler.getConstructor(), Transactions.One.DelegateRegistrationTransaction);
 	});
 
-	describe("bootstrap", () => {
-		it("should resolve", async (context) => {
-			await expect(context.handler.bootstrap()).toResolve();
-		});
+	it("bootstrap should resolve", async (context) => {
+		await assert.resolves(() => context.handler.bootstrap());
 	});
 
-	describe("isActivated", () => {
-		it("should return true", async (context) => {
-			await expect(context.handler.isActivated()).resolves.toBeTrue();
-		});
+	it("isActivated should return true", async (context) => {
+		assert.true(await context.handler.isActivated());
 	});
 });
