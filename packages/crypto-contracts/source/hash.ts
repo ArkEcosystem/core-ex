@@ -3,7 +3,5 @@ export interface IHashFactory {
 
 	sha256(data: Buffer): Promise<Buffer>;
 
-	hash160(data: Buffer): Promise<Buffer>;
-
 	hash256(data: Buffer): Promise<Buffer>;
 }
