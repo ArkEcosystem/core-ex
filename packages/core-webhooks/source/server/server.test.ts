@@ -31,7 +31,7 @@ const serverOptions = {
 	},
 };
 
-export const initApp = (): Application => {
+const initApp = (): Application => {
 	const app: Application = new Application(new Container.Container());
 
 	app.bind(Container.Identifiers.EventDispatcherService).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
@@ -51,7 +51,7 @@ export const initApp = (): Application => {
 	return app;
 };
 
-export const initServer = async (app: Application, serverOptions: any): Promise<Server> => {
+const initServer = async (app: Application, serverOptions: any): Promise<Server> => {
 	const server = app.get<Server>(WebhookIdentifiers.Server);
 
 	await server.register(serverOptions);
