@@ -1,8 +1,8 @@
-import {Application, Container, Contracts, Enums as KernelEnums, Exceptions} from "@arkecosystem/core-kernel";
-import {Stores, Wallets} from "@arkecosystem/core-state";
-import {describe, Factories, Generators, Mocks, passphrases} from "@arkecosystem/core-test-framework";
-import {Mempool} from "@arkecosystem/core-transaction-pool";
-import {Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils} from "@arkecosystem/crypto";
+import { Application, Container, Contracts, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { describe, Factories, Generators, Mocks, passphrases } from "@arkecosystem/core-test-framework";
+import { Mempool } from "@arkecosystem/core-transaction-pool";
+import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import {
 	InsufficientBalanceError,
 	NotSupportedForMultiSignatureWalletError,
@@ -10,9 +10,9 @@ import {
 	WalletIsAlreadyDelegateError,
 	WalletUsernameAlreadyRegisteredError,
 } from "../../errors";
-import {buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp} from "../../../test/app";
-import {TransactionHandlerRegistry} from "../handler-registry";
-import {TransactionHandler} from "../index";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { TransactionHandler } from "../index";
 
 describe<{
 	app: Application;
@@ -25,10 +25,10 @@ describe<{
 	delegateRegistrationTransaction: Interfaces.ITransaction;
 	store: any;
 	transactionHistoryService: any;
-}>("DelegateRegistrationTransaction", ({assert, afterEach, beforeEach, it, spy, stub}) => {
+}>("DelegateRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = {height: 4, timestamp: Crypto.Slots.getTime()};
-		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({data: mockLastBlockData});
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.delegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
 			.usernameAsset("dummy")
@@ -235,8 +235,8 @@ describe<{
 	it("throwIfCannotBeApplied should not throw", async (context) => {
 		const mock = spy(TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-		await assert.resolves(
-			() => context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
 		);
 
 		assert.true(mock.calledOnce);
@@ -284,7 +284,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet is delegate", async (context) => {
-		context.senderWallet.setAttribute("delegate", {username: "dummy"});
+		context.senderWallet.setAttribute("delegate", { username: "dummy" });
 		context.walletRepository.index(context.senderWallet);
 
 		await expect(
@@ -293,7 +293,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet is resigned delegate", async (context) => {
-		context.senderWallet.setAttribute("delegate", {username: "dummy"});
+		context.senderWallet.setAttribute("delegate", { username: "dummy" });
 		context.senderWallet.setAttribute("delegate.resigned", true);
 		context.walletRepository.index(context.senderWallet);
 
@@ -311,7 +311,7 @@ describe<{
 			})
 			.make();
 
-		delegateWallet.setAttribute("delegate", {username: "dummy"});
+		delegateWallet.setAttribute("delegate", { username: "dummy" });
 
 		context.walletRepository.index(delegateWallet);
 
