@@ -1,12 +1,12 @@
-import {Container, Contracts} from "@arkecosystem/core-kernel";
-import {Stores, Wallets} from "@arkecosystem/core-state";
-import {describe, Factories, Generators, Mapper, Mocks, passphrases} from "@arkecosystem/core-test-framework";
-import {ColdWalletError} from "../../errors";
-import {TransactionHandlerRegistry} from "../handler-registry";
-import {TransferTransactionHandler} from "../one";
-import {Crypto, Enums, Interfaces, Managers, Transactions, Utils} from "@arkecosystem/crypto";
+import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "@arkecosystem/core-test-framework";
+import { ColdWalletError } from "../../errors";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { TransferTransactionHandler } from "../one";
+import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
-import {buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp} from "../../../test/app";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 
 describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
@@ -80,23 +80,36 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub 
 
 	describe("throwIfCannotBeApplied", (context) => {
 		it("should not throw", async (context) => {
-			await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet));
+			await assert.resolves(() =>
+				context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			);
 		});
 
 		it("should not throw - multi sign", async (context) => {
-			await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.multiSignatureTransferTransaction, context.multiSignatureWallet));
+			await assert.resolves(() =>
+				context.handler.throwIfCannotBeApplied(
+					context.multiSignatureTransferTransaction,
+					context.multiSignatureWallet,
+				),
+			);
 		});
 
 		it("should throw", async (context) => {
 			context.transferTransaction.data.senderPublicKey = "a".repeat(66);
 
-			await assert.rejects(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet), "SenderWalletMismatchError");
+			await assert.rejects(
+				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+				"SenderWalletMismatchError",
+			);
 		});
 
 		it("should throw if wallet has insufficient funds for vote", async (context) => {
 			context.senderWallet.setBalance(Utils.BigNumber.ZERO);
 
-			await assert.rejects(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet), "InsufficientBalanceError");
+			await assert.rejects(
+				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+				"InsufficientBalanceError",
+			);
 		});
 
 		it("should throw if sender is cold wallet", async (context) => {
@@ -117,7 +130,10 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub 
 				.sign(passphrases[3])
 				.build();
 
-			await assert.rejects(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, coldWallet), "ColdWalletError");
+			await assert.rejects(
+				() => context.handler.throwIfCannotBeApplied(context.transferTransaction, coldWallet),
+				"ColdWalletError",
+			);
 		});
 
 		it("should not throw if recipient is cold wallet", async (context) => {
@@ -138,7 +154,9 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub 
 				.sign(passphrases[0])
 				.build();
 
-			await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet));
+			await assert.resolves(() =>
+				context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			);
 		});
 	});
 
@@ -150,8 +168,11 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub 
 		it("should throw if no wallet is not recipient on the active network", async (context) => {
 			Managers.configManager.set("network.pubKeyHash", 99);
 
-		await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), "Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99");
-		// await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), Contracts.TransactionPool.PoolError);
+			await assert.rejects(
+				() => context.handler.throwIfCannotEnterPool(context.transferTransaction),
+				"Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99",
+			);
+			// await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), Contracts.TransactionPool.PoolError);
 		});
 	});
 
@@ -162,13 +183,15 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub 
 
 			await context.handler.apply(context.transferTransaction);
 
-			assert.equal(context.senderWallet.getBalance(),
+			assert.equal(
+				context.senderWallet.getBalance(),
 				Utils.BigNumber.make(senderBalance)
 					.minus(context.transferTransaction.data.amount)
 					.minus(context.transferTransaction.data.fee),
 			);
 
-			assert.equal(context.recipientWallet.getBalance(),
+			assert.equal(
+				context.recipientWallet.getBalance(),
 				Utils.BigNumber.make(recipientBalance).plus(context.transferTransaction.data.amount),
 			);
 		});
@@ -181,13 +204,15 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, spy, stub 
 
 			await context.handler.apply(context.transferTransaction);
 
-			assert.equal(context.senderWallet.getBalance(),
+			assert.equal(
+				context.senderWallet.getBalance(),
 				Utils.BigNumber.make(senderBalance)
 					.minus(context.transferTransaction.data.amount)
 					.minus(context.transferTransaction.data.fee),
 			);
 
-			assert.equal(context.recipientWallet.getBalance(),
+			assert.equal(
+				context.recipientWallet.getBalance(),
 				Utils.BigNumber.make(recipientBalance).plus(context.transferTransaction.data.amount),
 			);
 

@@ -1,10 +1,10 @@
-import {Container} from "@arkecosystem/core-kernel";
-import {Stores, Wallets} from "@arkecosystem/core-state";
-import {describe, Factories, Generators} from "@arkecosystem/core-test-framework";
-import {Crypto, Enums, Interfaces, Managers, Transactions} from "@arkecosystem/crypto";
+import { Container } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { describe, Factories, Generators } from "@arkecosystem/core-test-framework";
+import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
-import {buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp} from "../../../test/app";
-import {TransactionHandlerRegistry} from "../handler-registry";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { TransactionHandlerRegistry } from "../handler-registry";
 
 describe("TransferTransaction V1", ({ assert, beforeEach, it, spy, stub }) => {
 	const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
