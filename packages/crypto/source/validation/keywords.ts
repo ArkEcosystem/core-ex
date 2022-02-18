@@ -1,8 +1,5 @@
 import Ajv from "ajv";
-import ajvKeywords from "ajv-keywords";
-
 import { TransactionType } from "../enums";
-import { ITransactionData } from "../interfaces";
 import { configManager } from "../managers";
 import { BigNumber, isGenesisTransaction } from "../utils";
 
