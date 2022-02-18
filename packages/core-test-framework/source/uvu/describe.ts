@@ -9,15 +9,15 @@ import { loader } from "./loader";
 import { nock } from "./nock";
 import { Stub } from "./stub";
 
-type ContextFunction = () => Context;
-type ContextCallback = (context: Context) => Promise<void> | void;
+type ContextFunction<T> = () => T;
+type ContextCallback<T> = (context: T) => Promise<void> | void;
 
-interface CallbackArguments {
-	afterAll: (callback_: ContextCallback) => void;
-	afterEach: (callback_: ContextCallback) => void;
+interface CallbackArguments<T> {
+	afterAll: (callback_: ContextCallback<T>) => void;
+	afterEach: (callback_: ContextCallback<T>) => void;
 	assert: typeof assert;
-	beforeAll: (callback_: ContextCallback) => void;
-	beforeEach: (callback_: ContextCallback) => void;
+	beforeAll: (callback_: ContextCallback<T>) => void;
+	beforeEach: (callback_: ContextCallback<T>) => void;
 	dataset: unknown;
 	each: (name: string, callback: Callback<any>, datasets: unknown[]) => void;
 	it: Test;
@@ -30,9 +30,9 @@ interface CallbackArguments {
 	stub: (owner: object, method: string) => Stub;
 }
 
-type CallbackFunction = (arguments_: CallbackArguments) => void;
+type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
 
-const runSuite = (suite: Test, callback: CallbackFunction, dataset?: unknown): void => {
+const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
 	let stubs: Stub[] = [];
 
 	suite.before(() => {
@@ -54,11 +54,11 @@ const runSuite = (suite: Test, callback: CallbackFunction, dataset?: unknown): v
 	});
 
 	callback({
-		afterAll: async (callback_: ContextCallback) => suite.after(runHook(callback_)),
-		afterEach: async (callback_: ContextCallback) => suite.after.each(runHook(callback_)),
+		afterAll: async (callback_: ContextCallback<T>) => suite.after(runHook(callback_)),
+		afterEach: async (callback_: ContextCallback<T>) => suite.after.each(runHook(callback_)),
 		assert,
-		beforeAll: async (callback_: ContextCallback) => suite.before(runHook(callback_)),
-		beforeEach: async (callback_: ContextCallback) => suite.before.each(runHook(callback_)),
+		beforeAll: async (callback_: ContextCallback<T>) => suite.before(runHook(callback_)),
+		beforeEach: async (callback_: ContextCallback<T>) => suite.before.each(runHook(callback_)),
 		dataset,
 		each: each(suite),
 		it: suite,
@@ -80,15 +80,16 @@ const runSuite = (suite: Test, callback: CallbackFunction, dataset?: unknown): v
 	suite.run();
 };
 
-export const describe = (title: string, callback: CallbackFunction): void => runSuite(suite(title), callback);
+export const describe = <T = Context>(title: string, callback: CallbackFunction<T>): void =>
+	runSuite<T>(suite<T>(title), callback);
 
-export const describeWithContext = (
+export const describeWithContext = <T = Context>(
 	title: string,
-	context: Context | ContextFunction,
-	callback: CallbackFunction,
+	context: Context | ContextFunction<T>,
+	callback: CallbackFunction<T>,
 ): void => runSuite(suite(title, typeof context === "function" ? context() : context), callback);
 
-export const describeEach = (title: string, callback: CallbackFunction, datasets: unknown[]): void => {
+export const describeEach = <T = Context>(title: string, callback: CallbackFunction<T>, datasets: unknown[]): void => {
 	for (const dataset of datasets) {
 		runSuite(suite(formatName(title, dataset)), callback);
 	}
