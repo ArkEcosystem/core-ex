@@ -1,4 +1,4 @@
-import { Container, Contracts, Enums as AppEnums,Utils } from "@arkecosystem/core-kernel";
+import { Container, Contracts, Enums as AppEnums, Utils } from "@arkecosystem/core-kernel";
 import { Enums, Interfaces, Transactions } from "@arkecosystem/crypto";
 
 import {
