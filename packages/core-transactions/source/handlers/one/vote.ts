@@ -1,5 +1,5 @@
-import { Container, Contracts, Utils, Enums as AppEnums } from "@arkecosystem/core-kernel";
-import { Enums, Interfaces, Transactions, Managers } from "@arkecosystem/crypto";
+import { Container, Contracts, Enums as AppEnums,Utils } from "@arkecosystem/core-kernel";
+import { Enums, Interfaces, Transactions } from "@arkecosystem/crypto";
 
 import {
 	AlreadyVotedError,
@@ -82,7 +82,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 	public emitEvents(transaction: Interfaces.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 
-		for (const vote of transaction.data.asset!.votes) {
+		for (const vote of transaction.data.asset.votes) {
 			emitter.dispatch(vote.startsWith("+") ? AppEnums.VoteEvent.Vote : AppEnums.VoteEvent.Unvote, {
 				delegate: vote,
 				transaction: transaction.data,
@@ -133,7 +133,7 @@ export class VoteTransactionHandler extends TransactionHandler {
 
 		Utils.assert.defined<Interfaces.ITransactionAsset>(transaction.data.asset?.votes);
 
-		for (const vote of transaction.data.asset.votes.slice().reverse()) {
+		for (const vote of [...transaction.data.asset.votes].reverse()) {
 			if (vote.startsWith("+")) {
 				sender.forgetAttribute("vote");
 			} else {
