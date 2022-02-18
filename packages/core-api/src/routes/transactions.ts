@@ -44,6 +44,7 @@ export const register = (server: Hapi.Server): void => {
                             transactions: {
                                 $ref: "transactions",
                                 minItems: 1,
+                                type: "array",
                                 maxItems: server.app.app
                                     .getTagged<Providers.PluginConfiguration>(
                                         Container.Identifiers.PluginConfiguration,

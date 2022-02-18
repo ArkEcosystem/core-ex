@@ -44,6 +44,7 @@ describe("Hapi Ajv", () => {
                         required: ["test"],
                         properties: {
                             test: {
+                                type: "array",
                                 minItems: 1,
                                 maxItems: 1,
                             },

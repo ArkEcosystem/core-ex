@@ -38,7 +38,7 @@ export const transactionBaseSchema: Record<string, any> = {
             minItems: 1,
             maxItems: 16,
             uniqueItems: true,
-            items: { allOf: [{ minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
+            items: { allOf: [{ type: "string", minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
         },
     },
 };
@@ -180,7 +180,7 @@ export const multiSignature = extend(transactionBaseSchema, {
             minItems: { $data: "1/asset/multiSignature/min" },
             maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },
             uniqueItems: true,
-            items: { allOf: [{ minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
+            items: { allOf: [{ type: "string", minLength: 130, maxLength: 130 }, { $ref: "alphanumeric" }] },
         },
     },
 });
@@ -253,7 +253,7 @@ export const htlcLock = extend(transactionBaseSchema, {
                     type: "object",
                     required: ["secretHash", "expiration"],
                     properties: {
-                        secretHash: { allOf: [{ minLength: 64, maxLength: 64 }, { $ref: "hex" }] },
+                        secretHash: { allOf: [{ type: "string", minLength: 64, maxLength: 64 }, { $ref: "hex" }] },
                         expiration: {
                             type: "object",
                             required: ["type", "value"],
@@ -284,7 +284,7 @@ export const htlcClaim = extend(transactionBaseSchema, {
                     required: ["lockTransactionId", "unlockSecret"],
                     properties: {
                         lockTransactionId: { $ref: "transactionId" },
-                        unlockSecret: { allOf: [{ minLength: 64, maxLength: 64 }, { $ref: "hex" }] },
+                        unlockSecret: { allOf: [{ type: "string", minLength: 64, maxLength: 64 }, { $ref: "hex" }] },
                     },
                 },
             },

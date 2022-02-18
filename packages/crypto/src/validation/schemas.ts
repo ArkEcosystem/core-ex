@@ -19,7 +19,7 @@ export const schemas = {
 
     transactionId: {
         $id: "transactionId",
-        allOf: [{ minLength: 64, maxLength: 64 }, { $ref: "hex" }],
+        allOf: [{ type: "string", minLength: 64, maxLength: 64 }, { $ref: "hex" }],
     },
 
     networkByte: {
@@ -29,12 +29,12 @@ export const schemas = {
 
     address: {
         $id: "address",
-        allOf: [{ minLength: 34, maxLength: 34 }, { $ref: "base58" }],
+        allOf: [{ type: "string", minLength: 34, maxLength: 34 }, { $ref: "base58" }],
     },
 
     publicKey: {
         $id: "publicKey",
-        allOf: [{ minLength: 66, maxLength: 66 }, { $ref: "hex" }, { transform: ["toLowerCase"] }],
+        allOf: [{ type: "string", minLength: 66, maxLength: 66 }, { $ref: "hex" }, { transform: ["toLowerCase"] }],
     },
 
     walletVote: {
@@ -46,7 +46,7 @@ export const schemas = {
         $id: "delegateUsername",
         allOf: [
             { type: "string", pattern: "^[a-z0-9!@$&_.]+$" },
-            { minLength: 1, maxLength: 20 },
+            { type: "string", minLength: 1, maxLength: 20 },
             { transform: ["toLowerCase"] },
         ],
     },
@@ -55,13 +55,13 @@ export const schemas = {
         $id: "genericName",
         allOf: [
             { type: "string", pattern: "^[a-zA-Z0-9]+(( - |[ ._-])[a-zA-Z0-9]+)*[.]?$" },
-            { minLength: 1, maxLength: 40 },
+            { type: "string", minLength: 1, maxLength: 40 },
         ],
     },
 
     uri: {
         $id: "uri",
-        allOf: [{ format: "uri" }, { minLength: 4, maxLength: 80 }],
+        allOf: [{ format: "uri" }, { type: "string", minLength: 4, maxLength: 80 }],
     },
 
     blockHeader: {
@@ -103,6 +103,7 @@ export const schemas = {
         properties: {
             transactions: {
                 $ref: "transactions",
+                type: "array",
                 minItems: { $data: "1/numberOfTransactions" },
                 maxItems: { $data: "1/numberOfTransactions" },
             },
