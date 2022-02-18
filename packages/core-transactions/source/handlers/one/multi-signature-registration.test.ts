@@ -1,6 +1,13 @@
 import { Application, Container, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Factories, Generators, getWalletAttributeSet, Mocks, passphrases } from "@arkecosystem/core-test-framework";
+import {
+	describe,
+	Factories,
+	Generators,
+	getWalletAttributeSet,
+	Mocks,
+	passphrases,
+} from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { LegacyMultiSignatureError, MultiSignatureAlreadyRegisteredError } from "../../errors";
@@ -8,63 +15,59 @@ import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, ini
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";
 
-let app: Application;
-let senderWallet: Wallets.Wallet;
-let multiSignatureWallet: Wallets.Wallet;
-let recipientWallet: Wallets.Wallet;
-let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: Factories.FactoryBuilder;
+describe<{
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	handler: TransactionHandler;
+	factoryBuilder: Factories.FactoryBuilder;
+	multiSignatureTransaction: Interfaces.ITransaction;
+	multiSignatureAsset: Interfaces.IMultiSignatureAsset;
+	pubKeyHash: number;
+	store: any;
+	transactionHistoryService: any;
+}>("MultiSignatureRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+	beforeEach((context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.transactionHistoryService = {
+			streamByCriteria: async function* () {
+				yield context.multiSignatureTransaction.data;
+			},
+		};
 
-const mockGetLastBlock = jest.fn();
-Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
-mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
+		context.pubKeyHash = Managers.configManager.get("network.pubKeyHash");
 
-const transactionHistoryService = {
-	streamByCriteria: jest.fn(),
-};
+		const config = Generators.generateCryptoConfigRaw();
+		Managers.configManager.setConfig(config);
+		Managers.configManager.getMilestone().aip11 = false;
 
-beforeEach(() => {
-	transactionHistoryService.streamByCriteria.mockReset();
+		context.app = initApp();
+		context.app
+			.bind(Container.Identifiers.TransactionHistoryService)
+			.toConstantValue(context.transactionHistoryService);
 
-	const config = Generators.generateCryptoConfigRaw();
-	Managers.configManager.setConfig(config);
-	Managers.configManager.getMilestone().aip11 = false;
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	app = initApp();
-	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+		context.factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(context.factoryBuilder);
+		Factories.Factories.registerTransactionFactory(context.factoryBuilder);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.senderWallet = buildSenderWallet(context.factoryBuilder);
+		context.multiSignatureWallet = buildMultiSignatureWallet();
+		context.recipientWallet = buildRecipientWallet(context.factoryBuilder);
 
-	factoryBuilder = new Factories.FactoryBuilder();
-	Factories.Factories.registerWalletFactory(factoryBuilder);
-	Factories.Factories.registerTransactionFactory(factoryBuilder);
+		context.walletRepository.index(context.senderWallet);
+		context.walletRepository.index(context.multiSignatureWallet);
+		context.walletRepository.index(context.recipientWallet);
 
-	senderWallet = buildSenderWallet(factoryBuilder);
-	multiSignatureWallet = buildMultiSignatureWallet();
-	recipientWallet = buildRecipientWallet(factoryBuilder);
-
-	walletRepository.index(senderWallet);
-	walletRepository.index(multiSignatureWallet);
-	walletRepository.index(recipientWallet);
-});
-
-afterEach(() => {
-	Mocks.TransactionRepository.setTransactions([]);
-});
-
-describe("MultiSignatureRegistrationTransaction", () => {
-	let multiSignatureTransaction: Interfaces.ITransaction;
-	let recipientWallet: Wallets.Wallet;
-	let handler: TransactionHandler;
-	let multiSignatureAsset: Interfaces.IMultiSignatureAsset;
-
-	beforeEach(async () => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
-		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
 				Enums.TransactionType.MultiSignature,
 				Enums.TransactionTypeGroup.Core,
@@ -72,9 +75,9 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			1,
 		);
 
-		senderWallet.setBalance(Utils.BigNumber.make(100_390_000_000));
+		context.senderWallet.setBalance(Utils.BigNumber.make(100_390_000_000));
 
-		multiSignatureAsset = {
+		context.multiSignatureAsset = {
 			min: 2,
 			publicKeys: [
 				Identities.PublicKey.fromPassphrase(passphrases[0]),
@@ -83,164 +86,147 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			],
 		};
 
-		recipientWallet = new Wallets.Wallet(
-			Identities.Address.fromMultiSignatureAsset(multiSignatureAsset),
+		context.recipientWallet = new Wallets.Wallet(
+			Identities.Address.fromMultiSignatureAsset(context.multiSignatureAsset),
 			new Services.Attributes.AttributeMap(getWalletAttributeSet()),
 		);
 
-		walletRepository.index(recipientWallet);
+		context.walletRepository.index(context.recipientWallet);
 
-		multiSignatureTransaction = Transactions.BuilderFactory.multiSignature()
+		context.multiSignatureTransaction = Transactions.BuilderFactory.multiSignature()
 			.version(1)
-			.multiSignatureAsset(multiSignatureAsset)
+			.multiSignatureAsset(context.multiSignatureAsset)
 			.senderPublicKey(Identities.PublicKey.fromPassphrase(passphrases[0]))
 			.nonce("1")
-			.recipientId(recipientWallet.getPublicKey()!)
+			.recipientId(context.recipientWallet.getPublicKey()!)
 			.multiSign(passphrases[0], 0) // ! implicitly sets version to 2
 			.multiSign(passphrases[1], 1)
 			.multiSign(passphrases[2], 2)
 			.sign(passphrases[0])
 			.build();
 
-		multiSignatureTransaction.data.asset.multiSignatureLegacy = "multiSignatureLegacy mock" as any;
+		context.multiSignatureTransaction.data.asset.multiSignatureLegacy = "multiSignatureLegacy mock" as any;
 	});
 
-	describe("dependencies", () => {
-		it("should return empty array", async () => {
-			expect(handler.dependencies()).toEqual([]);
-		});
+	afterEach((context) => {
+		Mocks.TransactionRepository.setTransactions([]);
+		// Managers.configManager.set("exceptions.transactions", []);
+		// Managers.configManager.set("network.pubKeyHash", context.pubKeyHash);
 	});
 
-	describe("walletAttributes", () => {
-		it("should return array", async () => {
-			const attributes = handler.walletAttributes();
-
-			expect(attributes).toBeArray();
-			expect(attributes.length).toBe(2);
-		});
+	it("dependencies should return empty array", async (context) => {
+		assert.equal(context.handler.dependencies(), []);
 	});
 
-	describe("getConstructor", () => {
-		it("should return v1 constructor", async () => {
-			expect(handler.getConstructor()).toBe(Transactions.One.MultiSignatureRegistrationTransaction);
-		});
+	it("walletAttributes should return array", async (context) => {
+		const attributes = context.handler.walletAttributes();
+
+		assert.array(attributes);
+		assert.is(attributes.length, 2);
 	});
 
-	describe("bootstrap", () => {
-		it("should resolve", async () => {
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield multiSignatureTransaction.data;
-			});
+	it("getConstructor should return v1 constructor", async (context) => {
+		assert.equal(context.handler.getConstructor(), Transactions.One.MultiSignatureRegistrationTransaction);
+	});
 
-			await expect(handler.bootstrap()).toResolve();
-
-			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				type: Enums.TransactionType.MultiSignature,
-				typeGroup: Enums.TransactionTypeGroup.Core,
-				version: 1,
-			});
+	it("bootstrap should resolve", async (context) => {
+		stub(context.transactionHistoryService, "streamByCriteria").callsFake(async function* () {
+			yield context.multiSignatureTransaction.data;
 		});
 
-		it("should throw when wallet has multi signature", async () => {
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield multiSignatureTransaction.data;
-			});
-			senderWallet.setAttribute("multiSignature", multiSignatureAsset);
+		// context.transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
+		// 	yield context.multiSignatureTransaction.data;
+		// });
 
-			await expect(handler.bootstrap()).rejects.toThrow(MultiSignatureAlreadyRegisteredError);
-		});
+		await assert.resolves(() => context.handler.bootstrap());
 
-		it("should throw if asset.multiSignatureLegacy is undefined", async () => {
-			multiSignatureTransaction.data.asset.multiSignatureLegacy = undefined;
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield multiSignatureTransaction.data;
-			});
-
-			await expect(handler.bootstrap()).rejects.toThrow(Exceptions.Runtime.AssertionException);
-		});
-
-		it("should throw if asset is undefined", async () => {
-			multiSignatureTransaction.data.asset = undefined;
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield multiSignatureTransaction.data;
-			});
-
-			await expect(handler.bootstrap()).rejects.toThrow(Exceptions.Runtime.AssertionException);
+		context.transactionHistoryService.streamByCriteria.calledWith({
+			type: Enums.TransactionType.MultiSignature,
+			typeGroup: Enums.TransactionTypeGroup.Core,
+			version: 1,
 		});
 	});
 
-	describe("isActivated", () => {
-		it("should return true when aip11 is false", async () => {
-			Managers.configManager.getMilestone().aip11 = false;
-			await expect(handler.isActivated()).resolves.toBe(true);
-		});
-		it("should return true when aip11 is undefined", async () => {
-			Managers.configManager.getMilestone().aip11 = undefined;
-			await expect(handler.isActivated()).resolves.toBe(true);
-		});
-		it("should return false when aip11 is true", async () => {
-			Managers.configManager.getMilestone().aip11 = true;
-			await expect(handler.isActivated()).resolves.toBe(false);
-		});
+	it("bootstrap should throw when wallet has multi signature", async (context) => {
+		context.senderWallet.setAttribute("multiSignature", context.multiSignatureAsset);
+
+		await assert.rejects(() => context.handler.bootstrap(), MultiSignatureAlreadyRegisteredError);
 	});
 
-	describe("throwIfCannotBeApplied", () => {
-		let pubKeyHash: number;
+	it("bootstrap should throw if asset.multiSignatureLegacy is undefined", async (context) => {
+		context.multiSignatureTransaction.data.asset.multiSignatureLegacy = undefined;
 
-		beforeEach(() => {
-			pubKeyHash = Managers.configManager.get("network.pubKeyHash");
-		});
-
-		afterEach(() => {
-			Managers.configManager.set("exceptions.transactions", []);
-			Managers.configManager.set("network.pubKeyHash", pubKeyHash);
-		});
-
-		it("should throw", async () => {
-			await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).rejects.toThrow(
-				LegacyMultiSignatureError,
-			);
-		});
-
-		it("should not throw if exception", async () => {
-			Managers.configManager.set("network.pubKeyHash", 99);
-			Managers.configManager.set("exceptions.transactions", [multiSignatureTransaction.id]);
-
-			await expect(handler.throwIfCannotBeApplied(multiSignatureTransaction, senderWallet)).toResolve();
-		});
+		await assert.rejects(() => context.handler.bootstrap(), Exceptions.Runtime.AssertionException);
 	});
 
-	describe("throwIfCannotEnterPool", () => {
-		it("should throw", async () => {
-			await expect(handler.throwIfCannotEnterPool(multiSignatureTransaction)).rejects.toThrow(
-				Contracts.TransactionPool.PoolError,
-			);
-		});
+	it("bootstrap should throw if asset is undefined", async (context) => {
+		context.multiSignatureTransaction.data.asset = undefined;
+
+		await assert.rejects(() => context.handler.bootstrap(), Exceptions.Runtime.AssertionException);
 	});
 
-	describe.skip("applyToSender", () => {
-		it("should be ok", async () => {
-			await expect(handler.applyToSender(multiSignatureTransaction)).rejects.toThrow(LegacyMultiSignatureError);
-		});
+	it("isActivated should return true when aip11 is false", async (context) => {
+		Managers.configManager.getMilestone().aip11 = false;
+
+		await assert.resolves(() => context.handler.isActivated());
+		assert.true(await context.handler.isActivated());
 	});
 
-	describe("applyToRecipient", () => {
-		it("should be ok", async () => {
-			await expect(handler.applyToRecipient(multiSignatureTransaction)).toResolve();
-		});
+	it("isActivated should return true when aip11 is undefined", async (context) => {
+		Managers.configManager.getMilestone().aip11 = undefined;
+
+		await assert.resolves(() => context.handler.isActivated());
+		assert.true(await context.handler.isActivated());
 	});
 
-	describe("revertForSender", () => {
-		it("should be ok", async () => {
-			senderWallet.setNonce(Utils.BigNumber.ONE);
+	it("isActivated should return false when aip11 is true", async (context) => {
+		Managers.configManager.getMilestone().aip11 = true;
 
-			await expect(handler.revertForSender(multiSignatureTransaction)).toResolve();
-		});
+		await assert.resolves(() => context.handler.isActivated());
+		assert.false(await context.handler.isActivated());
 	});
 
-	describe("revertForRecipient", () => {
-		it("should be ok", async () => {
-			await expect(handler.revertForRecipient(multiSignatureTransaction)).toResolve();
-		});
+	it("throwIfCannotBeApplied should throw", async (context) => {
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.multiSignatureTransaction, context.senderWallet),
+			LegacyMultiSignatureError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should not throw if exception", async (context) => {
+		Managers.configManager.set("network.pubKeyHash", 99);
+		Managers.configManager.set("exceptions.transactions", [context.multiSignatureTransaction.id]);
+
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(context.multiSignatureTransaction, context.senderWallet),
+		);
+	});
+
+	it("throwIfCannotEnterPool should throw", async (context) => {
+		await assert.rejects(
+			() => context.handler.throwIfCannotEnterPool(context.multiSignatureTransaction),
+			Contracts.TransactionPool.PoolError,
+		);
+	});
+
+	it.skip("applyToSender should be ok", async (context) => {
+		await assert.rejects(
+			() => context.handler.applyToSender(context.multiSignatureTransaction),
+			LegacyMultiSignatureError,
+		);
+	});
+
+	it("applyToRecipient should be ok", async (context) => {
+		await assert.resolves(() => context.handler.applyToRecipient(context.multiSignatureTransaction));
+	});
+
+	it("revertForSender should be ok", async (context) => {
+		context.senderWallet.setNonce(Utils.BigNumber.ONE);
+
+		await assert.resolves(() => context.handler.revertForSender(context.multiSignatureTransaction));
+	});
+
+	it("revertForRecipient should be ok", async (context) => {
+		await assert.resolves(() => context.handler.revertForRecipient(context.multiSignatureTransaction));
 	});
 });
