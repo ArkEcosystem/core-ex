@@ -13,19 +13,19 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del dist",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "uvu -r tsm source handlers/one/transfer.test.ts",
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
-		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"@arkecosystem/crypto": "workspace:*"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-state": "workspace:*",
 		"@arkecosystem/core-test": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/core-transaction-pool": "workspace:*",
 		"bytebuffer": "5.0.1",
 		"uvu": "^0.5.3"
 	},

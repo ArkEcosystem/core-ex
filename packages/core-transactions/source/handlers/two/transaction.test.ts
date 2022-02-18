@@ -1,7 +1,6 @@
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Factories, Generators } from "@packages/core-test-framework";
-import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import {
 	InsufficientBalanceError,
 	InvalidMultiSignaturesError,
@@ -15,7 +14,7 @@ import { TransactionHandler, TransactionHandlerConstructor } from "../transactio
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;

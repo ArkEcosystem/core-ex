@@ -1,12 +1,12 @@
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Factories, Generators } from "@packages/core-test-framework";
-import { DelegateRegistrationTransactionHandler } from "../one";
-import { TransactionHandler } from "../transaction";
-import { TransactionHandlerRegistry } from "../handler-registry";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, Generators } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { TransactionHandler } from "../transaction";
+import { DelegateRegistrationTransactionHandler } from ".";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -15,7 +15,7 @@ let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
 let factoryBuilder: Factories.FactoryBuilder;
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 const mockGetLastBlock = jest.fn();
 Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });

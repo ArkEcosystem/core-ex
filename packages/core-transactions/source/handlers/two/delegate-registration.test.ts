@@ -1,8 +1,9 @@
 import { Application, Container, Contracts, Enums as KernelEnums, Exceptions } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Mocks, Generators, Factories } from "@packages/core-test-framework";
-import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { Mempool } from "@packages/core-transaction-pool";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, Generators, Mocks, passphrases } from "@arkecosystem/core-test-framework";
+import { Mempool } from "@arkecosystem/core-transaction-pool";
+import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+
 import {
 	InsufficientBalanceError,
 	NotSupportedForMultiSignatureWalletError,
@@ -10,11 +11,9 @@ import {
 	WalletIsAlreadyDelegateError,
 	WalletUsernameAlreadyRegisteredError,
 } from "../../errors";
-import { TransactionHandler } from "../index";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
-import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { TransactionHandler } from "../index";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -23,7 +22,7 @@ let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
 let factoryBuilder: Factories.FactoryBuilder;
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 const mockGetLastBlock = jest.fn();
 Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
@@ -126,18 +125,18 @@ describe("DelegateRegistrationTransaction", () => {
 			await expect(handler.bootstrap()).toResolve();
 
 			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				typeGroup: Enums.TransactionTypeGroup.Core,
 				type: Enums.TransactionType.DelegateRegistration,
+				typeGroup: Enums.TransactionTypeGroup.Core,
 			});
 			expect(walletRepository.getIndex(Contracts.State.WalletIndexes.Usernames).has("dummy")).toBeTrue();
 			expect(senderWallet.hasAttribute("delegate")).toBeTrue();
 			expect(senderWallet.getAttribute("delegate")).toEqual({
-				username: "dummy",
-				voteBalance: Utils.BigNumber.ZERO,
 				forgedFees: Utils.BigNumber.ZERO,
 				forgedRewards: Utils.BigNumber.ZERO,
 				producedBlocks: 0,
 				rank: undefined,
+				username: "dummy",
+				voteBalance: Utils.BigNumber.ZERO,
 			});
 		});
 
@@ -193,16 +192,16 @@ describe("DelegateRegistrationTransaction", () => {
 			Mocks.BlockRepository.setDelegateForgedBlocks([
 				{
 					generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-					totalRewards: "2",
 					totalFees: "2",
 					totalProduced: 1,
+					totalRewards: "2",
 				},
 			]);
 
 			const lastForgedBlock = {
 				generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-				id: "123",
 				height: "1",
+				id: "123",
 				timestamp: 1,
 			};
 
@@ -231,17 +230,17 @@ describe("DelegateRegistrationTransaction", () => {
 			Mocks.BlockRepository.setDelegateForgedBlocks([
 				{
 					generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-					totalRewards: "2",
 					totalFees: "2",
 					totalProduced: 1,
+					totalRewards: "2",
 				},
 			]);
 
 			Mocks.BlockRepository.setLastForgedBlocks([
 				{
 					generatorPublicKey: Identities.PublicKey.fromPassphrase(passphrases[0]),
-					id: "123",
 					height: "1",
+					id: "123",
 					timestamp: 1,
 				},
 			]);
@@ -341,8 +340,8 @@ describe("DelegateRegistrationTransaction", () => {
 			const delegateWallet: Wallets.Wallet = factoryBuilder
 				.get("Wallet")
 				.withOptions({
-					passphrase: "delegate passphrase",
 					nonce: 0,
+					passphrase: "delegate passphrase",
 				})
 				.make();
 
@@ -391,12 +390,12 @@ describe("DelegateRegistrationTransaction", () => {
 			const anotherWallet: Wallets.Wallet = factoryBuilder
 				.get("Wallet")
 				.withOptions({
-					passphrase: passphrases[2],
 					nonce: 0,
+					passphrase: passphrases[2],
 				})
 				.make();
 
-			anotherWallet.setBalance(Utils.BigNumber.make(7527654310));
+			anotherWallet.setBalance(Utils.BigNumber.make(7_527_654_310));
 
 			walletRepository.index(anotherWallet);
 

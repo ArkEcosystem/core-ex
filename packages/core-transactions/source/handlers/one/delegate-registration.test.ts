@@ -1,12 +1,12 @@
-import { Contracts, Container } from "@arkecosystem/core-kernel";
+import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Generators, Factories } from "@arkecosystem/core-test-framework";
-import { TransactionHandler } from "../transaction";
-import { TransactionHandlerRegistry } from "../handler-registry";
-import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import { describe } from "@arkecosystem/core-test";
+import { Factories, Generators } from "@arkecosystem/core-test-framework";
+import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { TransactionHandler } from "../transaction";
 
 describe("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {
 	let senderWallet: Wallets.Wallet;
@@ -16,7 +16,7 @@ describe("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, b
 	let handler: TransactionHandler;
 
 	beforeEach(async (context) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		const mockGetLastBlock = jest.fn();
 		Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
 		mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
@@ -36,7 +36,7 @@ describe("DelegateRegistrationTransaction V1", ({ assert, afterAll, afterEach, b
 
 		walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-		let factoryBuilder = new Factories.FactoryBuilder();
+		const factoryBuilder = new Factories.FactoryBuilder();
 		Factories.Factories.registerWalletFactory(factoryBuilder);
 		Factories.Factories.registerTransactionFactory(factoryBuilder);
 

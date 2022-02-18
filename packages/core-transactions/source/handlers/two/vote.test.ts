@@ -1,8 +1,9 @@
 import { Application, Container, Contracts, Enums as AppEnums, Exceptions } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Factories, Generators } from "@packages/core-test-framework";
-import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { Mempool } from "@packages/core-transaction-pool";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
+import { Mempool } from "@arkecosystem/core-transaction-pool";
+import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+
 import {
 	AlreadyVotedError,
 	InsufficientBalanceError,
@@ -10,11 +11,9 @@ import {
 	UnvoteMismatchError,
 	VotedForNonDelegateError,
 } from "../../errors";
-import { TransactionHandler } from "../transaction";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
-import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { TransactionHandler } from "../transaction";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -23,7 +22,7 @@ let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
 let factoryBuilder: Factories.FactoryBuilder;
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 
 const mockGetLastBlock = jest.fn();
 Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
@@ -82,8 +81,8 @@ describe("VoteTransaction", () => {
 		delegateWallet1 = factoryBuilder
 			.get("Wallet")
 			.withOptions({
-				passphrase: passphrases[8],
 				nonce: 0,
+				passphrase: passphrases[8],
 			})
 			.make();
 		delegateWallet1.setAttribute("delegate", { username: "test1" });
@@ -92,8 +91,8 @@ describe("VoteTransaction", () => {
 		delegateWallet2 = factoryBuilder
 			.get("Wallet")
 			.withOptions({
-				passphrase: passphrases[9],
 				nonce: 0,
+				passphrase: passphrases[9],
 			})
 			.make();
 		delegateWallet2.setAttribute("delegate", { username: "test2" });
@@ -164,8 +163,8 @@ describe("VoteTransaction", () => {
 			await expect(handler.bootstrap()).toResolve();
 
 			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				typeGroup: Enums.TransactionTypeGroup.Core,
 				type: Enums.TransactionType.Vote,
+				typeGroup: Enums.TransactionTypeGroup.Core,
 			});
 		});
 

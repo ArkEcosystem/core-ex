@@ -1,10 +1,9 @@
-import { Application, Container, Contracts, Providers, Services } from "@packages/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Factories, getWalletAttributeSet, Mocks } from "@packages/core-test-framework";
-import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
+import { Application, Container, Contracts, Providers, Services } from "@arkecosystem/core-kernel";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, getWalletAttributeSet, Mocks, passphrases } from "@arkecosystem/core-test-framework";
 import {
-	Collator,
 	ApplyTransactionAction,
+	Collator,
 	DynamicFeeMatcher,
 	ExpirationService,
 	Mempool,
@@ -14,18 +13,31 @@ import {
 	SenderState,
 	ThrowIfCannotEnterPoolAction,
 	VerifyTransactionAction,
-} from "@packages/core-transaction-pool";
-import * as One from "../one";
-import * as Two from "../two";
-import { TransactionHandlerProvider } from "../../handlers/handler-provider";
-import { TransactionHandlerRegistry } from "../../handlers/handler-registry";
-import { ServiceProvider } from "../../service-provider";
-import { Identities, Interfaces, Utils } from "@packages/crypto";
+} from "@arkecosystem/core-transaction-pool";
+import { Identities, Interfaces, Utils } from "@arkecosystem/crypto";
+
+import { ServiceProvider } from "../source/service-provider";
+import { TransactionHandlerProvider } from "../source/handlers/handler-provider";
+import { TransactionHandlerRegistry } from "../source/handlers/handler-registry";
+import {
+	DelegateRegistrationTransactionHandler,
+	MultiSignatureRegistrationTransactionHandler,
+	TransferTransactionHandler,
+	VoteTransactionHandler,
+} from "../source/handlers/one";
+import {
+	DelegateRegistrationTransactionHandler as Two_DelegateRegistrationTransactionHandler,
+	DelegateResignationTransactionHandler,
+	MultiPaymentTransactionHandler,
+	MultiSignatureRegistrationTransactionHandler as Two_MultiSignatureRegistrationTransactionHandler,
+	TransferTransactionHandler as Two_TransferTransactionHandler,
+	VoteTransactionHandler as Two_VoteTransactionHandler,
+} from "../source/handlers/two";
 
 const logger = {
-	notice: jest.fn(),
-	debug: jest.fn(),
-	warning: jest.fn(),
+	debug: () => {},
+	notice: () => {},
+	warning: () => {},
 };
 
 export const initApp = (): Application => {
@@ -39,21 +51,21 @@ export const initApp = (): Application => {
 		.inSingletonScope();
 
 	app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-		name: Contracts.State.WalletIndexes.Addresses,
+		autoIndex: true,
 		indexer: Wallets.addressesIndexer,
-		autoIndex: true,
+		name: Contracts.State.WalletIndexes.Addresses,
 	});
 
 	app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-		name: Contracts.State.WalletIndexes.PublicKeys,
+		autoIndex: true,
 		indexer: Wallets.publicKeysIndexer,
-		autoIndex: true,
+		name: Contracts.State.WalletIndexes.PublicKeys,
 	});
 
 	app.bind<Contracts.State.WalletIndexerIndex>(Container.Identifiers.WalletRepositoryIndexerIndex).toConstantValue({
-		name: Contracts.State.WalletIndexes.Usernames,
-		indexer: Wallets.usernamesIndexer,
 		autoIndex: true,
+		indexer: Wallets.usernamesIndexer,
+		name: Contracts.State.WalletIndexes.Usernames,
 	});
 
 	app.bind(Container.Identifiers.WalletFactory).toFactory<Contracts.State.Wallet>(
@@ -71,7 +83,7 @@ export const initApp = (): Application => {
 	app.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration).set("maxTransactionAge", 500);
 	app.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration).set(
 		"maxTransactionBytes",
-		2000000,
+		2_000_000,
 	);
 	app.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration).set(
 		"maxTransactionsPerSender",
@@ -102,16 +114,16 @@ export const initApp = (): Application => {
 
 	app.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue(Mocks.TransactionRepository.instance);
 
-	app.bind(Container.Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
-	app.bind(Container.Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(TransferTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two_TransferTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(DelegateRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two_DelegateRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(VoteTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two_VoteTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(Two_MultiSignatureRegistrationTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(MultiPaymentTransactionHandler);
+	app.bind(Container.Identifiers.TransactionHandler).to(DelegateResignationTransactionHandler);
 
 	app.bind(Container.Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
 	app.bind(Container.Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
@@ -151,33 +163,32 @@ export const buildSenderWallet = (
 	const wallet: Wallets.Wallet = factoryBuilder
 		.get("Wallet")
 		.withOptions({
-			passphrase: passphrases[0],
 			nonce: 0,
+			passphrase: passphrases[0],
 		})
 		.make();
 
-	wallet.setBalance(Utils.BigNumber.make(7527654310));
+	wallet.setBalance(Utils.BigNumber.make(7_527_654_310));
 
 	return wallet;
 };
 
-export const buildRecipientWallet = (factoryBuilder: Factories.FactoryBuilder): Wallets.Wallet => {
-	return factoryBuilder
+export const buildRecipientWallet = (factoryBuilder: Factories.FactoryBuilder): Wallets.Wallet =>
+	factoryBuilder
 		.get("Wallet")
 		.withOptions({
 			passphrase: "passphrase2",
 		})
 		.make();
-};
 
 export const buildMultiSignatureWallet = (): Wallets.Wallet => {
 	const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+		min: 2,
 		publicKeys: [
 			Identities.PublicKey.fromPassphrase(passphrases[0]),
 			Identities.PublicKey.fromPassphrase(passphrases[1]),
 			Identities.PublicKey.fromPassphrase(passphrases[2]),
 		],
-		min: 2,
 	};
 
 	const wallet = new Wallets.Wallet(
@@ -185,7 +196,7 @@ export const buildMultiSignatureWallet = (): Wallets.Wallet => {
 		new Services.Attributes.AttributeMap(getWalletAttributeSet()),
 	);
 	wallet.setPublicKey(Identities.PublicKey.fromMultiSignatureAsset(multiSignatureAsset));
-	wallet.setBalance(Utils.BigNumber.make(100390000000));
+	wallet.setBalance(Utils.BigNumber.make(100_390_000_000));
 	wallet.setAttribute("multiSignature", multiSignatureAsset);
 
 	return wallet;

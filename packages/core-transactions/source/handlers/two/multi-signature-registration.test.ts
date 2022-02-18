@@ -1,9 +1,9 @@
 import { Application, Container, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Factories, Generators } from "@packages/core-test-framework";
-import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { getWalletAttributeSet } from "@packages/core-test-framework";
-import { Mempool } from "@packages/core-transaction-pool";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, Generators, getWalletAttributeSet, passphrases } from "@arkecosystem/core-test-framework";
+import { Mempool } from "@arkecosystem/core-transaction-pool";
+import { Crypto, Enums, Errors, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+
 import {
 	InsufficientBalanceError,
 	InvalidMultiSignatureError,
@@ -12,11 +12,9 @@ import {
 	// MultiSignatureKeyCountMismatchError,
 	// MultiSignatureMinimumKeysError,
 } from "../../errors";
-import { TransactionHandler } from "../transaction";
+import { buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
-import { Crypto, Enums, Errors, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-
-import { buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { TransactionHandler } from "../transaction";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -24,7 +22,7 @@ let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
 let factoryBuilder: Factories.FactoryBuilder;
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 
 const mockGetLastBlock = jest.fn();
 Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
@@ -73,15 +71,15 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			2,
 		);
 
-		senderWallet.setBalance(Utils.BigNumber.make(100390000000));
+		senderWallet.setBalance(Utils.BigNumber.make(100_390_000_000));
 
 		multiSignatureAsset = {
+			min: 2,
 			publicKeys: [
 				Identities.PublicKey.fromPassphrase(passphrases[0]),
 				Identities.PublicKey.fromPassphrase(passphrases[1]),
 				Identities.PublicKey.fromPassphrase(passphrases[2]),
 			],
-			min: 2,
 		};
 
 		recipientWallet = new Wallets.Wallet(
@@ -112,8 +110,8 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			await expect(handler.bootstrap()).toResolve();
 
 			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				typeGroup: Enums.TransactionTypeGroup.Core,
 				type: Enums.TransactionType.MultiSignature,
+				typeGroup: Enums.TransactionTypeGroup.Core,
 				version: 2,
 			});
 		});
@@ -177,10 +175,12 @@ describe("MultiSignatureRegistrationTransaction", () => {
 					"+028d3611c4f32feca3e6713992ae9387e18a0e01954046511878fe078703324dc0",
 					"+021d3932ab673230486d0f956d05b9e88791ee298d9af2d6df7d9ed5bb861c92dd",
 				],
-				min: 3,
-				lifetime: 0,
 				// @ts-ignore
 				legacy: true,
+
+				lifetime: 0,
+
+				min: 3,
 			};
 
 			multiSignatureTransaction.data.version = 1;
@@ -245,8 +245,8 @@ describe("MultiSignatureRegistrationTransaction", () => {
 
 			multiSignatureTransaction = Transactions.BuilderFactory.multiSignature()
 				.multiSignatureAsset({
-					publicKeys: participants,
 					min: 2,
+					publicKeys: participants,
 				})
 				.senderPublicKey(Identities.PublicKey.fromPassphrase(passphrases[0]))
 				.nonce("1")
@@ -274,9 +274,9 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			const transferBuilder = factoryBuilder
 				.get("Transfer")
 				.withOptions({
-					amount: 10000000,
-					senderPublicKey: senderWallet.getPublicKey(),
+					amount: 10_000_000,
 					recipientId: multiSigWallet.getAddress(),
+					senderPublicKey: senderWallet.getPublicKey(),
 				})
 				.make()
 				// @ts-ignore
@@ -372,12 +372,12 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			expect(senderWallet.hasAttribute("multiSignature")).toBeFalse();
 			expect(recipientWallet.hasAttribute("multiSignature")).toBeFalse();
 
-			expect(senderWallet.getBalance()).toEqual(Utils.BigNumber.make(100390000000));
+			expect(senderWallet.getBalance()).toEqual(Utils.BigNumber.make(100_390_000_000));
 			expect(recipientWallet.getBalance()).toEqual(Utils.BigNumber.ZERO);
 
 			await handler.apply(multiSignatureTransaction);
 
-			expect(senderWallet.getBalance()).toEqual(Utils.BigNumber.make(98390000000));
+			expect(senderWallet.getBalance()).toEqual(Utils.BigNumber.make(98_390_000_000));
 			expect(recipientWallet.getBalance()).toEqual(Utils.BigNumber.ZERO);
 
 			expect(senderWallet.hasAttribute("multiSignature")).toBeFalse();

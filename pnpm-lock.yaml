@@ -724,12 +724,12 @@ importers:
     dependencies:
       '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-state': link:../core-state
-      '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
       '@arkecosystem/crypto': link:../crypto
     devDependencies:
+      '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/core-test': link:../core-test
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
       bytebuffer: 5.0.1
       uvu: 0.5.3
 

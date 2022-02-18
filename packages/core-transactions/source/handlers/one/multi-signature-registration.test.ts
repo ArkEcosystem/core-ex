@@ -1,14 +1,12 @@
 import { Application, Container, Contracts, Exceptions, Services } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Factories, Generators, Mocks } from "@packages/core-test-framework";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, Generators, getWalletAttributeSet, Mocks, passphrases } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { getWalletAttributeSet } from "@packages/core-test-framework";
-import { LegacyMultiSignatureError, MultiSignatureAlreadyRegisteredError } from "../../errors";
-import { TransactionHandler } from "../transaction";
-import { TransactionHandlerRegistry } from "../handler-registry";
 
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { LegacyMultiSignatureError, MultiSignatureAlreadyRegisteredError } from "../../errors";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { TransactionHandler } from "../transaction";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -17,7 +15,7 @@ let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
 let factoryBuilder: Factories.FactoryBuilder;
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 
 const mockGetLastBlock = jest.fn();
 Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
@@ -74,15 +72,15 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			1,
 		);
 
-		senderWallet.setBalance(Utils.BigNumber.make(100390000000));
+		senderWallet.setBalance(Utils.BigNumber.make(100_390_000_000));
 
 		multiSignatureAsset = {
+			min: 2,
 			publicKeys: [
 				Identities.PublicKey.fromPassphrase(passphrases[0]),
 				Identities.PublicKey.fromPassphrase(passphrases[1]),
 				Identities.PublicKey.fromPassphrase(passphrases[2]),
 			],
-			min: 2,
 		};
 
 		recipientWallet = new Wallets.Wallet(
@@ -137,8 +135,8 @@ describe("MultiSignatureRegistrationTransaction", () => {
 			await expect(handler.bootstrap()).toResolve();
 
 			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				typeGroup: Enums.TransactionTypeGroup.Core,
 				type: Enums.TransactionType.MultiSignature,
+				typeGroup: Enums.TransactionTypeGroup.Core,
 				version: 1,
 			});
 		});

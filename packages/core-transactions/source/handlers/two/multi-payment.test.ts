@@ -1,13 +1,12 @@
 import { Application, Container, Contracts, Exceptions } from "@arkecosystem/core-kernel";
-import { Stores, Wallets } from "@packages/core-state";
-import { Factories, Generators } from "@packages/core-test-framework";
-import passphrases from "@packages/core-test-framework/source/internal/passphrases.json";
-import { InsufficientBalanceError } from "../../errors";
-import { TransactionHandler } from "../transaction";
-import { TransactionHandlerRegistry } from "../handler-registry";
+import { Stores, Wallets } from "@arkecosystem/core-state";
+import { Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
-import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../__support__/app";
+import { InsufficientBalanceError } from "../../errors";
+import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { TransactionHandler } from "../transaction";
 
 let app: Application;
 let senderWallet: Wallets.Wallet;
@@ -16,7 +15,7 @@ let recipientWallet: Wallets.Wallet;
 let walletRepository: Contracts.State.WalletRepository;
 let factoryBuilder: Factories.FactoryBuilder;
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 
 const mockGetLastBlock = jest.fn();
 Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
@@ -100,8 +99,8 @@ describe("MultiPaymentTransaction", () => {
 			await expect(handler.bootstrap()).toResolve();
 
 			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				typeGroup: Enums.TransactionTypeGroup.Core,
 				type: Enums.TransactionType.MultiPayment,
+				typeGroup: Enums.TransactionTypeGroup.Core,
 			});
 		});
 
@@ -154,7 +153,7 @@ describe("MultiPaymentTransaction", () => {
 		it("should be ok", async () => {
 			const senderBalance = senderWallet.getBalance();
 			const totalPaymentsAmount = multiPaymentTransaction.data.asset.payments.reduce(
-				(prev, curr) => prev.plus(curr.amount),
+				(previous, current) => previous.plus(current.amount),
 				Utils.BigNumber.ZERO,
 			);
 
@@ -203,7 +202,7 @@ describe("MultiPaymentTransaction", () => {
 				paymentRecipientWallet.setBalance(amount);
 			}
 			const totalPaymentsAmount = multiPaymentTransaction.data.asset.payments.reduce(
-				(prev, curr) => prev.plus(curr.amount),
+				(previous, current) => previous.plus(current.amount),
 				Utils.BigNumber.ZERO,
 			);
 
