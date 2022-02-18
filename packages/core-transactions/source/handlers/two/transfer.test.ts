@@ -4,11 +4,11 @@ import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "@ar
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { ColdWalletError, InsufficientBalanceError, SenderWalletMismatchError } from "../../errors";
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";
-import { ColdWalletError, InsufficientBalanceError, SenderWalletMismatchError } from "../../errors";
 
-interface SuiteContext {
+describe<{
 	app: Application;
 	senderWallet: Wallets.Wallet;
 	multiSignatureWallet: Wallets.Wallet;
@@ -20,11 +20,9 @@ interface SuiteContext {
 	multiSignatureTransferTransaction: Interfaces.ITransaction;
 	handler: TransactionHandler;
 	pubKeyHash: number;
-}
-
-describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
-	beforeEach(async (context: SuiteContext) => {
-		const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
+}>("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
+	beforeEach(async (context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());
