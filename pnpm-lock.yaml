@@ -907,6 +907,45 @@ importers:
     dependencies:
       ajv: 6.12.6
 
+  packages/crypto-hash-bcrypto:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      bcrypto: 5.4.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
+  packages/crypto-hash-noble:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@noble/hashes': ^1.0.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@noble/hashes': 1.0.0
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
+  packages/crypto-hash-wasm:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      hash-wasm: ^4.9.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      hash-wasm: 4.9.0
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
   packages/crypto-identities:
     specifiers:
       '@types/tmp': ^0.2.0
@@ -8204,7 +8243,6 @@ packages:
 
   /hash-wasm/4.9.0:
     resolution: {integrity: sha512-7SW7ejyfnRxuOc7ptQHSf4LDoZaWOivfzqw+5rpcQku0nHfmicPKE51ra9BiRLAmT8+gGLestr1XroUkqdjL6w==}
-    dev: true
 
   /hash.js/1.1.7:
     resolution: {integrity: sha512-taOaskGt4z4SOANNseOviYDvjEJinIkRgmp7LbKP2YTTmVxWBl87s/uzK9r+44BclBSp2X7K1hqeNfz9JbBeXA==}
