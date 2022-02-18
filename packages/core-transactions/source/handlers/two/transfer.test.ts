@@ -1,11 +1,11 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
 import { describe, Factories, Generators, Mapper, Mocks, passphrases } from "@arkecosystem/core-test-framework";
-import { TransactionHandlerRegistry } from "../handler-registry";
-import { TransferTransactionHandler } from "../one";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
+import { TransactionHandlerRegistry } from "../handler-registry";
+import { TransferTransactionHandler } from "../one";
 
 describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach(async (context) => {
@@ -115,8 +115,8 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 			const coldWallet: Wallets.Wallet = context.factoryBuilder
 				.get("Wallet")
 				.withOptions({
-					passphrase: passphrases[3],
 					nonce: 0,
+					passphrase: passphrases[3],
 				})
 				.make();
 
@@ -139,8 +139,8 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 			const coldWallet: Wallets.Wallet = context.factoryBuilder
 				.get("Wallet")
 				.withOptions({
-					passphrase: passphrases[3],
 					nonce: 0,
+					passphrase: passphrases[3],
 				})
 				.make();
 
@@ -164,12 +164,16 @@ describe("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) =>
 			await assert.resolves(() => context.handler.throwIfCannotEnterPool(context.transferTransaction));
 		});
 
-		it("should throw if no wallet is not recipient on the active network", async (context) => {
+		it.only("should throw if no wallet is not recipient on the active network", async (context) => {
 			Managers.configManager.set("network.pubKeyHash", 99);
 
+			// await assert.rejects(
+			// 	() => context.handler.throwIfCannotEnterPool(context.transferTransaction),
+			// 	"Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99",
+			// );
 			await assert.rejects(
 				() => context.handler.throwIfCannotEnterPool(context.transferTransaction),
-				"Recipient AWrp3vKnMoefPXRyooJdX9zGjsyv1QKUG7 is not on the same network: 99",
+				Contracts.TransactionPool.PoolError,
 			);
 			await assert.rejects(() => context.handler.throwIfCannotEnterPool(context.transferTransaction), Contracts.TransactionPool.PoolError);
 		});

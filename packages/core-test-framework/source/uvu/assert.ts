@@ -1,9 +1,13 @@
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { BigNumber } from "@arkecosystem/utils";
 import { format } from "concordance";
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
 import * as uvu from "uvu/assert";
 import { z, ZodRawShape } from "zod";
+
+interface Constructable {
+    new(...arguments_: any): any;
+}
 
 export const assert = {
 	...uvu,
@@ -63,7 +67,7 @@ export const assert = {
 	null: (value: unknown): void => uvu.ok(value === null),
 	number: (value: unknown): void => uvu.type(value, "number"),
 	object: (value: unknown): void => uvu.type(value, "object"),
-	rejects: async (callback: Function, expected?: uvu.Message): Promise<void> => {
+	rejects: async (callback: Function, expected?: uvu.Message | Constructable): Promise<void> => {
 		try {
 			await callback();
 
@@ -74,6 +78,10 @@ export const assert = {
 			}
 
 			if (expected instanceof Error) {
+				uvu.instance(error, expected);
+			}
+
+			if (typeof expected === "function" && new expected().name === "Error") {
 				uvu.instance(error, expected);
 			}
 
