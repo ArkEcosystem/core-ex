@@ -1095,7 +1095,6 @@ importers:
 
   packages/utils:
     specifiers:
-      '@faustbrian/benchmarker': ^0.1.2
       '@hapi/boom': ^9.1.0
       '@hapi/bourne': ^2.0.0
       '@hapi/hapi': ^20.0.1
@@ -1124,7 +1123,6 @@ importers:
       fast-sort: 2.2.0
       type-fest: 0.17.0
     devDependencies:
-      '@faustbrian/benchmarker': 0.1.2
       '@hapi/boom': 9.1.4
       '@hapi/hapi': 20.1.5
       '@types/benchmark': 1.0.33
@@ -2634,12 +2632,6 @@ packages:
       '@ethersproject/properties': 5.5.0
       '@ethersproject/strings': 5.5.0
     dev: false
-
-  /@faustbrian/benchmarker/0.1.2:
-    resolution: {integrity: sha512-JQWNeYUJR0Nh9LwpvcOkQOzmSJTjr2IkL3NN33zEaw7ZEBH9nEBVdQ0q70NpVmWGYe75N9NIaLl3glIXroxE5w==}
-    dependencies:
-      benchmark: 2.1.4
-    dev: true
 
   /@gar/promisify/1.1.2:
     resolution: {integrity: sha512-82cpyJyKRoQoRi+14ibCeGPu0CwypgtBAdBhq1WfvagpCZNKqwXbKwXllYSMG91DhmG4jt9gN8eP6lGOtozuaw==}
