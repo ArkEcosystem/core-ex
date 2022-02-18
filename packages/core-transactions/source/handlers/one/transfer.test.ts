@@ -20,10 +20,6 @@ describe<{
 	handler: TransactionHandler;
 	pubKeyHash: number;
 }>("TransferTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
-	const transactionHistoryService = {
-		streamByCriteria: spy(),
-	};
-
 	beforeEach((context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
@@ -32,7 +28,9 @@ describe<{
 		Managers.configManager.getMilestone().aip11 = false;
 
 		context.app = initApp();
-		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue({
+			streamByCriteria: spy(),
+		});
 
 		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 

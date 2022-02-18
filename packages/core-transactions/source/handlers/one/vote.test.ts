@@ -1,6 +1,6 @@
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Factories, Generators } from "@arkecosystem/core-test-framework";
+import { describe, Factories, Generators } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
@@ -8,91 +8,77 @@ import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";
 import { DelegateRegistrationTransactionHandler } from ".";
 
-let app: Application;
-let senderWallet: Wallets.Wallet;
-let multiSignatureWallet: Wallets.Wallet;
-let recipientWallet: Wallets.Wallet;
-let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: Factories.FactoryBuilder;
+describe<{
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	factoryBuilder: Factories.FactoryBuilder;
+	store: any;
+	handler: TransactionHandler;
+}>("DelegateRegistrationTransaction V1", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+	beforeEach((context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
-const mockGetLastBlock = jest.fn();
-Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
-mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
+		const config = Generators.generateCryptoConfigRaw();
+		Managers.configManager.setConfig(config);
+		Managers.configManager.getMilestone().aip11 = false;
 
-const transactionHistoryService = {
-	streamByCriteria: jest.fn(),
-};
+		context.app = initApp();
+		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue({
+			streamByCriteria: spy(),
+		});
 
-beforeEach(() => {
-	transactionHistoryService.streamByCriteria.mockReset();
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	const config = Generators.generateCryptoConfigRaw();
-	Managers.configManager.setConfig(config);
-	Managers.configManager.getMilestone().aip11 = false;
+		context.factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(context.factoryBuilder);
+		Factories.Factories.registerTransactionFactory(context.factoryBuilder);
 
-	app = initApp();
-	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+		context.senderWallet = buildSenderWallet(context.factoryBuilder);
+		context.multiSignatureWallet = buildMultiSignatureWallet();
+		context.recipientWallet = buildRecipientWallet(context.factoryBuilder);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository.index(context.senderWallet);
+		context.walletRepository.index(context.multiSignatureWallet);
+		context.walletRepository.index(context.recipientWallet);
 
-	factoryBuilder = new Factories.FactoryBuilder();
-	Factories.Factories.registerWalletFactory(factoryBuilder);
-	Factories.Factories.registerTransactionFactory(factoryBuilder);
-
-	senderWallet = buildSenderWallet(factoryBuilder);
-	multiSignatureWallet = buildMultiSignatureWallet();
-	recipientWallet = buildRecipientWallet(factoryBuilder);
-
-	walletRepository.index(senderWallet);
-	walletRepository.index(multiSignatureWallet);
-	walletRepository.index(recipientWallet);
-});
-
-describe("DelegateRegistrationTransaction V1", () => {
-	let handler: TransactionHandler;
-
-	beforeEach(async () => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 
-		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(Enums.TransactionType.Vote, Enums.TransactionTypeGroup.Core),
 			1,
 		);
 	});
 
-	describe("dependencies", () => {
-		it("should return empty array", async () => {
-			expect(handler.dependencies()).toEqual([DelegateRegistrationTransactionHandler]);
-		});
+	afterEach((context) => {
+		context.store.restore();
 	});
 
-	describe("walletAttributes", () => {
-		it("should return array", async () => {
-			const attributes = handler.walletAttributes();
-
-			expect(attributes).toBeArray();
-			expect(attributes.length).toBe(1);
-		});
+	it("dependencies should return empty array", async (context) => {
+		assert.equal(context.handler.dependencies(), [DelegateRegistrationTransactionHandler]);
 	});
 
-	describe("getConstructor", () => {
-		it("should return v1 constructor", async () => {
-			expect(handler.getConstructor()).toBe(Transactions.One.VoteTransaction);
-		});
+	it("walletAttributes should return array", async (context) => {
+		const attributes = context.handler.walletAttributes();
+
+		assert.array(attributes);
+		assert.is(attributes.length, 1);
 	});
 
-	describe("bootstrap", () => {
-		it("should resolve", async () => {
-			await expect(handler.bootstrap()).toResolve();
-		});
+	it("getConstructor should return v1 constructor", async (context) => {
+		assert.equal(context.handler.getConstructor(), Transactions.One.VoteTransaction);
 	});
 
-	describe("isActivated", () => {
-		it("should return true", async () => {
-			await expect(handler.isActivated()).resolves.toBeTrue();
-		});
+	it("bootstrap should resolve", async (context) => {
+		await assert.resolves(() => context.handler.bootstrap());
+	});
+
+	it("isActivated should return true", async (context) => {
+		assert.true(await context.handler.isActivated());
 	});
 });
