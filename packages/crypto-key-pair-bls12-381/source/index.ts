@@ -1,7 +1,7 @@
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/crypto-contracts";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";
-import { getPublicKey } from '@noble/bls12-381';
-import { mnemonicToSeedSync } from 'micro-bip39';
+import { getPublicKey } from "@noble/bls12-381";
+import { mnemonicToSeedSync } from "micro-bip39";
 
 export class KeyPairFactory implements Contract {
 	public fromMnemonic(mnemonic: string): IKeyPair {
