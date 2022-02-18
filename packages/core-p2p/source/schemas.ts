@@ -118,7 +118,7 @@ export const replySchemas = {
 										$ref: "hex",
 									},
 									{
-										type: "string", 
+										type: "string",
 										minLength: 64,
 										maxLength: 64,
 									},
