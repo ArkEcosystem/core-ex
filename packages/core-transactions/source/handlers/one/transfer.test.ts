@@ -64,11 +64,11 @@ describe("TransferTransaction V1", ({ assert, afterEach, beforeEach, it, spy, st
 		context.store.restore();
 	});
 
-	it("should return empty array", async (context) => {
+	it("dependencies should return empty array", async (context) => {
 		assert.equal(context.handler.dependencies(), []);
 	});
 
-	it("should return array", async (context) => {
+	it("walletAttributes should return array", async (context) => {
 		const attributes = context.handler.walletAttributes();
 
 		assert.array(attributes);
@@ -79,11 +79,11 @@ describe("TransferTransaction V1", ({ assert, afterEach, beforeEach, it, spy, st
 		assert.equal(context.handler.getConstructor(), Transactions.One.TransferTransaction);
 	});
 
-	it("should resolve", async (context) => {
+	it("bootstrap should resolve", async (context) => {
 		await assert.resolves(() => context.handler.bootstrap());
 	});
 
-	it("should return true", async (context) => {
+	it("isActivated should return true", async (context) => {
 		assert.true(await context.handler.isActivated());
 	});
 });
