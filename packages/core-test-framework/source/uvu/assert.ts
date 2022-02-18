@@ -77,19 +77,19 @@ export const assert = {
 				throw error;
 			}
 
-			expected.forEach((expected) => {
-				if (expected instanceof Error) {
-					uvu.instance(error, expected);
+			for (const item of expected) {
+				if (item instanceof Error) {
+					uvu.instance(error, item);
 				}
 
-				if (typeof expected === "function" && new expected().name === "Error") {
-					uvu.instance(error, expected);
+				if (typeof item === "function" && new item().name === "Error") {
+					uvu.instance(error, item);
 				}
 
-				if (typeof expected === "string") {
-					uvu.ok(error.message.includes(expected) || error.name.includes(expected));
+				if (typeof item === "string") {
+					uvu.ok(error.message.includes(item) || error.name.includes(item));
 				}
-			});
+			}
 
 			uvu.ok(true);
 		}
