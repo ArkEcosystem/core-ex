@@ -121,18 +121,18 @@ describe("keyword bignumber", () => {
 		expect(validate(101)).toBeFalse();
 	});
 
-    it("should be ok if above or equal minimum", () => {
-        const schema = { bignumber: { minimum: 20 } };
-        const validate = ajv.compile(schema);
+	it("should be ok if above or equal minimum", () => {
+		const schema = { bignumber: { minimum: 20 } };
+		const validate = ajv.compile(schema);
 
 		expect(validate(25)).toBeTrue();
 		expect(validate(20)).toBeTrue();
 		expect(validate(19)).toBeFalse();
 	});
 
-    it("should be ok if above or equal maximum", () => {
-        const schema = { bignumber: { maximum: 20 } };
-        const validate = ajv.compile(schema);
+	it("should be ok if above or equal maximum", () => {
+		const schema = { bignumber: { maximum: 20 } };
+		const validate = ajv.compile(schema);
 
 		expect(validate(20)).toBeTrue();
 		expect(validate(Number.MAX_SAFE_INTEGER)).toBeFalse();
@@ -148,9 +148,9 @@ describe("keyword bignumber", () => {
 		expect(validate("9223372036854775808")).toBeFalse();
 	});
 
-    it("should be ok for number, string and bignumber as input", () => {
-        const schema = { bignumber: { minimum: 100, maximum: 2000 } };
-        const validate = ajv.compile(schema);
+	it("should be ok for number, string and bignumber as input", () => {
+		const schema = { bignumber: { minimum: 100, maximum: 2000 } };
+		const validate = ajv.compile(schema);
 
 		for (const value of [100, 1e2, 1020.0, 500, 2000]) {
 			expect(validate(value)).toBeTrue();

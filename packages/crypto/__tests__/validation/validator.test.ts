@@ -24,15 +24,15 @@ describe("validator", () => {
 				id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
 			} as ITransactionData;
 
-            it("should expect a timestamp if version = 1 or absent", () => {
-                expect(validator.validate("transferSigned", transaction).error).toEqual(
-                    "data must have required property 'timestamp'",
-                );
+			it("should expect a timestamp if version = 1 or absent", () => {
+				expect(validator.validate("transferSigned", transaction).error).toEqual(
+					"data must have required property 'timestamp'",
+				);
 
-                transaction.version = 1;
-                expect(validator.validate("transferSigned", transaction).error).toEqual(
-                    "data must have required property 'timestamp'",
-                );
+				transaction.version = 1;
+				expect(validator.validate("transferSigned", transaction).error).toEqual(
+					"data must have required property 'timestamp'",
+				);
 
 				transaction.timestamp = 12222;
 				expect(validator.validate("transferSigned", transaction).error).toBeUndefined();
@@ -41,9 +41,9 @@ describe("validator", () => {
 			it("should expect a nonce if version = 2 or higher", () => {
 				transaction.version = 2;
 
-                expect(validator.validate("transferSigned", transaction).error).toEqual(
-                    "data must have required property 'nonce'",
-                );
+				expect(validator.validate("transferSigned", transaction).error).toEqual(
+					"data must have required property 'nonce'",
+				);
 
 				transaction.nonce = BigNumber.ZERO;
 				expect(validator.validate("transferSigned", transaction).error).toBeUndefined();

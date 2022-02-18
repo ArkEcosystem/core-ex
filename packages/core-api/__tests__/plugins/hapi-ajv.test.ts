@@ -36,28 +36,28 @@ describe("Hapi Ajv", () => {
 			data: "ok",
 		};
 
-        customRouteOptions = {
-            plugins: {
-                "hapi-ajv": {
-                    payloadSchema: {
-                        type: "object",
-                        required: ["test"],
-                        properties: {
-                            test: {
-                                type: "array",
-                                minItems: 1,
-                                maxItems: 1,
-                            },
-                        },
-                    },
-                    querySchema: {
-                        type: "object",
-                        required: ["test"],
-                    },
-                },
-            },
-        };
-		
+		customRouteOptions = {
+			plugins: {
+				"hapi-ajv": {
+					payloadSchema: {
+						type: "object",
+						required: ["test"],
+						properties: {
+							test: {
+								type: "array",
+								minItems: 1,
+								maxItems: 1,
+							},
+						},
+					},
+					querySchema: {
+						type: "object",
+						required: ["test"],
+					},
+				},
+			},
+		};
+
 		customRoute = {
 			method: "POST",
 			path: "/test",
