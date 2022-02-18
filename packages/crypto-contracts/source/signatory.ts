@@ -1,5 +1,5 @@
 export interface Signatory {
-	sign(hash: Buffer, privateKey: Buffer): Promise<string>;
+	sign(message: Buffer, privateKey: Buffer): Promise<string>;
 
-	verify(hash: Buffer, signature: Buffer | string, publicKey: Buffer | string): Promise<boolean>;
+	verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
 }
