@@ -1,6 +1,6 @@
 import { Application } from "@arkecosystem/core-kernel/source/application";
 import { Container } from "@arkecosystem/core-kernel/source/ioc";
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Database } from "./database";

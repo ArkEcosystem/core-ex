@@ -1,5 +1,5 @@
 import { Application,Container, Utils } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { dummyWebhook } from "../__tests__/__fixtures__/assets";
