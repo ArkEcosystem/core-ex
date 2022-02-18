@@ -1,6 +1,6 @@
 import Ajv, { Format, KeywordDefinition } from "ajv";
 import ajvKeywords from "ajv-keywords";
-
+import addFormats from "ajv-formats";
 import { ISchemaValidationResult } from "../interfaces";
 import { signedSchema, strictSchema, TransactionSchema } from "../transactions/types/schemas";
 import { formats } from "./formats";
@@ -85,7 +85,10 @@ export class Validator {
 			jsPropertySyntax: true,
 			...options,
 		});
+
+		// Register global keywords & formats...
 		ajvKeywords(ajv);
+		addFormats(ajv);
 
 		for (const addKeyword of keywords) {
 			addKeyword(ajv);

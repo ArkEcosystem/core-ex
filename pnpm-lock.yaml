@@ -718,6 +718,7 @@ importers:
       '@types/lodash.set': 4.3.6
       '@types/wif': 2.0.2
       ajv: 8.10.0
+      ajv-formats: ^2.1.1
       ajv-keywords: 5.1.0
       bcrypto: 5.4.0
       bip32: 2.0.6
@@ -742,6 +743,7 @@ importers:
       '@arkecosystem/crypto-networks': link:../crypto-networks
       '@arkecosystem/utils': link:../utils
       ajv: 8.10.0
+      ajv-formats: 2.1.1
       ajv-keywords: 5.1.0_ajv@8.10.0
       bcrypto: 5.4.0
       bip32: 2.0.6
@@ -4413,6 +4415,15 @@ packages:
       clean-stack: 2.2.0
       indent-string: 4.0.0
     dev: true
+
+  /ajv-formats/2.1.1:
+    resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+    dependencies:
+      ajv: 8.10.0
+    dev: false
 
   /ajv-keywords/3.5.2_ajv@6.12.6:
     resolution: {integrity: sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==}
