@@ -271,7 +271,6 @@ importers:
   packages/core-cli:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/fast-levenshtein': 0.0.2
@@ -334,7 +333,6 @@ importers:
       type-fest: 0.21.3
       yargs-parser: 20.2.9
     devDependencies:
-      '@arkecosystem/core-test-framework': link:../core-test-framework
       '@types/fast-levenshtein': 0.0.2
       '@types/fs-extra': 8.1.2
       '@types/is-ci': 2.0.0
@@ -343,10 +341,10 @@ importers:
       '@types/yargs-parser': 20.2.1
       uvu: 0.5.3
 
-  packages/core-cli/__tests__/services/plugins/@namespace/package2:
+  packages/core-cli/_migrate_these_tests/services/plugins/@namespace/package2:
     specifiers: {}
 
-  packages/core-cli/__tests__/services/plugins/package1:
+  packages/core-cli/_migrate_these_tests/services/plugins/package1:
     specifiers: {}
 
   packages/core-database:
