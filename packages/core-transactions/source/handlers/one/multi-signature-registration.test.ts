@@ -202,9 +202,7 @@ describe<{
 	});
 
 	it.skip("applyToSender should be ok", async (context) => {
-		await assert.resolves(
-			() => context.handler.applyToSender(context.multiSignatureTransaction),
-		);
+		await assert.resolves(() => context.handler.applyToSender(context.multiSignatureTransaction));
 	});
 
 	it("applyToRecipient should be ok", async (context) => {
