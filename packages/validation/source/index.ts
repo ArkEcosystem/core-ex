@@ -20,7 +20,10 @@ export class Validator {
 		return this.#ajv;
 	}
 
-	public async validate<T = any>(schemaKeyReference: string | boolean | object, data: T): Promise<ISchemaValidationResult<T>> {
+	public async validate<T = any>(
+		schemaKeyReference: string | boolean | object,
+		data: T,
+	): Promise<ISchemaValidationResult<T>> {
 		try {
 			await this.#ajv.validate(schemaKeyReference, data);
 

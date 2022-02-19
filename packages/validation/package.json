@@ -18,12 +18,8 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"@arkecosystem/crypto-identities": "workspace:*",
-		"@arkecosystem/crypto-networks": "workspace:*",
-		"@arkecosystem/utils": "workspace:*",
 		"ajv": "6.12.6",
-		"ajv-keywords": "3.4.1",
-		"bytebuffer": "5.0.1"
+		"ajv-keywords": "3.4.1"
 	},
 	"engines": {
 		"node": ">=16.x"

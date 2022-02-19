@@ -1234,20 +1234,12 @@ importers:
   packages/validation:
     specifiers:
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-identities': workspace:*
-      '@arkecosystem/crypto-networks': workspace:*
-      '@arkecosystem/utils': workspace:*
       ajv: 6.12.6
       ajv-keywords: 3.4.1
-      bytebuffer: 5.0.1
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
-      '@arkecosystem/crypto-identities': link:../crypto-identities
-      '@arkecosystem/crypto-networks': link:../crypto-networks
-      '@arkecosystem/utils': link:../utils
       ajv: 6.12.6
       ajv-keywords: 3.4.1_ajv@6.12.6
-      bytebuffer: 5.0.1
 
 packages:
 
