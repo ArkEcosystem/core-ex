@@ -53,16 +53,22 @@ export class Block implements IBlock {
 	}
 
 	public static applySchema(data: IBlockData): IBlockData | undefined {
-		const result = validator.validate("block", data);
+		let result = validator.validate("block", data);
 
 		if (!result.error) {
 			return result.value;
 		}
 
-		for (const error of result.errors) {
+		result = validator.validateException("block", data);
+
+		if (!result.errors) {
+			return result.value;
+		}
+
+		for (const err of result.errors) {
 			let fatal = false;
 
-			const match = error.dataPath.match(/\.transactions\[(\d+)]/);
+			const match = err.dataPath.match(/\.transactions\[(\d+)]/);
 			if (match === null) {
 				fatal = true;
 			} else {
@@ -80,8 +86,8 @@ export class Block implements IBlock {
 			if (fatal) {
 				throw new BlockSchemaError(
 					data.height,
-					`Invalid data${error.dataPath ? " at " + error.dataPath : ""}: ` +
-						`${error.message}: ${JSON.stringify(error.data)}`,
+					`Invalid data${err.dataPath ? " at " + err.dataPath : ""}: ` +
+						`${err.message}: ${JSON.stringify(err.data)}`,
 				);
 			}
 		}
@@ -99,19 +105,19 @@ export class Block implements IBlock {
 			return hash.toString("hex");
 		}
 
-		const temporary: Buffer = Buffer.alloc(8);
+		const temp: Buffer = Buffer.alloc(8);
 
-		for (let index = 0; index < 8; index++) {
-			temporary[index] = hash[7 - index];
+		for (let i = 0; i < 8; i++) {
+			temp[i] = hash[7 - i];
 		}
 
-		return temporary.toString("hex");
+		return temp.toString("hex");
 	}
 
 	public static toBytesHex(data): string {
-		const temporary: string = data ? BigNumber.make(data).toString(16) : "";
+		const temp: string = data ? BigNumber.make(data).toString(16) : "";
 
-		return "0".repeat(16 - temporary.length) + temporary;
+		return "0".repeat(16 - temp.length) + temp;
 	}
 
 	public static getId(data: IBlockData): string {
