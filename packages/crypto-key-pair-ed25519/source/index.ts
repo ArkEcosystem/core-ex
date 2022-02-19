@@ -1,6 +1,6 @@
 import { IKeyPair, IKeyPairFactory as Contract } from "@arkecosystem/crypto-contracts";
 import { getPublicKey } from "@noble/ed25519";
-import { mnemonicToSeedSync } from "micro-bip39";
+import { mnemonicToSeedSync } from "@scure/bip39";
 import { sha256 } from "@noble/hashes/sha256";
 
 export class KeyPairFactory implements Contract {
