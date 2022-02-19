@@ -147,9 +147,13 @@ export class Configuration {
 		const overwriteMerge = (destination, source, options) => source;
 
 		while (lastMerged < this.#milestones.length - 1) {
-			this.#milestones[lastMerged + 1] = deepmerge(this.#milestones[lastMerged], this.#milestones[lastMerged + 1], {
-				arrayMerge: overwriteMerge,
-			});
+			this.#milestones[lastMerged + 1] = deepmerge(
+				this.#milestones[lastMerged],
+				this.#milestones[lastMerged + 1],
+				{
+					arrayMerge: overwriteMerge,
+				},
+			);
 			lastMerged++;
 		}
 	}
