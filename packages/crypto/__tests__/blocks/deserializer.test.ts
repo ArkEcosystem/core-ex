@@ -1,7 +1,5 @@
 import { Deserializer } from "../../../../packages/crypto/source/blocks/deserializer";
-import { Serializer } from "../../../../packages/crypto/source/blocks/serializer";
-import { configManager } from "../../../../packages/crypto/source/managers";
-import { dummyBlock2, dummyBlock3 } from "../fixtures/block";
+import { dummyBlock2 } from "../fixtures/block";
 
 describe("block deserializer", () => {
 	describe("deserialize", () => {
