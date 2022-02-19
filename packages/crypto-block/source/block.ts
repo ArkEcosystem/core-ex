@@ -1,7 +1,14 @@
 import { Managers } from "..";
 import { Hash, HashAlgorithms, Slots } from "../crypto";
 import { BlockSchemaError } from "@arkecosystem/crypto-errors";
-import { IBlock, IBlockData, IBlockJson, IBlockVerification, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
+import {
+	IBlock,
+	IBlockData,
+	IBlockJson,
+	IBlockVerification,
+	ITransaction,
+	ITransactionData,
+} from "@arkecosystem/crypto-contracts";
 import { configManager } from "../managers/config";
 import { BigNumber } from "../utils";
 import { validator } from "../validation";
