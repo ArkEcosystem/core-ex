@@ -1,26 +1,19 @@
+import { IMilestone, MilestoneSearchResult , NetworkConfig } from "@arkecosystem/crypto-contracts";
+import { InvalidMilestoneConfigurationError } from "@arkecosystem/crypto-errors";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
 
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/crypto-errors";
-import { IMilestone } from "@arkecosystem/crypto-contracts";
-import { NetworkConfig } from "@arkecosystem/crypto-contracts";
-
-export interface MilestoneSearchResult {
-	found: boolean;
-	height: number;
-	data: any;
-}
-
-export class ConfigManager {
+export class Configuration {
+	readonly #networks: Record<string, any>;
 	#config: NetworkConfig | undefined;
 	#height: number | undefined;
 	#milestone: IMilestone | undefined;
 	#milestones: Record<string, any> | undefined;
-	#networks: Record<string, any>;
 
 	public constructor(networks: Record<string, any>) {
 		this.#networks = networks;
+
 		this.setConfig(networks.devnet as unknown as NetworkConfig);
 	}
 
@@ -108,12 +101,12 @@ export class ConfigManager {
 	}
 
 	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): MilestoneSearchResult {
-		if (!this.#milestones || !this.#milestones.length) {
+		if (!this.#milestones || this.#milestones.length === 0) {
 			throw new Error(`Attempted to get next milestone but none were set`);
 		}
 
-		for (let i = 0; i < this.#milestones.length; i++) {
-			const milestone = this.#milestones[i];
+		for (let index = 0; index < this.#milestones.length; index++) {
+			const milestone = this.#milestones[index];
 			if (
 				milestone[key] &&
 				milestone[key] !== this.getMilestone(previousMilestone)[key] &&
@@ -151,7 +144,7 @@ export class ConfigManager {
 
 		let lastMerged = 0;
 
-		const overwriteMerge = (dest, source, options) => source;
+		const overwriteMerge = (destination, source, options) => source;
 
 		while (lastMerged < this.#milestones.length - 1) {
 			this.#milestones[lastMerged + 1] = deepmerge(this.#milestones[lastMerged], this.#milestones[lastMerged + 1], {
@@ -170,9 +163,9 @@ export class ConfigManager {
 			.sort((a, b) => a.height - b.height)
 			.filter((milestone) => milestone.activeDelegates);
 
-		for (let i = 1; i < delegateMilestones.length; i++) {
-			const previous = delegateMilestones[i - 1];
-			const current = delegateMilestones[i];
+		for (let index = 1; index < delegateMilestones.length; index++) {
+			const previous = delegateMilestones[index - 1];
+			const current = delegateMilestones[index];
 
 			if (previous.activeDelegates === current.activeDelegates) {
 				continue;
