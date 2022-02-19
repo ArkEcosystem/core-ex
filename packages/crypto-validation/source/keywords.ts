@@ -162,4 +162,4 @@ export const keywords = (configManager) => {
 	};
 
 	return [bignumber, blockId, maxBytes, network, transactionType];
-}
+};
