@@ -11,7 +11,7 @@ export class Validator {
 	readonly #ajv: Ajv.Ajv;
 	readonly #transactionSchemas: Map<string, TransactionSchema> = new Map<string, TransactionSchema>();
 
-	private constructor(options: Record<string, any>) {
+	public constructor(options: Record<string, any>) {
 		this.#ajv = new Ajv({
 			$data: true,
 			extendRefs: true,
@@ -29,10 +29,6 @@ export class Validator {
 		for (const addFormat of formats) {
 			addFormat(this.#ajv);
 		}
-	}
-
-	public static make(options: Record<string, any> = {}): Validator {
-		return new Validator(options);
 	}
 
 	public getInstance(): Ajv.Ajv {
