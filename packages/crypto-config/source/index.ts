@@ -11,7 +11,7 @@ export class Configuration {
 	#milestone: IMilestone | undefined;
 	#milestones: Record<string, any> | undefined;
 
-	public constructor(networks: Record<string, any>) {
+	public constructor(networks: Record<string, NetworkConfig>) {
 		this.#networks = networks;
 
 		this.setConfig(networks.devnet as unknown as NetworkConfig);
