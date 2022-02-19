@@ -858,6 +858,20 @@ importers:
       '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
       uvu: 0.5.3
 
+  packages/crypto-config:
+    specifiers:
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      deepmerge: 4.2.2
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      deepmerge: 4.2.2
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+
   packages/crypto-contracts:
     specifiers:
       ajv: 6.12.6
