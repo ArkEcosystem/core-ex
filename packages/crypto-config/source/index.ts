@@ -1,11 +1,11 @@
-import { IMilestone, MilestoneSearchResult , NetworkConfig } from "@arkecosystem/crypto-contracts";
+import { IMilestone, MilestoneSearchResult, NetworkConfig } from "@arkecosystem/crypto-contracts";
 import { InvalidMilestoneConfigurationError } from "@arkecosystem/crypto-errors";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
 
 export class Configuration {
-	readonly #networks: Record<string, any>;
+	readonly #networks: Record<string, NetworkConfig>;
 	#config: NetworkConfig | undefined;
 	#height: number | undefined;
 	#milestone: IMilestone | undefined;
