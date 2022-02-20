@@ -1,7 +1,7 @@
 import { ITransactionData } from "@arkecosystem/crypto-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 import { Ajv } from "ajv";
 import ajvKeywords from "ajv-keywords";
-export { BigNumber } from "@arkecosystem/utils";
 
 export enum TransactionType {
 	Transfer = 0,

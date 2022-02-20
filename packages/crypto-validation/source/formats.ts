@@ -13,7 +13,7 @@ export const registerFormats = (configManager) => {
 		});
 	};
 
-	const validPeer = (ajv: Ajv) => {
+	const validPeer = (ajv: Ajv): void => {
 		ajv.addFormat("peer", (ip: string) => {
 			try {
 				return isValidPeer({ ip }, false);
