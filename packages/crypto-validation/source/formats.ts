@@ -1,12 +1,13 @@
+import { Configuration } from "@arkecosystem/crypto-config";
 import { Ajv } from "ajv";
 
 import { isValidPeer } from "./is-valid-peer";
 
-export const registerFormats = (configManager) => {
+export const registerFormats = (configuration: Configuration) => {
 	const vendorField = (ajv: Ajv) => {
 		ajv.addFormat("vendorField", (data) => {
 			try {
-				return Buffer.from(data, "utf8").length <= configManager.getMilestone().vendorFieldLength;
+				return Buffer.from(data, "utf8").length <= configuration.getMilestone().vendorFieldLength;
 			} catch {
 				return false;
 			}

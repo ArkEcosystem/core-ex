@@ -17,6 +17,7 @@
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
+		"@arkecosystem/crypto-config": "workspace:*",
 		"@arkecosystem/crypto-contracts": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"ajv": "6.12.6",

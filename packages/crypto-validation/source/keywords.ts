@@ -1,8 +1,10 @@
 import { ITransactionData } from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
+import { Configuration } from "@packages/crypto-config";
 import { Ajv } from "ajv";
 import ajvKeywords from "ajv-keywords";
 
+// @TODO: remove this
 export enum TransactionType {
 	Transfer = 0,
 	DelegateRegistration = 2,
@@ -12,7 +14,7 @@ export enum TransactionType {
 	DelegateResignation = 7,
 }
 
-export const registerKeywords = (configManager) => {
+export const registerKeywords = (configuration: Configuration) => {
 	const maxBytes = (ajv: Ajv) => {
 		ajv.addKeyword("maxBytes", {
 			compile(schema, parentSchema) {
@@ -46,7 +48,7 @@ export const registerKeywords = (configManager) => {
 						parentObject.asset &&
 						parentObject.asset.payments
 					) {
-						const limit: number = configManager.getMilestone().multiPaymentLimit || 256;
+						const limit: number = configuration.getMilestone().multiPaymentLimit || 256;
 						return parentObject.asset.payments.length <= limit;
 					}
 
@@ -64,7 +66,7 @@ export const registerKeywords = (configManager) => {
 	const network = (ajv: Ajv) => {
 		ajv.addKeyword("network", {
 			compile(schema) {
-				return (data) => schema && data === configManager.get("network.pubKeyHash");
+				return (data) => schema && data === configuration.get("network.pubKeyHash");
 			},
 			errors: false,
 			metaSchema: {
@@ -150,7 +152,7 @@ export const registerKeywords = (configManager) => {
 
 					if (parentObject && parentObject.height) {
 						const height = schema.isPreviousBlock ? parentObject.height - 1 : parentObject.height;
-						const constants = configManager.getMilestone(height ?? 1); // if height === 0 set it to 1
+						const constants = configuration.getMilestone(height ?? 1); // if height === 0 set it to 1
 						return constants.block.idFullSha256 ? isFullSha256 : isPartial;
 					}
 

@@ -1188,12 +1188,14 @@ importers:
 
   packages/crypto-validation:
     specifiers:
+      '@arkecosystem/crypto-config': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@arkecosystem/utils': workspace:*
       ajv: 6.12.6
       ajv-keywords: 3.4.1
       ipaddr.js: 2.0.1
     dependencies:
+      '@arkecosystem/crypto-config': link:../crypto-config
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       '@arkecosystem/utils': link:../utils
       ajv: 6.12.6

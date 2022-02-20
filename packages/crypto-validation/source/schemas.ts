@@ -16,8 +16,37 @@ export const registerSchemas = () => ({
 		type: "string",
 	},
 
+	block: {
+		$id: "block",
+		$ref: "blockHeader",
+		properties: {
+			transactions: {
+				$ref: "transactions",
+				maxItems: { $data: "1/numberOfTransactions" },
+				minItems: { $data: "1/numberOfTransactions" },
+			},
+		},
+	},
+
 	blockHeader: {
 		$id: "blockHeader",
+		properties: {
+			height: { minimum: 1, type: "integer" },
+			id: { blockId: {} },
+			idHex: { blockId: {} },
+			numberOfTransactions: { type: "integer" },
+			payloadHash: { $ref: "hex" },
+			blockSignature: { $ref: "hex" },
+			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
+			generatorPublicKey: { $ref: "publicKey" },
+			previousBlockHex: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
+			payloadLength: { minimum: 0, type: "integer" },
+			timestamp: { minimum: 0, type: "integer" },
+			reward: { bignumber: { minimum: 0 } },
+			version: { type: "integer", minimum: 0 },
+			totalAmount: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
+			totalFee: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
+		},
 		required: [
 			"id",
 			"timestamp",
@@ -29,36 +58,7 @@ export const registerSchemas = () => ({
 			"generatorPublicKey",
 			"blockSignature",
 		],
-		properties: {
-			id: { blockId: {} },
-			idHex: { blockId: {} },
-			timestamp: { type: "integer", minimum: 0 },
-			version: { type: "integer", minimum: 0 },
-			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
-			height: { type: "integer", minimum: 1 },
-			previousBlockHex: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
-			numberOfTransactions: { type: "integer" },
-			totalAmount: { bignumber: { bypassGenesis: true, minimum: 0, block: true } },
-			reward: { bignumber: { minimum: 0 } },
-			totalFee: { bignumber: { minimum: 0, bypassGenesis: true, block: true } },
-			payloadHash: { $ref: "hex" },
-			payloadLength: { type: "integer", minimum: 0 },
-			blockSignature: { $ref: "hex" },
-			generatorPublicKey: { $ref: "publicKey" },
-		},
 		type: "object",
-	},
-
-	block: {
-		$id: "block",
-		$ref: "blockHeader",
-		properties: {
-			transactions: {
-				$ref: "transactions",
-				maxItems: { $data: "1/numberOfTransactions" },
-				minItems: { $data: "1/numberOfTransactions" },
-			},
-		},
 	},
 
 	genericName: {
