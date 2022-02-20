@@ -172,4 +172,4 @@ export const registerKeywords = (configuration: Configuration) => {
 	};
 
 	return [bignum, blockId, maxBytes, network, transactionType];
-}
+};

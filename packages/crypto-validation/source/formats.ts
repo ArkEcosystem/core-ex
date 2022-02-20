@@ -25,4 +25,4 @@ export const registerFormats = (configuration: Configuration) => {
 	};
 
 	return [vendorField, validPeer];
-}
+};
