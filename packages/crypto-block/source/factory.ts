@@ -1,7 +1,6 @@
 import { Container } from "@arkecosystem/container";
 import {
 	BINDINGS,
-	BlockFactoryInstance,
 	IBlock,
 	IBlockData,
 	IBlockJson,
@@ -17,6 +16,7 @@ import { Serializer } from "./serializer";
 import { Configuration } from "@arkecosystem/crypto-config";
 import { applySchema } from "./utils";
 import { IdFactory } from "./id.factory";
+import { INTERNAL_FACTORY, InternalFactory } from "./container";
 
 @Container.injectable()
 export class BlockFactory {
@@ -29,8 +29,8 @@ export class BlockFactory {
 	@Container.inject(BINDINGS.Block.Deserializer)
 	private readonly deserializer: Deserializer; // @TODO: create contract for block deserializer
 
-	@Container.inject(BINDINGS.Block.FactoryInstance)
-	private readonly blockFactory: BlockFactoryInstance; // @TODO: create contract for block deserializer
+	@Container.inject(INTERNAL_FACTORY)
+	private readonly blockFactory: InternalFactory; // @TODO: create contract for block deserializer
 
 	@Container.inject(BINDINGS.Block.IdFactory)
 	private readonly idFactory: IdFactory;

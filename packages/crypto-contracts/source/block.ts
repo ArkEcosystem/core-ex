@@ -63,5 +63,3 @@ export interface IBlockJson {
 	serialized?: string;
 	transactions?: ITransactionJson[];
 }
-
-export type BlockFactoryInstance = (data: { data: IBlockData; transactions: ITransaction[]; id?: string }) => IBlock;
