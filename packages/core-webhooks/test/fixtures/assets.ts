@@ -1,10 +1,10 @@
-import { Webhook } from "@packages/core-webhooks/source/interfaces";
+import { Webhook } from "../../source/interfaces";
 
 export const dummyWebhook: Webhook = {
-	id: "id",
-	token: "token",
-	event: "event",
-	target: "target",
-	enabled: true,
 	conditions: [],
+	enabled: true,
+	event: "event",
+	id: "id",
+	target: "target",
+	token: "token",
 };
