@@ -1,5 +1,5 @@
 import { TransactionTypeGroup } from "../../enums";
-import { NotImplemented } from "@arkecosystem/crypto-errors";
+import { NotImplemented } from "../../errors";
 import { Address } from "../../identities";
 import {
 	ISchemaValidationResult,
@@ -7,7 +7,7 @@ import {
 	ITransaction,
 	ITransactionData,
 	ITransactionJson,
-} from "@arkecosystem/crypto-contracts";
+} from "../../interfaces";
 import { configManager } from "../../managers/config";
 import { BigNumber, ByteBuffer } from "../../utils";
 import { Verifier } from "../verifier";

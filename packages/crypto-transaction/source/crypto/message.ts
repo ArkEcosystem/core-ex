@@ -1,7 +1,7 @@
 import { Keys } from "../identities";
-import { IKeyPair, IMessage } from "@arkecosystem/crypto-contracts";
+import { IKeyPair, IMessage } from "../interfaces";
 import { Network } from "../interfaces/networks";
-import { Configuration } from "@arkecosystem/crypto-config";
+import { configManager } from "../managers";
 import { Hash } from "./hash";
 import { HashAlgorithms } from "./hash-algorithms";
 

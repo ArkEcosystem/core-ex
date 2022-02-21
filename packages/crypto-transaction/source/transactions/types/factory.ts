@@ -1,5 +1,5 @@
-import { UnkownTransactionError } from "@arkecosystem/crypto-errors";
-import { ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { UnkownTransactionError } from "../../errors";
+import { ITransaction, ITransactionData } from "../../interfaces";
 import { InternalTransactionType } from "./internal-transaction-type";
 import { Transaction } from "./transaction";
 

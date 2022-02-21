@@ -1,6 +1,6 @@
 import { HashAlgorithms } from "../crypto";
-import { AddressNetworkError } from "@arkecosystem/crypto-errors";
-import { ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { AddressNetworkError } from "../errors";
+import { ISerializeOptions, ITransactionData } from "../interfaces";
 import { Serializer } from "./serializer";
 import { TransactionTypeFactory } from "./types/factory";
 

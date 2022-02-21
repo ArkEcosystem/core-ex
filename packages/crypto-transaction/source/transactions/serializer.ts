@@ -1,7 +1,7 @@
 import { TransactionType, TransactionTypeGroup } from "../enums";
-import { TransactionVersionError } from "@arkecosystem/crypto-errors";
+import { TransactionVersionError } from "../errors";
 import { Address } from "../identities";
-import { ISerializeOptions, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { ISerializeOptions, ITransaction, ITransactionData } from "../interfaces";
 import { configManager } from "../managers/config";
 import { ByteBuffer, isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";

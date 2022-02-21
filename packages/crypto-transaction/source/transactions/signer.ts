@@ -1,5 +1,5 @@
 import { Hash } from "../crypto";
-import { IKeyPair, ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { IKeyPair, ISerializeOptions, ITransactionData } from "../interfaces";
 import { numberToHex } from "../utils";
 import { Utils } from "./utils";
 

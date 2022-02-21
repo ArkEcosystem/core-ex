@@ -1,7 +1,7 @@
 import { ByteBuffer } from "../../../utils/byte-buffer";
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
-import { ISerializeOptions } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
+import { ISerializeOptions } from "../../../interfaces";
+import { configManager } from "../../../managers";
 import { BigNumber } from "../../../utils/bignum";
 import * as schemas from "../schemas";
 import { Transaction } from "../transaction";

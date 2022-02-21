@@ -1,5 +1,5 @@
-import { IMultiSignatureAsset, ITransactionData } from "@arkecosystem/crypto-contracts";
-import { BigNumber } from "@arkecosystem/utils";
+import { IMultiSignatureAsset, ITransactionData } from "../../../interfaces";
+import { BigNumber } from "../../../utils";
 import { Two } from "../../types";
 import { TransactionBuilder } from "./transaction";
 

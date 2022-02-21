@@ -1,8 +1,8 @@
 import { BIP32Interface, fromPrivateKey, fromSeed } from "bip32";
 import { mnemonicToSeedSync } from "bip39";
 
-import { IKeyPair } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
+import { IKeyPair } from "../interfaces";
+import { configManager } from "../managers";
 
 export class HDWallet {
 	public static readonly slip44 = 111;

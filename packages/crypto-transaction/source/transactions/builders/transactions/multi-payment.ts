@@ -1,7 +1,7 @@
-import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/crypto-errors";
-import { ITransactionData } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
-import { BigNumber } from "@arkecosystem/utils";
+import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "../../../errors";
+import { ITransactionData } from "../../../interfaces";
+import { configManager } from "../../../managers";
+import { BigNumber } from "../../../utils";
 import { Two } from "../../types";
 import { TransactionBuilder } from "./transaction";
 

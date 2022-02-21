@@ -3,7 +3,7 @@ import {
 	TransactionKeyAlreadyRegisteredError,
 	TransactionVersionAlreadyRegisteredError,
 	UnkownTransactionError,
-} from "@arkecosystem/crypto-errors";
+} from "../errors";
 import { validator } from "../validation";
 import { One, Transaction, TransactionTypeFactory, Two } from "./types";
 import { InternalTransactionType } from "./types/internal-transaction-type";

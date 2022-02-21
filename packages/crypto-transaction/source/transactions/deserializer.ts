@@ -3,9 +3,9 @@ import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
 	TransactionVersionError,
-} from "@arkecosystem/crypto-errors";
+} from "../errors";
 import { Address } from "../identities";
-import { IDeserializeOptions, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { IDeserializeOptions, ITransaction, ITransactionData } from "../interfaces";
 import { BigNumber, ByteBuffer, isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";
 

@@ -1,5 +1,5 @@
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
-import { IMultiSignatureLegacyAsset, ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { IMultiSignatureLegacyAsset, ISerializeOptions, ITransactionData } from "../../../interfaces";
 import { BigNumber, ByteBuffer } from "../../../utils";
 import * as schemas from "../schemas";
 import { Transaction } from "../transaction";

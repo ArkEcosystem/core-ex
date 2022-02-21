@@ -1,9 +1,9 @@
 import { TransactionFactory, Utils } from "../..";
 import { Slots } from "../../../crypto";
 import { TransactionTypeGroup } from "../../../enums";
-import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "@arkecosystem/crypto-errors";
+import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "../../../errors";
 import { Address, Keys } from "../../../identities";
-import { IKeyPair, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
+import { IKeyPair, ITransaction, ITransactionData } from "../../../interfaces";
 import { configManager } from "../../../managers/config";
 import { NetworkType } from "../../../types";
 import { BigNumber, maxVendorFieldLength } from "../../../utils";

@@ -1194,6 +1194,7 @@ importers:
       '@arkecosystem/crypto-identities': workspace:*
       '@arkecosystem/crypto-networks': workspace:*
       '@arkecosystem/utils': workspace:*
+      '@arkecosystem/validation': workspace:*
       '@types/bip32': 2.0.0
       '@types/bip39': 2.4.2
       '@types/buffer-xor': 2.0.0
@@ -1227,6 +1228,7 @@ importers:
       '@arkecosystem/crypto-identities': link:../crypto-identities
       '@arkecosystem/crypto-networks': link:../crypto-networks
       '@arkecosystem/utils': link:../utils
+      '@arkecosystem/validation': link:../validation
       ajv: 6.12.6
       ajv-keywords: 3.4.1_ajv@6.12.6
       bcrypto: 5.4.0

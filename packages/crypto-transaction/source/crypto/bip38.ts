@@ -10,9 +10,9 @@ import {
 	Bip38PrefixError,
 	Bip38TypeError,
 	PrivateKeyLengthError,
-} from "@arkecosystem/crypto-errors";
+} from "../errors";
 import { Keys } from "../identities";
-import { IDecryptResult } from "@arkecosystem/crypto-contracts";
+import { IDecryptResult } from "../interfaces";
 import { Base58 } from "../utils/base58";
 import { HashAlgorithms } from ".";
 

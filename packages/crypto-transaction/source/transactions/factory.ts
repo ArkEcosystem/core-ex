@@ -3,15 +3,15 @@ import {
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 	TransactionVersionError,
-} from "@arkecosystem/crypto-errors";
+} from "../errors";
 import {
 	IDeserializeOptions,
 	ISerializeOptions,
 	ITransaction,
 	ITransactionData,
 	ITransactionJson,
-} from "@arkecosystem/crypto-contracts";
-import { BigNumber } from "@arkecosystem/utils";
+} from "../interfaces";
+import { BigNumber } from "../utils";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
 import { TransactionTypeFactory } from "./types";
