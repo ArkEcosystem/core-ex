@@ -79,7 +79,15 @@ describe("Server", ({ beforeEach, afterEach, afterAll, it, assert }) => {
 
 	afterAll(() => setGracefulCleanup());
 
+	it("should GET hello world", async () => {
+		const response = await server.inject({ method: "GET", url: `http://localhost:4004/` });
+
+		assert.equal(response.statusCode, 200);
+		assert.equal(response.result.data, "Hello World!");
+	});
+
 	it("should GET all the webhooks", async () => {
+		await createWebhook(server);
 		const response = await request(server, "GET", "webhooks");
 
 		assert.equal(response.status, 200);
