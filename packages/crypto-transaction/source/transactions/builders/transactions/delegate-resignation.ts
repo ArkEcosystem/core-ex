@@ -1,5 +1,5 @@
 import { ITransactionData } from "../../../interfaces";
-import { BigNumber } from "../../../utils";
+import { BigNumber } from "@arkecosystem/utils";
 import { Two } from "../../types";
 import { TransactionBuilder } from "./transaction";
 
@@ -10,13 +10,13 @@ export class DelegateResignationBuilder extends TransactionBuilder<DelegateResig
 		this.data.type = Two.DelegateResignationTransaction.type;
 		this.data.typeGroup = Two.DelegateResignationTransaction.typeGroup;
 		this.data.version = 2;
-		this.data.fee = Two.DelegateResignationTransaction.staticFee();
+		this.data.fee = Two.DelegateResignationTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.senderPublicKey = undefined;
 	}
 
-	public getStruct(): ITransactionData {
-		const struct: ITransactionData = super.getStruct();
+	public async getStruct(): Promise<ITransactionData> {
+		const struct: ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		return struct;
 	}

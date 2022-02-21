@@ -1281,6 +1281,7 @@ importers:
       '@arkecosystem/crypto-errors': workspace:*
       '@arkecosystem/crypto-identities': workspace:*
       '@arkecosystem/crypto-networks': workspace:*
+      '@arkecosystem/crypto-time': workspace:*
       '@arkecosystem/utils': workspace:*
       '@arkecosystem/validation': workspace:*
       '@types/bip32': 2.0.0
@@ -1316,6 +1317,7 @@ importers:
       '@arkecosystem/crypto-errors': link:../crypto-errors
       '@arkecosystem/crypto-identities': link:../crypto-identities
       '@arkecosystem/crypto-networks': link:../crypto-networks
+      '@arkecosystem/crypto-time': link:../crypto-time
       '@arkecosystem/utils': link:../utils
       '@arkecosystem/validation': link:../validation
       ajv: 6.12.6

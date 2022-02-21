@@ -4,13 +4,19 @@ import {
 	TransactionVersionAlreadyRegisteredError,
 	UnkownTransactionError,
 } from "../errors";
-import { validator } from "../validation";
 import { One, Transaction, TransactionTypeFactory, Two } from "./types";
 import { InternalTransactionType } from "./types/internal-transaction-type";
+import { Container } from "@arkecosystem/container";
+// import { BINDINGS } from "@arkecosystem/crypto-contracts";
+// import { Validator } from "@arkecosystem/validation";
 
 export type TransactionConstructor = typeof Transaction;
 
+@Container.injectable()
 class TransactionRegistry {
+	// @Container.inject(BINDINGS.Validator)
+	// private readonly validator: Validator;
+
 	private readonly transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>> = new Map();
 
 	public constructor() {
@@ -96,7 +102,8 @@ class TransactionRegistry {
 	}
 
 	private updateSchemas(transaction: TransactionConstructor, remove?: boolean): void {
-		validator.extendTransaction(transaction.getSchema(), remove);
+		// @TODO
+		// this.validator.extendTransaction(transaction.getSchema(), remove);
 	}
 }
 

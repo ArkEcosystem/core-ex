@@ -5,6 +5,7 @@ import { IMultiSignatureLegacyAsset, ISerializeOptions, ITransactionData } from 
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import * as schemas from "../schemas";
 import { Transaction } from "../transaction";
+import { Configuration } from "@packages/crypto-config/distribution";
 
 @Container.injectable()
 export abstract class MultiSignatureRegistrationTransaction extends Transaction {
@@ -19,12 +20,12 @@ export abstract class MultiSignatureRegistrationTransaction extends Transaction 
 		return schemas.multiSignatureLegacy;
 	}
 
-	public static staticFee(feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
+	public static staticFee(configuration: Configuration, feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
 		if (feeContext.data?.asset?.multiSignatureLegacy) {
-			return super.staticFee(feeContext).times(feeContext.data.asset.multiSignatureLegacy.keysgroup.length + 1);
+			return super.staticFee(configuration, feeContext).times(feeContext.data.asset.multiSignatureLegacy.keysgroup.length + 1);
 		}
 
-		return super.staticFee(feeContext);
+		return super.staticFee(configuration, feeContext);
 	}
 
 	public async verify(): Promise<boolean> {

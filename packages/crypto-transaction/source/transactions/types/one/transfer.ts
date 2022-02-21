@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/container";
 
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
-import { Address } from "../../../identities";
+import { Address } from "@arkecosystem/crypto-identities";
 import { ISerializeOptions } from "../../../interfaces";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import * as schemas from "../schemas";
@@ -31,7 +31,7 @@ export abstract class TransferTransaction extends Transaction {
 		buff.writeUInt32LE(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer, addressError } = Address.toBuffer(data.recipientId);
+			const { addressBuffer, addressError } = Address.toBuffer(data.recipientId, this.configuration.get("network"));
 
 			if (options) {
 				options.addressError = addressError;

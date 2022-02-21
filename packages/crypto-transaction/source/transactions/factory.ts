@@ -26,6 +26,9 @@ export class TransactionFactory {
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: Configuration;
 
+	@Container.inject(BINDINGS.Transaction.Deserializer)
+	private readonly deserializer: Deserializer;
+
 	@Container.inject(BINDINGS.Transaction.Serializer)
 	private readonly serializer: Serializer;
 
@@ -53,7 +56,7 @@ export class TransactionFactory {
 	public async fromBytesUnsafe(buff: Buffer, id?: string): Promise<ITransaction> {
 		try {
 			const options: IDeserializeOptions | ISerializeOptions = { acceptLegacyVersion: true };
-			const transaction = Deserializer.deserialize(buff, options);
+			const transaction = this.deserializer.deserialize(buff, options);
 			transaction.data.id = id || await this.utils.getId(transaction.data, options);
 			transaction.isVerified = true;
 
@@ -82,7 +85,7 @@ export class TransactionFactory {
 
 		const { version } = transaction.data;
 		if (version === 1) {
-			Deserializer.applyV1Compatibility(transaction.data);
+			this.deserializer.applyV1Compatibility(transaction.data);
 		}
 
 		this.serializer.serialize(transaction);
@@ -92,7 +95,7 @@ export class TransactionFactory {
 
 	private async fromSerialized(serialized: string, strict = true, options: IDeserializeOptions = {}): Promise<ITransaction> {
 		try {
-			const transaction = Deserializer.deserialize(serialized, options);
+			const transaction = this.deserializer.deserialize(serialized, options);
 			transaction.data.id = await this.utils.getId(transaction.data, options);
 
 			const { error } = this.verifier.verifySchema(transaction.data, strict);

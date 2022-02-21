@@ -1,5 +1,5 @@
 import { IMultiSignatureAsset, ITransactionData } from "../../../interfaces";
-import { BigNumber } from "../../../utils";
+import { BigNumber } from "@arkecosystem/utils";
 import { Two } from "../../types";
 import { TransactionBuilder } from "./transaction";
 
@@ -23,7 +23,7 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 
 			if (publicKeys.length <= 16) {
 				publicKeys.push(publicKey);
-				this.data.fee = Two.MultiSignatureRegistrationTransaction.staticFee({ data: this.data });
+				this.data.fee = Two.MultiSignatureRegistrationTransaction.staticFee(this.configuration, { data: this.data });
 			}
 		}
 
@@ -41,14 +41,14 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 	public multiSignatureAsset(multiSignature: IMultiSignatureAsset): MultiSignatureBuilder {
 		if (this.data.asset && this.data.asset.multiSignature) {
 			this.data.asset.multiSignature = multiSignature;
-			this.data.fee = Two.MultiSignatureRegistrationTransaction.staticFee({ data: this.data });
+			this.data.fee = Two.MultiSignatureRegistrationTransaction.staticFee(this.configuration, { data: this.data });
 		}
 
 		return this;
 	}
 
-	public getStruct(): ITransactionData {
-		const struct: ITransactionData = super.getStruct();
+	public async getStruct(): Promise<ITransactionData> {
+		const struct: ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;

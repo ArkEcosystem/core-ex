@@ -1,15 +1,34 @@
 import { TransactionFactory, Utils } from "../..";
-import { Slots } from "../../../crypto";
+import { Slots } from "@arkecosystem/crypto-time";
 import { TransactionTypeGroup } from "../../../enums";
 import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "../../../errors";
-import { Address, Keys } from "../../../identities";
+import { Address, Keys } from "@arkecosystem/crypto-identities";
 import { IKeyPair, ITransaction, ITransactionData } from "../../../interfaces";
-import { configManager } from "../../../managers/config";
-import { BigNumber, maxVendorFieldLength } from "../../../utils";
+import { BigNumber } from "@arkecosystem/utils";
+import { maxVendorFieldLength } from "../../../utils";
 import { Signer } from "../../signer";
 import { Verifier } from "../../verifier";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
 
+@Container.injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
+	@Container.inject(BINDINGS.Configuration)
+	protected readonly configuration: Configuration;
+
+	@Container.inject(BINDINGS.Transaction.Factory)
+	protected readonly factory: TransactionFactory;
+
+	@Container.inject(BINDINGS.Transaction.Signer)
+	protected readonly signer: Signer;
+
+	@Container.inject(BINDINGS.Transaction.Utils)
+	protected readonly utils: Utils;
+
+	@Container.inject(BINDINGS.Transaction.Verifier)
+	protected readonly verifier: Verifier;
+
 	public data: ITransactionData;
 
 	protected signWithSenderAsRecipient = false;
@@ -19,15 +38,15 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	public constructor() {
 		this.data = {
 			id: undefined,
-			timestamp: Slots.getTime(),
+			timestamp: (new Slots(this.configuration, {})).getTime(),
 			typeGroup: TransactionTypeGroup.Test,
 			nonce: BigNumber.ZERO,
-			version: configManager.getMilestone().aip11 ? 0x02 : 0x01,
+			version: this.configuration.getMilestone().aip11 ? 0x02 : 0x01,
 		} as ITransactionData;
 	}
 
-	public build(data: Partial<ITransactionData> = {}): ITransaction {
-		return TransactionFactory.fromData({ ...this.data, ...data }, false, {
+	public async build(data: Partial<ITransactionData> = {}): Promise<ITransaction> {
+		return this.factory.fromData({ ...this.data, ...data }, false, {
 			disableVersionCheck: this.disableVersionCheck,
 		});
 	}
@@ -85,7 +104,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public vendorField(vendorField: string): TBuilder {
-		const limit: number = maxVendorFieldLength();
+		const limit: number = maxVendorFieldLength(this.configuration);
 
 		if (vendorField) {
 			if (Buffer.from(vendorField).length > limit) {
@@ -104,14 +123,14 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	public sign(passphrase: string): TBuilder {
+	public async sign(passphrase: string): Promise<TBuilder> {
 		const keys: IKeyPair = Keys.fromPassphrase(passphrase);
 		return this.signWithKeyPair(keys);
 	}
 
-	public signWithWif(wif: string, networkWif?: number): TBuilder {
+	public async signWithWif(wif: string, networkWif?: number): Promise<TBuilder> {
 		const keys: IKeyPair = Keys.fromWIF(wif, {
-			wif: networkWif || configManager.get("network.wif"),
+			wif: networkWif || this.configuration.get("network.wif"),
 		} as any);
 
 		return this.signWithKeyPair(keys);
@@ -124,23 +143,23 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 
 	public multiSignWithWif(index: number, wif: string, networkWif?: number): TBuilder {
 		const keys = Keys.fromWIF(wif, {
-			wif: networkWif || configManager.get("network.wif"),
+			wif: networkWif || this.configuration.get("network.wif"),
 		} as any);
 
 		return this.multiSignWithKeyPair(index, keys);
 	}
 
 	public async verify(): Promise<boolean> {
-		return Verifier.verifyHash(this.data, this.disableVersionCheck);
+		return this.verifier.verifyHash(this.data, this.disableVersionCheck);
 	}
 
-	public getStruct(): ITransactionData {
+	public async getStruct(): Promise<ITransactionData> {
 		if (!this.data.senderPublicKey || (!this.data.signature && !this.data.signatures)) {
 			throw new MissingTransactionSignatureError();
 		}
 
 		const struct: ITransactionData = {
-			id: Utils.getId(this.data).toString(),
+			id: (await this.utils.getId(this.data)).toString(),
 			signature: this.data.signature,
 			version: this.data.version,
 			type: this.data.type,
@@ -163,14 +182,14 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return struct;
 	}
 
-	private signWithKeyPair(keys: IKeyPair): TBuilder {
+	private async signWithKeyPair(keys: IKeyPair): Promise<TBuilder> {
 		this.data.senderPublicKey = keys.publicKey;
 
 		if (this.signWithSenderAsRecipient) {
-			this.data.recipientId = Address.fromPublicKey(keys.publicKey, this.data.network);
+			this.data.recipientId = Address.fromPublicKey(keys.publicKey, {pubKeyHash:this.data.network});
 		}
 
-		this.data.signature = Signer.sign(this.getSigningObject(), keys, {
+		this.data.signature = await this.signer.sign(this.getSigningObject(), keys, {
 			disableVersionCheck: this.disableVersionCheck,
 		});
 
@@ -183,7 +202,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		}
 
 		this.version(2);
-		Signer.multiSign(this.getSigningObject(), keys, index);
+		this.signer.multiSign(this.getSigningObject(), keys, index);
 
 		return this.instance();
 	}

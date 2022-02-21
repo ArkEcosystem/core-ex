@@ -4,18 +4,25 @@ import {
 	InvalidTransactionBytesError,
 	TransactionVersionError,
 } from "../errors";
-import { Address } from "../identities";
+import { Address } from "@arkecosystem/crypto-identities";
 import { IDeserializeOptions, ITransaction, ITransactionData } from "../interfaces";
-import { BigNumber, ByteBuffer, isSupportedTransactionVersion } from "../utils";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
 
-// Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
+@Container.injectable()
 export class Deserializer {
-	public static applyV1Compatibility(transaction: ITransactionData): void {
+	@Container.inject(BINDINGS.Configuration)
+	protected readonly configuration: Configuration;
+
+	public applyV1Compatibility(transaction: ITransactionData): void {
 		transaction.typeGroup = TransactionTypeGroup.Core;
 
 		if (transaction.type === TransactionType.Vote && transaction.senderPublicKey) {
-			transaction.recipientId = Address.fromPublicKey(transaction.senderPublicKey, transaction.network);
+			transaction.recipientId = Address.fromPublicKey(transaction.senderPublicKey, {pubKeyHash: transaction.network});
 		} else if (
 			transaction.type === TransactionType.MultiSignature &&
 			transaction.asset &&
@@ -27,7 +34,7 @@ export class Deserializer {
 		}
 	}
 
-	public static deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): ITransaction {
+	public deserialize(serialized: string | Buffer, options: IDeserializeOptions = {}): ITransaction {
 		const data = {} as ITransactionData;
 
 		const buff: ByteBuffer = this.getByteBuffer(serialized);
@@ -45,7 +52,7 @@ export class Deserializer {
 			if (
 				options.acceptLegacyVersion ||
 				options.disableVersionCheck ||
-				isSupportedTransactionVersion(data.version)
+				isSupportedTransactionVersion(this.configuration, data.version)
 			) {
 				if (data.version === 1) {
 					this.applyV1Compatibility(data);
@@ -60,7 +67,7 @@ export class Deserializer {
 		return instance;
 	}
 
-	public static deserializeCommon(transaction: ITransactionData, buf: ByteBuffer): void {
+	public deserializeCommon(transaction: ITransactionData, buf: ByteBuffer): void {
 		// buf.skip(1); // Skip 0xFF marker
 		buf.jump(1); // Skip 0xFF marker
 		transaction.version = buf.readUInt8();
@@ -80,7 +87,7 @@ export class Deserializer {
 		transaction.amount = BigNumber.ZERO;
 	}
 
-	private static deserializeVendorField(transaction: ITransaction, buf: ByteBuffer): void {
+	private deserializeVendorField(transaction: ITransaction, buf: ByteBuffer): void {
 		const vendorFieldLength: number = buf.readUInt8();
 		if (vendorFieldLength > 0) {
 			if (transaction.hasVendorField()) {
@@ -92,7 +99,7 @@ export class Deserializer {
 		}
 	}
 
-	private static deserializeSignatures(transaction: ITransactionData, buf: ByteBuffer): void {
+	private deserializeSignatures(transaction: ITransactionData, buf: ByteBuffer): void {
 		if (transaction.version === 1) {
 			this.deserializeECDSA(transaction, buf);
 		} else {
@@ -100,7 +107,7 @@ export class Deserializer {
 		}
 	}
 
-	private static deserializeSchnorrOrECDSA(transaction: ITransactionData, buf: ByteBuffer): void {
+	private deserializeSchnorrOrECDSA(transaction: ITransactionData, buf: ByteBuffer): void {
 		if (this.detectSchnorr(buf)) {
 			this.deserializeSchnorr(transaction, buf);
 		} else {
@@ -108,7 +115,7 @@ export class Deserializer {
 		}
 	}
 
-	private static deserializeECDSA(transaction: ITransactionData, buf: ByteBuffer): void {
+	private deserializeECDSA(transaction: ITransactionData, buf: ByteBuffer): void {
 		const currentSignatureLength = (): number => {
 			buf.jump(1);
 			const length = buf.readUInt8();
@@ -143,7 +150,7 @@ export class Deserializer {
 		}
 	}
 
-	private static deserializeSchnorr(transaction: ITransactionData, buf: ByteBuffer): void {
+	private deserializeSchnorr(transaction: ITransactionData, buf: ByteBuffer): void {
 		const canReadNonMultiSignature = () =>
 			buf.getRemainderLength() && (buf.getRemainderLength() % 64 === 0 || buf.getRemainderLength() % 65 !== 0);
 
@@ -175,7 +182,7 @@ export class Deserializer {
 		}
 	}
 
-	private static detectSchnorr(buf: ByteBuffer): boolean {
+	private detectSchnorr(buf: ByteBuffer): boolean {
 		const remaining: number = buf.getRemainderLength();
 
 		// `signature`
@@ -197,7 +204,7 @@ export class Deserializer {
 		return false;
 	}
 
-	private static getByteBuffer(serialized: Buffer | string): ByteBuffer {
+	private getByteBuffer(serialized: Buffer | string): ByteBuffer {
 		if (!(serialized instanceof Buffer)) {
 			serialized = Buffer.from(serialized, "hex");
 		}

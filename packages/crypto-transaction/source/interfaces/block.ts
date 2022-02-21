@@ -1,4 +1,4 @@
-import { BigNumber } from "../utils";
+import { BigNumber } from "@arkecosystem/utils";
 import { ITransactionData } from "./";
 import { ITransaction, ITransactionJson } from "./transactions";
 

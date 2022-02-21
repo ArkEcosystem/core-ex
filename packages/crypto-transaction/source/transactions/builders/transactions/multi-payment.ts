@@ -1,7 +1,7 @@
 import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "../../../errors";
 import { ITransactionData } from "../../../interfaces";
 
-import { BigNumber } from "../../../utils";
+import { BigNumber } from "@arkecosystem/utils";
 import { Two } from "../../types";
 import { TransactionBuilder } from "./transaction";
 
@@ -11,7 +11,7 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 
 		this.data.type = Two.MultiPaymentTransaction.type;
 		this.data.typeGroup = Two.MultiPaymentTransaction.typeGroup;
-		this.data.fee = Two.MultiPaymentTransaction.staticFee();
+		this.data.fee = Two.MultiPaymentTransaction.staticFee(this.configuration);
 		this.data.vendorField = undefined;
 		this.data.asset = {
 			payments: [],
@@ -21,7 +21,8 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 
 	public addPayment(recipientId: string, amount: string): MultiPaymentBuilder {
 		if (this.data.asset && this.data.asset.payments) {
-			const limit: number = configManager.getMilestone().multiPaymentLimit || 256;
+			const limit: number = this.configuration.getMilestone().multiPaymentLimit || 256;
+
 			if (this.data.asset.payments.length >= limit) {
 				throw new MaximumPaymentCountExceededError(limit);
 			}
@@ -35,7 +36,7 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 		return this;
 	}
 
-	public getStruct(): ITransactionData {
+	public async getStruct(): Promise<ITransactionData> {
 		if (
 			!this.data.asset ||
 			!this.data.asset.payments ||
@@ -45,7 +46,7 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 			throw new MinimumPaymentCountSubceededError();
 		}
 
-		const struct: ITransactionData = super.getStruct();
+		const struct: ITransactionData = await super.getStruct();
 		struct.senderPublicKey = this.data.senderPublicKey;
 		struct.vendorField = this.data.vendorField;
 		struct.amount = this.data.amount;

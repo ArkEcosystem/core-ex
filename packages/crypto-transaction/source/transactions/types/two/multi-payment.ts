@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/container";
 
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
-import { Address } from "../../../identities";
+import { Address } from "@arkecosystem/crypto-identities";
 import { IMultiPaymentItem, ISerializeOptions } from "../../../interfaces";
 
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
@@ -39,7 +39,7 @@ export abstract class MultiPaymentTransaction extends Transaction {
 			for (const payment of data.asset.payments) {
 				buff.writeBigUInt64LE(payment.amount.toBigInt());
 
-				const { addressBuffer, addressError } = Address.toBuffer(payment.recipientId);
+				const { addressBuffer, addressError } = Address.toBuffer(payment.recipientId, this.configuration.get("network"));
 				options.addressError = addressError || options.addressError;
 
 				buff.writeBuffer(addressBuffer);

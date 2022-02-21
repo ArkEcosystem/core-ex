@@ -3,7 +3,7 @@ import { BINDINGS } from "@arkecosystem/crypto-contracts";
 
 import { TransactionTypeGroup } from "../../enums";
 import { NotImplemented } from "../../errors";
-import { Address } from "../../identities";
+import { Address } from "@arkecosystem/crypto-identities";
 import {
 	ISchemaValidationResult,
 	ISerializeOptions,
@@ -43,8 +43,9 @@ export abstract class Transaction implements ITransaction {
 		throw new NotImplemented();
 	}
 
-	public static staticFee(feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
-		const milestones = this.configuration.getMilestone(feeContext.height);
+	public static staticFee(configuration: Configuration, feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
+		const milestones = configuration.getMilestone(feeContext.height);
+
 		if (milestones.fees && milestones.fees.staticFees && this.key) {
 			const fee: any = milestones.fees.staticFees[this.key];
 
@@ -84,9 +85,9 @@ export abstract class Transaction implements ITransaction {
 		const parts: string[] = [];
 
 		if (this.data.senderPublicKey && this.data.nonce) {
-			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey)}#${this.data.nonce}`);
+			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}#${this.data.nonce}`);
 		} else if (this.data.senderPublicKey) {
-			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey)}`);
+			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}`);
 		}
 
 		if (this.data.id) {
@@ -126,6 +127,6 @@ export abstract class Transaction implements ITransaction {
 	}
 
 	public get staticFee(): BigNumber {
-		return (this as any).__proto__.constructor.staticFee({ data: this.data });
+		return (this as any).__proto__.constructor.staticFee(this.configuration, { data: this.data });
 	}
 }

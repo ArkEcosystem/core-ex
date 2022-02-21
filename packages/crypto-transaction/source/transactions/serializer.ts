@@ -5,7 +5,7 @@ import { ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionType, TransactionTypeGroup } from "../enums";
 import { TransactionVersionError } from "../errors";
-import { Address } from "../identities";
+import { Address } from "@arkecosystem/crypto-identities";
 import { ISerializeOptions, ITransaction, ITransactionData } from "../interfaces";
 import { isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";
@@ -103,8 +103,8 @@ export class Serializer {
 
 			if (transaction.recipientId && transaction.type !== 1 && transaction.type !== 4) {
 				const recipientId =
-					transaction.recipientId || Address.fromPublicKey(transaction.senderPublicKey, transaction.network);
-				bb.writeBuffer(Address.toBuffer(recipientId).addressBuffer);
+					transaction.recipientId || Address.fromPublicKey(transaction.senderPublicKey, {pubKeyHash:transaction.network});
+				bb.writeBuffer(Address.toBuffer(recipientId, this.configuration.get("network")).addressBuffer);
 			} else {
 				for (let i = 0; i < 21; i++) {
 					bb.writeUInt8(0);

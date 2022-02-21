@@ -1,5 +1,5 @@
 import { ITransactionData } from "../../../interfaces";
-import { BigNumber } from "../../../utils";
+import { BigNumber } from "@arkecosystem/utils";
 import { Two } from "../../types";
 import { TransactionBuilder } from "./transaction";
 
@@ -9,7 +9,7 @@ export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 
 		this.data.type = Two.TransferTransaction.type;
 		this.data.typeGroup = Two.TransferTransaction.typeGroup;
-		this.data.fee = Two.TransferTransaction.staticFee();
+		this.data.fee = Two.TransferTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;
@@ -22,8 +22,8 @@ export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 		return this.instance();
 	}
 
-	public getStruct(): ITransactionData {
-		const struct: ITransactionData = super.getStruct();
+	public async getStruct(): Promise<ITransactionData> {
+		const struct: ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;
