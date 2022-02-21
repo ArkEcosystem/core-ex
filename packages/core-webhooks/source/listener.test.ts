@@ -133,7 +133,7 @@ describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it, assert }) => {
 		spyOnPost.neverCalled();
 	});
 
-	it.only("should broadcast if webhook condition is satisfied", async () => {
+	it("should broadcast if webhook condition is satisfied", async () => {
 		const spyOnPost = stub(Utils.http, "post").resolvedValue({
 			statusCode: 200,
 		});
@@ -174,27 +174,25 @@ describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it, assert }) => {
 		spyOnPost.neverCalled();
 	});
 
-	// it("should not broadcast if webhook condition throws error", async () => {
-	// 	const spyOnEq = stub(conditions, "eq").callsFake(() => {
-	// 		console.log("STUB THROWS");
-	//
-	// 		throw new Error("dummy error");
-	// 	});
-	//
-	// 	const spyOnPost = stub(Utils.http, "post");
-	//
-	// 	webhook.conditions = [
-	// 		{
-	// 			key: "test",
-	// 			value: 1,
-	// 			condition: "eq",
-	// 		},
-	// 	];
-	// 	database.create(webhook);
-	//
-	// 	await listener.handle({ name: "event", data: { test: 2 } });
-	//
-	// 	spyOnEq.calledOnce();
-	// 	spyOnPost.neverCalled();
-	// });
+	it("should not broadcast if webhook condition throws error", async () => {
+		const spyOnEq = stub(conditions, "eq").callsFake(() => {
+			throw new Error("dummy error");
+		});
+
+		const spyOnPost = stub(Utils.http, "post");
+
+		webhook.conditions = [
+			{
+				key: "test",
+				value: 1,
+				condition: "eq",
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ name: "event", data: { test: 2 } });
+
+		spyOnEq.calledOnce();
+		spyOnPost.neverCalled();
+	});
 });

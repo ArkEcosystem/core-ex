@@ -1,6 +1,7 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { between, contains, eq, falsy, gt, gte, lt, lte, ne, notBetween, regexp, truthy } from "./conditions";
+import { conditions } from "./conditions";
+const { between, contains, eq, falsy, gt, gte, lt, lte, ne, notBetween, regexp, truthy } = conditions;
 
 describe("Conditions.between", ({ it, assert }) => {
 	it("should be true", () => {
