@@ -3,67 +3,63 @@ import { describe } from "@arkecosystem/core-test-framework";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { dummyWebhook } from "../__tests__/__fixtures__/assets";
+import { conditions } from "./conditions";
 import { Database } from "./database";
+import { WebhookEvent } from "./events";
 import { Identifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
-import { WebhookEvent } from "./events";
-import { conditions } from "./conditions";
 
-let app: Application;
-let database: Database;
-let listener: Listener;
-let webhook: Webhook;
+describe<{
+	database: Database,
+	listener: Listener
+}>("Listener", ({ beforeEach, afterAll, stub, it, assert }) => {
+	let webhook: Webhook;
 
-const logger = {
-	debug: () => {},
-	error: () => {},
-};
+	const logger = {
+		debug: () => {},
+		error: () => {},
+	};
 
-const eventDispatcher = {
-	dispatch: () => {},
-};
+	const eventDispatcher = {
+		dispatch: () => {},
+	};
 
-const prepareContainer = () => {
-	app = new Application(new Container.Container());
-	app.bind("path.cache").toConstantValue(dirSync().name);
+	const expectFinishedEventData = ({ executionTime, webhook, payload }) => {
+		assert.number(executionTime);
+		assert.object(webhook);
+		assert.defined(payload);
+	};
 
-	app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
-	app.bind<Database>(Identifiers.Database).to(Database).inSingletonScope();
+	const expectFailedEventData = ({ executionTime, webhook, payload, error }) => {
+		assert.number(executionTime);
+		assert.object(webhook);
+		assert.defined(payload);
+		assert.object(error);
+	};
 
-	app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	beforeEach((context) => {
+		const app = new Application(new Container.Container());
+		app.bind("path.cache").toConstantValue(dirSync().name);
 
-	database = app.get<Database>(Identifiers.Database);
-	database.boot();
+		app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
+		app.bind<Database>(Identifiers.Database).to(Database).inSingletonScope();
 
-	listener = app.resolve<Listener>(Listener);
+		app.bind(Container.Identifiers.LogService).toConstantValue(logger);
 
-	webhook = Object.assign({}, dummyWebhook);
-};
+		context.database = app.get<Database>(Identifiers.Database);
+		context.database.boot();
 
-const expectFinishedEventData = (assert, { executionTime, webhook, payload }) => {
-	assert.number(executionTime);
-	assert.object(webhook);
-	assert.defined(payload);
-};
+		context.listener = app.resolve<Listener>(Listener);
 
-const expectFailedEventData = (assert, { executionTime, webhook, payload, error }) => {
-	assert.number(executionTime);
-	assert.object(webhook);
-	assert.defined(payload);
-	assert.object(error);
-};
-
-describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it, assert }) => {
-	beforeEach(() => {
-		prepareContainer();
+		webhook = Object.assign({}, dummyWebhook);
 	});
 
 	afterAll(() => {
 		setGracefulCleanup();
 	});
 
-	it("should broadcast to registered webhooks", async () => {
+	it("should broadcast to registered webhooks", async ({database, listener}) => {
 		const spyOnPost = stub(Utils.http, "post").resolvedValue({
 			statusCode: 200,
 		});
@@ -78,12 +74,12 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it, assert }) => {
 		spyOnDebug.calledOnce();
 		spyOnDispatch.calledOnce();
 
-		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted);
-		expectFinishedEventData(assert, spyOnDispatchArgs[1]);
+		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
+		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Broadcasted);
+		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
-	it("should log error if broadcast is not successful", async () => {
+	it("should log error if broadcast is not successful", async ({database, listener}) => {
 		const spyOnPost = stub(Utils.http, "post").callsFake(() => {
 			throw new Error("dummy error");
 		});
@@ -97,43 +93,33 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it, assert }) => {
 		spyOnPost.calledOnce();
 		spyOnError.calledOnce();
 		spyOnDispatch.calledOnce();
-		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Failed);
-		expectFailedEventData(assert, spyOnDispatchArgs[1]);
-	});
-});
-
-describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it, assert }) => {
-	beforeEach(() => {
-		prepareContainer();
+		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
+		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Failed);
+		expectFailedEventData(spyOnDispatchArguments[1]);
 	});
 
-	afterAll(() => {
-		setGracefulCleanup();
-	});
-
-	it("should not broadcast if webhook is disabled", async () => {
+	it("#should not broadcast if webhook is disabled", async ({database, listener}) => {
 		const spyOnPost = stub(Utils.http, "post");
 
 		webhook.enabled = false;
 		database.create(webhook);
 
-		await listener.handle({ name: "event", data: "dummy_data" });
+		await listener.handle({ data: "dummy_data", name: "event" });
 
 		spyOnPost.neverCalled();
 	});
 
-	it("should not broadcast if event is webhook event", async () => {
+	it("should not broadcast if event is webhook event", async ({database, listener}) => {
 		const spyOnPost = stub(Utils.http, "post");
 
 		database.create(webhook);
 
-		await listener.handle({ name: WebhookEvent.Broadcasted, data: "dummy_data" });
+		await listener.handle({ data: "dummy_data", name: WebhookEvent.Broadcasted });
 
 		spyOnPost.neverCalled();
 	});
 
-	it("should broadcast if webhook condition is satisfied", async () => {
+	it("should broadcast if webhook condition is satisfied", async ({database, listener}) => {
 		const spyOnPost = stub(Utils.http, "post").resolvedValue({
 			statusCode: 200,
 		});
@@ -141,40 +127,40 @@ describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it, assert }) => {
 
 		webhook.conditions = [
 			{
+				condition: "eq",
 				key: "test",
 				value: 1,
-				condition: "eq",
 			},
 		];
 		database.create(webhook);
 
-		await listener.handle({ name: "event", data: { test: 1 } });
+		await listener.handle({ data: { test: 1 }, name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
-		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted);
-		expectFinishedEventData(assert, spyOnDispatchArgs[1]);
+		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
+		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Broadcasted);
+		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
-	it("should not broadcast if webhook condition is not satisfied", async () => {
+	it("should not broadcast if webhook condition is not satisfied", async ({database, listener}) => {
 		const spyOnPost = stub(Utils.http, "post");
 
 		webhook.conditions = [
 			{
+				condition: "eq",
 				key: "test",
 				value: 1,
-				condition: "eq",
 			},
 		];
 		database.create(webhook);
 
-		await listener.handle({ name: "event", data: { test: 2 } });
+		await listener.handle({ data: { test: 2 }, name: "event" });
 
 		spyOnPost.neverCalled();
 	});
 
-	it("should not broadcast if webhook condition throws error", async () => {
+	it("should not broadcast if webhook condition throws error", async ({database, listener}) => {
 		const spyOnEq = stub(conditions, "eq").callsFake(() => {
 			throw new Error("dummy error");
 		});
@@ -183,16 +169,17 @@ describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it, assert }) => {
 
 		webhook.conditions = [
 			{
+				condition: "eq",
 				key: "test",
 				value: 1,
-				condition: "eq",
 			},
 		];
 		database.create(webhook);
 
-		await listener.handle({ name: "event", data: { test: 2 } });
+		await listener.handle({ data: { test: 2 }, name: "event" });
 
 		spyOnEq.calledOnce();
 		spyOnPost.neverCalled();
 	});
 });
+
