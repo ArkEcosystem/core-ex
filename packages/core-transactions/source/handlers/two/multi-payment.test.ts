@@ -1,6 +1,6 @@
 import { Application, Container, Contracts, Exceptions } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
+import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import { Crypto, Enums, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { InsufficientBalanceError } from "../../errors";
@@ -8,57 +8,55 @@ import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, ini
 import { TransactionHandlerRegistry } from "../handler-registry";
 import { TransactionHandler } from "../transaction";
 
-let app: Application;
-let senderWallet: Wallets.Wallet;
-let multiSignatureWallet: Wallets.Wallet;
-let recipientWallet: Wallets.Wallet;
-let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: Factories.FactoryBuilder;
+describe<{
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	factoryBuilder: Factories.FactoryBuilder;
+	multiPaymentTransaction: Interfaces.ITransaction;
+	multiSignatureMultiPaymentTransaction: Interfaces.ITransaction;
+	handler: TransactionHandler;
+	store: any;
+	transactionHistoryService: any;
+}>("MultiPaymentTransaction", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+	beforeEach(async (context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.transactionHistoryService = {
+			streamByCriteria: async function* () {
+				yield context.multiPaymentTransaction.data;
+			},
+		};
 
-const mockGetLastBlock = jest.fn();
-Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
-mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
+		const config = Generators.generateCryptoConfigRaw();
+		Managers.configManager.setConfig(config);
 
-const transactionHistoryService = {
-	streamByCriteria: jest.fn(),
-};
+		context.app = initApp();
+		context.app
+			.bind(Container.Identifiers.TransactionHistoryService)
+			.toConstantValue(context.transactionHistoryService);
 
-beforeEach(() => {
-	transactionHistoryService.streamByCriteria.mockReset();
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	const config = Generators.generateCryptoConfigRaw();
-	Managers.configManager.setConfig(config);
+		context.factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(context.factoryBuilder);
+		Factories.Factories.registerTransactionFactory(context.factoryBuilder);
 
-	app = initApp();
-	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(transactionHistoryService);
+		context.senderWallet = buildSenderWallet(context.factoryBuilder);
+		context.multiSignatureWallet = buildMultiSignatureWallet();
+		context.recipientWallet = buildRecipientWallet(context.factoryBuilder);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository.index(context.senderWallet);
+		context.walletRepository.index(context.multiSignatureWallet);
+		context.walletRepository.index(context.recipientWallet);
 
-	factoryBuilder = new Factories.FactoryBuilder();
-	Factories.Factories.registerWalletFactory(factoryBuilder);
-	Factories.Factories.registerTransactionFactory(factoryBuilder);
-
-	senderWallet = buildSenderWallet(factoryBuilder);
-	multiSignatureWallet = buildMultiSignatureWallet();
-	recipientWallet = buildRecipientWallet(factoryBuilder);
-
-	walletRepository.index(senderWallet);
-	walletRepository.index(multiSignatureWallet);
-	walletRepository.index(recipientWallet);
-});
-
-describe("MultiPaymentTransaction", () => {
-	let multiPaymentTransaction: Interfaces.ITransaction;
-	let multiSignatureMultiPaymentTransaction: Interfaces.ITransaction;
-	let handler: TransactionHandler;
-
-	beforeEach(async () => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
-		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
 				Enums.TransactionType.MultiPayment,
 				Enums.TransactionTypeGroup.Core,
@@ -66,7 +64,7 @@ describe("MultiPaymentTransaction", () => {
 			2,
 		);
 
-		multiPaymentTransaction = Transactions.BuilderFactory.multiPayment()
+		context.multiPaymentTransaction = Transactions.BuilderFactory.multiPayment()
 			.addPayment("ARYJmeYHSUTgbxaiqsgoPwf6M3CYukqdKN", "10")
 			.addPayment("AFyjB5jULQiYNsp37wwipCm9c7V1xEzTJD", "20")
 			.addPayment("AJwD3UJM7UESFnP1fsKYr4EX9Gc1EJNSqm", "30")
@@ -76,165 +74,172 @@ describe("MultiPaymentTransaction", () => {
 			.sign(passphrases[0])
 			.build();
 
-		multiSignatureMultiPaymentTransaction = Transactions.BuilderFactory.multiPayment()
+		context.multiSignatureMultiPaymentTransaction = Transactions.BuilderFactory.multiPayment()
 			.addPayment("ARYJmeYHSUTgbxaiqsgoPwf6M3CYukqdKN", "10")
 			.addPayment("AFyjB5jULQiYNsp37wwipCm9c7V1xEzTJD", "20")
 			.addPayment("AJwD3UJM7UESFnP1fsKYr4EX9Gc1EJNSqm", "30")
 			.addPayment("AUsi9ZcFkcwG7WMpRE121TR4HaTjnAP7qD", "40")
 			.addPayment("ARugw4i18i2pVnYZEMWKJj2mAnQQ97wuat", "50")
 			.nonce("1")
-			.senderPublicKey(multiSignatureWallet.getPublicKey()!)
+			.senderPublicKey(context.multiSignatureWallet.getPublicKey()!)
 			.multiSign(passphrases[0], 0)
 			.multiSign(passphrases[1], 1)
 			.multiSign(passphrases[2], 2)
 			.build();
 	});
 
-	describe("bootstrap", () => {
-		it("should resolve", async () => {
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield multiPaymentTransaction.data;
-			});
-
-			await expect(handler.bootstrap()).toResolve();
-
-			expect(transactionHistoryService.streamByCriteria).toBeCalledWith({
-				type: Enums.TransactionType.MultiPayment,
-				typeGroup: Enums.TransactionTypeGroup.Core,
-			});
+	it("bootstrap should resolve", async (context) => {
+		stub(context.transactionHistoryService, "streamByCriteria").callsFake(async function* () {
+			yield context.multiPaymentTransaction.data;
 		});
 
-		it("should throw if asset is undefined", async () => {
-			multiPaymentTransaction.data.asset = undefined;
+		await assert.resolves(() => context.handler.bootstrap());
 
-			transactionHistoryService.streamByCriteria.mockImplementationOnce(async function* () {
-				yield multiPaymentTransaction.data;
-			});
-
-			await expect(handler.bootstrap()).rejects.toThrow(Exceptions.Runtime.AssertionException);
+		context.transactionHistoryService.streamByCriteria.calledWith({
+			type: Enums.TransactionType.MultiPayment,
+			typeGroup: Enums.TransactionTypeGroup.Core,
 		});
 	});
 
-	describe("throwIfCannotBeApplied", () => {
-		it("should not throw", async () => {
-			await expect(handler.throwIfCannotBeApplied(multiPaymentTransaction, senderWallet)).toResolve();
-		});
+	it("bootstrap should throw if asset is undefined", async (context) => {
+		context.multiPaymentTransaction.data.asset = undefined;
 
-		it("should not throw - multi sign", async () => {
-			await expect(
-				handler.throwIfCannotBeApplied(multiSignatureMultiPaymentTransaction, multiSignatureWallet),
-			).toResolve();
-		});
-
-		it("should throw if asset is undefined", async () => {
-			multiPaymentTransaction.data.asset = undefined;
-
-			await expect(handler.throwIfCannotBeApplied(multiPaymentTransaction, senderWallet)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
-
-		it("should throw if wallet has insufficient funds", async () => {
-			senderWallet.setBalance(Utils.BigNumber.ZERO);
-			await expect(handler.throwIfCannotBeApplied(multiPaymentTransaction, senderWallet)).rejects.toThrow(
-				InsufficientBalanceError,
-			);
-		});
-
-		it("should throw if wallet has insufficient funds send all payouts", async () => {
-			senderWallet.setBalance(Utils.BigNumber.make(150)); // short by the fee
-			await expect(handler.throwIfCannotBeApplied(multiPaymentTransaction, senderWallet)).rejects.toThrow(
-				InsufficientBalanceError,
-			);
-		});
+		await assert.rejects(() => context.handler.bootstrap(), Exceptions.Runtime.AssertionException);
 	});
 
-	describe("apply", () => {
-		it("should be ok", async () => {
-			const senderBalance = senderWallet.getBalance();
-			const totalPaymentsAmount = multiPaymentTransaction.data.asset.payments.reduce(
-				(previous, current) => previous.plus(current.amount),
-				Utils.BigNumber.ZERO,
-			);
-
-			await handler.apply(multiPaymentTransaction);
-
-			expect(senderWallet.getBalance()).toEqual(
-				Utils.BigNumber.make(senderBalance).minus(totalPaymentsAmount).minus(multiPaymentTransaction.data.fee),
-			);
-
-			for (const { recipientId, amount } of multiPaymentTransaction.data.asset.payments) {
-				const paymentRecipientWallet = walletRepository.findByAddress(recipientId);
-				expect(paymentRecipientWallet.getBalance()).toEqual(amount);
-			}
-		});
+	it("throwIfCannotBeApplied should not throw", async (context) => {
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(context.multiPaymentTransaction, context.senderWallet),
+		);
 	});
 
-	describe("applyToSender", () => {
-		it("should throw if asset is undefined", async () => {
-			multiPaymentTransaction.data.asset = undefined;
-
-			handler.throwIfCannotBeApplied = jest.fn();
-
-			await expect(handler.applyToSender(multiPaymentTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+	it("throwIfCannotBeApplied should not throw - multi sign", async (context) => {
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(
+				context.multiSignatureMultiPaymentTransaction,
+				context.multiSignatureWallet,
+			),
+		);
 	});
 
-	describe("applyToRecipient", () => {
-		it("should throw if asset is undefined", async () => {
-			multiPaymentTransaction.data.asset = undefined;
+	it("throwIfCannotBeApplied should throw if asset is undefined", async (context) => {
+		context.multiPaymentTransaction.data.asset = undefined;
 
-			await expect(handler.applyToRecipient(multiPaymentTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+		await assert.rejects(() =>
+			context.handler.throwIfCannotBeApplied(
+				context.multiPaymentTransaction,
+				context.senderWallet,
+			),
+			Exceptions.Runtime.AssertionException
+		);
 	});
 
-	describe("revert", () => {
-		it("should be ok", async () => {
-			const senderBalance = senderWallet.getBalance();
-			senderWallet.setNonce(Utils.BigNumber.make(1));
+	it("throwIfCannotBeApplied should throw if wallet has insufficient funds", async (context) => {
+		context.senderWallet.setBalance(Utils.BigNumber.ZERO);
 
-			for (const { recipientId, amount } of multiPaymentTransaction.data.asset.payments) {
-				const paymentRecipientWallet = walletRepository.findByAddress(recipientId);
-				paymentRecipientWallet.setBalance(amount);
-			}
-			const totalPaymentsAmount = multiPaymentTransaction.data.asset.payments.reduce(
-				(previous, current) => previous.plus(current.amount),
-				Utils.BigNumber.ZERO,
-			);
-
-			await handler.revert(multiPaymentTransaction);
-			expect(senderWallet.getBalance()).toEqual(
-				Utils.BigNumber.make(senderBalance).plus(totalPaymentsAmount).plus(multiPaymentTransaction.data.fee),
-			);
-
-			expect(senderWallet.getNonce().isZero()).toBeTrue();
-			expect(recipientWallet.getBalance()).toEqual(Utils.BigNumber.ZERO);
-		});
+		await assert.rejects(() =>
+				context.handler.throwIfCannotBeApplied(
+					context.multiPaymentTransaction,
+					context.senderWallet,
+				),
+			InsufficientBalanceError
+		);
 	});
 
-	describe("revertForSender", () => {
-		it("should throw if asset is undefined", async () => {
-			senderWallet.setNonce(Utils.BigNumber.ONE);
+	it("throwIfCannotBeApplied should throw if wallet has insufficient funds send all payouts", async (context) => {
+		context.senderWallet.setBalance(Utils.BigNumber.make(150)); // short by the fee
 
-			multiPaymentTransaction.data.asset = undefined;
-
-			await expect(handler.revertForSender(multiPaymentTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+		await assert.rejects(() =>
+				context.handler.throwIfCannotBeApplied(
+					context.multiPaymentTransaction,
+					context.senderWallet,
+				),
+			InsufficientBalanceError
+		);
 	});
 
-	describe("revertForRecipient", () => {
-		it("should throw if asset is undefined", async () => {
-			multiPaymentTransaction.data.asset = undefined;
+	it("apply should be ok", async (context) => {
+		const senderBalance = context.senderWallet.getBalance();
+		const totalPaymentsAmount = context.multiPaymentTransaction.data.asset.payments.reduce(
+			(previous, current) => previous.plus(current.amount),
+			Utils.BigNumber.ZERO,
+		);
 
-			await expect(handler.revertForRecipient(multiPaymentTransaction)).rejects.toThrow(
-				Exceptions.Runtime.AssertionException,
-			);
-		});
+		await context.handler.apply(context.multiPaymentTransaction);
+
+		assert.equal(context.senderWallet.getBalance(),
+			Utils.BigNumber.make(senderBalance)
+				.minus(totalPaymentsAmount)
+				.minus(context.multiPaymentTransaction.data.fee),
+		);
+
+		for (const { recipientId, amount } of context.multiPaymentTransaction.data.asset.payments) {
+			const paymentRecipientWallet = context.walletRepository.findByAddress(recipientId);
+			assert.equal(paymentRecipientWallet.getBalance(), amount);
+		}
+	});
+
+	it("applyToSender should throw if asset is undefined", async (context) => {
+		context.multiPaymentTransaction.data.asset = undefined;
+
+		context.handler.throwIfCannotBeApplied = spy();
+
+		await assert.rejects(() =>
+				context.handler.applyToSender(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException
+		);
+	});
+
+	it("applyToRecipient should throw if asset is undefined", async (context) => {
+		context.multiPaymentTransaction.data.asset = undefined;
+
+		await assert.rejects(() =>
+				context.handler.applyToRecipient(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException
+		);
+	});
+
+	it("revert should be ok", async (context) => {
+		const senderBalance = context.senderWallet.getBalance();
+		context.senderWallet.setNonce(Utils.BigNumber.make(1));
+
+		for (const { recipientId, amount } of context.multiPaymentTransaction.data.asset.payments) {
+			const paymentRecipientWallet = context.walletRepository.findByAddress(recipientId);
+			paymentRecipientWallet.setBalance(amount);
+		}
+		const totalPaymentsAmount = context.multiPaymentTransaction.data.asset.payments.reduce(
+			(previous, current) => previous.plus(current.amount),
+			Utils.BigNumber.ZERO,
+		);
+
+		await context.handler.revert(context.multiPaymentTransaction);
+		assert.equal(context.senderWallet.getBalance(),
+			Utils.BigNumber.make(senderBalance)
+				.plus(totalPaymentsAmount)
+				.plus(context.multiPaymentTransaction.data.fee),
+		);
+
+		assert.true(context.senderWallet.getNonce().isZero());
+		assert.equal(context.recipientWallet.getBalance(), Utils.BigNumber.ZERO);
+	});
+
+	it("revertForSender should throw if asset is undefined", async (context) => {
+		context.senderWallet.setNonce(Utils.BigNumber.ONE);
+
+		context.multiPaymentTransaction.data.asset = undefined;
+
+		await assert.rejects(() =>
+				context.handler.revertForSender(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException
+		);
+	});
+
+	it("revertForRecipient should throw if asset is undefined", async (context) => {
+		context.multiPaymentTransaction.data.asset = undefined;
+
+		await assert.rejects(() =>
+				context.handler.revertForRecipient(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException
+		);
 	});
 });
