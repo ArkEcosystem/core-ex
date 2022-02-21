@@ -1,4 +1,4 @@
-export class Exception extends Error {
+export class ContainerException extends Error {
 	public constructor(message: string, code?: string) {
 		super(message);
 
@@ -15,8 +15,6 @@ export class Exception extends Error {
 		Error.captureStackTrace(this, this.constructor);
 	}
 }
-
-export class ContainerException extends Exception {}
 
 export class EntryNotFound extends ContainerException {}
 
