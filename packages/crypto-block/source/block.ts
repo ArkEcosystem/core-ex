@@ -1,5 +1,3 @@
-import { HashFactory } from "@arkecosystem/crypto-hash-bcrypto";
-import { Signatory } from "@arkecosystem/crypto-signature-ecdsa";
 import { Slots } from "@arkecosystem/crypto-time";
 import { Container } from "@arkecosystem/container";
 import {
@@ -8,8 +6,10 @@ import {
 	IBlockData,
 	IBlockJson,
 	IBlockVerification,
+	IHashFactory,
 	ITransaction,
 	ITransactionData,
+	Signatory,
 } from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Configuration } from "@arkecosystem/crypto-config";
@@ -24,6 +24,12 @@ export class Block implements IBlock {
 	@Container.inject(BINDINGS.Block.Serializer)
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer
 
+	@Container.inject(BINDINGS.HashFactory)
+	private readonly hashFactory: IHashFactory;
+
+	@Container.inject(BINDINGS.SignatureFactory)
+	private readonly signatureFactory: Signatory;
+
 	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;
 	public data: IBlockData;
@@ -36,15 +42,6 @@ export class Block implements IBlock {
 	) {
 		this.configuration = configuration;
 		this.data = data;
-
-		// TODO genesis block calculated id is wrong for some reason
-		if (this.data.height === 1) {
-			if (id) {
-				this.applyGenesisBlockFix(id);
-			} else if (data.id) {
-				this.applyGenesisBlockFix(data.id);
-			}
-		}
 
 		// fix on real timestamp, this is overloading transaction
 		// timestamp with block timestamp for storage only
@@ -64,6 +61,7 @@ export class Block implements IBlock {
 
 	public getHeader(): IBlockData {
 		const header: IBlockData = Object.assign({}, this.data);
+
 		delete header.transactions;
 
 		return header;
@@ -71,13 +69,13 @@ export class Block implements IBlock {
 
 	public async verifySignature(): Promise<boolean> {
 		const bytes: Buffer = this.serializer.serialize(this.data, false);
-		const hash: Buffer = await new HashFactory().sha256(bytes);
+		const hash: Buffer = await this.hashFactory.sha256(bytes);
 
 		if (!this.data.blockSignature) {
 			throw new Error();
 		}
 
-		return new Signatory().verify(
+		return this.signatureFactory.verify(
 			hash,
 			Buffer.from(this.data.blockSignature, "hex"),
 			Buffer.from(this.data.generatorPublicKey, "hex"),
@@ -205,7 +203,7 @@ export class Block implements IBlock {
 				result.errors.push("Invalid total fee");
 			}
 
-			if ((await new HashFactory().sha256(payloadBuffers)).toString("hex") !== block.payloadHash) {
+			if ((await this.hashFactory.sha256(payloadBuffers)).toString("hex") !== block.payloadHash) {
 				result.errors.push("Invalid payload hash");
 			}
 		} catch (error) {
@@ -215,9 +213,5 @@ export class Block implements IBlock {
 		result.verified = result.errors.length === 0;
 
 		return result;
-	}
-
-	private applyGenesisBlockFix(id: string): void {
-		this.data.id = id;
 	}
 }

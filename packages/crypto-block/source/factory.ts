@@ -1,7 +1,5 @@
-import { HashFactory } from "@arkecosystem/crypto-hash-bcrypto";
-import { Signatory } from "@arkecosystem/crypto-signature-ecdsa";
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, BlockFactoryInstance, IBlock, IBlockData, IBlockJson, IKeyPair, ITransaction } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, BlockFactoryInstance, IBlock, IBlockData, IBlockJson, IHashFactory, IKeyPair, ITransaction, Signatory } from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Block } from "./block";
 import { Deserializer } from "./deserializer";
@@ -27,14 +25,20 @@ export class BlockFactory {
 	@Container.inject(BINDINGS.Block.IdFactory)
 	private readonly idFactory: IdFactory;
 
+	@Container.inject(BINDINGS.HashFactory)
+	private readonly hashFactory: IHashFactory;
+
+	@Container.inject(BINDINGS.SignatureFactory)
+	private readonly signatureFactory: Signatory;
+
 	// @todo: add a proper type hint for data
 	public async make(data: any, keys: IKeyPair): Promise<IBlock | undefined> {
 		data.generatorPublicKey = keys.publicKey;
 
 		const payloadHash: Buffer = this.serializer.serialize(data, false);
-		const hash: Buffer = await new HashFactory().sha256(payloadHash);
+		const hash: Buffer = await this.hashFactory.sha256(payloadHash);
 
-		data.blockSignature = await new Signatory().sign(hash, Buffer.from(keys.privateKey, "hex"));
+		data.blockSignature = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
 
 		data.id = await this.idFactory.make(data);
 
