@@ -41,13 +41,13 @@ const prepareContainer = () => {
 	webhook = Object.assign({}, dummyWebhook);
 };
 
-const expectFinishedEventData = (assert, {executionTime, webhook, payload}) => {
+const expectFinishedEventData = (assert, { executionTime, webhook, payload }) => {
 	assert.number(executionTime);
 	assert.object(webhook);
 	assert.defined(payload);
-}
+};
 
-const expectFailedEventData = (assert, {executionTime, webhook, payload, error}) => {
+const expectFailedEventData = (assert, { executionTime, webhook, payload, error }) => {
 	assert.number(executionTime);
 	assert.object(webhook);
 	assert.defined(payload);
@@ -78,9 +78,9 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it, assert }) => {
 		spyOnDebug.calledOnce();
 		spyOnDispatch.calledOnce();
 
-		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0)
-		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted)
-		expectFinishedEventData(assert, spyOnDispatchArgs[1])
+		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
+		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted);
+		expectFinishedEventData(assert, spyOnDispatchArgs[1]);
 	});
 
 	it("should log error if broadcast is not successful", async () => {
@@ -98,8 +98,8 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it, assert }) => {
 		spyOnError.calledOnce();
 		spyOnDispatch.calledOnce();
 		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Failed)
-		expectFailedEventData(assert, spyOnDispatchArgs[1])
+		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Failed);
+		expectFailedEventData(assert, spyOnDispatchArgs[1]);
 	});
 });
 
@@ -153,8 +153,8 @@ describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it, assert }) => {
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
 		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted)
-		expectFinishedEventData(assert, spyOnDispatchArgs[1])
+		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted);
+		expectFinishedEventData(assert, spyOnDispatchArgs[1]);
 	});
 
 	it("should not broadcast if webhook condition is not satisfied", async () => {

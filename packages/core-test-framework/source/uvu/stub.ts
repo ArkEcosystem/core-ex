@@ -48,7 +48,7 @@ export class Stub {
 		if (this.subject.callCount > index) {
 			return this.subject.getCall(index).args;
 		}
-		throw new Error(`Can't get args for call: ${index}`)
+		throw new Error(`Can't get args for call: ${index}`);
 	}
 
 	public restore(): void {
