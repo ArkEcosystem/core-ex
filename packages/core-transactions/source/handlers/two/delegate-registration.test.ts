@@ -6,7 +6,6 @@ import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } 
 import {
 	InsufficientBalanceError,
 	NotSupportedForMultiSignatureWalletError,
-	UnexpectedNonceError,
 	WalletIsAlreadyDelegateError,
 	WalletUsernameAlreadyRegisteredError,
 } from "../../errors";
