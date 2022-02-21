@@ -3,7 +3,9 @@ import { ripemd160, sha256 } from "hash-wasm";
 
 export class HashFactory implements Contract {
 	public async ripemd160(data: HashInput): Promise<Buffer> {
-		return Buffer.from(await ripemd160(Array.isArray(data) ? Buffer.concat(data) : data), "hex");
+		return Buffer.from(await ripemd160(
+			Array.isArray(data) ? Buffer.concat(data) : data,
+		), "hex");
 	}
 
 	public async sha256(data: HashInput): Promise<Buffer> {
@@ -11,9 +13,6 @@ export class HashFactory implements Contract {
 	}
 
 	public async hash256(data: HashInput): Promise<Buffer> {
-		return Buffer.from(
-			await sha256(Buffer.from(await sha256(Array.isArray(data) ? Buffer.concat(data) : data), "hex")),
-			"hex",
-		);
+		return Buffer.from(await sha256(Buffer.from(await sha256(Array.isArray(data) ? Buffer.concat(data) : data), "hex")), "hex");
 	}
 }
