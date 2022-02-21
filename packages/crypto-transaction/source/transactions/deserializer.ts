@@ -5,7 +5,7 @@ import {
 	TransactionVersionError,
 } from "../errors";
 import { Address } from "@arkecosystem/crypto-identities";
-import { IDeserializeOptions, ITransaction, ITransactionData } from "../interfaces";
+import { IDeserializeOptions, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";

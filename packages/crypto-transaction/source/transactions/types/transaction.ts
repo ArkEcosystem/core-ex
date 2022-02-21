@@ -10,7 +10,7 @@ import {
 	ITransaction,
 	ITransactionData,
 	ITransactionJson,
-} from "../../interfaces";
+} from "@arkecosystem/crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { Verifier } from "../verifier";
 import { TransactionSchema } from "./schemas";

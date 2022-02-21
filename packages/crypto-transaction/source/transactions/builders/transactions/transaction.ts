@@ -3,7 +3,7 @@ import { Slots } from "@arkecosystem/crypto-time";
 import { TransactionTypeGroup } from "../../../enums";
 import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "../../../errors";
 import { Address, Keys } from "@arkecosystem/crypto-identities";
-import { IKeyPair, ITransaction, ITransactionData } from "../../../interfaces";
+import { IKeyPair, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { maxVendorFieldLength } from "../../../utils";
 import { Signer } from "../../signer";

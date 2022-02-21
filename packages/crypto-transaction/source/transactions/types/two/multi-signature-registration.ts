@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/container";
 
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
-import { IMultiSignatureAsset, ISerializeOptions, ITransactionData } from "../../../interfaces";
+import { IMultiSignatureAsset, ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
 
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import * as schemas from "../schemas";

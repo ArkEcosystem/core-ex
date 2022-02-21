@@ -10,7 +10,7 @@ import {
 	ITransaction,
 	ITransactionData,
 	ITransactionJson,
-} from "../interfaces";
+} from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
@@ -104,7 +104,7 @@ export class TransactionFactory {
 				throw new TransactionSchemaError(error);
 			}
 
-			transaction.isVerified = transaction.verify(options);
+			transaction.isVerified = await transaction.verify(options);
 
 			return transaction;
 		} catch (error) {

@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/container";
 import { BINDINGS, IHashFactory } from "@packages/crypto-contracts/distribution";
 
-import { ISerializeOptions, ITransactionData } from "../interfaces";
+import { ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { TransactionTypeFactory } from "./types/factory";
 
 @Container.injectable()

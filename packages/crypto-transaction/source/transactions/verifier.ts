@@ -4,7 +4,7 @@ import { Configuration } from "@arkecosystem/crypto-config";
 
 import { Hash } from "../crypto/hash";
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "../errors";
-import { IMultiSignatureAsset, ISchemaValidationResult, ITransactionData, IVerifyOptions } from "../interfaces";
+import { IMultiSignatureAsset, ISchemaValidationResult, ITransactionData, IVerifyOptions } from "@arkecosystem/crypto-contracts";
 import { TransactionTypeFactory } from "./types/factory";
 import { Utils } from "./utils";
 

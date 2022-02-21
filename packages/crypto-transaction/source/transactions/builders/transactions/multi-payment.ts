@@ -1,5 +1,5 @@
 import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "../../../errors";
-import { ITransactionData } from "../../../interfaces";
+import { ITransactionData } from "@arkecosystem/crypto-contracts";
 
 import { BigNumber } from "@arkecosystem/utils";
 import { Two } from "../../types";

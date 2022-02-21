@@ -2,7 +2,7 @@ import { Container } from "@arkecosystem/container";
 import { BINDINGS } from "@arkecosystem/crypto-contracts";
 
 import { Hash } from "../crypto";
-import { IKeyPair, ISerializeOptions, ITransactionData } from "../interfaces";
+import { IKeyPair, ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { numberToHex } from "../utils";
 import { Utils } from "./utils";
 

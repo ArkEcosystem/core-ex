@@ -2,7 +2,7 @@ import { Container } from "@arkecosystem/container";
 
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
 import { Address } from "@arkecosystem/crypto-identities";
-import { IMultiPaymentItem, ISerializeOptions } from "../../../interfaces";
+import { IMultiPaymentItem, ISerializeOptions } from "@arkecosystem/crypto-contracts";
 
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import * as schemas from "../schemas";
