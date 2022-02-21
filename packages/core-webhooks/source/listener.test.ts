@@ -2,7 +2,7 @@ import { Application, Container, Utils } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test-framework";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { dummyWebhook } from "../__tests__/__fixtures__/assets";
+import { dummyWebhook } from "../test/fixtures/assets";
 import { conditions } from "./conditions";
 import { Database } from "./database";
 import { WebhookEvent } from "./events";
