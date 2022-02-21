@@ -113,8 +113,8 @@ export abstract class Transaction implements ITransaction {
 		return false;
 	}
 
-	public abstract serialize(): ByteBuffer | undefined;
-	public abstract deserialize(buf: ByteBuffer): void;
+	public abstract serialize(): Promise<ByteBuffer | undefined>;
+	public abstract deserialize(buf: ByteBuffer): Promise<void>;
 
 	public get id(): string | undefined {
 		return this.data.id;

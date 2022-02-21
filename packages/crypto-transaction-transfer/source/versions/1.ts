@@ -30,14 +30,14 @@ export abstract class One extends Transaction {
 		return true;
 	}
 
-	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
+	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(33));
 		buff.writeBigUInt64LE(data.amount.toBigInt());
 		buff.writeUInt32LE(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer, addressError } = this.addressFactory.toBuffer(
+			const { addressBuffer, addressError } = await this.addressFactory.toBuffer(
 				data.recipientId,
 				this.configuration.get("network.pubKeyHash"),
 			);
@@ -52,10 +52,10 @@ export abstract class One extends Transaction {
 		return buff;
 	}
 
-	public deserialize(buf: ByteBuffer): void {
+	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
 		data.expiration = buf.readUInt32LE();
-		data.recipientId = this.addressFactory.fromBuffer(buf.readBuffer(21));
+		data.recipientId = await this.addressFactory.fromBuffer(buf.readBuffer(21));
 	}
 }
