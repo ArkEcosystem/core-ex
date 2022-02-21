@@ -9,13 +9,12 @@ export * from "./factory";
 export * from "./serializer";
 
 export const createBlockPackage = (container: Container.Container) => {
-	container.bind(BINDINGS.Block.FactoryInstance).toFactory<IBlock>(
-		(context: Container.interfaces.Context) => (data) =>
-			new Block(
-				context.container.get<Configuration>(BINDINGS.Configuration),
-				data,
-			),
-	);
+	container
+		.bind(BINDINGS.Block.FactoryInstance)
+		.toFactory<IBlock>(
+			(context: Container.interfaces.Context) => (data) =>
+				new Block(context.container.get<Configuration>(BINDINGS.Configuration), data),
+		);
 
 	return {};
 };

@@ -1,5 +1,15 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, BlockFactoryInstance, IBlock, IBlockData, IBlockJson, IHashFactory, IKeyPair, ITransaction, Signatory } from "@arkecosystem/crypto-contracts";
+import {
+	BINDINGS,
+	BlockFactoryInstance,
+	IBlock,
+	IBlockData,
+	IBlockJson,
+	IHashFactory,
+	IKeyPair,
+	ITransaction,
+	Signatory,
+} from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Block } from "./block";
 import { Deserializer } from "./deserializer";
@@ -74,7 +84,6 @@ export class BlockFactory {
 		data: IBlockData,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): Promise<IBlock | undefined> {
-
 		if (await applySchema(data)) {
 			const serialized: Buffer = this.serializer.serializeWithTransactions(data);
 			const block: IBlock = this.blockFactory({
@@ -90,7 +99,9 @@ export class BlockFactory {
 	}
 
 	private async fromSerialized(serialized: Buffer): Promise<IBlock> {
-		const deserialized: { data: IBlockData; transactions: ITransaction[] } = await this.deserializer.deserialize(serialized);
+		const deserialized: { data: IBlockData; transactions: ITransaction[] } = await this.deserializer.deserialize(
+			serialized,
+		);
 
 		const validated: IBlockData | undefined = await applySchema(deserialized.data);
 

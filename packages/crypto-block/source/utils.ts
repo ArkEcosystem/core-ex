@@ -7,7 +7,7 @@ export const toBytesHex = (data): string => {
 	const temp: string = data ? BigNumber.make(data).toString(16) : "";
 
 	return "0".repeat(16 - temp.length) + temp;
-}
+};
 
 export const applySchema = async (data: IBlockData): Promise<IBlockData | undefined> => {
 	let result = await new Validator({}).validate("block", data);
@@ -44,4 +44,4 @@ export const applySchema = async (data: IBlockData): Promise<IBlockData | undefi
 	}
 
 	return result.value;
-}
+};

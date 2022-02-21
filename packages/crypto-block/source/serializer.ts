@@ -82,7 +82,6 @@ export class Serializer {
 
 			block.previousBlockHex = block.previousBlock;
 		} else {
-
 			block.previousBlockHex = toBytesHex(block.previousBlock);
 		}
 

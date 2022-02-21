@@ -1,9 +1,5 @@
 import { Container } from "@arkecosystem/container";
-import {
-	BINDINGS,
-	IBlockData,
-	IHashFactory,
-} from "@arkecosystem/crypto-contracts";
+import { BINDINGS, IBlockData, IHashFactory } from "@arkecosystem/crypto-contracts";
 
 import { Serializer } from "./serializer";
 
