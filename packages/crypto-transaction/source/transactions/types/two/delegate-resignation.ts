@@ -1,12 +1,19 @@
-import { ByteBuffer } from "../../../utils/byte-buffer";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
+
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
 import { ISerializeOptions } from "../../../interfaces";
-import { configManager } from "../../../managers";
-import { BigNumber } from "../../../utils/bignum";
+
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import * as schemas from "../schemas";
 import { Transaction } from "../transaction";
 
+@Container.injectable()
 export abstract class DelegateResignationTransaction extends Transaction {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
+
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.DelegateResignation;
 	public static key = "delegateResignation";
@@ -19,7 +26,7 @@ export abstract class DelegateResignationTransaction extends Transaction {
 	}
 
 	public verify(): boolean {
-		return configManager.getMilestone().aip11 && super.verify();
+		return this.configuration.getMilestone().aip11 && super.verify();
 	}
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {

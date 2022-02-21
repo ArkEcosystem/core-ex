@@ -1,9 +1,12 @@
+import { Container } from "@arkecosystem/container";
+
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
 import { IMultiSignatureLegacyAsset, ISerializeOptions, ITransactionData } from "../../../interfaces";
-import { BigNumber, ByteBuffer } from "../../../utils";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import * as schemas from "../schemas";
 import { Transaction } from "../transaction";
 
+@Container.injectable()
 export abstract class MultiSignatureRegistrationTransaction extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;

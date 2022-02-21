@@ -1,12 +1,20 @@
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
+
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
 import { Address } from "../../../identities";
 import { IMultiPaymentItem, ISerializeOptions } from "../../../interfaces";
-import { configManager } from "../../../managers";
-import { BigNumber, ByteBuffer } from "../../../utils";
+
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import * as schemas from "../schemas";
 import { Transaction } from "../transaction";
 
+@Container.injectable()
 export abstract class MultiPaymentTransaction extends Transaction {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
+
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiPayment;
 	public static key = "multiPayment";
@@ -19,7 +27,7 @@ export abstract class MultiPaymentTransaction extends Transaction {
 	}
 
 	public verify(): boolean {
-		return configManager.getMilestone().aip11 && super.verify();
+		return this.configuration.getMilestone().aip11 && super.verify();
 	}
 
 	public hasVendorField(): boolean {

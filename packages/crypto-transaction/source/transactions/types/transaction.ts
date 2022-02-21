@@ -9,7 +9,7 @@ import {
 	ITransactionJson,
 } from "../../interfaces";
 import { configManager } from "../../managers/config";
-import { BigNumber, ByteBuffer } from "../../utils";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { Verifier } from "../verifier";
 import { TransactionSchema } from "./schemas";
 

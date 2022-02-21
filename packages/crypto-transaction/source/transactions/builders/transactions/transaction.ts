@@ -5,7 +5,6 @@ import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from
 import { Address, Keys } from "../../../identities";
 import { IKeyPair, ITransaction, ITransactionData } from "../../../interfaces";
 import { configManager } from "../../../managers/config";
-import { NetworkType } from "../../../types";
 import { BigNumber, maxVendorFieldLength } from "../../../utils";
 import { Signer } from "../../signer";
 import { Verifier } from "../../verifier";
@@ -113,7 +112,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	public signWithWif(wif: string, networkWif?: number): TBuilder {
 		const keys: IKeyPair = Keys.fromWIF(wif, {
 			wif: networkWif || configManager.get("network.wif"),
-		} as NetworkType);
+		} as any);
 
 		return this.signWithKeyPair(keys);
 	}
@@ -126,7 +125,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	public multiSignWithWif(index: number, wif: string, networkWif?: number): TBuilder {
 		const keys = Keys.fromWIF(wif, {
 			wif: networkWif || configManager.get("network.wif"),
-		} as NetworkType);
+		} as any);
 
 		return this.multiSignWithKeyPair(index, keys);
 	}

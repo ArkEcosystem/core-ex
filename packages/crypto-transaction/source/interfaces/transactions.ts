@@ -1,6 +1,6 @@
 import { ErrorObject } from "ajv";
 
-import { BigNumber, ByteBuffer } from "../utils";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 export interface ITransaction {
 	readonly id: string | undefined;

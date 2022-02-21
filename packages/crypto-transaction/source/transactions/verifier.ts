@@ -1,21 +1,30 @@
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
+
 import { Hash } from "../crypto/hash";
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "../errors";
 import { IMultiSignatureAsset, ISchemaValidationResult, ITransactionData, IVerifyOptions } from "../interfaces";
-import { configManager } from "../managers";
-import { validator } from "../validation";
 import { TransactionTypeFactory } from "./types/factory";
 import { Utils } from "./utils";
 
+@Container.injectable()
 export class Verifier {
-	public static verify(data: ITransactionData, options?: IVerifyOptions): boolean {
-		if (configManager.getMilestone().aip11 && (!data.version || data.version === 1)) {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
+
+	@Container.inject(BINDINGS.Validator)
+	private readonly validator: any;
+
+	public verify(data: ITransactionData, options?: IVerifyOptions): boolean {
+		if (this.configuration.getMilestone().aip11 && (!data.version || data.version === 1)) {
 			return false;
 		}
 
-		return Verifier.verifyHash(data, options?.disableVersionCheck);
+		return this.verifyHash(data, options?.disableVersionCheck);
 	}
 
-	public static verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): boolean {
+	public verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): boolean {
 		if (!multiSignature) {
 			throw new InvalidMultiSignatureAssetError();
 		}
@@ -62,7 +71,7 @@ export class Verifier {
 		return verified;
 	}
 
-	public static verifyHash(data: ITransactionData, disableVersionCheck = false): boolean {
+	public verifyHash(data: ITransactionData, disableVersionCheck = false): boolean {
 		const { signature, senderPublicKey } = data;
 
 		if (!signature || !senderPublicKey) {
@@ -77,7 +86,7 @@ export class Verifier {
 		return this.internalVerifySignature(hash, signature, senderPublicKey);
 	}
 
-	public static verifySchema(data: ITransactionData, strict = true): ISchemaValidationResult {
+	public verifySchema(data: ITransactionData, strict = true): ISchemaValidationResult {
 		const transactionType = TransactionTypeFactory.get(data.type, data.typeGroup, data.version);
 
 		if (!transactionType) {
@@ -86,10 +95,10 @@ export class Verifier {
 
 		const { $id } = transactionType.getSchema();
 
-		return validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
+		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
 	}
 
-	private static internalVerifySignature(hash: Buffer, signature: string, publicKey: string): boolean {
+	private internalVerifySignature(hash: Buffer, signature: string, publicKey: string): boolean {
 		const isSchnorr = Buffer.from(signature, "hex").byteLength === 64;
 		if (isSchnorr) {
 			return Hash.verifySchnorr(hash, signature, publicKey);

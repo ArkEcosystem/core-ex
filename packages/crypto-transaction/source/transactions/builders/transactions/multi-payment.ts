@@ -1,6 +1,6 @@
 import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "../../../errors";
 import { ITransactionData } from "../../../interfaces";
-import { configManager } from "../../../managers";
+
 import { BigNumber } from "../../../utils";
 import { Two } from "../../types";
 import { TransactionBuilder } from "./transaction";
