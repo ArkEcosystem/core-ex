@@ -106,7 +106,6 @@ describe<{
 
 	afterEach(() => {
 		Mocks.TransactionRepository.setTransactions([]);
-		Managers.configManager.set("exceptions.transactions", []);
 		Managers.configManager.set("network.pubKeyHash", 23);
 	});
 
@@ -182,15 +181,6 @@ describe<{
 		await assert.rejects(
 			() => context.handler.throwIfCannotBeApplied(context.multiSignatureTransaction, context.senderWallet),
 			LegacyMultiSignatureError,
-		);
-	});
-
-	it("throwIfCannotBeApplied should not throw if exception", async (context) => {
-		Managers.configManager.set("network.pubKeyHash", 99);
-		Managers.configManager.set("exceptions.transactions", [context.multiSignatureTransaction.id]);
-
-		await assert.resolves(() =>
-			context.handler.throwIfCannotBeApplied(context.multiSignatureTransaction, context.senderWallet),
 		);
 	});
 
