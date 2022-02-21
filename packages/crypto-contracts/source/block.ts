@@ -63,3 +63,34 @@ export interface IBlockJson {
 	serialized?: string;
 	transactions?: ITransactionJson[];
 }
+
+export interface IBlockDeserializer {
+	deserialize(
+		serialized: Buffer,
+		headerOnly = false,
+		options: { deserializeTransactionsUnchecked?: boolean } = {},
+	): Promise<{ data: IBlockData; transactions: ITransaction[] }>;
+}
+
+export interface IBlockBlockFactory {
+	make(data: any, keys: IKeyPair): Promise<IBlock | undefined>;
+
+	fromHex(hex: string): Promise<IBlock>;
+
+	fromBytes(buff: Buffer): Promise<IBlock>;
+
+	fromJson(json: IBlockJson): Promise<IBlock | undefined>;
+
+	fromData(
+		data: IBlockData,
+		options: { deserializeTransactionsUnchecked?: boolean } = {},
+	): Promise<IBlock | undefined>;
+}
+
+export interface IBlockSerializer {
+	size(block: IBlock): number;
+
+	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
+
+	serialize(block: IBlockData, includeSignature = true): Buffer;
+}
