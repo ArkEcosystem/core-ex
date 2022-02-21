@@ -26,14 +26,20 @@ export class TransactionFactory {
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: Configuration;
 
+	@Container.inject(BINDINGS.Transaction.Serializer)
+	private readonly serializer: Serializer;
+
+	@Container.inject(BINDINGS.Transaction.Utils)
+	private readonly utils: Utils;
+
 	@Container.inject(BINDINGS.Transaction.Verifier)
 	private readonly verifier: Verifier;
 
-	public static fromHex(hex: string): ITransaction {
+	public async fromHex(hex: string): Promise<ITransaction> {
 		return this.fromSerialized(hex);
 	}
 
-	public static fromBytes(buff: Buffer, strict = true, options: IDeserializeOptions = {}): ITransaction {
+	public async fromBytes(buff: Buffer, strict = true, options: IDeserializeOptions = {}): Promise<ITransaction> {
 		return this.fromSerialized(buff.toString("hex"), strict, options);
 	}
 
@@ -44,11 +50,11 @@ export class TransactionFactory {
 	 * NOTE: Only use this internally when it is safe to assume the buffer has already been
 	 * verified.
 	 */
-	public static fromBytesUnsafe(buff: Buffer, id?: string): ITransaction {
+	public async fromBytesUnsafe(buff: Buffer, id?: string): Promise<ITransaction> {
 		try {
 			const options: IDeserializeOptions | ISerializeOptions = { acceptLegacyVersion: true };
 			const transaction = Deserializer.deserialize(buff, options);
-			transaction.data.id = id || Utils.getId(transaction.data, options);
+			transaction.data.id = id || await this.utils.getId(transaction.data, options);
 			transaction.isVerified = true;
 
 			return transaction;
@@ -57,7 +63,7 @@ export class TransactionFactory {
 		}
 	}
 
-	public static fromJson(json: ITransactionJson): ITransaction {
+	public async fromJson(json: ITransactionJson): Promise<ITransaction> {
 		const data: ITransactionData = { ...json } as unknown as ITransactionData;
 		data.amount = BigNumber.make(data.amount);
 		data.fee = BigNumber.make(data.fee);
@@ -65,8 +71,8 @@ export class TransactionFactory {
 		return this.fromData(data);
 	}
 
-	public static fromData(data: ITransactionData, strict = true, options: IDeserializeOptions = {}): ITransaction {
-		const { value, error } = Verifier.verifySchema(data, strict);
+	public async fromData(data: ITransactionData, strict = true, options: IDeserializeOptions = {}): Promise<ITransaction> {
+		const { value, error } = this.verifier.verifySchema(data, strict);
 
 		if (error) {
 			throw new TransactionSchemaError(error);
@@ -79,17 +85,17 @@ export class TransactionFactory {
 			Deserializer.applyV1Compatibility(transaction.data);
 		}
 
-		Serializer.serialize(transaction);
+		this.serializer.serialize(transaction);
 
 		return this.fromBytes(transaction.serialized, strict, options);
 	}
 
-	private static fromSerialized(serialized: string, strict = true, options: IDeserializeOptions = {}): ITransaction {
+	private async fromSerialized(serialized: string, strict = true, options: IDeserializeOptions = {}): Promise<ITransaction> {
 		try {
 			const transaction = Deserializer.deserialize(serialized, options);
-			transaction.data.id = Utils.getId(transaction.data, options);
+			transaction.data.id = await this.utils.getId(transaction.data, options);
 
-			const { error } = Verifier.verifySchema(transaction.data, strict);
+			const { error } = this.verifier.verifySchema(transaction.data, strict);
 
 			if (error) {
 				throw new TransactionSchemaError(error);
