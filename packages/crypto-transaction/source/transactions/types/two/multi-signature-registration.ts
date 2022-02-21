@@ -21,16 +21,21 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		return schemas.multiSignature;
 	}
 
-	public static staticFee(configuration: Configuration, feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
+	public static staticFee(
+		configuration: Configuration,
+		feeContext: { height?: number; data?: ITransactionData } = {},
+	): BigNumber {
 		if (feeContext.data?.asset?.multiSignature) {
-			return super.staticFee(configuration, feeContext).times(feeContext.data.asset.multiSignature.publicKeys.length + 1);
+			return super
+				.staticFee(configuration, feeContext)
+				.times(feeContext.data.asset.multiSignature.publicKeys.length + 1);
 		}
 
 		return super.staticFee(configuration, feeContext);
 	}
 
 	public async verify(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 && await super.verify();
+		return this.configuration.getMilestone().aip11 && (await super.verify());
 	}
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {

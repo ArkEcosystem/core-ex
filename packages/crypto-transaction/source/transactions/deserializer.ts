@@ -22,7 +22,9 @@ export class Deserializer {
 		transaction.typeGroup = TransactionTypeGroup.Core;
 
 		if (transaction.type === TransactionType.Vote && transaction.senderPublicKey) {
-			transaction.recipientId = Address.fromPublicKey(transaction.senderPublicKey, {pubKeyHash: transaction.network});
+			transaction.recipientId = Address.fromPublicKey(transaction.senderPublicKey, {
+				pubKeyHash: transaction.network,
+			});
 		} else if (
 			transaction.type === TransactionType.MultiSignature &&
 			transaction.asset &&
