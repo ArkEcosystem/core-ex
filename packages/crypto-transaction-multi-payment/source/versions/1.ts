@@ -21,7 +21,35 @@ export abstract class One extends Transaction {
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
 	public static getSchema(): schemas.TransactionSchema {
-		return schemas.multiSignatureLegacy;
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "multiPayment",
+			properties: {
+				type: { transactionType: TransactionType.MultiPayment },
+				amount: { bignumber: { minimum: 0, maximum: 0 } },
+				fee: { bignumber: { minimum: 1 } },
+				vendorField: { anyOf: [{ type: "null" }, { type: "string", format: "vendorField" }] },
+				asset: {
+					type: "object",
+					required: ["payments"],
+					properties: {
+						payments: {
+							type: "array",
+							minItems: 2,
+							additionalItems: false,
+							uniqueItems: false,
+							items: {
+								type: "object",
+								required: ["amount", "recipientId"],
+								properties: {
+									amount: { bignumber: { minimum: 1 } },
+									recipientId: { $ref: "address" },
+								},
+							},
+						},
+					},
+				},
+			},
+		});
 	}
 
 	public static staticFee(
