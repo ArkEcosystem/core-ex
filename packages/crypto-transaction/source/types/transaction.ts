@@ -92,12 +92,18 @@ export abstract class Transaction implements ITransaction {
 
 		if (this.data.senderPublicKey && this.data.nonce) {
 			parts.push(
-				`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}#${
-					this.data.nonce
-				}`,
+				`${await this.addressFactory.fromPublicKey(
+					this.data.senderPublicKey,
+					this.configuration.get("network"),
+				)}#${this.data.nonce}`,
 			);
 		} else if (this.data.senderPublicKey) {
-			parts.push(`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}`);
+			parts.push(
+				`${await this.addressFactory.fromPublicKey(
+					this.data.senderPublicKey,
+					this.configuration.get("network"),
+				)}`,
+			);
 		}
 
 		if (this.data.id) {

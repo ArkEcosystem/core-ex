@@ -155,10 +155,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public async multiSignWithWif(index: number, wif: string, networkWif?: number): Promise<TBuilder> {
-		const keys = await this.keyPairFactory.fromWIF(
-			wif,
-			networkWif || this.configuration.get("network.wif"),
-		);
+		const keys = await this.keyPairFactory.fromWIF(wif, networkWif || this.configuration.get("network.wif"));
 
 		return this.multiSignWithKeyPair(index, keys);
 	}
