@@ -1275,6 +1275,7 @@ importers:
 
   packages/crypto-transaction:
     specifiers:
+      '@arkecosystem/container': workspace:*
       '@arkecosystem/crypto-config': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@arkecosystem/crypto-errors': workspace:*
@@ -1309,6 +1310,7 @@ importers:
       process-es6: 0.11.6
       util: 0.12.4
     dependencies:
+      '@arkecosystem/container': link:../container
       '@arkecosystem/crypto-config': link:../crypto-config
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       '@arkecosystem/crypto-errors': link:../crypto-errors
