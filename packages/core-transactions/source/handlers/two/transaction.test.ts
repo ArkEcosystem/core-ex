@@ -463,7 +463,9 @@ describe<{
 		const senderBalance = context.senderWallet.getBalance();
 
 		await context.handler.revert(instance);
-		assert.equal(context.senderWallet.getBalance(),Utils.BigNumber.make(senderBalance).plus(instance.data.amount).plus(instance.data.fee),
+		assert.equal(
+			context.senderWallet.getBalance(),
+			Utils.BigNumber.make(senderBalance).plus(instance.data.amount).plus(instance.data.fee),
 		);
 
 		assert.true(context.senderWallet.getNonce().isZero());
