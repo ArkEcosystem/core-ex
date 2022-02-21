@@ -2,6 +2,7 @@ import { Container } from "@arkecosystem/container";
 import { Configuration } from "@arkecosystem/crypto-config";
 import {
 	BINDINGS,
+	IAddressFactory,
 	ISchemaValidationResult,
 	ISerializeOptions,
 	ITransaction,
@@ -9,7 +10,6 @@ import {
 	ITransactionJson,
 	ITransactionVerifier,
 } from "@arkecosystem/crypto-contracts";
-import { Address } from "@arkecosystem/crypto-identities";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import { TransactionTypeGroup } from "../enums";
@@ -18,6 +18,9 @@ import { TransactionSchema } from "./schemas";
 
 @Container.injectable()
 export abstract class Transaction implements ITransaction {
+	@Container.inject(BINDINGS.Identity.AddressFactory)
+	protected readonly addressFactory: IAddressFactory;
+
 	@Container.inject(BINDINGS.Configuration)
 	protected readonly configuration: Configuration;
 
@@ -84,17 +87,17 @@ export abstract class Transaction implements ITransaction {
 		return data;
 	}
 
-	public toString(): string {
+	public async toString(): Promise<string> {
 		const parts: string[] = [];
 
 		if (this.data.senderPublicKey && this.data.nonce) {
 			parts.push(
-				`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}#${
+				`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}#${
 					this.data.nonce
 				}`,
 			);
 		} else if (this.data.senderPublicKey) {
-			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}`);
+			parts.push(`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}`);
 		}
 
 		if (this.data.id) {

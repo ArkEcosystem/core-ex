@@ -1,6 +1,5 @@
 import { Container } from "@arkecosystem/container";
 import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
-import { Address } from "@arkecosystem/crypto-identities";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
@@ -38,9 +37,9 @@ export abstract class One extends Transaction {
 		buff.writeUInt32LE(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer, addressError } = Address.toBuffer(
+			const { addressBuffer, addressError } = this.addressFactory.toBuffer(
 				data.recipientId,
-				this.configuration.get("network"),
+				this.configuration.get("network.pubKeyHash"),
 			);
 
 			if (options) {
@@ -57,6 +56,6 @@ export abstract class One extends Transaction {
 		const { data } = this;
 		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
 		data.expiration = buf.readUInt32LE();
-		data.recipientId = Address.fromBuffer(buf.readBuffer(21));
+		data.recipientId = this.addressFactory.fromBuffer(buf.readBuffer(21));
 	}
 }
