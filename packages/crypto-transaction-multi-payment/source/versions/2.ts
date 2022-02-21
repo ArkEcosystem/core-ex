@@ -1,7 +1,12 @@
 import { Container } from "@arkecosystem/container";
 
-
-import { IMultiSignatureAsset, ISerializeOptions, ITransactionData, TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
+import {
+	IMultiSignatureAsset,
+	ISerializeOptions,
+	ITransactionData,
+	TransactionType,
+	TransactionTypeGroup,
+} from "@arkecosystem/crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
 import { Configuration } from "@arkecosystem/crypto-config";
@@ -11,7 +16,7 @@ export class Two extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
-	public static version: number = 2;
+	public static version = 2;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
@@ -38,7 +43,7 @@ export class Two extends Transaction {
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
 		const { data } = this;
-		const { min, publicKeys } = data.asset!.multiSignature!;
+		const { min, publicKeys } = data.asset.multiSignature;
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(2 + publicKeys.length * 33));
 
 		buff.writeUInt8(min);

@@ -1,6 +1,12 @@
 import { Container } from "@arkecosystem/container";
 
-import { IMultiSignatureLegacyAsset, ISerializeOptions, ITransactionData, TransactionType, TransactionTypeGroup } from "@arkecosystem/crypto-contracts";
+import {
+	IMultiSignatureLegacyAsset,
+	ISerializeOptions,
+	ITransactionData,
+	TransactionType,
+	TransactionTypeGroup,
+} from "@arkecosystem/crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { schemas, Transaction } from "@arkecosystem/crypto-transaction";
 import { Configuration } from "@packages/crypto-config/distribution";
@@ -10,7 +16,7 @@ export abstract class One extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
-	public static version: number = 1;
+	public static version = 1;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
@@ -38,7 +44,7 @@ export abstract class One extends Transaction {
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
 		const { data } = this;
 
-		const legacyAsset: IMultiSignatureLegacyAsset = data.asset!.multiSignatureLegacy!;
+		const legacyAsset: IMultiSignatureLegacyAsset = data.asset.multiSignatureLegacy;
 		const joined: string = legacyAsset.keysgroup.map((k) => (k.startsWith("+") ? k.slice(1) : k)).join("");
 		const keysgroupBuffer: Buffer = Buffer.from(joined, "hex");
 		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(keysgroupBuffer.length + 3));

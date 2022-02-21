@@ -7,6 +7,6 @@ import { Two } from "./versions/2";
 export * from "./builder";
 
 export const init = (container: Container.Container): void => {
-    const registry: TransactionRegistry = container.get(BINDINGS.Transaction.Registry);
+	const registry: TransactionRegistry = container.get(BINDINGS.Transaction.Registry);
 	registry.registerTransactionType(Two);
-}
+};

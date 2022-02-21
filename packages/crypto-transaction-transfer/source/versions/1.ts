@@ -11,7 +11,7 @@ export abstract class One extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.Transfer;
 	public static key = "transfer";
-	public static version: number = 1;
+	public static version = 1;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("10000000");
 

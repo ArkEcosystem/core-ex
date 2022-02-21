@@ -9,7 +9,7 @@ export abstract class Two extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.DelegateResignation;
 	public static key = "delegateResignation";
-	public static version: number = 2;
+	public static version = 2;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("2500000000");
 
