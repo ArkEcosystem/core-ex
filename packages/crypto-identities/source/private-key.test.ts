@@ -1,13 +1,13 @@
 import "jest-extended";
 
-import { data, passphrase } from "../test/identity.json";
+import { data, mnemonic } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
 import { PrivateKey } from "./private-key";
 
 describe("Identities - Private Key", () => {
-	describe("fromPassphrase", () => {
+	describe("fromMnemonic", () => {
 		it("should be OK", () => {
-			expect(PrivateKey.fromPassphrase(passphrase)).toBe(data.privateKey);
+			expect(PrivateKey.fromMnemonic(mnemonic)).toBe(data.privateKey);
 		});
 	});
 

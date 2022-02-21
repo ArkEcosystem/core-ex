@@ -1,14 +1,14 @@
 import "jest-extended";
 
-import { data, passphrase } from "../test/identity.json";
+import { data, mnemonic } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
 import { InvalidMultiSignatureAssetError, PublicKeyError } from "./errors";
 import { PublicKey } from "./public-key";
 
 describe("Identities - Public Key", () => {
-	describe("fromPassphrase", () => {
+	describe("fromMnemonic", () => {
 		it("should be OK", () => {
-			expect(PublicKey.fromPassphrase(passphrase)).toBe(data.publicKey);
+			expect(PublicKey.fromMnemonic(mnemonic)).toBe(data.publicKey);
 		});
 	});
 
@@ -23,7 +23,7 @@ describe("Identities - Public Key", () => {
 			expect(
 				PublicKey.fromMultiSignatureAsset({
 					min: 3,
-					publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
+					publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromMnemonic(secret)),
 				}),
 			).toBe("0279f05076556da7173610a7676399c3620276ebbf8c67552ad3b1f26ec7627794");
 		});
@@ -81,7 +81,7 @@ describe("Identities - Public Key", () => {
 			const publicKeys = new Set();
 
 			for (let i = 1; i < 16; i++) {
-				participants.push(PublicKey.fromPassphrase(`secret ${i}`));
+				participants.push(PublicKey.fromMnemonic(`secret ${i}`));
 			}
 
 			for (let i = 1; i < 16; i++) {
@@ -100,7 +100,7 @@ describe("Identities - Public Key", () => {
 			expect(() => {
 				PublicKey.fromMultiSignatureAsset({
 					min: 7,
-					publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
+					publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromMnemonic(secret)),
 				});
 			}).toThrowError(InvalidMultiSignatureAssetError);
 

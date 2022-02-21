@@ -26,4 +26,12 @@ describe("KeyPairFactory", ({ assert, it }) => {
 			},
 		);
 	});
+
+	it("should derive from a WIF", async () => {
+		assert.equal(await new KeyPairFactory().fromWIF("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn", 128), {
+			compressed: true,
+			privateKey: "0000000000000000000000000000000000000000000000000000000000000001",
+			publicKey: "4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29",
+		});
+	});
 });

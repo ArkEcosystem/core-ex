@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { KeyPairFactory } from "./index";
+import { KeyPairFactory } from "./pair";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";

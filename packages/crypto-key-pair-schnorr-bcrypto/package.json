@@ -17,7 +17,9 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
-		"bcrypto": "5.4.0"
+		"@arkecosystem/crypto-errors": "workspace:*",
+		"bcrypto": "5.4.0",
+		"wif": "^2.0.6"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",

@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
+		"@arkecosystem/crypto-errors": "workspace:*",
 		"@noble/secp256k1": "^1.5.4"
 	},
 	"devDependencies": {

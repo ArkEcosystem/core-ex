@@ -1,24 +1,22 @@
-import { Container } from "@arkecosystem/container";
-import { BINDINGS, IKeyPairFactory, IPublicKeyFactory, IMultiSignatureAsset } from "@arkecosystem/crypto-contracts";
+import { IPublicKeyFactory, IMultiSignatureAsset } from "@arkecosystem/crypto-contracts";
 import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/crypto-errors";
 import { secp256k1 } from "bcrypto";
 
-import { numberToHex } from "./helpers";
+import { KeyPairFactory } from "./pair";
 
-@Container.injectable()
-export class PublicKey implements IPublicKeyFactory {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+export class PublicKeyFactory implements IPublicKeyFactory {
+	readonly #keyPairFactory: KeyPairFactory;
 
-	@Container.inject(BINDINGS.Identity.PublicKeyFactory)
-	private readonly publicKeyFactory: IPublicKeyFactory;
-
-	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
+	public constructor() {
+		this.#keyPairFactory = new KeyPairFactory();
 	}
 
-	public async fromWIF(wif: string, options: { wif: number }): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif, options)).publicKey;
+	public async fromMnemonic(mnemonic: string): Promise<string> {
+		return (await this.#keyPairFactory.fromMnemonic(mnemonic)).publicKey;
+	}
+
+	public async fromWIF(wif: string, version: number): Promise<string> {
+		return (await this.#keyPairFactory.fromWIF(wif, version)).publicKey;
 	}
 
 	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
@@ -34,7 +32,7 @@ export class PublicKey implements IPublicKeyFactory {
 			throw new InvalidMultiSignatureAssetError();
 		}
 
-		const minKey: string = await this.publicKeyFactory.fromMnemonic(numberToHex(min));
+		const minKey: string = await this.fromMnemonic(this.#numberToHex(min));
 		const keys: string[] = [minKey, ...publicKeys];
 
 		return secp256k1
@@ -44,5 +42,11 @@ export class PublicKey implements IPublicKeyFactory {
 
 	public async verify(publicKey: string): Promise<boolean> {
 		return secp256k1.publicKeyVerify(Buffer.from(publicKey, "hex"));
+	}
+
+	#numberToHex(num: number, padding = 2): string {
+		const indexHex: string = Number(num).toString(16);
+
+		return "0".repeat(padding - indexHex.length) + indexHex;
 	}
 }

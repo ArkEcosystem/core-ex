@@ -1,11 +1,16 @@
-import { Keys } from "./keys";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IKeyPairFactory, IPrivateKeyFactory } from "@arkecosystem/crypto-contracts";
 
-export class PrivateKey {
-	public static fromPassphrase(passphrase: string): string {
-		return Keys.fromPassphrase(passphrase).privateKey;
+@Container.injectable()
+export class PrivateKey implements IPrivateKeyFactory {
+	@Container.inject(BINDINGS.Identity.KeyPairFactory)
+	private readonly keyPairFactory: IKeyPairFactory;
+
+	public async fromMnemonic(mnemonic: string): Promise<string> {
+		return (await this.keyPairFactory.fromMnemonic(mnemonic)).privateKey;
 	}
 
-	public static fromWIF(wif: string, options: { wif: number }): string {
-		return Keys.fromWIF(wif, options).privateKey;
+	public async fromWIF(wif: string, options: { wif: number }): Promise<string> {
+		return (await this.keyPairFactory.fromWIF(wif, options)).privateKey;
 	}
 }

@@ -16,6 +16,9 @@
 		"test": "cross-env CORE_ENV=test jest --forceExit"
 	},
 	"dependencies": {
+		"@arkecosystem/container": "workspace:*",
+		"@arkecosystem/crypto-contracts": "workspace:*",
+		"@arkecosystem/crypto-errors": "workspace:*",
 		"bcrypto": "^5.3.0",
 		"bstring": "^0.3.9",
 		"fast-memoize": "^2.5.1",

@@ -1,17 +1,19 @@
-// @ts-ignore
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IKeyPair, IKeyPairFactory, IWIFFactory } from "@arkecosystem/crypto-contracts";
 import wif from "wif";
 
-import { KeyPair } from "./contracts";
-import { Keys } from "./keys";
+@Container.injectable()
+export class WIF implements IWIFFactory {
+	@Container.inject(BINDINGS.Identity.KeyPairFactory)
+	private readonly keyPairFactory: IKeyPairFactory;
 
-export class WIF {
-	public static fromPassphrase(passphrase: string, options: { wif: number }): string {
-		const { compressed, privateKey }: KeyPair = Keys.fromPassphrase(passphrase);
+	public async fromMnemonic(mnemonic: string, options: { wif: number }): Promise<string> {
+		const { compressed, privateKey }: IKeyPair = await this.keyPairFactory.fromMnemonic(mnemonic);
 
 		return wif.encode(options.wif, Buffer.from(privateKey, "hex"), compressed);
 	}
 
-	public static fromKeys(keys: KeyPair, options: { wif: number }): string {
+	public async fromKeys(keys: IKeyPair, options: { wif: number }): Promise<string> {
 		return wif.encode(options.wif, Buffer.from(keys.privateKey, "hex"), keys.compressed);
 	}
 }

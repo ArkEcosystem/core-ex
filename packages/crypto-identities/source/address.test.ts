@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { data, passphrase } from "../test/identity.json";
+import { data, mnemonic } from "../test/identity.json";
 import { devnet, mainnet } from "../test/networks.json";
 import { Address } from "./address";
 import { InvalidMultiSignatureAssetError, PublicKeyError } from "./errors";
@@ -8,9 +8,9 @@ import { Keys } from "./keys";
 import { PublicKey } from "./public-key";
 
 describe("Identities - Address", () => {
-	describe("fromPassphrase", () => {
+	describe("fromMnemonic", () => {
 		it("should be OK", () => {
-			expect(Address.fromPassphrase(passphrase, devnet)).toBe(data.address);
+			expect(Address.fromMnemonic(mnemonic, devnet)).toBe(data.address);
 		});
 	});
 
@@ -45,7 +45,7 @@ describe("Identities - Address", () => {
 					{
 						min: 3,
 						publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) =>
-							PublicKey.fromPassphrase(secret),
+							PublicKey.fromMnemonic(secret),
 						),
 					},
 					devnet,
@@ -58,7 +58,7 @@ describe("Identities - Address", () => {
 			const addresses = new Set();
 
 			for (let i = 1; i < 16; i++) {
-				participants.push(PublicKey.fromPassphrase(`secret ${i}`));
+				participants.push(PublicKey.fromMnemonic(`secret ${i}`));
 			}
 
 			for (let i = 1; i < 16; i++) {
@@ -82,7 +82,7 @@ describe("Identities - Address", () => {
 					{
 						min: 7,
 						publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) =>
-							PublicKey.fromPassphrase(secret),
+							PublicKey.fromMnemonic(secret),
 						),
 					},
 					devnet,
@@ -113,7 +113,7 @@ describe("Identities - Address", () => {
 
 	describe("fromPrivateKey", () => {
 		it("should be OK", () => {
-			expect(Address.fromPrivateKey(Keys.fromPassphrase(passphrase), devnet)).toBe(data.address);
+			expect(Address.fromPrivateKey(Keys.fromMnemonic(mnemonic), devnet)).toBe(data.address);
 		});
 	});
 

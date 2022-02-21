@@ -1,17 +1,19 @@
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IHashFactory, IKeyPair, IKeyPairFactory } from "@arkecosystem/crypto-contracts";
+import { NetworkVersionError } from "@arkecosystem/crypto-errors";
 import { secp256k1 } from "bcrypto";
-// @ts-ignore
 import WIF from "wif";
 
-import { KeyPair } from "./contracts";
-import { NetworkVersionError } from "./errors";
-import { HashAlgorithms } from "./hash-algorithms";
+@Container.injectable()
+export class Keys implements IKeyPairFactory {
+	@Container.inject(BINDINGS.HashFactory)
+	private readonly hashFactory: IHashFactory;
 
-export class Keys {
-	public static fromPassphrase(passphrase: string, compressed = true): KeyPair {
-		return Keys.fromPrivateKey(HashAlgorithms.sha256(Buffer.from(passphrase, "utf8")), compressed);
+	public async fromMnemonic(mnemonic: string, compressed = true): Promise<IKeyPair> {
+		return this.fromPrivateKey(await this.hashFactory.sha256(Buffer.from(mnemonic, "utf8")), compressed);
 	}
 
-	public static fromPrivateKey(privateKey: Buffer | string, compressed = true): KeyPair {
+	public async fromPrivateKey(privateKey: Buffer | string, compressed = true): Promise<IKeyPair> {
 		privateKey = privateKey instanceof Buffer ? privateKey : Buffer.from(privateKey, "hex");
 
 		return {
@@ -21,7 +23,7 @@ export class Keys {
 		};
 	}
 
-	public static fromWIF(wif: string, options: { wif: number }): KeyPair {
+	public async fromWIF(wif: string, options: { wif: number }): Promise<IKeyPair> {
 		const { version, compressed, privateKey } = WIF.decode(wif, options.wif);
 
 		if (version !== options.wif) {

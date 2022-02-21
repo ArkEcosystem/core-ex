@@ -1,20 +1,33 @@
-import { Base58 } from "./base58";
-import { KeyPair, MultiSignatureAsset } from "./contracts";
-import { PublicKeyError } from "./errors";
-import { HashAlgorithms } from "./hash-algorithms";
-import { PublicKey } from "./public-key";
+import { Container } from "@arkecosystem/container";
+import {
+	BINDINGS,
+	IAddressFactory,
+	IHashFactory,
+	IKeyPair,
+	IMultiSignatureAsset,
+	IPublicKeyFactory,
+} from "@arkecosystem/crypto-contracts";
 
-export class Address {
-	public static fromPassphrase(passphrase: string, options: { pubKeyHash: number }): string {
-		return Address.fromPublicKey(PublicKey.fromPassphrase(passphrase), options);
+import { PublicKeyError } from "@arkecosystem/crypto-errors";
+
+@Container.injectable()
+export class Address implements IAddressFactory {
+	@Container.inject(BINDINGS.HashFactory)
+	private readonly hashFactory: IHashFactory;
+
+	@Container.inject(BINDINGS.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: IPublicKeyFactory;
+
+	public async fromMnemonic(mnemonic: string, options: { pubKeyHash: number }): Promise<string> {
+		return this.fromPublicKey(await this.publicKeyFactory.fromMnemonic(mnemonic), options);
 	}
 
-	public static fromPublicKey(publicKey: string, options: { pubKeyHash: number }): string {
-		if (!PublicKey.verify(publicKey)) {
+	public async fromPublicKey(publicKey: string, options: { pubKeyHash: number }): Promise<string> {
+		if (!this.publicKeyFactory.verify(publicKey)) {
 			throw new PublicKeyError(publicKey);
 		}
 
-		const buffer: Buffer = HashAlgorithms.ripemd160(Buffer.from(publicKey, "hex"));
+		const buffer: Buffer = await this.hashFactory.ripemd160(Buffer.from(publicKey, "hex"));
 		const payload: Buffer = Buffer.alloc(21);
 
 		payload.writeUInt8(options.pubKeyHash, 0);
@@ -23,26 +36,29 @@ export class Address {
 		return this.fromBuffer(payload);
 	}
 
-	public static fromWIF(wif: string, options: { pubKeyHash: number; wif: number }): string {
-		return Address.fromPublicKey(PublicKey.fromWIF(wif, options), options);
+	public async fromWIF(wif: string, options: { pubKeyHash: number; wif: number }): Promise<string> {
+		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif, options), options);
 	}
 
-	public static fromMultiSignatureAsset(asset: MultiSignatureAsset, options: { pubKeyHash: number }): string {
-		return this.fromPublicKey(PublicKey.fromMultiSignatureAsset(asset), options);
+	public async fromMultiSignatureAsset(
+		asset: IMultiSignatureAsset,
+		options: { pubKeyHash: number },
+	): Promise<string> {
+		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset), options);
 	}
 
-	public static fromPrivateKey(privateKey: KeyPair, options: { pubKeyHash: number }): string {
-		return Address.fromPublicKey(privateKey.publicKey, options);
+	public async fromPrivateKey(privateKey: IKeyPair, options: { pubKeyHash: number }): Promise<string> {
+		return this.fromPublicKey(privateKey.publicKey, options);
 	}
 
-	public static fromBuffer(buffer: Buffer): string {
+	public async fromBuffer(buffer: Buffer): Promise<string> {
 		return Base58.encodeCheck(buffer);
 	}
 
-	public static toBuffer(
+	public async toBuffer(
 		address: string,
 		options: { pubKeyHash: number },
-	): { addressBuffer: Buffer; addressError?: string } {
+	): Promise<{ addressBuffer: Buffer; addressError?: string }> {
 		const buffer: Buffer = Base58.decodeCheck(address);
 		const result: { addressBuffer: Buffer; addressError?: string } = {
 			addressBuffer: buffer,
@@ -55,7 +71,7 @@ export class Address {
 		return result;
 	}
 
-	public static validate(address: string, options: { pubKeyHash: number }): boolean {
+	public async validate(address: string, options: { pubKeyHash: number }): Promise<boolean> {
 		try {
 			return Base58.decodeCheck(address)[0] === options.pubKeyHash;
 		} catch {

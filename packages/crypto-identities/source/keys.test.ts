@@ -3,15 +3,15 @@ import "jest-extended";
 // @ts-ignore
 import wif from "wif";
 
-import { data, passphrase } from "../test/identity.json";
+import { data, mnemonic } from "../test/identity.json";
 import { devnet } from "../test/networks.json";
 import { Address } from "./address";
 import { Keys } from "./keys";
 
 describe("Identities - Keys", () => {
-	describe("fromPassphrase", () => {
+	describe("fromMnemonic", () => {
 		it("should return two keys in hex", () => {
-			const keys = Keys.fromPassphrase("secret");
+			const keys = Keys.fromMnemonic("secret");
 
 			expect(keys).toBeObject();
 			expect(keys.publicKey).toMatch(keys.publicKey);
@@ -19,7 +19,7 @@ describe("Identities - Keys", () => {
 		});
 
 		it("should return address", () => {
-			const keys = Keys.fromPassphrase(passphrase);
+			const keys = Keys.fromMnemonic(mnemonic);
 			// @ts-ignore
 			const address = Address.fromPublicKey(keys.publicKey.toString("hex"), devnet);
 			expect(address).toBe(data.address);
