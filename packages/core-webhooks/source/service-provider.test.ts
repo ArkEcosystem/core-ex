@@ -49,9 +49,7 @@ const init = (context: Context) => {
 
 const importDefaults = () =>
 	// @ts-ignore
-	 importFresh("../distribution/defaults.js").defaults
-;
-
+	importFresh("../distribution/defaults.js").defaults;
 describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
 	beforeEach(init);
 

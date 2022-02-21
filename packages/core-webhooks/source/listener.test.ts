@@ -11,8 +11,8 @@ import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
 
 describe<{
-	database: Database,
-	listener: Listener
+	database: Database;
+	listener: Listener;
 }>("Listener", ({ beforeEach, afterAll, stub, it, assert }) => {
 	let webhook: Webhook;
 
@@ -59,7 +59,7 @@ describe<{
 		setGracefulCleanup();
 	});
 
-	it("should broadcast to registered webhooks", async ({database, listener}) => {
+	it("should broadcast to registered webhooks", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post").resolvedValue({
 			statusCode: 200,
 		});
@@ -79,7 +79,7 @@ describe<{
 		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
-	it("should log error if broadcast is not successful", async ({database, listener}) => {
+	it("should log error if broadcast is not successful", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post").callsFake(() => {
 			throw new Error("dummy error");
 		});
@@ -98,7 +98,7 @@ describe<{
 		expectFailedEventData(spyOnDispatchArguments[1]);
 	});
 
-	it("#should not broadcast if webhook is disabled", async ({database, listener}) => {
+	it("#should not broadcast if webhook is disabled", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post");
 
 		webhook.enabled = false;
@@ -109,7 +109,7 @@ describe<{
 		spyOnPost.neverCalled();
 	});
 
-	it("should not broadcast if event is webhook event", async ({database, listener}) => {
+	it("should not broadcast if event is webhook event", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post");
 
 		database.create(webhook);
@@ -119,7 +119,7 @@ describe<{
 		spyOnPost.neverCalled();
 	});
 
-	it("should broadcast if webhook condition is satisfied", async ({database, listener}) => {
+	it("should broadcast if webhook condition is satisfied", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post").resolvedValue({
 			statusCode: 200,
 		});
@@ -143,7 +143,7 @@ describe<{
 		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
-	it("should not broadcast if webhook condition is not satisfied", async ({database, listener}) => {
+	it("should not broadcast if webhook condition is not satisfied", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post");
 
 		webhook.conditions = [
@@ -160,7 +160,7 @@ describe<{
 		spyOnPost.neverCalled();
 	});
 
-	it("should not broadcast if webhook condition throws error", async ({database, listener}) => {
+	it("should not broadcast if webhook condition throws error", async ({ database, listener }) => {
 		const spyOnEq = stub(conditions, "eq").callsFake(() => {
 			throw new Error("dummy error");
 		});
@@ -182,4 +182,3 @@ describe<{
 		spyOnPost.neverCalled();
 	});
 });
-
