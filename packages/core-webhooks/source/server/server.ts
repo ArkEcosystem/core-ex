@@ -81,11 +81,13 @@ export class Server {
 				stripTrailingSlash: true,
 			},
 			routes: {
+				/* c8 ignore next 3 */
 				payload: {
 					async failAction(request, h, err) {
 						return badData(err.message);
 					},
 				},
+				/* c8 ignore next 3 */
 				validate: {
 					async failAction(request, h, err) {
 						return badData(err.message);
@@ -164,6 +166,7 @@ export class Server {
 					request.server.app.database.findById(request.params.id),
 				);
 
+				/* c8 ignore next 3 */
 				if (!webhook) {
 					return Boom.badImplementation();
 				}
