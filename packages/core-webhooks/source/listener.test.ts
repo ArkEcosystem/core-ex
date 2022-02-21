@@ -41,7 +41,20 @@ const prepareContainer = () => {
 	webhook = Object.assign({}, dummyWebhook);
 };
 
-describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
+const expectFinishedEventData = (assert, {executionTime, webhook, payload}) => {
+	assert.number(executionTime);
+	assert.object(webhook);
+	assert.defined(payload);
+}
+
+const expectFailedEventData = (assert, {executionTime, webhook, payload, error}) => {
+	assert.number(executionTime);
+	assert.object(webhook);
+	assert.defined(payload);
+	assert.object(error);
+};
+
+describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it, assert }) => {
 	beforeEach(() => {
 		prepareContainer();
 	});
@@ -51,7 +64,6 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 	});
 
 	it("should broadcast to registered webhooks", async () => {
-		// TODO: Implement type checks
 		const spyOnPost = stub(Utils.http, "post").resolvedValue({
 			statusCode: 200,
 		});
@@ -66,11 +78,9 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 		spyOnDebug.calledOnce();
 		spyOnDispatch.calledOnce();
 
-		// TODO: Use called with
-		// expect(spyOnDispatch).toHaveBeenCalledWith(
-		// 	WebhookEvent.Broadcasted,
-		// 	expectFinishedEventData(),
-		// );
+		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0)
+		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted)
+		expectFinishedEventData(assert, spyOnDispatchArgs[1])
 	});
 
 	it("should log error if broadcast is not successful", async () => {
@@ -87,13 +97,13 @@ describe("Listener.broadcast", ({ beforeEach, afterAll, stub, it }) => {
 		spyOnPost.calledOnce();
 		spyOnError.calledOnce();
 		spyOnDispatch.calledOnce();
-
-		// TODO: Use called with
-		// expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(WebhookEvent.Failed, expectFailedEventData());
+		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
+		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Failed)
+		expectFailedEventData(assert, spyOnDispatchArgs[1])
 	});
 });
 
-describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it }) => {
+describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it, assert }) => {
 	beforeEach(() => {
 		prepareContainer();
 	});
@@ -123,8 +133,10 @@ describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it }) => {
 		spyOnPost.neverCalled();
 	});
 
-	it("should broadcast if webhook condition is satisfied", async () => {
-		const spyOnPost = stub(Utils.http, "post");
+	it.only("should broadcast if webhook condition is satisfied", async () => {
+		const spyOnPost = stub(Utils.http, "post").resolvedValue({
+			statusCode: 200,
+		});
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
 
 		webhook.conditions = [
@@ -140,12 +152,9 @@ describe("Listener.webhooks", ({ beforeEach, afterAll, stub, it }) => {
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
-
-		// TODO: Use called with
-		// expect(mockEventDispatcher.dispatch).toHaveBeenCalledWith(
-		// 	WebhookEvent.Broadcasted,
-		// 	expectFinishedEventData(),
-		// );
+		const spyOnDispatchArgs = spyOnDispatch.getCallArgs(0);
+		assert.equal(spyOnDispatchArgs[0], WebhookEvent.Broadcasted)
+		expectFinishedEventData(assert, spyOnDispatchArgs[1])
 	});
 
 	it("should not broadcast if webhook condition is not satisfied", async () => {
