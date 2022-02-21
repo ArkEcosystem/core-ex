@@ -6,12 +6,5 @@ export const dummyWebhook: Webhook = {
 	event: "event",
 	target: "target",
 	enabled: true,
-	// conditions: [
-	//     {
-	//         key: "key",
-	//         value: "value",
-	//         condition: "condition",
-	//     },
-	// ],
 	conditions: [],
 };
