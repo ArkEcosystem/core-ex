@@ -1,8 +1,8 @@
-import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "../../../errors";
+import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "../errors";
 import { ITransactionData } from "@arkecosystem/crypto-contracts";
 
 import { BigNumber } from "@arkecosystem/utils";
-import { Two } from "../../types";
+import { Two } from "../types";
 import { TransactionBuilder } from "./transaction";
 
 export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder> {

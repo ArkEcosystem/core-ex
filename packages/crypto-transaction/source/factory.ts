@@ -3,7 +3,7 @@ import {
 	InvalidTransactionBytesError,
 	TransactionSchemaError,
 	TransactionVersionError,
-} from "../errors";
+} from "./errors";
 import {
 	IDeserializeOptions,
 	ISerializeOptions,

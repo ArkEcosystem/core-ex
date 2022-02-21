@@ -3,11 +3,11 @@ import { BINDINGS } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 import { ByteBuffer } from "@arkecosystem/utils";
 
-import { TransactionType, TransactionTypeGroup } from "../enums";
-import { TransactionVersionError } from "../errors";
+import { TransactionType, TransactionTypeGroup } from "./enums";
+import { TransactionVersionError } from "./errors";
 import { Address } from "@arkecosystem/crypto-identities";
 import { ISerializeOptions, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
-import { isSupportedTransactionVersion } from "../utils";
+import { isSupportedTransactionVersion } from "./helpers";
 import { TransactionTypeFactory } from "./types";
 
 @Container.injectable()

@@ -2,7 +2,7 @@ import { Container } from "@arkecosystem/container";
 import { BINDINGS, Signatory } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 
-import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "../errors";
+import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";
 import {
 	IMultiSignatureAsset,
 	ISchemaValidationResult,

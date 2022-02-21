@@ -1,13 +1,13 @@
-import { TransactionType, TransactionTypeGroup } from "../enums";
+import { TransactionType, TransactionTypeGroup } from "./enums";
 import {
 	DuplicateParticipantInMultiSignatureError,
 	InvalidTransactionBytesError,
 	TransactionVersionError,
-} from "../errors";
+} from "./errors";
 import { Address } from "@arkecosystem/crypto-identities";
 import { IDeserializeOptions, ITransaction, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
-import { isSupportedTransactionVersion } from "../utils";
+import { isSupportedTransactionVersion } from "./helpers";
 import { TransactionTypeFactory } from "./types";
 import { Container } from "@arkecosystem/container";
 import { BINDINGS } from "@arkecosystem/crypto-contracts";

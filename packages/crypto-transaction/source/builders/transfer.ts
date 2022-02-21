@@ -1,6 +1,6 @@
 import { ITransactionData } from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { Two } from "../../types";
+import { Two } from "../types";
 import { TransactionBuilder } from "./transaction";
 
 export class TransferBuilder extends TransactionBuilder<TransferBuilder> {

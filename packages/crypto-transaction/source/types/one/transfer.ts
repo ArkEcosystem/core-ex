@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/container";
 
-import { TransactionType, TransactionTypeGroup } from "../../../enums";
+import { TransactionType, TransactionTypeGroup } from "../../enums";
 import { Address } from "@arkecosystem/crypto-identities";
 import { ISerializeOptions } from "@arkecosystem/crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";

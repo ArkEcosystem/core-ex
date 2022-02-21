@@ -1,11 +1,11 @@
-import { DelegateRegistrationBuilder } from "./transactions/delegate-registration";
-import { DelegateResignationBuilder } from "./transactions/delegate-resignation";
-import { MultiPaymentBuilder } from "./transactions/multi-payment";
-import { MultiSignatureBuilder } from "./transactions/multi-signature";
-import { TransferBuilder } from "./transactions/transfer";
-import { VoteBuilder } from "./transactions/vote";
+import { DelegateRegistrationBuilder } from "./delegate-registration";
+import { DelegateResignationBuilder } from "./delegate-resignation";
+import { MultiPaymentBuilder } from "./multi-payment";
+import { MultiSignatureBuilder } from "./multi-signature";
+import { TransferBuilder } from "./transfer";
+import { VoteBuilder } from "./vote";
 
-export * from "./transactions/transaction";
+export * from "./transaction";
 
 export class BuilderFactory {
 	public static transfer(): TransferBuilder {

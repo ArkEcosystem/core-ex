@@ -1,8 +1,8 @@
 import { Container } from "@arkecosystem/container";
 import { BINDINGS } from "@arkecosystem/crypto-contracts";
 
-import { TransactionTypeGroup } from "../../enums";
-import { NotImplemented } from "../../errors";
+import { TransactionTypeGroup } from "../enums";
+import { NotImplemented } from "../errors";
 import { Address } from "@arkecosystem/crypto-identities";
 import {
 	ISchemaValidationResult,

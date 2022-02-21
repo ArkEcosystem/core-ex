@@ -2,7 +2,7 @@ import { Container } from "@arkecosystem/container";
 import { BINDINGS, Signatory } from "@arkecosystem/crypto-contracts";
 
 import { IKeyPair, ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
-import { numberToHex } from "../utils";
+import { numberToHex } from "./helpers";
 import { Utils } from "./utils";
 
 @Container.injectable()
