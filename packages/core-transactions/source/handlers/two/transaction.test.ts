@@ -1,6 +1,6 @@
 import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
 import { Stores, Wallets } from "@arkecosystem/core-state";
-import { Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
+import { describe, Factories, Generators, passphrases } from "@arkecosystem/core-test-framework";
 import {
 	InsufficientBalanceError,
 	InvalidMultiSignaturesError,
@@ -15,19 +15,6 @@ import { TransactionHandlerRegistry } from "../handler-registry";
 import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
-
-let app: Application;
-let senderWallet: Wallets.Wallet;
-let multiSignatureWallet: Wallets.Wallet;
-let recipientWallet: Wallets.Wallet;
-let walletRepository: Contracts.State.WalletRepository;
-let factoryBuilder: Factories.FactoryBuilder;
-
-const mockLastBlockData: Partial<Interfaces.IBlockData> = { timestamp: Crypto.Slots.getTime(), height: 4 };
-
-const mockGetLastBlock = jest.fn();
-Stores.StateStore.prototype.getLastBlock = mockGetLastBlock;
-mockGetLastBlock.mockReturnValue({ data: mockLastBlockData });
 
 class TestTransaction extends Transactions.Transaction {
 	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
@@ -74,63 +61,71 @@ class TestTransactionHandler extends TransactionHandler {
 	public async revertForRecipient(transaction: Interfaces.ITransaction): Promise<void> {}
 }
 
-// Transactions.TransactionRegistry.registerTransactionType(TestTransaction);
+describe<{
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	factoryBuilder: Factories.FactoryBuilder;
+	transferTransaction: Interfaces.ITransaction;
+	multiSignatureTransferTransaction: Interfaces.ITransaction;
+	handler: TestTransactionHandler;
+	pubKeyHash: number;
+	store: any;
+}>("General Tests", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+	beforeEach(async (context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
-beforeEach(() => {
-	const config = Generators.generateCryptoConfigRaw();
-	Managers.configManager.setConfig(config);
+		const config = Generators.generateCryptoConfigRaw();
+		Managers.configManager.setConfig(config);
 
-	app = initApp();
+		context.pubKeyHash = Managers.configManager.get("network.pubKeyHash");
 
-	app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app = initApp();
 
-	app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
+		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
 
-	walletRepository = app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
 
-	factoryBuilder = new Factories.FactoryBuilder();
-	Factories.Factories.registerWalletFactory(factoryBuilder);
-	Factories.Factories.registerTransactionFactory(factoryBuilder);
+		context.factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(context.factoryBuilder);
+		Factories.Factories.registerTransactionFactory(context.factoryBuilder);
 
-	senderWallet = buildSenderWallet(factoryBuilder);
-	multiSignatureWallet = buildMultiSignatureWallet();
-	recipientWallet = buildRecipientWallet(factoryBuilder);
+		context.senderWallet = buildSenderWallet(context.factoryBuilder);
+		context.multiSignatureWallet = buildMultiSignatureWallet();
+		context.recipientWallet = buildRecipientWallet(context.factoryBuilder);
 
-	walletRepository.index(senderWallet);
-	walletRepository.index(multiSignatureWallet);
-	walletRepository.index(recipientWallet);
-});
+		context.walletRepository.index(context.senderWallet);
+		context.walletRepository.index(context.multiSignatureWallet);
+		context.walletRepository.index(context.recipientWallet);
 
-afterEach(() => {
-	try {
-		Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
-	} catch {}
-});
-
-describe("General Tests", () => {
-	let transferTransaction: Interfaces.ITransaction;
-	let multiSignatureTransferTransaction: Interfaces.ITransaction;
-	let handler: TestTransactionHandler;
-
-	beforeEach(async () => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
-		handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(1, Enums.TransactionTypeGroup.Test),
 			2,
 		);
 
-		transferTransaction = Transactions.BuilderFactory.transfer()
-			.recipientId(recipientWallet.getAddress())
+		// context.transferTransaction = new TestTransaction();
+		// context.transferTransaction.nonce =
+
+		context.transferTransaction = Transactions.BuilderFactory.transfer()
+			.version(2)
+			.recipientId(context.recipientWallet.getAddress())
 			.amount("10000000")
-			.nonce("1")
+			.nonce(Utils.BigNumber.ONE.toString())
 			.sign(passphrases[0])
 			.build();
+		// context.senderWallet.setNonce(Utils.BigNumber.ONE);
+		context.transferTransaction.data.nonce = Utils.BigNumber.ONE;
 
-		multiSignatureTransferTransaction = Transactions.BuilderFactory.transfer()
-			.senderPublicKey(multiSignatureWallet.getPublicKey()!)
-			.recipientId(recipientWallet.getAddress())
+		context.multiSignatureTransferTransaction = Transactions.BuilderFactory.transfer()
+			.senderPublicKey(context.multiSignatureWallet.getPublicKey()!)
+			.recipientId(context.recipientWallet.getAddress())
 			.amount("1")
 			.nonce("1")
 			.multiSign(passphrases[0], 0)
@@ -139,135 +134,170 @@ describe("General Tests", () => {
 			.build();
 	});
 
-	describe("verify", () => {
-		it("should be verified", async () => {
-			await expect(handler.verify(transferTransaction)).resolves.toBeTrue();
-		});
+	afterEach((context) => {
+		Managers.configManager.set("exceptions.transactions", []);
+		Managers.configManager.set("network.pubKeyHash", context.pubKeyHash);
+		Managers.configManager.getMilestone().aip11 = true;
+		process.env.CORE_ENV === "test";
 
-		it("should be verified with multi sign", async () => {
-			await expect(handler.verify(multiSignatureTransferTransaction)).resolves.toBeTrue();
-		});
+		try {
+			Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
+		} catch {}
 	});
 
-	describe("throwIfCannotBeApplied", () => {
-		it("should not throw", async () => {
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).toResolve();
-		});
-
-		it("should not throw if version is undefined", async () => {
-			transferTransaction.data.version = undefined;
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).toResolve();
-		});
-
-		it("should throw if wallet publicKey does not match transaction senderPublicKey", async () => {
-			transferTransaction.data.senderPublicKey = "a".repeat(66);
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrowError(
-				SenderWalletMismatchError,
-			);
-		});
-
-		it("should throw if nonce is invalid", async () => {
-			senderWallet.setNonce(Utils.BigNumber.make(1));
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrowError(
-				UnexpectedNonceError,
-			);
-		});
-
-		it("should not throw if transaction nonce is undefined", async () => {
-			transferTransaction.data.nonce = undefined;
-
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrowError(
-				UnexpectedNonceError,
-			);
-		});
-
-		it("should throw if sender has legacy multi signature", async () => {
-			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
-				publicKeys: [
-					Identities.PublicKey.fromPassphrase(passphrases[0]),
-					Identities.PublicKey.fromPassphrase(passphrases[1]),
-					Identities.PublicKey.fromPassphrase(passphrases[2]),
-				],
-				min: 2,
-				// @ts-ignore
-				legacy: true,
-			};
-
-			senderWallet.setAttribute("multiSignature", multiSignatureAsset);
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrowError(
-				LegacyMultiSignatureError,
-			);
-		});
-
-		it("should throw if sender has multi signature, but indexed wallet has not", async () => {
-			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
-				publicKeys: [
-					Identities.PublicKey.fromPassphrase(passphrases[0]),
-					Identities.PublicKey.fromPassphrase(passphrases[1]),
-					Identities.PublicKey.fromPassphrase(passphrases[2]),
-				],
-				min: 2,
-			};
-
-			const multiSigWallet = buildSenderWallet(factoryBuilder);
-			multiSigWallet.setAttribute("multiSignature", multiSignatureAsset);
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, multiSigWallet)).rejects.toThrowError(
-				MissingMultiSignatureOnSenderError,
-			);
-		});
-
-		it("should throw if sender and transaction multi signatures does not match", async () => {
-			const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
-				publicKeys: [
-					Identities.PublicKey.fromPassphrase(passphrases[1]),
-					Identities.PublicKey.fromPassphrase(passphrases[0]),
-					Identities.PublicKey.fromPassphrase(passphrases[2]),
-				],
-				min: 2,
-			};
-
-			multiSignatureWallet.setAttribute("multiSignature", multiSignatureAsset);
-			await expect(
-				handler.throwIfCannotBeApplied(multiSignatureTransferTransaction, multiSignatureWallet),
-			).rejects.toThrowError(InvalidMultiSignaturesError);
-		});
-
-		it("should throw if transaction has signatures and it is not multi signature registration", async () => {
-			transferTransaction.data.signatures = [
-				"009fe6ca3b83a9a5e693fecb2b184900c5135a8c07e704c473b2f19117630f840428416f583f1a24ff371ba7e6fbca9a7fb796226ef9ef6542f44ed911951ac88d",
-				"0116779a98b2009b35d4003dda7628e46365f1a52068489bfbd80594770967a3949f76bc09e204eddd7d460e1e519b826c53dc6e2c9573096326dbc495050cf292",
-				"02687bd0f4a91be39daf648a5b1e1af5ffa4a3d4319b2e38b1fc2dc206db03f542f3b26c4803e0b4c8a53ddfb6cf4533b512d71ae869d4e4ccba989c4a4222396b",
-			];
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrowError(
-				UnsupportedMultiSignatureTransactionError,
-			);
-		});
-
-		it("should throw if wallet has not enough balance", async () => {
-			// 1 arktoshi short
-			senderWallet.setBalance(transferTransaction.data.amount.plus(transferTransaction.data.fee).minus(1));
-			await expect(handler.throwIfCannotBeApplied(transferTransaction, senderWallet)).rejects.toThrow(
-				InsufficientBalanceError,
-			);
-		});
-
-		it("should be true even with publicKey case mismatch", async () => {
-			transferTransaction.data.senderPublicKey = transferTransaction.data.senderPublicKey!.toUpperCase();
-			senderWallet.setPublicKey(senderWallet.getPublicKey()!.toLowerCase());
-
-			const instance: Interfaces.ITransaction = Transactions.TransactionFactory.fromData(
-				transferTransaction.data,
-			);
-			await expect(handler.throwIfCannotBeApplied(instance, senderWallet)).toResolve();
-		});
+	it("verify should be verified", async (context) => {
+		await assert.resolves(() => context.handler.verify(context.transferTransaction));
+		assert.true(await context.handler.verify(context.transferTransaction));
 	});
 
-	describe("dynamicFees", () => {
-		beforeEach(async () => {
-			const transactionHandlerRegistry: TransactionHandlerRegistry = app.get<TransactionHandlerRegistry>(
+	it("verify should be verified with multi sign", async (context) => {
+		await assert.resolves(() => context.handler.verify(context.multiSignatureTransferTransaction));
+		assert.true(await context.handler.verify(context.multiSignatureTransferTransaction));
+	});
+
+	it("throwIfCannotBeApplied should not throw", async (context) => {
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+		);
+	});
+
+	it("throwIfCannotBeApplied should not throw if version is undefined", async (context) => {
+		context.transferTransaction.data.nonce = Utils.BigNumber.ONE;
+		context.transferTransaction.data.version = undefined;
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+		);
+	});
+
+	it("throwIfCannotBeApplied should throw if wallet publicKey does not match transaction senderPublicKey", async (context) => {
+		context.transferTransaction.data.nonce = Utils.BigNumber.ONE;
+		context.transferTransaction.data.senderPublicKey = "a".repeat(66);
+
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			SenderWalletMismatchError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should throw if nonce is invalid", async (context) => {
+		context.senderWallet.setNonce(Utils.BigNumber.make(1));
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			UnexpectedNonceError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should not throw if transaction nonce is undefined", async (context) => {
+		context.transferTransaction.data.nonce = undefined;
+
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			UnexpectedNonceError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should throw if sender has legacy multi signature", async (context) => {
+		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+			publicKeys: [
+				Identities.PublicKey.fromPassphrase(passphrases[0]),
+				Identities.PublicKey.fromPassphrase(passphrases[1]),
+				Identities.PublicKey.fromPassphrase(passphrases[2]),
+			],
+			min: 2,
+			// @ts-ignore
+			legacy: true,
+		};
+
+		context.senderWallet.setAttribute("multiSignature", multiSignatureAsset);
+
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			LegacyMultiSignatureError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should throw if sender has multi signature, but indexed wallet has not", async (context) => {
+		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+			publicKeys: [
+				Identities.PublicKey.fromPassphrase(passphrases[0]),
+				Identities.PublicKey.fromPassphrase(passphrases[1]),
+				Identities.PublicKey.fromPassphrase(passphrases[2]),
+			],
+			min: 2,
+		};
+
+		const multiSigWallet = buildSenderWallet(context.factoryBuilder);
+		multiSigWallet.setAttribute("multiSignature", multiSignatureAsset);
+
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, multiSigWallet),
+			MissingMultiSignatureOnSenderError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should throw if sender and transaction multi signatures does not match", async (context) => {
+		const multiSignatureAsset: Interfaces.IMultiSignatureAsset = {
+			publicKeys: [
+				Identities.PublicKey.fromPassphrase(passphrases[1]),
+				Identities.PublicKey.fromPassphrase(passphrases[0]),
+				Identities.PublicKey.fromPassphrase(passphrases[2]),
+			],
+			min: 2,
+		};
+
+		context.multiSignatureWallet.setAttribute("multiSignature", multiSignatureAsset);
+
+		await assert.rejects(
+			() =>
+				context.handler.throwIfCannotBeApplied(
+					context.multiSignatureTransferTransaction,
+					context.multiSignatureWallet,
+				),
+			InvalidMultiSignaturesError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should throw if transaction has signatures and it is not multi signature registration", async (context) => {
+		context.transferTransaction.data.signatures = [
+			"009fe6ca3b83a9a5e693fecb2b184900c5135a8c07e704c473b2f19117630f840428416f583f1a24ff371ba7e6fbca9a7fb796226ef9ef6542f44ed911951ac88d",
+			"0116779a98b2009b35d4003dda7628e46365f1a52068489bfbd80594770967a3949f76bc09e204eddd7d460e1e519b826c53dc6e2c9573096326dbc495050cf292",
+			"02687bd0f4a91be39daf648a5b1e1af5ffa4a3d4319b2e38b1fc2dc206db03f542f3b26c4803e0b4c8a53ddfb6cf4533b512d71ae869d4e4ccba989c4a4222396b",
+		];
+
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			UnsupportedMultiSignatureTransactionError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should throw if wallet has not enough balance", async (context) => {
+		// 1 arktoshi short
+		context.senderWallet.setBalance(
+			context.transferTransaction.data.amount.plus(context.transferTransaction.data.fee).minus(1),
+		);
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
+			InsufficientBalanceError,
+		);
+	});
+
+	it("throwIfCannotBeApplied should be true even with publicKey case mismatch", async (context) => {
+		context.transferTransaction.data.senderPublicKey =
+			context.transferTransaction.data.senderPublicKey!.toUpperCase();
+		context.senderWallet.setPublicKey(context.senderWallet.getPublicKey()!.toLowerCase());
+
+		const instance: Interfaces.ITransaction = Transactions.TransactionFactory.fromData(
+			context.transferTransaction.data,
+		);
+		await assert.resolves(() => context.handler.throwIfCannotBeApplied(instance, context.senderWallet));
+	});
+
+	describe("", () => {
+		beforeEach(async (context) => {
+			const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 				Container.Identifiers.TransactionHandlerRegistry,
 			);
-			handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+			context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 				Transactions.InternalTransactionType.from(
 					Enums.TransactionType.Transfer,
 					Enums.TransactionTypeGroup.Core,
@@ -275,9 +305,9 @@ describe("General Tests", () => {
 				2,
 			);
 
-			transferTransaction = Transactions.BuilderFactory.transfer()
+			context.transferTransaction = Transactions.BuilderFactory.transfer()
 				.amount("10000000")
-				.recipientId(recipientWallet.getAddress())
+				.recipientId(context.recipientWallet.getAddress())
 				.sign("secret")
 				.nonce("0")
 				.build();
@@ -285,152 +315,166 @@ describe("General Tests", () => {
 			Managers.configManager.getMilestone().aip11 = true;
 		});
 
-		it("should correctly calculate the transaction fee based on transaction size and addonBytes", async () => {
+		it("dynamicFees should correctly calculate the transaction fee based on transaction size and addonBytes", async (context) => {
 			const addonBytes = 137;
 
 			expect(
-				handler.dynamicFee({ transaction: transferTransaction, addonBytes, satoshiPerByte: 3, height: 1 }),
-			).toEqual(Utils.BigNumber.make(137 + transferTransaction.serialized.length / 2).times(3));
+				context.handler.dynamicFee({
+					transaction: context.transferTransaction,
+					addonBytes,
+					satoshiPerByte: 3,
+					height: 1,
+				}),
+			).toEqual(Utils.BigNumber.make(137 + context.transferTransaction.serialized.length / 2).times(3));
 
 			expect(
-				handler.dynamicFee({ transaction: transferTransaction, addonBytes, satoshiPerByte: 6, height: 1 }),
-			).toEqual(Utils.BigNumber.make(137 + transferTransaction.serialized.length / 2).times(6));
+				context.handler.dynamicFee({
+					transaction: context.transferTransaction,
+					addonBytes,
+					satoshiPerByte: 6,
+					height: 1,
+				}),
+			).toEqual(Utils.BigNumber.make(137 + context.transferTransaction.serialized.length / 2).times(6));
 
 			expect(
-				handler.dynamicFee({ transaction: transferTransaction, addonBytes: 0, satoshiPerByte: 9, height: 1 }),
-			).toEqual(Utils.BigNumber.make(transferTransaction.serialized.length / 2).times(9));
+				context.handler.dynamicFee({
+					transaction: context.transferTransaction,
+					addonBytes: 0,
+					satoshiPerByte: 9,
+					height: 1,
+				}),
+			).toEqual(Utils.BigNumber.make(context.transferTransaction.serialized.length / 2).times(9));
 		});
 
-		it("should default satoshiPerByte to 1 if value provided is <= 0", async () => {
+		it("dynamicFees should default satoshiPerByte to 1 if value provided is <= 0", async (context) => {
 			expect(
-				handler.dynamicFee({ transaction: transferTransaction, addonBytes: 0, satoshiPerByte: -50, height: 1 }),
+				context.handler.dynamicFee({
+					transaction: context.transferTransaction,
+					addonBytes: 0,
+					satoshiPerByte: -50,
+					height: 1,
+				}),
 			).toEqual(
-				handler.dynamicFee({ transaction: transferTransaction, addonBytes: 0, satoshiPerByte: 1, height: 1 }),
+				context.handler.dynamicFee({
+					transaction: context.transferTransaction,
+					addonBytes: 0,
+					satoshiPerByte: 1,
+					height: 1,
+				}),
 			);
 			expect(
-				handler.dynamicFee({ transaction: transferTransaction, addonBytes: 0, satoshiPerByte: 0, height: 1 }),
+				context.handler.dynamicFee({
+					transaction: context.transferTransaction,
+					addonBytes: 0,
+					satoshiPerByte: 0,
+					height: 1,
+				}),
 			).toEqual(
-				handler.dynamicFee({ transaction: transferTransaction, addonBytes: 0, satoshiPerByte: 1, height: 1 }),
+				context.handler.dynamicFee({
+					transaction: context.transferTransaction,
+					addonBytes: 0,
+					satoshiPerByte: 1,
+					height: 1,
+				}),
 			);
 		});
 	});
 
-	describe("apply", () => {
-		let pubKeyHash: number;
-
-		beforeEach(() => {
-			pubKeyHash = Managers.configManager.get("network.pubKeyHash");
-		});
-
-		afterEach(() => {
-			Managers.configManager.set("exceptions.transactions", []);
-			Managers.configManager.set("network.pubKeyHash", pubKeyHash);
-			Managers.configManager.getMilestone().aip11 = true;
-			process.env.CORE_ENV === "test";
-		});
-
-		it("should resolve", async () => {
-			await expect(handler.apply(transferTransaction)).toResolve();
-		});
-
-		it("should not fail due to case mismatch", async () => {
-			const transactionData: Interfaces.ITransactionData = transferTransaction.data;
-			transactionData.senderPublicKey = transactionData.senderPublicKey?.toUpperCase();
-			const instance = Transactions.TransactionFactory.fromData(transactionData);
-
-			const senderBalance = senderWallet.getBalance();
-
-			await handler.apply(instance);
-
-			expect(senderWallet.getBalance()).toEqual(
-				Utils.BigNumber.make(senderBalance).minus(instance.data.amount).minus(instance.data.fee),
-			);
-		});
-
-		it("should resolve with V1", async () => {
-			Managers.configManager.getMilestone().aip11 = false;
-
-			transferTransaction = Transactions.BuilderFactory.transfer()
-				.recipientId(recipientWallet.getAddress())
-				.amount("10000000")
-				.nonce("1")
-				.sign(passphrases[0])
-				.build();
-
-			await expect(handler.apply(transferTransaction)).toResolve();
-		});
-
-		it("should throw with negative balance", async () => {
-			senderWallet.setBalance(Utils.BigNumber.ZERO);
-			await expect(handler.apply(transferTransaction)).rejects.toThrow(InsufficientBalanceError);
-		});
-
-		it("should throw with negative balance if environment is not test", async () => {
-			process.env.CORE_ENV === "unitest";
-			senderWallet.setBalance(Utils.BigNumber.ZERO);
-			await expect(handler.apply(transferTransaction)).rejects.toThrow(InsufficientBalanceError);
-		});
-
-		it("should resolve defined as exception", async () => {
-			Managers.configManager.set("exceptions.transactions", [transferTransaction.id]);
-			Managers.configManager.set("network.pubKeyHash", 99);
-			await expect(handler.apply(transferTransaction)).toResolve();
-		});
+	it("apply should resolve", async (context) => {
+		await assert.resolves(() => context.handler.apply(context.transferTransaction));
 	});
 
-	describe("revert", () => {
-		it("should resolve", async () => {
-			await expect(handler.apply(transferTransaction)).toResolve();
-			await expect(handler.revert(transferTransaction)).toResolve();
-		});
+	it("apply should not fail due to case mismatch", async (context) => {
+		const transactionData: Interfaces.ITransactionData = context.transferTransaction.data;
+		transactionData.senderPublicKey = transactionData.senderPublicKey?.toUpperCase();
+		const instance = Transactions.TransactionFactory.fromData(transactionData);
 
-		it("should resolve if version is undefined", async () => {
-			transferTransaction.data.version = undefined;
+		const senderBalance = context.senderWallet.getBalance();
 
-			await expect(handler.apply(transferTransaction)).toResolve();
-			await expect(handler.revert(transferTransaction)).toResolve();
-		});
+		await context.handler.apply(instance);
 
-		it("should throw if nonce is undefined", async () => {
-			await expect(handler.apply(transferTransaction)).toResolve();
-			transferTransaction.data.nonce = undefined;
-			await expect(handler.revert(transferTransaction)).rejects.toThrow(UnexpectedNonceError);
-		});
-
-		it("should throw if nonce is invalid", async () => {
-			await expect(handler.apply(transferTransaction)).toResolve();
-			senderWallet.setNonce(Utils.BigNumber.make(100));
-			await expect(handler.revert(transferTransaction)).rejects.toThrow(UnexpectedNonceError);
-		});
-
-		it("should not fail due to case mismatch", async () => {
-			senderWallet.setNonce(Utils.BigNumber.make(1));
-
-			const transactionData: Interfaces.ITransactionData = transferTransaction.data;
-			transactionData.senderPublicKey = transactionData.senderPublicKey?.toUpperCase();
-			const instance = Transactions.TransactionFactory.fromData(transactionData);
-
-			const senderBalance = senderWallet.getBalance();
-
-			await handler.revert(instance);
-			expect(senderWallet.getBalance()).toEqual(
-				Utils.BigNumber.make(senderBalance).plus(instance.data.amount).plus(instance.data.fee),
-			);
-
-			expect(senderWallet.getNonce().isZero()).toBeTrue();
-		});
+		assert.equal(
+			context.senderWallet.getBalance(),
+			Utils.BigNumber.make(senderBalance).minus(instance.data.amount).minus(instance.data.fee),
+		);
 	});
 
-	describe("emitEvents", () => {
-		it("should be ok", async () => {
-			// @ts-ignore
-			handler.emitEvents(transferTransaction, {});
-		});
+	it("apply should resolve with V1", async (context) => {
+		Managers.configManager.getMilestone().aip11 = false;
+
+		context.transferTransaction = Transactions.BuilderFactory.transfer()
+			.recipientId(context.recipientWallet.getAddress())
+			.amount("10000000")
+			.nonce("1")
+			.sign(passphrases[0])
+			.build();
+
+		await assert.resolves(() => context.handler.apply(context.transferTransaction));
 	});
 
-	describe("throwIfCannotEnterPool", () => {
-		it("should resolve", async () => {
-			await expect(handler.throwIfCannotEnterPool(transferTransaction)).toResolve();
-		});
+	it("apply should throw with negative balance", async (context) => {
+		context.senderWallet.setBalance(Utils.BigNumber.ZERO);
+		await assert.rejects(() => context.handler.apply(context.transferTransaction), InsufficientBalanceError);
+	});
+
+	it("apply should throw with negative balance if environment is not test", async (context) => {
+		process.env.CORE_ENV === "unitest";
+		context.senderWallet.setBalance(Utils.BigNumber.ZERO);
+		await assert.rejects(() => context.handler.apply(context.transferTransaction), InsufficientBalanceError);
+	});
+
+	it("apply should resolve defined as exception", async (context) => {
+		Managers.configManager.set("exceptions.transactions", [context.transferTransaction.id]);
+		Managers.configManager.set("network.pubKeyHash", 99);
+		await assert.resolves(() => context.handler.apply(context.transferTransaction));
+	});
+
+	it("revert should resolve", async (context) => {
+		await assert.resolves(() => context.handler.apply(context.transferTransaction));
+		await assert.resolves(() => context.handler.revert(context.transferTransaction));
+	});
+
+	it("revert should resolve if version is undefined", async (context) => {
+		context.transferTransaction.data.version = undefined;
+
+		await assert.resolves(() => context.handler.apply(context.transferTransaction));
+		await assert.resolves(() => context.handler.revert(context.transferTransaction));
+	});
+
+	it("revert should throw if nonce is undefined", async (context) => {
+		await assert.resolves(() => context.handler.apply(context.transferTransaction));
+		context.transferTransaction.data.nonce = undefined;
+		await assert.rejects(() => context.handler.revert(context.transferTransaction), UnexpectedNonceError);
+	});
+
+	it("revert should throw if nonce is invalid", async (context) => {
+		await assert.resolves(() => context.handler.apply(context.transferTransaction));
+		context.senderWallet.setNonce(Utils.BigNumber.make(100));
+		await assert.rejects(() => context.handler.revert(context.transferTransaction), UnexpectedNonceError);
+	});
+
+	it("revert should not fail due to case mismatch", async (context) => {
+		context.senderWallet.setNonce(Utils.BigNumber.make(1));
+
+		const transactionData: Interfaces.ITransactionData = context.transferTransaction.data;
+		transactionData.senderPublicKey = transactionData.senderPublicKey?.toUpperCase();
+		const instance = Transactions.TransactionFactory.fromData(transactionData);
+
+		const senderBalance = context.senderWallet.getBalance();
+
+		await context.handler.revert(instance);
+		assert.equal(context.senderWallet.getBalance(),Utils.BigNumber.make(senderBalance).plus(instance.data.amount).plus(instance.data.fee),
+		);
+
+		assert.true(context.senderWallet.getNonce().isZero());
+	});
+
+	it("emitEvents should be ok", async (context) => {
+		// @ts-ignore
+		context.handler.emitEvents(context.transferTransaction, {});
+	});
+
+	it("throwIfCannotEnterPool should resolve", async (context) => {
+		await assert.resolves(() => context.handler.throwIfCannotEnterPool(context.transferTransaction));
 	});
 });
