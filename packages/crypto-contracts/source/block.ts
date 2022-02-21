@@ -82,10 +82,7 @@ export interface IBlockFactory {
 
 	fromJson(json: IBlockJson): Promise<IBlock | undefined>;
 
-	fromData(
-		data: IBlockData,
-		options?: { deserializeTransactionsUnchecked?: boolean },
-	): Promise<IBlock | undefined>;
+	fromData(data: IBlockData, options?: { deserializeTransactionsUnchecked?: boolean }): Promise<IBlock | undefined>;
 }
 
 export interface IBlockSerializer {
