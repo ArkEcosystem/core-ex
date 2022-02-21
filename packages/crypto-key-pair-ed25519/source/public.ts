@@ -1,4 +1,6 @@
-import { IPublicKeyFactory, IMultiSignatureAsset } from "@arkecosystem/crypto-contracts";
+import { IMultiSignatureAsset, IPublicKeyFactory } from "@arkecosystem/crypto-contracts";
+import { NotImplemented } from "@arkecosystem/crypto-errors";
+
 import { KeyPairFactory } from "./pair";
 
 export class PublicKeyFactory implements IPublicKeyFactory {
@@ -17,10 +19,10 @@ export class PublicKeyFactory implements IPublicKeyFactory {
 	}
 
 	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
-		throw new Error("Not Implemented");
+		throw new NotImplemented();
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
-		throw new Error("Not Implemented");
+		throw new NotImplemented();
 	}
 }

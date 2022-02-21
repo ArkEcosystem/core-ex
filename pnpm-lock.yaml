@@ -781,8 +781,8 @@ importers:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
       bcrypto: 5.4.0
       bstring: 0.3.9
       uvu: ^0.5.3
@@ -792,16 +792,16 @@ importers:
       bstring: 0.3.9
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
+      '@arkecosystem/crypto-key-pair-ecdsa': link:../crypto-key-pair-ecdsa
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
       uvu: 0.5.3
 
   packages/crypto-address-bech32:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
       '@scure/base': ^1.0.0
       uvu: ^0.5.3
     dependencies:
@@ -809,16 +809,16 @@ importers:
       '@scure/base': 1.0.0
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
+      '@arkecosystem/crypto-key-pair-ecdsa': link:../crypto-key-pair-ecdsa
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
       uvu: 0.5.3
 
   packages/crypto-address-bech32m:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
       '@scure/base': ^1.0.0
       uvu: ^0.5.3
     dependencies:
@@ -826,16 +826,16 @@ importers:
       '@scure/base': 1.0.0
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
+      '@arkecosystem/crypto-key-pair-ecdsa': link:../crypto-key-pair-ecdsa
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
       uvu: 0.5.3
 
   packages/crypto-address-keccak256:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
       ethers: ^5.5.4
       uvu: ^0.5.3
     dependencies:
@@ -843,16 +843,16 @@ importers:
       ethers: 5.5.4
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
+      '@arkecosystem/crypto-key-pair-ecdsa': link:../crypto-key-pair-ecdsa
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
       uvu: 0.5.3
 
   packages/crypto-address-ss58:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
       '@polkadot/util': ^8.4.1
       '@polkadot/util-crypto': ^8.4.1
       uvu: ^0.5.3
@@ -862,8 +862,8 @@ importers:
       '@polkadot/util-crypto': 8.4.1
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
-      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
+      '@arkecosystem/crypto-key-pair-ecdsa': link:../crypto-key-pair-ecdsa
+      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
       uvu: 0.5.3
 
   packages/crypto-block:
@@ -1092,7 +1092,7 @@ importers:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
 
-  packages/crypto-key-pair-ecdsa-bcrypto:
+  packages/crypto-key-pair-ecdsa:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
@@ -1105,21 +1105,6 @@ importers:
       '@arkecosystem/crypto-errors': link:../crypto-errors
       bcrypto: 5.4.0
       wif: 2.0.6
-    devDependencies:
-      '@arkecosystem/core-test-framework': link:../core-test-framework
-      uvu: 0.5.3
-
-  packages/crypto-key-pair-ecdsa-noble:
-    specifiers:
-      '@arkecosystem/core-test-framework': workspace:*
-      '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-errors': workspace:*
-      '@noble/secp256k1': ^1.5.4
-      uvu: ^0.5.3
-    dependencies:
-      '@arkecosystem/crypto-contracts': link:../crypto-contracts
-      '@arkecosystem/crypto-errors': link:../crypto-errors
-      '@noble/secp256k1': 1.5.4
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
@@ -1145,7 +1130,7 @@ importers:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
 
-  packages/crypto-key-pair-schnorr-bcrypto:
+  packages/crypto-key-pair-schnorr:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
@@ -1157,23 +1142,6 @@ importers:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       '@arkecosystem/crypto-errors': link:../crypto-errors
       bcrypto: 5.4.0
-      wif: 2.0.6
-    devDependencies:
-      '@arkecosystem/core-test-framework': link:../core-test-framework
-      uvu: 0.5.3
-
-  packages/crypto-key-pair-schnorr-noble:
-    specifiers:
-      '@arkecosystem/core-test-framework': workspace:*
-      '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-errors': workspace:*
-      '@noble/secp256k1': ^1.5.5
-      uvu: ^0.5.3
-      wif: ^2.0.6
-    dependencies:
-      '@arkecosystem/crypto-contracts': link:../crypto-contracts
-      '@arkecosystem/crypto-errors': link:../crypto-errors
-      '@noble/secp256k1': 1.5.5
       wif: 2.0.6
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
@@ -3561,14 +3529,6 @@ packages:
 
   /@noble/secp256k1/1.5.2:
     resolution: {integrity: sha512-5mzA40W2q55VCRuC9XzmkiEnODdY0c5a7qsK2QcOfI5/MuVQyBaWGQyE6YOEF7kDwp+tDVWGsCDVJUME+wsWWw==}
-    dev: false
-
-  /@noble/secp256k1/1.5.4:
-    resolution: {integrity: sha512-sOIQR+fSvgHlI+oeBMgrrxmePmLQMQloXP6DZGzcJ/Ek8N1dCgSWu+15K60qyvTI7mawp90A8G7UFb+D1ReeVQ==}
-    dev: false
-
-  /@noble/secp256k1/1.5.5:
-    resolution: {integrity: sha512-sZ1W6gQzYnu45wPrWx8D3kwI2/U29VYTx9OjbDAd7jwRItJ0cSTMPRL/C8AWZFn9kWFLQGqEXVEE86w4Z8LpIQ==}
     dev: false
 
   /@nodelib/fs.scandir/2.1.5:

@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-key-pair-schnorr-noble",
+	"name": "@arkecosystem/crypto-key-pair-ecdsa",
 	"version": "0.0.1",
-	"description": "Schnorr Key Derivation",
+	"description": "secp256k1 Key Derivation",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -18,7 +18,7 @@
 	"dependencies": {
 		"@arkecosystem/crypto-contracts": "workspace:*",
 		"@arkecosystem/crypto-errors": "workspace:*",
-		"@noble/secp256k1": "^1.5.5",
+		"bcrypto": "5.4.0",
 		"wif": "^2.0.6"
 	},
 	"devDependencies": {

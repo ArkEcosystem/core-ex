@@ -63,5 +63,7 @@ export interface IKeyPairFactory {
 }
 
 export interface IWIFFactory {
-	//
+	fromMnemonic(mnemonic: string, version: number): Promise<string>;
+
+	fromKeys(keys: IKeyPair, version: number): Promise<string>;
 }

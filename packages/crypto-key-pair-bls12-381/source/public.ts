@@ -1,5 +1,7 @@
-import { IPublicKeyFactory, IMultiSignatureAsset } from "@arkecosystem/crypto-contracts";
+import { IMultiSignatureAsset, IPublicKeyFactory } from "@arkecosystem/crypto-contracts";
+import { NotImplemented } from "@arkecosystem/crypto-errors";
 import { aggregatePublicKeys } from "@noble/bls12-381";
+
 import { KeyPairFactory } from "./pair";
 
 export class PublicKeyFactory implements IPublicKeyFactory {
@@ -22,6 +24,6 @@ export class PublicKeyFactory implements IPublicKeyFactory {
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
-		throw new Error("Not Implemented");
+		throw new NotImplemented();
 	}
 }
