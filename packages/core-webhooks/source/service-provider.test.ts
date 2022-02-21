@@ -8,19 +8,19 @@ import { dirSync, setGracefulCleanup } from "tmp";
 import { defaults } from "./defaults";
 import { ServiceProvider } from "./service-provider";
 
-let app: Application;
-let serviceProvider: ServiceProvider;
-let pluginConfiguration: Providers.PluginConfiguration;
-
-const logger = {
-	debug: () => {},
-	error: () => {},
-	notice: () => {},
+type Context = {
+	serviceProvider: ServiceProvider;
+	pluginConfiguration: Providers.PluginConfiguration;
 };
 
-const init = () => {
-	app = new Application(new Container.Container());
+const init = (context: Context) => {
+	const logger = {
+		debug: () => {},
+		error: () => {},
+		notice: () => {},
+	};
 
+	const app = new Application(new Container.Container());
 	app.bind(Container.Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Container.Identifiers.StateStore).toConstantValue({});
 	app.bind(Container.Identifiers.BlockchainService).toConstantValue({});
@@ -42,30 +42,32 @@ const init = () => {
 	app.bind(Container.Identifiers.LogService).toConstantValue(logger);
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
-	serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
-	pluginConfiguration = app.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration);
-	const instance = pluginConfiguration.from("core-webhooks", defaults);
-	serviceProvider.setConfig(instance);
+	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
+	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Container.Identifiers.PluginConfiguration);
+	context.serviceProvider.setConfig(context.pluginConfiguration.from("core-webhooks", defaults));
 };
 
-describe("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
-	beforeEach(() => {
-		init();
-	});
+const importDefaults = () =>
+	// @ts-ignore
+	 importFresh("../distribution/defaults.js").defaults
+;
+
+describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
+	beforeEach(init);
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should register", async () => {
+	it("should register", async ({ serviceProvider }) => {
 		await assert.resolves(() => serviceProvider.register());
 	});
 
-	it("should boot and dispose", async () => {
+	it("should boot and dispose", async ({ serviceProvider }) => {
 		await assert.resolves(() => serviceProvider.register());
 		await assert.resolves(() => serviceProvider.boot());
 		await assert.resolves(() => serviceProvider.dispose());
 	});
 
-	it("should bootWhen be true when enabled", async () => {
+	it("should bootWhen be true when enabled", async ({ serviceProvider, pluginConfiguration }) => {
 		defaults.enabled = true;
 		const instance = pluginConfiguration.from("core-webhooks", defaults);
 		serviceProvider.setConfig(instance);
@@ -73,18 +75,16 @@ describe("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
 		assert.true(await serviceProvider.bootWhen());
 	});
 
-	it("should not be required", async () => {
+	it("should not be required", async ({ serviceProvider }) => {
 		assert.false(await serviceProvider.required());
 	});
 });
 
-describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
-	const importDefaults = () => importFresh("../distribution/defaults.js").defaults;
-
+describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 	let defaults;
 
-	beforeEach(() => {
-		init();
+	beforeEach((context) => {
+		init(context);
 
 		for (const key of Object.keys(process.env)) {
 			if (key.includes("CORE_WEBHOOKS_")) {
@@ -95,7 +95,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		defaults = importDefaults();
 	});
 
-	it("should validate schema using defaults", async () => {
+	it("should validate schema using defaults", async ({ serviceProvider }) => {
 		const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
 		assert.undefined(result.error);
@@ -109,7 +109,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.number(result.value.timeout);
 	});
 
-	it("should allow configuration extension", async () => {
+	it("should allow configuration extension", async ({ serviceProvider }) => {
 		defaults["customField"] = "dummy";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -118,7 +118,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.value.customField, "dummy");
 	});
 
-	it("should return true if process.env.CORE_WEBHOOKS_ENABLED is defined", async () => {
+	it("should return true if process.env.CORE_WEBHOOKS_ENABLED is defined", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_ENABLED = "true";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
@@ -127,7 +127,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.true(result.value.enabled);
 	});
 
-	it("should return value of process.env.CORE_WEBHOOKS_HOST if defined", async () => {
+	it("should return value of process.env.CORE_WEBHOOKS_HOST if defined", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_HOST = "127.0.0.1";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
@@ -136,7 +136,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.value.server.http.host, "127.0.0.1");
 	});
 
-	it("should return value of process.env.CORE_WEBHOOKS_TIMEOUT if defined", async () => {
+	it("should return value of process.env.CORE_WEBHOOKS_TIMEOUT if defined", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_TIMEOUT = "5000";
 
 		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
@@ -145,7 +145,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.value.timeout, 5000);
 	});
 
-	it("enabled is required && is boolean", async () => {
+	it("enabled is required && is boolean", async ({ serviceProvider }) => {
 		defaults.enabled = 123;
 		let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
@@ -157,7 +157,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.error.message, '"enabled" is required');
 	});
 
-	it("server is required && is object", async () => {
+	it("server is required && is object", async ({ serviceProvider }) => {
 		defaults.server = false;
 		let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
@@ -169,7 +169,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.error.message, '"server" is required');
 	});
 
-	it("server.http is required && is object", async () => {
+	it("server.http is required && is object", async ({ serviceProvider }) => {
 		defaults.server.http = false;
 		let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
@@ -181,7 +181,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.error.message, '"server.http" is required');
 	});
 
-	it("server.http.host is required && is IP address", async () => {
+	it("server.http.host is required && is IP address", async ({ serviceProvider }) => {
 		defaults.server.http.host = false;
 		let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
@@ -201,7 +201,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.error.message, '"server.http.host" is required');
 	});
 
-	it("server.http.port is required && is integer && >= 1 && <= 65535", async () => {
+	it("server.http.port is required && is integer && >= 1 && <= 65535", async ({ serviceProvider }) => {
 		defaults.server.http.port = false;
 		let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
@@ -228,7 +228,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.error.message, '"server.http.port" is required');
 	});
 
-	it("server.whitelist is required && is array && contains strings", async () => {
+	it("server.whitelist is required && is array && contains strings", async ({ serviceProvider }) => {
 		defaults.server.whitelist = false;
 		let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
@@ -245,7 +245,7 @@ describe("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 		assert.equal(result.error.message, '"server.whitelist" is required');
 	});
 
-	it("timeout is required && is integer && >= 1", async () => {
+	it("timeout is required && is integer && >= 1", async ({ serviceProvider }) => {
 		defaults.timeout = false;
 		let result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
