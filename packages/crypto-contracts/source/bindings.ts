@@ -3,6 +3,8 @@ export const BINDINGS = {
 	Block: {
         Deserializer: Symbol.for("Crypto<Block.Deserializer>"),
         Factory: Symbol.for("Crypto<Block.Factory>"),
+        FactoryInstance: Symbol.for("Crypto<Block.FactoryInstance>"),
+        IdFactory: Symbol.for("Crypto<Block.IdFactory>"),
         Serializer: Symbol.for("Crypto<Block.Serializer>"),
         Verifier: Symbol.for("Crypto<Block.Verifier>"),
     },

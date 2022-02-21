@@ -6,7 +6,7 @@ import { Container } from "@arkecosystem/container";
 import { BINDINGS, IBlock, IBlockData, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 import { Utils } from "@arkecosystem/crypto-transaction";
-import { Block } from "./block";
+import { toBytesHex } from "./utils";
 
 @Container.injectable()
 export class Serializer {
@@ -83,7 +83,7 @@ export class Serializer {
 			block.previousBlockHex = block.previousBlock;
 		} else {
 
-			block.previousBlockHex = new Block(this.configuration, {}).toBytesHex(block.previousBlock);
+			block.previousBlockHex = toBytesHex(block.previousBlock);
 		}
 
 		buff.writeUint32(block.version);

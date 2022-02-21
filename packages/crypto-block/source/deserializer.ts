@@ -4,19 +4,23 @@ import { Container } from "@arkecosystem/container";
 import { BINDINGS, IBlockData, ITransaction } from "@arkecosystem/crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
-import { Block } from "./block";
 import { Configuration } from "@arkecosystem/crypto-config";
+
+import { IdFactory } from "./id.factory";
 
 @Container.injectable()
 export class Deserializer {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
 
-	public deserialize(
+	@Container.inject(BINDINGS.Block.IdFactory)
+	private readonly idFactory: IdFactory;
+
+	public async deserialize(
 		serialized: Buffer,
 		headerOnly = false,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
-	): { data: IBlockData; transactions: ITransaction[] } {
+	): Promise<{ data: IBlockData; transactions: ITransaction[] }> {
 		const block = {} as IBlockData;
 		let transactions: ITransaction[] = [];
 
@@ -31,10 +35,7 @@ export class Deserializer {
 			transactions = this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
 		}
 
-
-		block.idHex = new Block(this.configuration, {}).getIdHex(block);
-
-		block.id = new Block(this.configuration, {}).getId(block);
+		block.id = await this.idFactory.make(block);
 
 		return { data: block, transactions };
 	}

@@ -1,7 +1,6 @@
 import { HashFactory } from "@arkecosystem/crypto-hash-bcrypto";
 import { Signatory } from "@arkecosystem/crypto-signature-ecdsa";
 import { Slots } from "@arkecosystem/crypto-time";
-import { BlockSchemaError } from "@arkecosystem/crypto-errors";
 import { Container } from "@arkecosystem/container";
 import {
 	BINDINGS,
@@ -13,9 +12,9 @@ import {
 	ITransactionData,
 } from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { Validator } from "@arkecosystem/validation";
+import { Configuration } from "@arkecosystem/crypto-config";
+
 import { Serializer } from "./serializer";
-import { Configuration } from "@packages/crypto-config/distribution";
 
 @Container.injectable()
 export class Block implements IBlock {
@@ -61,76 +60,6 @@ export class Block implements IBlock {
 		delete this.data.transactions;
 
 		this.verification = void this.verify();
-	}
-
-	public async applySchema(data: IBlockData): Promise<IBlockData | undefined> {
-		let result = await new Validator({}).validate("block", data);
-
-		if (!result.error) {
-			return result.value;
-		}
-
-		for (const err of result.errors) {
-			let fatal = false;
-
-			const match = err.dataPath.match(/\.transactions\[(\d+)]/);
-			if (match === null) {
-				fatal = true;
-			} else {
-				const txIndex = match[1];
-
-				if (data.transactions) {
-					const tx = data.transactions[txIndex];
-
-					if (tx.id === undefined) {
-						fatal = true;
-					}
-				}
-			}
-
-			if (fatal) {
-				throw new BlockSchemaError(
-					data.height,
-					`Invalid data${err.dataPath ? " at " + err.dataPath : ""}: ` +
-						`${err.message}: ${JSON.stringify(err.data)}`,
-				);
-			}
-		}
-
-		return result.value;
-	}
-
-	public async getIdHex(data: IBlockData): Promise<string> {
-		const constants = this.configuration.getMilestone(data.height);
-		const payloadHash: Buffer = this.serializer.serialize(data);
-
-		const hash: Buffer = await new HashFactory().sha256(payloadHash);
-
-		if (constants.block.idFullSha256) {
-			return hash.toString("hex");
-		}
-
-		const temp: Buffer = Buffer.alloc(8);
-
-		for (let i = 0; i < 8; i++) {
-			temp[i] = hash[7 - i];
-		}
-
-		return temp.toString("hex");
-	}
-
-	public toBytesHex(data): string {
-		const temp: string = data ? BigNumber.make(data).toString(16) : "";
-
-		return "0".repeat(16 - temp.length) + temp;
-	}
-
-	public getId(data: IBlockData): string {
-		const constants = this.configuration.getMilestone(data.height);
-
-		const idHex: string = new Block(this.configuration, {}).getIdHex(data);
-
-		return constants.block.idFullSha256 ? idHex : BigNumber.make(`0x${idHex}`).toString();
 	}
 
 	public getHeader(): IBlockData {
@@ -291,7 +220,5 @@ export class Block implements IBlock {
 
 	private applyGenesisBlockFix(id: string): void {
 		this.data.id = id;
-
-		this.data.idHex = id.length === 64 ? id : new Block(this.configuration, {}).toBytesHex(id); // if id.length is 64 it's already hex
 	}
 }
