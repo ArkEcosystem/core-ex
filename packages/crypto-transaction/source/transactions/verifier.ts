@@ -1,8 +1,7 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, Signatory } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 
-import { Hash } from "../crypto/hash";
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "../errors";
 import { IMultiSignatureAsset, ISchemaValidationResult, ITransactionData, IVerifyOptions } from "@arkecosystem/crypto-contracts";
 import { TransactionTypeFactory } from "./types/factory";
@@ -12,6 +11,9 @@ import { Utils } from "./utils";
 export class Verifier {
 	@Container.inject(BINDINGS.Configuration)
 	private readonly configuration: Configuration;
+
+	@Container.inject(BINDINGS.SignatureFactory)
+	private readonly signatureFactory: Signatory;
 
 	@Container.inject(BINDINGS.Validator)
 	private readonly validator: any;
@@ -58,7 +60,7 @@ export class Verifier {
 				const partialSignature: string = signature.slice(2, 130);
 				const publicKey: string = publicKeys[publicKeyIndex];
 
-				if (Hash.verifySchnorr(hash, partialSignature, publicKey)) {
+				if (this.signatureFactory.verify(hash, Buffer.from(partialSignature, "hex"), Buffer.from(publicKey, "hex"))) {
 					verifiedSignatures++;
 				}
 
@@ -86,7 +88,7 @@ export class Verifier {
 			excludeSignature: true,
 		});
 
-		return this.internalVerifySignature(hash, signature, senderPublicKey);
+		return this.signatureFactory.verify(hash, Buffer.from(signature, "hex"), Buffer.from(senderPublicKey, "hex"));
 	}
 
 	public verifySchema(data: ITransactionData, strict = true): ISchemaValidationResult {
@@ -99,14 +101,5 @@ export class Verifier {
 		const { $id } = transactionType.getSchema();
 
 		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
-	}
-
-	private internalVerifySignature(hash: Buffer, signature: string, publicKey: string): boolean {
-		const isSchnorr = Buffer.from(signature, "hex").byteLength === 64;
-		if (isSchnorr) {
-			return Hash.verifySchnorr(hash, signature, publicKey);
-		}
-
-		return Hash.verifyECDSA(hash, signature, publicKey);
 	}
 }

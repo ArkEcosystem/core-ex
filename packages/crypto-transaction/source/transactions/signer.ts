@@ -1,13 +1,15 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, Signatory } from "@arkecosystem/crypto-contracts";
 
-import { Hash } from "../crypto";
 import { IKeyPair, ISerializeOptions, ITransactionData } from "@arkecosystem/crypto-contracts";
 import { numberToHex } from "../utils";
 import { Utils } from "./utils";
 
 @Container.injectable()
 export class Signer {
+	@Container.inject(BINDINGS.SignatureFactory)
+	private readonly signatureFactory: Signatory;
+
 	@Container.inject(BINDINGS.Transaction.Utils)
 	private readonly utils: Utils;
 
@@ -17,8 +19,7 @@ export class Signer {
 		}
 
 		const hash: Buffer = await this.utils.toHash(transaction, options);
-		const signature: string =
-			transaction.version && transaction.version > 1 ? Hash.signSchnorr(hash, keys) : Hash.signECDSA(hash, keys);
+		const signature: string = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
 
 		if (!transaction.signature && !options.excludeMultiSignature) {
 			transaction.signature = signature;
@@ -39,7 +40,7 @@ export class Signer {
 			excludeSignature: true,
 		});
 
-		const signature: string = Hash.signSchnorr(hash, keys);
+		const signature: string = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
 		const indexedSignature = `${numberToHex(index)}${signature}`;
 		transaction.signatures.push(indexedSignature);
 

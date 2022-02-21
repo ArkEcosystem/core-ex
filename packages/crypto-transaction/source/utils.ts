@@ -1,7 +1,7 @@
 import { BigNumber } from "@arkecosystem/utils";
 import { Configuration } from "@packages/crypto-config/distribution";
 
-import { SATOSHI } from "../constants";
+import { SATOSHI } from "./constants";
 
 let genesisTransactions: { [key: string]: boolean };
 let currentNetwork: number;
@@ -50,5 +50,3 @@ export const isSupportedTransactionVersion = (configuration: Configuration, vers
 
 	return true;
 };
-
-export { Base58 } from "./base58";
