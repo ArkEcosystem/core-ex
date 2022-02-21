@@ -29,6 +29,10 @@ export interface Network {
 export interface IExceptions {
 	blocks?: string[];
 	transactions?: string[];
-	outlookTable?: Record<string, string>;
-	transactionIdFixTable?: Record<string, string>;
+}
+
+export interface MilestoneSearchResult {
+	found: boolean;
+	height: number;
+	data: any;
 }

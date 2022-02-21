@@ -126,6 +126,14 @@ importers:
       uuid: 8.3.2
       yaml: 1.10.2
 
+  packages/container:
+    specifiers:
+      inversify: 5.1.1
+      reflect-metadata: 0.1.13
+    dependencies:
+      inversify: 5.1.1
+      reflect-metadata: 0.1.13
+
   packages/core:
     specifiers:
       '@arkecosystem/core-api': workspace:*
@@ -781,8 +789,8 @@ importers:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
-      '@arkecosystem/crypto-key-pair-secp256k1': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
       bcrypto: 5.4.0
       bstring: 0.3.9
       uvu: ^0.5.3
@@ -792,16 +800,16 @@ importers:
       bstring: 0.3.9
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
-      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
       uvu: 0.5.3
 
   packages/crypto-address-bech32:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
-      '@arkecosystem/crypto-key-pair-secp256k1': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
       '@scure/base': ^1.0.0
       uvu: ^0.5.3
     dependencies:
@@ -809,16 +817,16 @@ importers:
       '@scure/base': 1.0.0
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
-      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
       uvu: 0.5.3
 
   packages/crypto-address-bech32m:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
-      '@arkecosystem/crypto-key-pair-secp256k1': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
       '@scure/base': ^1.0.0
       uvu: ^0.5.3
     dependencies:
@@ -826,16 +834,16 @@ importers:
       '@scure/base': 1.0.0
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
-      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
       uvu: 0.5.3
 
   packages/crypto-address-keccak256:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
-      '@arkecosystem/crypto-key-pair-secp256k1': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
       ethers: ^5.5.4
       uvu: ^0.5.3
     dependencies:
@@ -843,16 +851,16 @@ importers:
       ethers: 5.5.4
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
-      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
       uvu: 0.5.3
 
   packages/crypto-address-ss58:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
-      '@arkecosystem/crypto-key-pair-schnorr': workspace:*
-      '@arkecosystem/crypto-key-pair-secp256k1': workspace:*
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': workspace:*
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': workspace:*
       '@polkadot/util': ^8.4.1
       '@polkadot/util-crypto': ^8.4.1
       uvu: ^0.5.3
@@ -862,15 +870,171 @@ importers:
       '@polkadot/util-crypto': 8.4.1
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
-      '@arkecosystem/crypto-key-pair-schnorr': link:../crypto-key-pair-schnorr
-      '@arkecosystem/crypto-key-pair-secp256k1': link:../crypto-key-pair-secp256k1
+      '@arkecosystem/crypto-key-pair-ecdsa-bcrypto': link:../crypto-key-pair-ecdsa-bcrypto
+      '@arkecosystem/crypto-key-pair-schnorr-bcrypto': link:../crypto-key-pair-schnorr-bcrypto
       uvu: 0.5.3
+
+  packages/crypto-block:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto': workspace:*
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-networks': workspace:*
+      '@arkecosystem/crypto-time': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': 1.3.1
+      '@arkecosystem/validation': workspace:*
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer: 6.0.3
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+      micro-bmark: ^0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto': link:../crypto
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-networks': link:../crypto-networks
+      '@arkecosystem/crypto-time': link:../crypto-time
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+      '@arkecosystem/validation': link:../validation
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1_ajv@6.12.6
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+    devDependencies:
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      buffer: 6.0.3
+      micro-bmark: 0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
+
+  packages/crypto-config:
+    specifiers:
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      deepmerge: 4.2.2
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      deepmerge: 4.2.2
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
 
   packages/crypto-contracts:
     specifiers:
       ajv: 6.12.6
     dependencies:
       ajv: 6.12.6
+
+  packages/crypto-errors:
+    specifiers:
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-networks': workspace:*
+      '@arkecosystem/utils': 1.3.1
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer: 6.0.3
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+      micro-bmark: ^0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
+    dependencies:
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-networks': link:../crypto-networks
+      '@arkecosystem/utils': link:../utils
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1_ajv@6.12.6
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+    devDependencies:
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      buffer: 6.0.3
+      micro-bmark: 0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
 
   packages/crypto-hash-bcrypto:
     specifiers:
@@ -943,21 +1107,21 @@ importers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@noble/bls12-381': ^1.2.0
+      '@scure/bip39': ^1.0.0
       bcrypto: ^5.4.0
       bls12-381-keygen: ^0.2.1
-      micro-bip39: ^0.1.3
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       '@noble/bls12-381': 1.2.0
+      '@scure/bip39': 1.0.0
       bcrypto: 5.4.0
       bls12-381-keygen: 0.2.1
-      micro-bip39: 0.1.3
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
 
-  packages/crypto-key-pair-schnorr:
+  packages/crypto-key-pair-ecdsa-bcrypto:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
@@ -970,7 +1134,37 @@ importers:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
 
-  packages/crypto-key-pair-secp256k1:
+  packages/crypto-key-pair-ecdsa-noble:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@noble/secp256k1': ^1.5.4
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@noble/secp256k1': 1.5.4
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
+  packages/crypto-key-pair-ed25519:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@noble/ed25519': ^1.6.0
+      '@noble/hashes': ^1.0.0
+      '@scure/bip39': ^1.0.0
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@noble/ed25519': 1.6.0
+      '@noble/hashes': 1.0.0
+      '@scure/bip39': 1.0.0
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
+  packages/crypto-key-pair-schnorr-bcrypto:
     specifiers:
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
@@ -979,6 +1173,19 @@ importers:
     dependencies:
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
+      uvu: 0.5.3
+
+  packages/crypto-key-pair-schnorr-noble:
+    specifiers:
+      '@arkecosystem/core-test-framework': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@noble/secp256k1': ^1.5.5
+      uvu: ^0.5.3
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@noble/secp256k1': 1.5.5
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
@@ -1066,6 +1273,203 @@ importers:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
 
+  packages/crypto-time:
+    specifiers:
+      '@arkecosystem/crypto-contracts': workspace:*
+      dayjs: 1.10.7
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      dayjs: 1.10.7
+
+  packages/crypto-transaction:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-networks': workspace:*
+      '@arkecosystem/crypto-time': workspace:*
+      '@arkecosystem/utils': workspace:*
+      '@arkecosystem/validation': workspace:*
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer: 6.0.3
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+      micro-bmark: ^0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-networks': link:../crypto-networks
+      '@arkecosystem/crypto-time': link:../crypto-time
+      '@arkecosystem/utils': link:../utils
+      '@arkecosystem/validation': link:../validation
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1_ajv@6.12.6
+      bcrypto: 5.4.0
+      bip32: 2.0.6
+      bip39: 3.0.4
+      browserify-aes: 1.2.0
+      bstring: 0.3.9
+      buffer-xor: 2.0.2
+      builtin-modules: 3.2.0
+      bytebuffer: 5.0.1
+      dayjs: 1.10.7
+      deepmerge: 4.2.2
+      fast-memoize: 2.5.2
+      ipaddr.js: 2.0.1
+      lodash.get: 4.4.2
+      lodash.set: 4.3.2
+    devDependencies:
+      '@types/bip32': 2.0.0
+      '@types/bip39': 2.4.2
+      '@types/buffer-xor': 2.0.0
+      '@types/lodash.get': 4.4.6
+      '@types/lodash.set': 4.3.6
+      '@types/wif': 2.0.2
+      buffer: 6.0.3
+      micro-bmark: 0.1.3
+      process-es6: 0.11.6
+      util: 0.12.4
+
+  packages/crypto-transaction-delegate-registration:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-delegate-resignation:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-multi-payment:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-multi-signature-registration:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-transfer:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-transaction-vote:
+    specifiers:
+      '@arkecosystem/container': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/crypto-errors': workspace:*
+      '@arkecosystem/crypto-identities': workspace:*
+      '@arkecosystem/crypto-transaction': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/container': link:../container
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/crypto-errors': link:../crypto-errors
+      '@arkecosystem/crypto-identities': link:../crypto-identities
+      '@arkecosystem/crypto-transaction': link:../crypto-transaction
+      '@arkecosystem/utils': link:../utils
+
+  packages/crypto-validation:
+    specifiers:
+      '@arkecosystem/crypto-config': workspace:*
+      '@arkecosystem/crypto-contracts': workspace:*
+      '@arkecosystem/utils': workspace:*
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1
+      ipaddr.js: 2.0.1
+    dependencies:
+      '@arkecosystem/crypto-config': link:../crypto-config
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      '@arkecosystem/utils': link:../utils
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1_ajv@6.12.6
+      ipaddr.js: 2.0.1
+
   packages/utils:
     specifiers:
       '@hapi/boom': ^9.1.0
@@ -1110,6 +1514,16 @@ importers:
       micro-bmark: 0.1.3
       pluralize: 8.0.0
       random-object: 1.3.4
+
+  packages/validation:
+    specifiers:
+      '@arkecosystem/crypto-contracts': workspace:*
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1
+    dependencies:
+      '@arkecosystem/crypto-contracts': link:../crypto-contracts
+      ajv: 6.12.6
+      ajv-keywords: 3.4.1_ajv@6.12.6
 
 packages:
 
@@ -3126,6 +3540,14 @@ packages:
     resolution: {integrity: sha512-5mzA40W2q55VCRuC9XzmkiEnODdY0c5a7qsK2QcOfI5/MuVQyBaWGQyE6YOEF7kDwp+tDVWGsCDVJUME+wsWWw==}
     dev: false
 
+  /@noble/secp256k1/1.5.4:
+    resolution: {integrity: sha512-sOIQR+fSvgHlI+oeBMgrrxmePmLQMQloXP6DZGzcJ/Ek8N1dCgSWu+15K60qyvTI7mawp90A8G7UFb+D1ReeVQ==}
+    dev: false
+
+  /@noble/secp256k1/1.5.5:
+    resolution: {integrity: sha512-sZ1W6gQzYnu45wPrWx8D3kwI2/U29VYTx9OjbDAd7jwRItJ0cSTMPRL/C8AWZFn9kWFLQGqEXVEE86w4Z8LpIQ==}
+    dev: false
+
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -3632,6 +4054,13 @@ packages:
     resolution: {integrity: sha512-gIVaYhUsy+9s58m/ETjSJVKHhKTBMmcRb9cEV5/5dwvfDlfORjKrFsDeDHWRrm6RjcPvCLZFwGJjAjLj1gg4HA==}
     dev: false
 
+  /@scure/bip39/1.0.0:
+    resolution: {integrity: sha512-HrtcikLbd58PWOkl02k9V6nXWQyoa7A0+Ek9VF7z17DDk9XZAFUcIdqfh0jJXLypmizc5/8P6OxoUeKliiWv4w==}
+    dependencies:
+      '@noble/hashes': 1.0.0
+      '@scure/base': 1.0.0
+    dev: false
+
   /@sideway/address/4.1.3:
     resolution: {integrity: sha512-8ncEUtmnTsMmL7z1YPB47kPUq7LpKWJNFPsRzHiIajGC5uXlWGn+AmkYPcHNl8S4tcEGx+cnORnNYaw2wvL+LQ==}
     dependencies:
@@ -3763,7 +4192,7 @@ packages:
   /@types/bip39/2.4.2:
     resolution: {integrity: sha512-Vo9lqOIRq8uoIzEVrV87ZvcIM0PN9t0K3oYZ/CS61fIYKCBdOIM7mlWzXuRvSXrDtVa1uUO2w1cdfufxTC0bzg==}
     dependencies:
-      '@types/node': 14.18.12
+      '@types/node': 17.0.18
     dev: true
 
   /@types/bn.js/5.1.0:
@@ -3775,7 +4204,7 @@ packages:
   /@types/buffer-xor/2.0.0:
     resolution: {integrity: sha512-NEJkIKUE/xboduuIAJmdtUvbXgUOfMkjOo6lWsiBVUIWBC5fVWGT+50yEw9W1Xp4ga76khg57pHELXw5Xm3Y+A==}
     dependencies:
-      '@types/node': 14.18.12
+      '@types/node': 17.0.18
     dev: true
 
   /@types/cacheable-request/6.0.2:
@@ -4101,7 +4530,7 @@ packages:
   /@types/wif/2.0.2:
     resolution: {integrity: sha512-IiIuBeJzlh4LWJ7kVTrX0nwB60OG0vvGTaWC/SgSbVFw7uYUTF6gEuvDZ1goWkeirekJDD58Y8g7NljQh2fNkA==}
     dependencies:
-      '@types/node': 14.18.12
+      '@types/node': 17.0.18
     dev: true
 
   /@types/yargs-parser/20.2.1:
@@ -10153,19 +10582,6 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
     dev: true
-
-  /micro-base/0.10.2:
-    resolution: {integrity: sha512-lqqJrT7lfJtDmmiQ4zRLZuIJBk96t0RAc5pCrrWpL9zDeH5i/SUL85mku9HqzTI/OCZ8EQ3aicbMW+eK5Nyu5w==}
-    deprecated: Switch to @scure/base for audited version of the lib & updates
-    dev: false
-
-  /micro-bip39/0.1.3:
-    resolution: {integrity: sha512-lEaRG/MKxFQvG19lfJfPkLIG0rgT28nWud3otN+VgAbrozGqXn2PLaZuYPsy9guQjIZWBTvoLw/HDJQxmMXjMA==}
-    deprecated: Switch to @scure/bip39 for audited version of the lib & updates
-    dependencies:
-      '@noble/hashes': 0.5.9
-      micro-base: 0.10.2
-    dev: false
 
   /micro-bmark/0.1.3:
     resolution: {integrity: sha512-vZ/B9WET+y4cWwfAOGdj3u5W31Ts2wxjLeCVvd7iNXJYONX6DAEBJCuXrdzzMWQHWJQTXgGEryrdNhY2JUz4Uw==}
