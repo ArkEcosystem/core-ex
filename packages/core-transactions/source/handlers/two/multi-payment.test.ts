@@ -125,36 +125,27 @@ describe<{
 	it("throwIfCannotBeApplied should throw if asset is undefined", async (context) => {
 		context.multiPaymentTransaction.data.asset = undefined;
 
-		await assert.rejects(() =>
-			context.handler.throwIfCannotBeApplied(
-				context.multiPaymentTransaction,
-				context.senderWallet,
-			),
-			Exceptions.Runtime.AssertionException
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.multiPaymentTransaction, context.senderWallet),
+			Exceptions.Runtime.AssertionException,
 		);
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet has insufficient funds", async (context) => {
 		context.senderWallet.setBalance(Utils.BigNumber.ZERO);
 
-		await assert.rejects(() =>
-				context.handler.throwIfCannotBeApplied(
-					context.multiPaymentTransaction,
-					context.senderWallet,
-				),
-			InsufficientBalanceError
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.multiPaymentTransaction, context.senderWallet),
+			InsufficientBalanceError,
 		);
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet has insufficient funds send all payouts", async (context) => {
 		context.senderWallet.setBalance(Utils.BigNumber.make(150)); // short by the fee
 
-		await assert.rejects(() =>
-				context.handler.throwIfCannotBeApplied(
-					context.multiPaymentTransaction,
-					context.senderWallet,
-				),
-			InsufficientBalanceError
+		await assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.multiPaymentTransaction, context.senderWallet),
+			InsufficientBalanceError,
 		);
 	});
 
@@ -167,7 +158,8 @@ describe<{
 
 		await context.handler.apply(context.multiPaymentTransaction);
 
-		assert.equal(context.senderWallet.getBalance(),
+		assert.equal(
+			context.senderWallet.getBalance(),
 			Utils.BigNumber.make(senderBalance)
 				.minus(totalPaymentsAmount)
 				.minus(context.multiPaymentTransaction.data.fee),
@@ -184,18 +176,18 @@ describe<{
 
 		context.handler.throwIfCannotBeApplied = spy();
 
-		await assert.rejects(() =>
-				context.handler.applyToSender(context.multiPaymentTransaction),
-			Exceptions.Runtime.AssertionException
+		await assert.rejects(
+			() => context.handler.applyToSender(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException,
 		);
 	});
 
 	it("applyToRecipient should throw if asset is undefined", async (context) => {
 		context.multiPaymentTransaction.data.asset = undefined;
 
-		await assert.rejects(() =>
-				context.handler.applyToRecipient(context.multiPaymentTransaction),
-			Exceptions.Runtime.AssertionException
+		await assert.rejects(
+			() => context.handler.applyToRecipient(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException,
 		);
 	});
 
@@ -213,7 +205,8 @@ describe<{
 		);
 
 		await context.handler.revert(context.multiPaymentTransaction);
-		assert.equal(context.senderWallet.getBalance(),
+		assert.equal(
+			context.senderWallet.getBalance(),
 			Utils.BigNumber.make(senderBalance)
 				.plus(totalPaymentsAmount)
 				.plus(context.multiPaymentTransaction.data.fee),
@@ -228,18 +221,18 @@ describe<{
 
 		context.multiPaymentTransaction.data.asset = undefined;
 
-		await assert.rejects(() =>
-				context.handler.revertForSender(context.multiPaymentTransaction),
-			Exceptions.Runtime.AssertionException
+		await assert.rejects(
+			() => context.handler.revertForSender(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException,
 		);
 	});
 
 	it("revertForRecipient should throw if asset is undefined", async (context) => {
 		context.multiPaymentTransaction.data.asset = undefined;
 
-		await assert.rejects(() =>
-				context.handler.revertForRecipient(context.multiPaymentTransaction),
-			Exceptions.Runtime.AssertionException
+		await assert.rejects(
+			() => context.handler.revertForRecipient(context.multiPaymentTransaction),
+			Exceptions.Runtime.AssertionException,
 		);
 	});
 });
