@@ -1,17 +1,16 @@
 import ByteBuffer from "bytebuffer";
 
-import { IBlockData, ITransaction } from "@arkecosystem/crypto-contracts";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IBlockData, ITransaction } from "@arkecosystem/crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 import { Block } from "./block";
 import { Configuration } from "@arkecosystem/crypto-config";
 
+@Container.injectable()
 export class Deserializer {
-	readonly #configuration: Configuration;
-
-	public constructor(configuration: Configuration) {
-		this.#configuration = configuration;
-	}
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
 
 	public deserialize(
 		serialized: Buffer,
@@ -32,10 +31,10 @@ export class Deserializer {
 			transactions = this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
 		}
 
-		// @ts-ignore
-		block.idHex = new Block(this.#configuration, {}).getIdHex(block);
-		// @ts-ignore
-		block.id = new Block(this.#configuration, {}).getId(block);
+
+		block.idHex = new Block(this.configuration, {}).getIdHex(block);
+
+		block.id = new Block(this.configuration, {}).getId(block);
 
 		return { data: block, transactions };
 	}
@@ -45,7 +44,7 @@ export class Deserializer {
 		block.timestamp = buf.readUint32();
 		block.height = buf.readUint32();
 
-		const constants = this.#configuration.getMilestone(block.height - 1 || 1);
+		const constants = this.configuration.getMilestone(block.height - 1 || 1);
 
 		if (constants.block.idFullSha256) {
 			const previousBlockFullSha256 = buf.readBytes(32).toString("hex");

@@ -868,6 +868,7 @@ importers:
 
   packages/crypto-block:
     specifiers:
+      '@arkecosystem/container': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@arkecosystem/crypto-config': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
@@ -908,6 +909,7 @@ importers:
       process-es6: 0.11.6
       util: 0.12.4
     dependencies:
+      '@arkecosystem/container': link:../container
       '@arkecosystem/crypto': link:../crypto
       '@arkecosystem/crypto-config': link:../crypto-config
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
