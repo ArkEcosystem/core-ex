@@ -8,7 +8,7 @@ import { Identifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
 import { WebhookEvent } from "./events";
-import * as conditions from "./conditions";
+import { conditions } from "./conditions";
 
 let app: Application;
 let database: Database;
