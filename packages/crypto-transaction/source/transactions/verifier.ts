@@ -16,7 +16,10 @@ export class Verifier {
 	@Container.inject(BINDINGS.Validator)
 	private readonly validator: any;
 
-	public verify(data: ITransactionData, options?: IVerifyOptions): boolean {
+	@Container.inject(BINDINGS.Transaction.Utils)
+	private readonly utils: Utils;
+
+	public async verify(data: ITransactionData, options?: IVerifyOptions): Promise<boolean> {
 		if (this.configuration.getMilestone().aip11 && (!data.version || data.version === 1)) {
 			return false;
 		}
@@ -24,7 +27,7 @@ export class Verifier {
 		return this.verifyHash(data, options?.disableVersionCheck);
 	}
 
-	public verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): boolean {
+	public async verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): Promise<boolean> {
 		if (!multiSignature) {
 			throw new InvalidMultiSignatureAssetError();
 		}
@@ -32,7 +35,7 @@ export class Verifier {
 		const { publicKeys, min }: IMultiSignatureAsset = multiSignature;
 		const { signatures }: ITransactionData = transaction;
 
-		const hash: Buffer = Utils.toHash(transaction, {
+		const hash: Buffer = await this.utils.toHash(transaction, {
 			excludeMultiSignature: true,
 			excludeSignature: true,
 		});
@@ -71,14 +74,14 @@ export class Verifier {
 		return verified;
 	}
 
-	public verifyHash(data: ITransactionData, disableVersionCheck = false): boolean {
+	public async verifyHash(data: ITransactionData, disableVersionCheck = false): Promise<boolean> {
 		const { signature, senderPublicKey } = data;
 
 		if (!signature || !senderPublicKey) {
 			return false;
 		}
 
-		const hash: Buffer = Utils.toHash(data, {
+		const hash: Buffer = await this.utils.toHash(data, {
 			disableVersionCheck,
 			excludeSignature: true,
 		});

@@ -1,15 +1,22 @@
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+
 import { Hash } from "../crypto";
 import { IKeyPair, ISerializeOptions, ITransactionData } from "../interfaces";
 import { numberToHex } from "../utils";
 import { Utils } from "./utils";
 
+@Container.injectable()
 export class Signer {
-	public static sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): string {
+	@Container.inject(BINDINGS.Transaction.Utils)
+	private readonly utils: Utils;
+
+	public async sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): Promise<string> {
 		if (!options || options.excludeSignature === undefined) {
 			options = { excludeSignature: true, ...options };
 		}
 
-		const hash: Buffer = Utils.toHash(transaction, options);
+		const hash: Buffer = await this.utils.toHash(transaction, options);
 		const signature: string =
 			transaction.version && transaction.version > 1 ? Hash.signSchnorr(hash, keys) : Hash.signECDSA(hash, keys);
 
@@ -20,14 +27,14 @@ export class Signer {
 		return signature;
 	}
 
-	public static multiSign(transaction: ITransactionData, keys: IKeyPair, index = -1): string {
+	public async multiSign(transaction: ITransactionData, keys: IKeyPair, index = -1): Promise<string> {
 		if (!transaction.signatures) {
 			transaction.signatures = [];
 		}
 
 		index = index === -1 ? transaction.signatures.length : index;
 
-		const hash: Buffer = Utils.toHash(transaction, {
+		const hash: Buffer = await this.utils.toHash(transaction, {
 			excludeMultiSignature: true,
 			excludeSignature: true,
 		});

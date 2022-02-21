@@ -1,6 +1,4 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
 
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
 import { Address } from "../../../identities";
@@ -12,9 +10,6 @@ import { Transaction } from "../transaction";
 
 @Container.injectable()
 export abstract class MultiPaymentTransaction extends Transaction {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiPayment;
 	public static key = "multiPayment";
@@ -26,8 +21,8 @@ export abstract class MultiPaymentTransaction extends Transaction {
 		return schemas.multiPayment;
 	}
 
-	public verify(): boolean {
-		return this.configuration.getMilestone().aip11 && super.verify();
+	public async verify(): Promise<boolean> {
+		return this.configuration.getMilestone().aip11 && await super.verify();
 	}
 
 	public hasVendorField(): boolean {

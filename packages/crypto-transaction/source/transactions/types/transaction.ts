@@ -1,3 +1,6 @@
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+
 import { TransactionTypeGroup } from "../../enums";
 import { NotImplemented } from "../../errors";
 import { Address } from "../../identities";
@@ -8,12 +11,19 @@ import {
 	ITransactionData,
 	ITransactionJson,
 } from "../../interfaces";
-import { configManager } from "../../managers/config";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { Verifier } from "../verifier";
 import { TransactionSchema } from "./schemas";
+import { Configuration } from "@arkecosystem/crypto-config";
 
+@Container.injectable()
 export abstract class Transaction implements ITransaction {
+	@Container.inject(BINDINGS.Configuration)
+	protected readonly configuration: Configuration;
+
+	@Container.inject(BINDINGS.Transaction.Verifier)
+	private readonly verifier: Verifier;
+
 	public static type: number | undefined = undefined;
 	public static typeGroup: number | undefined = undefined;
 	public static version: number = 1;
@@ -34,7 +44,7 @@ export abstract class Transaction implements ITransaction {
 	}
 
 	public static staticFee(feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
-		const milestones = configManager.getMilestone(feeContext.height);
+		const milestones = this.configuration.getMilestone(feeContext.height);
 		if (milestones.fees && milestones.fees.staticFees && this.key) {
 			const fee: any = milestones.fees.staticFees[this.key];
 
@@ -46,12 +56,12 @@ export abstract class Transaction implements ITransaction {
 		return this.defaultStaticFee;
 	}
 
-	public verify(options?: ISerializeOptions): boolean {
-		return Verifier.verify(this.data, options);
+	public async verify(options?: ISerializeOptions): Promise<boolean> {
+		return this.verifier.verify(this.data, options);
 	}
 
 	public verifySchema(): ISchemaValidationResult {
-		return Verifier.verifySchema(this.data);
+		return this.verifier.verifySchema(this.data);
 	}
 
 	public toJson(): ITransactionJson {

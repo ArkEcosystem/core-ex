@@ -27,7 +27,7 @@ export abstract class MultiSignatureRegistrationTransaction extends Transaction 
 		return super.staticFee(feeContext);
 	}
 
-	public verify(): boolean {
+	public async verify(): Promise<boolean> {
 		return true;
 	}
 

@@ -1,32 +1,26 @@
-import { HashAlgorithms } from "../crypto";
-import { AddressNetworkError } from "../errors";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS, IHashFactory } from "@packages/crypto-contracts/distribution";
+
 import { ISerializeOptions, ITransactionData } from "../interfaces";
-import { Serializer } from "./serializer";
 import { TransactionTypeFactory } from "./types/factory";
 
+@Container.injectable()
 export class Utils {
-	public static toBytes(data: ITransactionData): Buffer {
-		return Serializer.serialize(TransactionTypeFactory.create(data));
+	@Container.inject(BINDINGS.Transaction.Serializer)
+	private readonly serializer: any;
+
+	@Container.inject(BINDINGS.HashFactory)
+	private readonly hashFactory: IHashFactory;
+
+	public toBytes(data: ITransactionData): Buffer {
+		return this.serializer.serialize(TransactionTypeFactory.create(data));
 	}
 
-	public static toHash(transaction: ITransactionData, options?: ISerializeOptions): Buffer {
-		return HashAlgorithms.sha256(Serializer.getBytes(transaction, options));
+	public async toHash(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer> {
+		return this.hashFactory.sha256(this.serializer.getBytes(transaction, options));
 	}
 
-	public static getId(transaction: ITransactionData, options: ISerializeOptions = {}): string {
-		const id: string = Utils.toHash(transaction, options).toString("hex");
-
-		// WORKAROUND:
-		// A handful of mainnet transactions have an invalid recipient. Due to a
-		// refactor of the Address network byte validation it is no longer
-		// trivially possible to handle them. If an invalid address is encountered
-		// during transfer serialization, the error is bubbled up to defer the
-		// `AddressNetworkByteError` until the actual id is available to call
-		// `isException`.
-		if (options.addressError) {
-			throw new AddressNetworkError(options.addressError);
-		}
-
-		return id;
+	public async getId(transaction: ITransactionData, options: ISerializeOptions = {}): Promise<string> {
+		return (await this.toHash(transaction, options)).toString("hex");
 	}
 }

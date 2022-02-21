@@ -130,7 +130,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.multiSignWithKeyPair(index, keys);
 	}
 
-	public verify(): boolean {
+	public async verify(): Promise<boolean> {
 		return Verifier.verifyHash(this.data, this.disableVersionCheck);
 	}
 

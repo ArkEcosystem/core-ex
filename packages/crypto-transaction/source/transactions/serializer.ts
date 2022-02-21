@@ -1,17 +1,24 @@
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
+import { ByteBuffer } from "@arkecosystem/utils";
+
 import { TransactionType, TransactionTypeGroup } from "../enums";
 import { TransactionVersionError } from "../errors";
 import { Address } from "../identities";
 import { ISerializeOptions, ITransaction, ITransactionData } from "../interfaces";
-import { configManager } from "../managers/config";
-import { ByteBuffer, isSupportedTransactionVersion } from "../utils";
+import { isSupportedTransactionVersion } from "../utils";
 import { TransactionTypeFactory } from "./types";
 
-// Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
+@Container.injectable()
 export class Serializer {
-	public static getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
+	@Container.inject(BINDINGS.Configuration)
+	private readonly configuration: Configuration;
+
+	public getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
 		const version: number = transaction.version || 1;
 
-		if (options.acceptLegacyVersion || options.disableVersionCheck || isSupportedTransactionVersion(version)) {
+		if (options.acceptLegacyVersion || options.disableVersionCheck || isSupportedTransactionVersion(this.configuration, version)) {
 			if (version === 1) {
 				return this.getBytesV1(transaction, options);
 			}
@@ -22,9 +29,9 @@ export class Serializer {
 		}
 	}
 
-	public static serialize(transaction: ITransaction, options: ISerializeOptions = {}): Buffer {
+	public serialize(transaction: ITransaction, options: ISerializeOptions = {}): Buffer {
 		const buff: ByteBuffer = new ByteBuffer(
-			Buffer.alloc(configManager.getMilestone(configManager.getHeight()).block?.maxPayload ?? 8192),
+			Buffer.alloc(this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192),
 		);
 
 		this.serializeCommon(transaction.data, buff);
@@ -46,7 +53,7 @@ export class Serializer {
 		return bufferBuffer;
 	}
 
-	private static getBytesV1(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
+	private getBytesV1(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
 		let assetSize = 0;
 		let assetBytes: Buffer | Uint8Array | undefined;
 
@@ -136,7 +143,7 @@ export class Serializer {
 		return bb.getResult();
 	}
 
-	private static serializeCommon(transaction: ITransactionData, buff: ByteBuffer): void {
+	private serializeCommon(transaction: ITransactionData, buff: ByteBuffer): void {
 		transaction.version = transaction.version || 0x01;
 		if (transaction.typeGroup === undefined) {
 			transaction.typeGroup = TransactionTypeGroup.Core;
@@ -144,7 +151,7 @@ export class Serializer {
 
 		buff.writeUInt8(0xff);
 		buff.writeUInt8(transaction.version);
-		buff.writeUInt8(transaction.network || configManager.get("network.pubKeyHash"));
+		buff.writeUInt8(transaction.network || this.configuration.get("network.pubKeyHash"));
 
 		if (transaction.version === 1) {
 			buff.writeUInt8(transaction.type);
@@ -165,7 +172,7 @@ export class Serializer {
 		buff.writeBigInt64LE(transaction.fee.toBigInt());
 	}
 
-	private static serializeVendorField(transaction: ITransaction, buff: ByteBuffer): void {
+	private serializeVendorField(transaction: ITransaction, buff: ByteBuffer): void {
 		const { data }: ITransaction = transaction;
 
 		if (transaction.hasVendorField() && data.vendorField) {
@@ -177,7 +184,7 @@ export class Serializer {
 		}
 	}
 
-	private static serializeSignatures(
+	private serializeSignatures(
 		transaction: ITransactionData,
 		buff: ByteBuffer,
 		options: ISerializeOptions = {},

@@ -11,14 +11,24 @@ import {
 	ITransactionData,
 	ITransactionJson,
 } from "../interfaces";
-import { BigNumber } from "../utils";
+import { BigNumber } from "@arkecosystem/utils";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
 import { TransactionTypeFactory } from "./types";
 import { Utils } from "./utils";
 import { Verifier } from "./verifier";
+import { Container } from "@arkecosystem/container";
+import { BINDINGS } from "@arkecosystem/crypto-contracts";
+import { Configuration } from "@arkecosystem/crypto-config";
 
+@Container.injectable()
 export class TransactionFactory {
+	@Container.inject(BINDINGS.Configuration)
+	protected readonly configuration: Configuration;
+
+	@Container.inject(BINDINGS.Transaction.Verifier)
+	private readonly verifier: Verifier;
+
 	public static fromHex(hex: string): ITransaction {
 		return this.fromSerialized(hex);
 	}

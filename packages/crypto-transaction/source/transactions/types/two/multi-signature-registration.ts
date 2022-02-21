@@ -1,6 +1,4 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS } from "@arkecosystem/crypto-contracts";
-import { Configuration } from "@arkecosystem/crypto-config";
 
 import { TransactionType, TransactionTypeGroup } from "../../../enums";
 import { IMultiSignatureAsset, ISerializeOptions, ITransactionData } from "../../../interfaces";
@@ -11,9 +9,6 @@ import { Transaction } from "../transaction";
 
 @Container.injectable()
 export class MultiSignatureRegistrationTransaction extends Transaction {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
@@ -33,8 +28,8 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		return super.staticFee(feeContext);
 	}
 
-	public verify(): boolean {
-		return this.configuration.getMilestone().aip11 && super.verify();
+	public async verify(): Promise<boolean> {
+		return this.configuration.getMilestone().aip11 && await super.verify();
 	}
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {
