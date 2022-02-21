@@ -1,3 +1,4 @@
+import { IKeyPair } from "./identities";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
 export interface IBlockVerification {
@@ -67,12 +68,12 @@ export interface IBlockJson {
 export interface IBlockDeserializer {
 	deserialize(
 		serialized: Buffer,
-		headerOnly = false,
-		options: { deserializeTransactionsUnchecked?: boolean } = {},
+		headerOnly?: boolean,
+		options?: { deserializeTransactionsUnchecked?: boolean },
 	): Promise<{ data: IBlockData; transactions: ITransaction[] }>;
 }
 
-export interface IBlockBlockFactory {
+export interface IBlockFactory {
 	make(data: any, keys: IKeyPair): Promise<IBlock | undefined>;
 
 	fromHex(hex: string): Promise<IBlock>;
@@ -83,7 +84,7 @@ export interface IBlockBlockFactory {
 
 	fromData(
 		data: IBlockData,
-		options: { deserializeTransactionsUnchecked?: boolean } = {},
+		options?: { deserializeTransactionsUnchecked?: boolean },
 	): Promise<IBlock | undefined>;
 }
 
@@ -92,5 +93,5 @@ export interface IBlockSerializer {
 
 	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
 
-	serialize(block: IBlockData, includeSignature = true): Buffer;
+	serialize(block: IBlockData, includeSignature?: boolean): Buffer;
 }
