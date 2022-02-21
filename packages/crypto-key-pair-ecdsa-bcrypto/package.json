@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/crypto-key-pair-schnorr",
+	"name": "@arkecosystem/crypto-key-pair-ecdsa-bcrypto",
 	"version": "0.0.1",
-	"description": "Schnorr Key Derivation",
+	"description": "secp256k1 Key Derivation",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
