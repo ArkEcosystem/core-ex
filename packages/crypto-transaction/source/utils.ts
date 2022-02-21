@@ -1,7 +1,7 @@
 import { BigNumber } from "@arkecosystem/utils";
 import { Configuration } from "@packages/crypto-config/distribution";
 
-import { SATOSHI } from "./constants";
+const SATOSHI = 1e8;
 
 let genesisTransactions: { [key: string]: boolean };
 let currentNetwork: number;
