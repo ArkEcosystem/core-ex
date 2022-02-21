@@ -20,7 +20,7 @@
 		"@arkecosystem/container": "workspace:*",
 		"@arkecosystem/crypto-contracts": "workspace:*",
 		"@arkecosystem/crypto-errors": "workspace:*",
-		"@arkecosystem/crypto-identities": "workspace:*",
+		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@arkecosystem/crypto-transaction": "workspace:*",
 		"@arkecosystem/utils": "workspace:*"
 	},
