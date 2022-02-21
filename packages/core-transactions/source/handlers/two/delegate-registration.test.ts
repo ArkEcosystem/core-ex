@@ -12,7 +12,7 @@ import {
 } from "../../errors";
 import { buildMultiSignatureWallet, buildRecipientWallet, buildSenderWallet, initApp } from "../../../test/app";
 import { TransactionHandlerRegistry } from "../handler-registry";
-import { TransactionHandler } from "../index";
+import { TransactionHandler } from "../transaction";
 
 describe<{
 	app: Application;
