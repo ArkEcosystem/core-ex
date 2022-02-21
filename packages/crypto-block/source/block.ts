@@ -205,7 +205,6 @@ export class Block implements IBlock {
 				result.errors.push("Invalid total fee");
 			}
 
-
 			if ((await new HashFactory().sha256(payloadBuffers)).toString("hex") !== block.payloadHash) {
 				result.errors.push("Invalid payload hash");
 			}
