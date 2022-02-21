@@ -1,5 +1,6 @@
-import { Managers } from "..";
-import { Hash, HashAlgorithms, Slots } from "../crypto";
+import { HashFactory } from "@arkecosystem/crypto-hash-bcrypto";
+import { Signatory } from "@arkecosystem/crypto-signature-ecdsa";
+import { Slots } from "@arkecosystem/crypto-time";
 import { BlockSchemaError } from "@arkecosystem/crypto-errors";
 import {
 	IBlock,
@@ -9,10 +10,10 @@ import {
 	ITransaction,
 	ITransactionData,
 } from "@arkecosystem/crypto-contracts";
-import { configManager } from "../managers/config";
-import { BigNumber } from "../utils";
-import { validator } from "../validation";
+import { BigNumber } from "@arkecosystem/utils";
+import { Validator } from "@arkecosystem/validation";
 import { Serializer } from "./serializer";
+import { Configuration } from "@packages/crypto-config/distribution";
 
 export class Block implements IBlock {
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
@@ -21,7 +22,13 @@ export class Block implements IBlock {
 	public transactions: ITransaction[];
 	public verification: IBlockVerification;
 
-	public constructor({ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string }) {
+	readonly #configuration: Configuration;
+
+	public constructor(
+		configuration: Configuration,
+		{ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string },
+	) {
+		this.#configuration = configuration;
 		this.data = data;
 
 		// TODO genesis block calculated id is wrong for some reason
@@ -46,29 +53,13 @@ export class Block implements IBlock {
 
 		delete this.data.transactions;
 
-		this.verification = this.verify();
-
-		// Order of transactions messed up in mainnet V1
-		const { wrongTransactionOrder } = configManager.get("exceptions");
-		if (this.data.id && wrongTransactionOrder && wrongTransactionOrder[this.data.id]) {
-			const fixedOrderIds = wrongTransactionOrder[this.data.id];
-
-			this.transactions = fixedOrderIds.map((id: string) =>
-				this.transactions.find((transaction) => transaction.id === id),
-			);
-		}
+		this.verification = void this.verify();
 	}
 
-	public static applySchema(data: IBlockData): IBlockData | undefined {
-		let result = validator.validate("block", data);
+	public async applySchema(data: IBlockData): Promise<IBlockData | undefined> {
+		let result = await new Validator({}).validate("block", data);
 
 		if (!result.error) {
-			return result.value;
-		}
-
-		result = validator.validateException("block", data);
-
-		if (!result.errors) {
 			return result.value;
 		}
 
@@ -102,11 +93,11 @@ export class Block implements IBlock {
 		return result.value;
 	}
 
-	public static getIdHex(data: IBlockData): string {
-		const constants = configManager.getMilestone(data.height);
-		const payloadHash: Buffer = Serializer.serialize(data);
+	public async getIdHex(data: IBlockData): Promise<string> {
+		const constants = this.#configuration.getMilestone(data.height);
+		const payloadHash: Buffer = new Serializer(this.#configuration).serialize(data);
 
-		const hash: Buffer = HashAlgorithms.sha256(payloadHash);
+		const hash: Buffer = await new HashFactory().sha256(payloadHash);
 
 		if (constants.block.idFullSha256) {
 			return hash.toString("hex");
@@ -121,15 +112,16 @@ export class Block implements IBlock {
 		return temp.toString("hex");
 	}
 
-	public static toBytesHex(data): string {
+	public toBytesHex(data): string {
 		const temp: string = data ? BigNumber.make(data).toString(16) : "";
 
 		return "0".repeat(16 - temp.length) + temp;
 	}
 
-	public static getId(data: IBlockData): string {
-		const constants = configManager.getMilestone(data.height);
-		const idHex: string = Block.getIdHex(data);
+	public getId(data: IBlockData): string {
+		const constants = this.#configuration.getMilestone(data.height);
+		// @ts-ignore
+		const idHex: string = new Block(this.#configuration, {}).getIdHex(data);
 
 		return constants.block.idFullSha256 ? idHex : BigNumber.make(`0x${idHex}`).toString();
 	}
@@ -141,15 +133,19 @@ export class Block implements IBlock {
 		return header;
 	}
 
-	public verifySignature(): boolean {
-		const bytes: Buffer = Serializer.serialize(this.data, false);
-		const hash: Buffer = HashAlgorithms.sha256(bytes);
+	public async verifySignature(): Promise<boolean> {
+		const bytes: Buffer = new Serializer(this.#configuration).serialize(this.data, false);
+		const hash: Buffer = await new HashFactory().sha256(bytes);
 
 		if (!this.data.blockSignature) {
 			throw new Error();
 		}
 
-		return Hash.verifyECDSA(hash, this.data.blockSignature, this.data.generatorPublicKey);
+		return new Signatory().verify(
+			hash,
+			Buffer.from(this.data.blockSignature, "hex"),
+			Buffer.from(this.data.generatorPublicKey, "hex"),
+		);
 	}
 
 	public toJson(): IBlockJson {
@@ -162,7 +158,7 @@ export class Block implements IBlock {
 		return data;
 	}
 
-	public verify(): IBlockVerification {
+	public async verify(): Promise<IBlockVerification> {
 		const block: IBlockData = this.data;
 		const result: IBlockVerification = {
 			containsMultiSignatures: false,
@@ -171,7 +167,7 @@ export class Block implements IBlock {
 		};
 
 		try {
-			const constants = configManager.getMilestone(block.height);
+			const constants = this.#configuration.getMilestone(block.height);
 
 			if (block.height !== 1 && !block.previousBlock) {
 				result.errors.push("Invalid previous block");
@@ -191,11 +187,14 @@ export class Block implements IBlock {
 				result.errors.push("Invalid block version");
 			}
 
-			if (block.timestamp > Slots.getTime() + Managers.configManager.getMilestone(block.height).blocktime) {
+			if (
+				block.timestamp >
+				new Slots(this.#configuration, {}).getTime() + this.#configuration.getMilestone(block.height).blocktime
+			) {
 				result.errors.push("Invalid block timestamp");
 			}
 
-			const size: number = Serializer.size(this);
+			const size: number = new Serializer(this.#configuration).size(this);
 			if (size > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
@@ -270,7 +269,8 @@ export class Block implements IBlock {
 				result.errors.push("Invalid total fee");
 			}
 
-			if (HashAlgorithms.sha256(payloadBuffers).toString("hex") !== block.payloadHash) {
+			// @ts-ignore
+			if ((await new HashFactory().sha256(payloadBuffers)).toString("hex") !== block.payloadHash) {
 				result.errors.push("Invalid payload hash");
 			}
 		} catch (error) {
@@ -284,6 +284,7 @@ export class Block implements IBlock {
 
 	private applyGenesisBlockFix(id: string): void {
 		this.data.id = id;
-		this.data.idHex = id.length === 64 ? id : Block.toBytesHex(id); // if id.length is 64 it's already hex
+		// @ts-ignore
+		this.data.idHex = id.length === 64 ? id : new Block(this.#configuration, {}).toBytesHex(id); // if id.length is 64 it's already hex
 	}
 }

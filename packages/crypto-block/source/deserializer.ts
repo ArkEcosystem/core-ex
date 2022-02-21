@@ -1,13 +1,19 @@
 import ByteBuffer from "bytebuffer";
 
 import { IBlockData, ITransaction } from "@arkecosystem/crypto-contracts";
-import { configManager } from "../managers";
-import { TransactionFactory } from "../transactions";
-import { BigNumber } from "../utils";
+import { TransactionFactory } from "@arkecosystem/crypto-transaction";
+import { BigNumber } from "@arkecosystem/utils";
 import { Block } from "./block";
+import { Configuration } from "@arkecosystem/crypto-config";
 
 export class Deserializer {
-	public static deserialize(
+	readonly #configuration: Configuration;
+
+	public constructor(configuration: Configuration) {
+		this.#configuration = configuration;
+	}
+
+	public deserialize(
 		serialized: Buffer,
 		headerOnly = false,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
@@ -26,18 +32,20 @@ export class Deserializer {
 			transactions = this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
 		}
 
-		block.idHex = Block.getIdHex(block);
-		block.id = Block.getId(block);
+		// @ts-ignore
+		block.idHex = new Block(this.#configuration, {}).getIdHex(block);
+		// @ts-ignore
+		block.id = new Block(this.#configuration, {}).getId(block);
 
 		return { data: block, transactions };
 	}
 
-	private static deserializeHeader(block: IBlockData, buf: ByteBuffer): void {
+	private deserializeHeader(block: IBlockData, buf: ByteBuffer): void {
 		block.version = buf.readUint32();
 		block.timestamp = buf.readUint32();
 		block.height = buf.readUint32();
 
-		const constants = configManager.getMilestone(block.height - 1 || 1);
+		const constants = this.#configuration.getMilestone(block.height - 1 || 1);
 
 		if (constants.block.idFullSha256) {
 			const previousBlockFullSha256 = buf.readBytes(32).toString("hex");
@@ -69,7 +77,7 @@ export class Deserializer {
 		block.blockSignature = buf.readBytes(signatureLength()).toString("hex");
 	}
 
-	private static deserializeTransactions(
+	private deserializeTransactions(
 		block: IBlockData,
 		buf: ByteBuffer,
 		deserializeTransactionsUnchecked = false,

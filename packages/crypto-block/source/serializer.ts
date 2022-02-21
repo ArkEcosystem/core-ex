@@ -3,12 +3,18 @@ import ByteBuffer from "bytebuffer";
 
 import { PreviousBlockIdFormatError } from "@arkecosystem/crypto-errors";
 import { IBlock, IBlockData, ITransactionData } from "@arkecosystem/crypto-contracts";
-import { configManager } from "../managers/config";
-import { Utils } from "../transactions";
+import { Configuration } from "@arkecosystem/crypto-config";
+import { Utils } from "@arkecosystem/crypto-transaction";
 import { Block } from "./block";
 
 export class Serializer {
-	public static size(block: IBlock): number {
+	readonly #configuration: Configuration;
+
+	public constructor(configuration: Configuration) {
+		this.#configuration = configuration;
+	}
+
+	public size(block: IBlock): number {
 		let size = this.headerSize(block.data) + block.data.blockSignature.length / 2;
 
 		for (const transaction of block.transactions) {
@@ -18,7 +24,7 @@ export class Serializer {
 		return size;
 	}
 
-	public static serializeWithTransactions(block: IBlockData): Buffer {
+	public serializeWithTransactions(block: IBlockData): Buffer {
 		const transactions: ITransactionData[] = block.transactions || [];
 		block.numberOfTransactions = block.numberOfTransactions || transactions.length;
 
@@ -37,7 +43,7 @@ export class Serializer {
 		return buff.flip().toBuffer();
 	}
 
-	public static serialize(block: IBlockData, includeSignature = true): Buffer {
+	public serialize(block: IBlockData, includeSignature = true): Buffer {
 		const buff: ByteBuffer = new ByteBuffer(512, true);
 
 		this.serializeHeader(block, buff);
@@ -49,8 +55,8 @@ export class Serializer {
 		return buff.flip().toBuffer();
 	}
 
-	private static headerSize(block: IBlockData): number {
-		const constants = configManager.getMilestone(block.height - 1 || 1);
+	private headerSize(block: IBlockData): number {
+		const constants = this.#configuration.getMilestone(block.height - 1 || 1);
 
 		return (
 			4 + // version
@@ -67,8 +73,8 @@ export class Serializer {
 		);
 	}
 
-	private static serializeHeader(block: IBlockData, buff: ByteBuffer): void {
-		const constants = configManager.getMilestone(block.height - 1 || 1);
+	private serializeHeader(block: IBlockData, buff: ByteBuffer): void {
+		const constants = this.#configuration.getMilestone(block.height - 1 || 1);
 
 		if (constants.block.idFullSha256) {
 			if (block.previousBlock.length !== 64) {
@@ -77,7 +83,8 @@ export class Serializer {
 
 			block.previousBlockHex = block.previousBlock;
 		} else {
-			block.previousBlockHex = Block.toBytesHex(block.previousBlock);
+			// @ts-ignore
+			block.previousBlockHex = new Block(this.#configuration, {}).toBytesHex(block.previousBlock);
 		}
 
 		buff.writeUint32(block.version);
@@ -98,7 +105,7 @@ export class Serializer {
 		assert.strictEqual(buff.offset, this.headerSize(block));
 	}
 
-	private static serializeSignature(block: IBlockData, buff: ByteBuffer): void {
+	private serializeSignature(block: IBlockData, buff: ByteBuffer): void {
 		if (block.blockSignature) {
 			buff.append(block.blockSignature, "hex");
 		}

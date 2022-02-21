@@ -1,33 +1,42 @@
-import { Hash, HashAlgorithms } from "../crypto";
+import { HashFactory } from "@arkecosystem/crypto-hash-bcrypto";
+import { Signatory } from "@arkecosystem/crypto-signature-ecdsa";
 import { IBlock, IBlockData, IBlockJson, IKeyPair, ITransaction } from "@arkecosystem/crypto-contracts";
-import { BigNumber } from "../utils";
+import { BigNumber } from "@arkecosystem/utils";
 import { Block } from "./block";
 import { Deserializer } from "./deserializer";
 import { Serializer } from "./serializer";
+import { Configuration } from "@arkecosystem/crypto-config";
 
 export class BlockFactory {
+	readonly #configuration: Configuration;
+
+	public constructor(configuration: Configuration) {
+		this.#configuration = configuration;
+	}
+
 	// @todo: add a proper type hint for data
-	public static make(data: any, keys: IKeyPair): IBlock | undefined {
+	public async make(data: any, keys: IKeyPair): Promise<IBlock | undefined> {
 		data.generatorPublicKey = keys.publicKey;
 
-		const payloadHash: Buffer = Serializer.serialize(data, false);
-		const hash: Buffer = HashAlgorithms.sha256(payloadHash);
+		const payloadHash: Buffer = new Serializer(this.#configuration).serialize(data, false);
+		const hash: Buffer = await new HashFactory().sha256(payloadHash);
 
-		data.blockSignature = Hash.signECDSA(hash, keys);
-		data.id = Block.getId(data);
+		data.blockSignature = await new Signatory().sign(hash, Buffer.from(keys.privateKey, "hex"));
+		// @ts-ignore
+		data.id = new Block(this.#configuration, {}).getId(data);
 
 		return this.fromData(data);
 	}
 
-	public static fromHex(hex: string): IBlock {
+	public fromHex(hex: string): IBlock {
 		return this.fromSerialized(Buffer.from(hex, "hex"));
 	}
 
-	public static fromBytes(buff: Buffer): IBlock {
+	public fromBytes(buff: Buffer): IBlock {
 		return this.fromSerialized(buff);
 	}
 
-	public static fromJson(json: IBlockJson): IBlock | undefined {
+	public fromJson(json: IBlockJson): IBlock | undefined {
 		// @ts-ignore
 		const data: IBlockData = { ...json };
 		data.totalAmount = BigNumber.make(data.totalAmount);
@@ -44,16 +53,17 @@ export class BlockFactory {
 		return this.fromData(data);
 	}
 
-	public static fromData(
+	public fromData(
 		data: IBlockData,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): IBlock | undefined {
-		const block: IBlockData | undefined = Block.applySchema(data);
+		// @ts-ignore
+		const block: IBlockData | undefined = new Block(this.#configuration, {}).applySchema(data);
 
 		if (block) {
-			const serialized: Buffer = Serializer.serializeWithTransactions(data);
-			const block: IBlock = new Block({
-				...Deserializer.deserialize(serialized, false, options),
+			const serialized: Buffer = new Serializer(this.#configuration).serializeWithTransactions(data);
+			const block: IBlock = new Block(this.#configuration, {
+				...new Deserializer(this.#configuration).deserialize(serialized, false, options),
 				id: data.id,
 			});
 			block.serialized = serialized.toString("hex");
@@ -64,16 +74,19 @@ export class BlockFactory {
 		return undefined;
 	}
 
-	private static fromSerialized(serialized: Buffer): IBlock {
-		const deserialized: { data: IBlockData; transactions: ITransaction[] } = Deserializer.deserialize(serialized);
+	private fromSerialized(serialized: Buffer): IBlock {
+		const deserialized: { data: IBlockData; transactions: ITransaction[] } = new Deserializer(
+			this.#configuration,
+		).deserialize(serialized);
 
-		const validated: IBlockData | undefined = Block.applySchema(deserialized.data);
+		// @ts-ignore
+		const validated: IBlockData | undefined = new Block(this.#configuration, {}).applySchema(deserialized.data);
 
 		if (validated) {
 			deserialized.data = validated;
 		}
 
-		const block: IBlock = new Block(deserialized);
+		const block: IBlock = new Block(this.#configuration, deserialized);
 		block.serialized = serialized.toString("hex");
 
 		return block;
