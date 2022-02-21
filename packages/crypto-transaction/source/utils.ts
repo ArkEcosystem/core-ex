@@ -35,7 +35,8 @@ export const numberToHex = (num: number, padding = 2): string => {
 	return "0".repeat(padding - indexHex.length) + indexHex;
 };
 
-export const maxVendorFieldLength = (configuration: Configuration, height?: number): number => configuration.getMilestone(height).vendorFieldLength;
+export const maxVendorFieldLength = (configuration: Configuration, height?: number): number =>
+	configuration.getMilestone(height).vendorFieldLength;
 
 export const isSupportedTransactionVersion = (configuration: Configuration, version: number): boolean => {
 	const aip11: boolean = configuration.getMilestone().aip11;

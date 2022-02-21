@@ -21,7 +21,7 @@ export abstract class DelegateResignationTransaction extends Transaction {
 	}
 
 	public async verify(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 && await super.verify();
+		return this.configuration.getMilestone().aip11 && (await super.verify());
 	}
 
 	public serialize(options?: ISerializeOptions): ByteBuffer | undefined {

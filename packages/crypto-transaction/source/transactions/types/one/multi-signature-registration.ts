@@ -20,9 +20,14 @@ export abstract class MultiSignatureRegistrationTransaction extends Transaction 
 		return schemas.multiSignatureLegacy;
 	}
 
-	public static staticFee(configuration: Configuration, feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
+	public static staticFee(
+		configuration: Configuration,
+		feeContext: { height?: number; data?: ITransactionData } = {},
+	): BigNumber {
 		if (feeContext.data?.asset?.multiSignatureLegacy) {
-			return super.staticFee(configuration, feeContext).times(feeContext.data.asset.multiSignatureLegacy.keysgroup.length + 1);
+			return super
+				.staticFee(configuration, feeContext)
+				.times(feeContext.data.asset.multiSignatureLegacy.keysgroup.length + 1);
 		}
 
 		return super.staticFee(configuration, feeContext);

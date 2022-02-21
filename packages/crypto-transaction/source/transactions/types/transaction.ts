@@ -43,7 +43,10 @@ export abstract class Transaction implements ITransaction {
 		throw new NotImplemented();
 	}
 
-	public static staticFee(configuration: Configuration, feeContext: { height?: number; data?: ITransactionData } = {}): BigNumber {
+	public static staticFee(
+		configuration: Configuration,
+		feeContext: { height?: number; data?: ITransactionData } = {},
+	): BigNumber {
 		const milestones = configuration.getMilestone(feeContext.height);
 
 		if (milestones.fees && milestones.fees.staticFees && this.key) {
@@ -85,7 +88,11 @@ export abstract class Transaction implements ITransaction {
 		const parts: string[] = [];
 
 		if (this.data.senderPublicKey && this.data.nonce) {
-			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}#${this.data.nonce}`);
+			parts.push(
+				`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}#${
+					this.data.nonce
+				}`,
+			);
 		} else if (this.data.senderPublicKey) {
 			parts.push(`${Address.fromPublicKey(this.data.senderPublicKey, this.configuration.get("network"))}`);
 		}

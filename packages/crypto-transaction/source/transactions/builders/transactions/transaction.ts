@@ -38,7 +38,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	public constructor() {
 		this.data = {
 			id: undefined,
-			timestamp: (new Slots(this.configuration, {})).getTime(),
+			timestamp: new Slots(this.configuration, {}).getTime(),
 			typeGroup: TransactionTypeGroup.Test,
 			nonce: BigNumber.ZERO,
 			version: this.configuration.getMilestone().aip11 ? 0x02 : 0x01,
@@ -186,7 +186,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		this.data.senderPublicKey = keys.publicKey;
 
 		if (this.signWithSenderAsRecipient) {
-			this.data.recipientId = Address.fromPublicKey(keys.publicKey, {pubKeyHash:this.data.network});
+			this.data.recipientId = Address.fromPublicKey(keys.publicKey, { pubKeyHash: this.data.network });
 		}
 
 		this.data.signature = await this.signer.sign(this.getSigningObject(), keys, {

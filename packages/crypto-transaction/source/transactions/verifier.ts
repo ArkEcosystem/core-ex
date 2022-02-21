@@ -3,7 +3,12 @@ import { BINDINGS, Signatory } from "@arkecosystem/crypto-contracts";
 import { Configuration } from "@arkecosystem/crypto-config";
 
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "../errors";
-import { IMultiSignatureAsset, ISchemaValidationResult, ITransactionData, IVerifyOptions } from "@arkecosystem/crypto-contracts";
+import {
+	IMultiSignatureAsset,
+	ISchemaValidationResult,
+	ITransactionData,
+	IVerifyOptions,
+} from "@arkecosystem/crypto-contracts";
 import { TransactionTypeFactory } from "./types/factory";
 import { Utils } from "./utils";
 
@@ -29,7 +34,10 @@ export class Verifier {
 		return this.verifyHash(data, options?.disableVersionCheck);
 	}
 
-	public async verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): Promise<boolean> {
+	public async verifySignatures(
+		transaction: ITransactionData,
+		multiSignature: IMultiSignatureAsset,
+	): Promise<boolean> {
 		if (!multiSignature) {
 			throw new InvalidMultiSignatureAssetError();
 		}
@@ -60,7 +68,13 @@ export class Verifier {
 				const partialSignature: string = signature.slice(2, 130);
 				const publicKey: string = publicKeys[publicKeyIndex];
 
-				if (this.signatureFactory.verify(hash, Buffer.from(partialSignature, "hex"), Buffer.from(publicKey, "hex"))) {
+				if (
+					this.signatureFactory.verify(
+						hash,
+						Buffer.from(partialSignature, "hex"),
+						Buffer.from(publicKey, "hex"),
+					)
+				) {
 					verifiedSignatures++;
 				}
 

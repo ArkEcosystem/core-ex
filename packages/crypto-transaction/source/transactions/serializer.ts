@@ -18,7 +18,11 @@ export class Serializer {
 	public getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
 		const version: number = transaction.version || 1;
 
-		if (options.acceptLegacyVersion || options.disableVersionCheck || isSupportedTransactionVersion(this.configuration, version)) {
+		if (
+			options.acceptLegacyVersion ||
+			options.disableVersionCheck ||
+			isSupportedTransactionVersion(this.configuration, version)
+		) {
 			if (version === 1) {
 				return this.getBytesV1(transaction, options);
 			}
@@ -103,7 +107,8 @@ export class Serializer {
 
 			if (transaction.recipientId && transaction.type !== 1 && transaction.type !== 4) {
 				const recipientId =
-					transaction.recipientId || Address.fromPublicKey(transaction.senderPublicKey, {pubKeyHash:transaction.network});
+					transaction.recipientId ||
+					Address.fromPublicKey(transaction.senderPublicKey, { pubKeyHash: transaction.network });
 				bb.writeBuffer(Address.toBuffer(recipientId, this.configuration.get("network")).addressBuffer);
 			} else {
 				for (let i = 0; i < 21; i++) {

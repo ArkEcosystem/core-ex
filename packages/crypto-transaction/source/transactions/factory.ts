@@ -57,7 +57,7 @@ export class TransactionFactory {
 		try {
 			const options: IDeserializeOptions | ISerializeOptions = { acceptLegacyVersion: true };
 			const transaction = this.deserializer.deserialize(buff, options);
-			transaction.data.id = id || await this.utils.getId(transaction.data, options);
+			transaction.data.id = id || (await this.utils.getId(transaction.data, options));
 			transaction.isVerified = true;
 
 			return transaction;
@@ -74,7 +74,11 @@ export class TransactionFactory {
 		return this.fromData(data);
 	}
 
-	public async fromData(data: ITransactionData, strict = true, options: IDeserializeOptions = {}): Promise<ITransaction> {
+	public async fromData(
+		data: ITransactionData,
+		strict = true,
+		options: IDeserializeOptions = {},
+	): Promise<ITransaction> {
 		const { value, error } = this.verifier.verifySchema(data, strict);
 
 		if (error) {
@@ -93,7 +97,11 @@ export class TransactionFactory {
 		return this.fromBytes(transaction.serialized, strict, options);
 	}
 
-	private async fromSerialized(serialized: string, strict = true, options: IDeserializeOptions = {}): Promise<ITransaction> {
+	private async fromSerialized(
+		serialized: string,
+		strict = true,
+		options: IDeserializeOptions = {},
+	): Promise<ITransaction> {
 		try {
 			const transaction = this.deserializer.deserialize(serialized, options);
 			transaction.data.id = await this.utils.getId(transaction.data, options);
