@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/container";
-import { BINDINGS, TransactionExtension as Contract } from "@arkecosystem/crypto-contracts";
+import { BINDINGS, TransactionServiceProvider as Contract } from "@arkecosystem/crypto-contracts";
 import { TransactionRegistry } from "@arkecosystem/crypto-transaction";
 
 import { One } from "./versions/1";
@@ -8,7 +8,7 @@ import { Two } from "./versions/2";
 export * from "./builder";
 
 @Container.injectable()
-export class TransactionExtension implements Contract {
+export class TransactionServiceProvider implements Contract {
 	@Container.inject(BINDINGS.Transaction.Registry)
 	private readonly registry: TransactionRegistry;
 

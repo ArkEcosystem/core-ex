@@ -142,6 +142,6 @@ export interface ISerializeOptions {
 	addressError?: string;
 }
 
-export interface TransactionExtension {
+export interface TransactionServiceProvider {
 	register(): Promise<void>;
 }
