@@ -1,12 +1,14 @@
 import { Container } from "@arkecosystem/container";
 import { Configuration } from "@arkecosystem/crypto-config";
-import { BINDINGS, 	IMultiSignatureAsset,
+import {
+	BINDINGS,
+	IMultiSignatureAsset,
 	ISchemaValidationResult,
 	ITransactionData,
 	ITransactionUtils,
 	ITransactionVerifier,
 	IVerifyOptions,
-Signatory ,
+	Signatory,
 } from "@arkecosystem/crypto-contracts";
 
 import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";

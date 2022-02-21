@@ -1,6 +1,14 @@
 import { Container } from "@arkecosystem/container";
 import { Configuration } from "@arkecosystem/crypto-config";
-import { BINDINGS,IKeyPair, ITransaction, ITransactionData, ITransactionSigner, ITransactionUtils, ITransactionVerifier  } from "@arkecosystem/crypto-contracts";
+import {
+	BINDINGS,
+	IKeyPair,
+	ITransaction,
+	ITransactionData,
+	ITransactionSigner,
+	ITransactionUtils,
+	ITransactionVerifier,
+} from "@arkecosystem/crypto-contracts";
 import { Address, Keys } from "@arkecosystem/crypto-identities";
 import { Slots } from "@arkecosystem/crypto-time";
 import { BigNumber } from "@arkecosystem/utils";

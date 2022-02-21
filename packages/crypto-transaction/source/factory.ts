@@ -11,7 +11,8 @@ import {
 	ITransactionJson,
 	ITransactionSerializer,
 	ITransactionUtils,
-	ITransactionVerifier } from "@arkecosystem/crypto-contracts";
+	ITransactionVerifier,
+} from "@arkecosystem/crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import {

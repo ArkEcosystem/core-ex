@@ -1,6 +1,7 @@
 import { Container } from "@arkecosystem/container";
 import { Configuration } from "@arkecosystem/crypto-config";
-import { BINDINGS ,
+import {
+	BINDINGS,
 	ISchemaValidationResult,
 	ISerializeOptions,
 	ITransaction,

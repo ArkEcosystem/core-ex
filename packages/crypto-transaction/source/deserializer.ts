@@ -1,6 +1,12 @@
 import { Container } from "@arkecosystem/container";
 import { Configuration } from "@arkecosystem/crypto-config";
-import { BINDINGS,IDeserializeOptions, ITransaction, ITransactionData, ITransactionDeserializer  } from "@arkecosystem/crypto-contracts";
+import {
+	BINDINGS,
+	IDeserializeOptions,
+	ITransaction,
+	ITransactionData,
+	ITransactionDeserializer,
+} from "@arkecosystem/crypto-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import {
@@ -30,9 +36,7 @@ export class Deserializer implements ITransactionDeserializer {
 
 		this.deserializeSignatures(data, buff);
 
-		if (data.version &&
-			!isSupportedTransactionVersion(this.configuration, data.version)
-		) {
+		if (data.version && !isSupportedTransactionVersion(this.configuration, data.version)) {
 			throw new TransactionVersionError(data.version);
 		}
 

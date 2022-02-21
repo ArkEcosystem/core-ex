@@ -151,10 +151,7 @@ export interface TransactionServiceProvider {
 export interface ITransactionVerifier {
 	verify(data: ITransactionData, options?: IVerifyOptions): Promise<boolean>;
 
-	verifySignatures(
-		transaction: ITransactionData,
-		multiSignature: IMultiSignatureAsset,
-	): Promise<boolean>;
+	verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): Promise<boolean>;
 
 	verifyHash(data: ITransactionData, disableVersionCheck?: boolean): Promise<boolean>;
 
@@ -187,11 +184,7 @@ export interface ITransactionFactory {
 
 	fromJson(json: ITransactionJson): Promise<ITransaction>;
 
-	fromData(
-		data: ITransactionData,
-		strict?: boolean,
-		options?: IDeserializeOptions,
-	): Promise<ITransaction>;
+	fromData(data: ITransactionData, strict?: boolean, options?: IDeserializeOptions): Promise<ITransaction>;
 }
 
 export type TransactionConstructor = any;
