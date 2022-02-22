@@ -41,7 +41,6 @@ describe<{
 		render: (options?: string | OraOptions | undefined): Ora => ora as Ora,
 	};
 
-
 	beforeEach((context) => {
 		const app = new Container();
 		app.bind(Identifiers.Application).toConstantValue(app);
@@ -170,7 +169,7 @@ describe<{
 	it("should start process should run with potato settings", ({ action }) => {
 		const spyOnHas = spy(processManager, "has");
 		const spyOnStart = spy(processManager, "start");
-		stub(os, "totalmem").returnValue(2 * 1024 ** 3 - 1)
+		stub(os, "totalmem").returnValue(2 * 1024 ** 3 - 1);
 
 		action.execute(
 			{
@@ -206,18 +205,22 @@ describe<{
 
 	it("should throw if processManager.start throws", ({ action }) => {
 		const spyOnStart = stub(processManager, "start").callsFake(() => {
-			throw new Error("Dummy error")
-		})
+			throw new Error("Dummy error");
+		});
 
-		assert.throws(() =>action.execute(
-			{
-				name: "ark-core",
-				script: "script",
-				args: "core:run --daemon",
-			},
-			{},
-		), "Dummy error");
+		assert.throws(
+			() =>
+				action.execute(
+					{
+						name: "ark-core",
+						script: "script",
+						args: "core:run --daemon",
+					},
+					{},
+				),
+			"Dummy error",
+		);
 
-		spyOnStart.calledOnce()
+		spyOnStart.calledOnce();
 	});
 });
