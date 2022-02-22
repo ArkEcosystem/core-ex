@@ -367,7 +367,9 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should not throw on vote+unvote transaction when wallet has not voted", async (context) => {
-		await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.voteUnvoteTransaction, context.senderWallet));
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(context.voteUnvoteTransaction, context.senderWallet),
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw on vote+unvote transaction when wallet has voted", async (context) => {
@@ -382,7 +384,9 @@ describe<{
 	it("throwIfCannotBeApplied should not throw on unvote+vote transaction when wallet has voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.unvoteVoteTransaction, context.senderWallet));
+		await assert.resolves(() =>
+			context.handler.throwIfCannotBeApplied(context.unvoteVoteTransaction, context.senderWallet),
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw on unvote+vote transaction when wallet has not voted", async (context) => {
@@ -409,9 +413,7 @@ describe<{
 	});
 
 	it("throwIfCannotEnterPool should not throw", async (context) => {
-		assert.resolves(
-			() => context.handler.throwIfCannotEnterPool(context.voteTransaction),
-		);
+		assert.resolves(() => context.handler.throwIfCannotEnterPool(context.voteTransaction));
 	});
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
@@ -437,10 +439,7 @@ describe<{
 
 		assert.defined(context.senderWallet.getAttribute("vote"));
 
-		assert.rejects(
-			() => context.handler.apply(context.voteTransaction),
-			AlreadyVotedError,
-		);
+		assert.rejects(() => context.handler.apply(context.voteTransaction), AlreadyVotedError);
 		assert.defined(context.senderWallet.getAttribute("vote"));
 	});
 
@@ -463,10 +462,7 @@ describe<{
 	it("apply vote+unvote should throw when wallet has voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		assert.rejects(
-			() => context.handler.apply(context.voteUnvoteTransaction),
-			AlreadyVotedError,
-		);
+		assert.rejects(() => context.handler.apply(context.voteUnvoteTransaction), AlreadyVotedError);
 	});
 
 	it("apply unvote+vote should apply when wallet has voted", async (context) => {
@@ -478,19 +474,13 @@ describe<{
 	});
 
 	it("apply unvote+vote should throw when wallet has not voted", async (context) => {
-		assert.rejects(
-			() => context.handler.apply(context.unvoteUnvoteTransaction),
-			NoVoteError,
-		);
+		assert.rejects(() => context.handler.apply(context.unvoteUnvoteTransaction), NoVoteError);
 	});
 
 	it("apply unvote+vote should throw when wallet has voted for different delegate", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet2.getPublicKey());
 
-		assert.rejects(
-			() => context.handler.apply(context.unvoteUnvoteTransaction),
-			UnvoteMismatchError,
-		);
+		assert.rejects(() => context.handler.apply(context.unvoteUnvoteTransaction), UnvoteMismatchError);
 	});
 
 	it("applyForSender should throw if asset.vote is undefined", async (context) => {
@@ -559,7 +549,8 @@ describe<{
 		context.voteTransaction.data.asset.votes = undefined;
 		context.senderWallet.setNonce(Utils.BigNumber.ONE);
 
-		await assert.rejects(() => context.handler.revertForSender(context.voteTransaction),
+		await assert.rejects(
+			() => context.handler.revertForSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);
 	});
@@ -568,7 +559,8 @@ describe<{
 		context.voteTransaction.data.asset = undefined;
 		context.senderWallet.setNonce(Utils.BigNumber.ONE);
 
-		await assert.rejects(() => context.handler.revertForSender(context.voteTransaction),
+		await assert.rejects(
+			() => context.handler.revertForSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);
 	});
