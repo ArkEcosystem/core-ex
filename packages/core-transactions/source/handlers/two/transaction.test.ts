@@ -137,8 +137,8 @@ describe<{
 	afterEach((context) => {
 		Managers.configManager.set("exceptions.transactions", []);
 		Managers.configManager.set("network.pubKeyHash", context.pubKeyHash);
-		Managers.configManager.getMilestone().aip11 = true;
-		process.env.CORE_ENV === "test";
+		Managers.configManager.getMilestone().aip11 = undefined;
+		process.env.CORE_ENV = undefined;
 
 		try {
 			Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
@@ -162,7 +162,7 @@ describe<{
 	});
 
 	it("throwIfCannotBeApplied should not throw if version is undefined", async (context) => {
-		context.transferTransaction.data.nonce = Utils.BigNumber.ONE;
+		// context.transferTransaction.data.nonce = Utils.BigNumber.ONE;
 		context.transferTransaction.data.version = undefined;
 		await assert.resolves(() =>
 			context.handler.throwIfCannotBeApplied(context.transferTransaction, context.senderWallet),
