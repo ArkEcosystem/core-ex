@@ -1,4 +1,3 @@
-import { SinonSpyStatic, spy } from "sinon";
 import { Callback, Context, suite, Test } from "uvu";
 import { z as schema } from "zod";
 
@@ -7,6 +6,7 @@ import { each, formatName } from "./each";
 import { runHook } from "./hooks";
 import { loader } from "./loader";
 import { nock } from "./nock";
+import { Spy } from "./spy";
 import { Stub } from "./stub";
 
 type ContextFunction<T> = () => T;
@@ -26,7 +26,7 @@ interface CallbackArguments<T> {
 	only: Function;
 	schema: typeof schema;
 	skip: Function;
-	spy: SinonSpyStatic;
+	spy: (owner: object, method: string) => Spy;
 	stub: (owner: object, method: string) => Stub;
 }
 
@@ -67,7 +67,9 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		only: suite.only,
 		schema,
 		skip: suite.skip,
-		spy,
+		spy: (owner: object, metod: string) => {
+			return new Spy(owner, metod)
+		},
 		stub: (owner: object, method: string) => {
 			const result: Stub = new Stub(owner, method);
 
