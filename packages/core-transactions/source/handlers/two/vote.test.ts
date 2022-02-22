@@ -206,25 +206,36 @@ describe<{
 		await assert.rejects(() => context.handler.bootstrap(), Exceptions.Runtime.AssertionException);
 	});
 
-	it.only("emitEvents should dispatch", async (context) => {
+	it("emitEvents should dispatch for vote", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
 			Container.Identifiers.EventDispatcherService,
 		);
-
 		const mock = spy(emitter, "dispatch");
 
 		context.handler.emitEvents(context.voteTransaction, emitter);
 
 		assert.true(mock.calledWith(AppEnums.VoteEvent.Vote));
-		assert.true(mock.notCalledWith(AppEnums.VoteEvent.Unvote));
+		assert.false(mock.calledWith(AppEnums.VoteEvent.Unvote));
+	});
 
-		mock.resetHistory();
+	it("emitEvents should dispatch for unvote", async (context) => {
+		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
+			Container.Identifiers.EventDispatcherService,
+		);
+		const mock = spy(emitter, "dispatch");
+
 		context.handler.emitEvents(context.unvoteTransaction, emitter);
 
-		assert.true(mock.notCalledWith(AppEnums.VoteEvent.Vote));
+		assert.false(mock.calledWith(AppEnums.VoteEvent.Vote));
 		assert.true(mock.calledWith(AppEnums.VoteEvent.Unvote));
+	});
 
-		mock.resetHistory();
+	it("emitEvents should dispatch for vote-unvote", async (context) => {
+		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
+			Container.Identifiers.EventDispatcherService,
+		);
+		const mock = spy(emitter, "dispatch");
+
 		context.handler.emitEvents(context.voteUnvoteTransaction, emitter);
 
 		assert.true(mock.calledWith(AppEnums.VoteEvent.Vote));
@@ -235,12 +246,12 @@ describe<{
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
 			Container.Identifiers.EventDispatcherService,
 		);
-
 		context.voteTransaction.data.asset.votes = undefined;
 
-		expect(() => {
-			context.handler.emitEvents(context.voteTransaction, emitter);
-		}).toThrow(Exceptions.Runtime.AssertionException);
+		assert.rejects(
+			() => context.handler.emitEvents(context.voteTransaction, emitter),
+			Exceptions.Runtime.AssertionException,
+		);
 	});
 
 	it("emitEvents should throw if asset is undefined", async (context) => {
@@ -250,137 +261,157 @@ describe<{
 
 		context.voteTransaction.data.asset = undefined;
 
-		expect(() => {
-			context.handler.emitEvents(context.voteTransaction, emitter);
-		}).toThrow(Exceptions.Runtime.AssertionException);
+		assert.rejects(
+			() => context.handler.emitEvents(context.voteTransaction, emitter),
+			Exceptions.Runtime.AssertionException,
+		);
 	});
 
 	it("throwIfCannotBeApplied should not throw if the vote is valid and the wallet has not voted", async (context) => {
-		await expect(context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet)).toResolve();
+		assert.resolves(() => context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet));
 	});
 
 	it("throwIfCannotBeApplied should not throw - multi sign vote", async (context) => {
-		await expect(
+		assert.resolves(() =>
 			context.handler.throwIfCannotBeApplied(context.multiSignatureVoteTransaction, context.multiSignatureWallet),
-		).toResolve();
+		);
 	});
 
 	it("throwIfCannotBeApplied should not throw if the unvote is valid and the wallet has voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet),
-		).toResolve();
+
+		assert.resolves(() => context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet));
 	});
 
 	it("throwIfCannotBeApplied should not throw - multi sign unvote", async (context) => {
 		context.multiSignatureWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
-		await expect(
+
+		assert.resolves(() =>
 			context.handler.throwIfCannotBeApplied(
 				context.multiSignatureUnvoteTransaction,
 				context.multiSignatureWallet,
 			),
-		).toResolve();
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet has already voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
-		).rejects.toThrow(AlreadyVotedError);
+
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
+			AlreadyVotedError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if vote for non delegate wallet", async (context) => {
 		context.delegateWallet1.forgetAttribute("delegate");
 		context.walletRepository.index(context.delegateWallet1);
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
-		).rejects.toThrow(VotedForNonDelegateError);
+
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
+			VotedForNonDelegateError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if the asset public key differs from the currently voted one", async (context) => {
 		context.senderWallet.setAttribute("vote", "a310ad026647eed112d1a46145eed58b8c19c67c505a67f1199361a511ce7860c0");
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet),
-		).rejects.toThrow(UnvoteMismatchError);
+
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet),
+			UnvoteMismatchError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if unvoting a non-voted wallet", async (context) => {
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet),
-		).rejects.toThrow(NoVoteError);
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet),
+			NoVoteError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet has insufficient funds for vote", async (context) => {
 		context.senderWallet.setBalance(Utils.BigNumber.ZERO);
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
-		).rejects.toThrow(InsufficientBalanceError);
+
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
+			InsufficientBalanceError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if wallet has insufficient funds for unvote", async (context) => {
 		context.senderWallet.setBalance(Utils.BigNumber.ZERO);
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet),
-		).rejects.toThrow(InsufficientBalanceError);
+
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.unvoteTransaction, context.senderWallet),
+			InsufficientBalanceError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if asset.votes is undefined", async (context) => {
 		context.voteTransaction.data.asset.votes = undefined;
 
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
-		).rejects.toThrow(Exceptions.Runtime.AssertionException);
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
+			Exceptions.Runtime.AssertionException,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw if asset is undefined", async (context) => {
 		context.voteTransaction.data.asset = undefined;
 
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
-		).rejects.toThrow(Exceptions.Runtime.AssertionException);
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.voteTransaction, context.senderWallet),
+			Exceptions.Runtime.AssertionException,
+		);
 	});
 
 	it("throwIfCannotBeApplied should not throw on vote+unvote transaction when wallet has not voted", async (context) => {
-		await context.handler.throwIfCannotBeApplied(context.voteUnvoteTransaction, context.senderWallet);
+		await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.voteUnvoteTransaction, context.senderWallet));
 	});
 
 	it("throwIfCannotBeApplied should throw on vote+unvote transaction when wallet has voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.voteUnvoteTransaction, context.senderWallet),
-		).rejects.toThrow(AlreadyVotedError);
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.voteUnvoteTransaction, context.senderWallet),
+			AlreadyVotedError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should not throw on unvote+vote transaction when wallet has voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		await context.handler.throwIfCannotBeApplied(context.unvoteVoteTransaction, context.senderWallet);
+		await assert.resolves(() => context.handler.throwIfCannotBeApplied(context.unvoteVoteTransaction, context.senderWallet));
 	});
 
 	it("throwIfCannotBeApplied should throw on unvote+vote transaction when wallet has not voted", async (context) => {
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.unvoteVoteTransaction, context.senderWallet),
-		).rejects.toThrow(NoVoteError);
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.unvoteVoteTransaction, context.senderWallet),
+			NoVoteError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw on vote+vote transaction when wallet has not voted", async (context) => {
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.voteVoteTransaction, context.senderWallet),
-		).rejects.toThrow(AlreadyVotedError);
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.voteVoteTransaction, context.senderWallet),
+			AlreadyVotedError,
+		);
 	});
 
 	it("throwIfCannotBeApplied should throw on unvote+unvote transaction when wallet has voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		await expect(
-			context.handler.throwIfCannotBeApplied(context.unvoteUnvoteTransaction, context.senderWallet),
-		).rejects.toThrow(NoVoteError);
+		assert.rejects(
+			() => context.handler.throwIfCannotBeApplied(context.unvoteUnvoteTransaction, context.senderWallet),
+			NoVoteError,
+		);
 	});
 
 	it("throwIfCannotEnterPool should not throw", async (context) => {
-		await expect(context.handler.throwIfCannotEnterPool(context.voteTransaction)).toResolve();
+		assert.resolves(
+			() => context.handler.throwIfCannotEnterPool(context.voteTransaction),
+		);
 	});
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
@@ -388,48 +419,54 @@ describe<{
 			.get<Mempool>(Container.Identifiers.TransactionPoolMempool)
 			.addTransaction(context.voteTransaction);
 
-		await expect(context.handler.throwIfCannotEnterPool(context.voteTransaction)).rejects.toThrow(
+		assert.rejects(
+			() => context.handler.throwIfCannotEnterPool(context.voteTransaction),
 			Contracts.TransactionPool.PoolError,
 		);
 	});
 
 	it("apply vote should be ok", async (context) => {
-		expect(context.senderWallet.hasAttribute("vote")).toBeFalse();
+		assert.false(context.senderWallet.hasAttribute("vote"));
 
 		await context.handler.apply(context.voteTransaction);
-		expect(context.senderWallet.getAttribute("vote")).not.toBeUndefined();
+		assert.defined(context.senderWallet.getAttribute("vote"));
 	});
 
 	it("apply vote should not be ok", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		expect(context.senderWallet.getAttribute("vote")).not.toBeUndefined();
+		assert.defined(context.senderWallet.getAttribute("vote"));
 
-		await expect(context.handler.apply(context.voteTransaction)).rejects.toThrow(AlreadyVotedError);
-
-		expect(context.senderWallet.getAttribute("vote")).not.toBeUndefined();
+		assert.rejects(
+			() => context.handler.apply(context.voteTransaction),
+			AlreadyVotedError,
+		);
+		assert.defined(context.senderWallet.getAttribute("vote"));
 	});
 
 	it("apply unvote should remove the vote from the wallet", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		expect(context.senderWallet.getAttribute("vote")).not.toBeUndefined();
+		assert.defined(context.senderWallet.getAttribute("vote"));
 
 		await context.handler.apply(context.unvoteTransaction);
 
-		expect(context.senderWallet.hasAttribute("vote")).toBeFalse();
+		assert.false(context.senderWallet.hasAttribute("vote"));
 	});
 
 	it("apply vote+unvote should apply when wallet has not voted", async (context) => {
 		await context.handler.apply(context.voteUnvoteTransaction);
 
-		expect(context.senderWallet.hasAttribute("vote")).toBeFalse();
+		assert.false(context.senderWallet.hasAttribute("vote"));
 	});
 
 	it("apply vote+unvote should throw when wallet has voted", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 
-		await expect(context.handler.apply(context.voteUnvoteTransaction)).rejects.toThrow(AlreadyVotedError);
+		assert.rejects(
+			() => context.handler.apply(context.voteUnvoteTransaction),
+			AlreadyVotedError,
+		);
 	});
 
 	it("apply unvote+vote should apply when wallet has voted", async (context) => {
@@ -437,25 +474,32 @@ describe<{
 
 		await context.handler.apply(context.unvoteVoteTransaction);
 
-		expect(context.senderWallet.getAttribute("vote")).toEqual(context.delegateWallet2.getPublicKey());
+		assert.equal(context.senderWallet.getAttribute("vote"), context.delegateWallet2.getPublicKey());
 	});
 
 	it("apply unvote+vote should throw when wallet has not voted", async (context) => {
-		await expect(context.handler.apply(context.unvoteUnvoteTransaction)).rejects.toThrow(NoVoteError);
+		assert.rejects(
+			() => context.handler.apply(context.unvoteUnvoteTransaction),
+			NoVoteError,
+		);
 	});
 
 	it("apply unvote+vote should throw when wallet has voted for different delegate", async (context) => {
 		context.senderWallet.setAttribute("vote", context.delegateWallet2.getPublicKey());
 
-		await expect(context.handler.apply(context.unvoteUnvoteTransaction)).rejects.toThrow(UnvoteMismatchError);
+		assert.rejects(
+			() => context.handler.apply(context.unvoteUnvoteTransaction),
+			UnvoteMismatchError,
+		);
 	});
 
 	it("applyForSender should throw if asset.vote is undefined", async (context) => {
 		context.voteTransaction.data.asset.votes = undefined;
 
-		context.handler.throwIfCannotBeApplied = jest.fn();
+		context.handler.throwIfCannotBeApplied = spy();
 
-		await expect(context.handler.applyToSender(context.voteTransaction)).rejects.toThrow(
+		assert.rejects(
+			() => context.handler.applyToSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);
 	});
@@ -463,9 +507,10 @@ describe<{
 	it("applyForSender should throw if asset is undefined", async (context) => {
 		context.voteTransaction.data.asset = undefined;
 
-		context.handler.throwIfCannotBeApplied = jest.fn();
+		context.handler.throwIfCannotBeApplied = spy();
 
-		await expect(context.handler.applyToSender(context.voteTransaction)).rejects.toThrow(
+		assert.rejects(
+			() => context.handler.applyToSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);
 	});
@@ -474,23 +519,23 @@ describe<{
 		context.senderWallet.setAttribute("vote", context.delegateWallet1.getPublicKey());
 		context.senderWallet.setNonce(Utils.BigNumber.make(1));
 
-		expect(context.senderWallet.getAttribute("vote")).not.toBeUndefined();
+		assert.defined(context.senderWallet.getAttribute("vote"));
 
 		await context.handler.revert(context.voteTransaction);
 
-		expect(context.senderWallet.getNonce().isZero()).toBeTrue();
-		expect(context.senderWallet.hasAttribute("vote")).toBeFalse();
+		assert.true(context.senderWallet.getNonce().isZero());
+		assert.false(context.senderWallet.hasAttribute("vote"));
 	});
 
 	it("revert unvote should add the vote to the wallet", async (context) => {
 		context.senderWallet.setNonce(Utils.BigNumber.make(1));
 
-		expect(context.senderWallet.hasAttribute("vote")).toBeFalse();
+		assert.false(context.senderWallet.hasAttribute("vote"));
 
 		await context.handler.revert(context.unvoteTransaction);
 
-		expect(context.senderWallet.getNonce().isZero()).toBeTrue();
-		expect(context.senderWallet.getAttribute("vote")).toBe(context.delegateWallet1.getPublicKey());
+		assert.true(context.senderWallet.getNonce().isZero());
+		assert.is(context.senderWallet.getAttribute("vote"), context.delegateWallet1.getPublicKey());
 	});
 
 	it("revert vote+unvote should revert when wallet has no vote", async (context) => {
@@ -498,7 +543,7 @@ describe<{
 
 		await context.handler.revert(context.voteUnvoteTransaction);
 
-		expect(context.senderWallet.hasAttribute("vote")).toBeFalse();
+		assert.false(context.senderWallet.hasAttribute("vote"));
 	});
 
 	it("revert unvote+vote should revert when wallet has no vote", async (context) => {
@@ -507,26 +552,23 @@ describe<{
 
 		await context.handler.revert(context.unvoteVoteTransaction);
 
-		expect(context.senderWallet.getAttribute("vote")).toEqual(context.delegateWallet1.getPublicKey());
+		assert.equal(context.senderWallet.getAttribute("vote"), context.delegateWallet1.getPublicKey());
 	});
 
 	it("revertForSender should throw if asset.vote is undefined", async (context) => {
 		context.voteTransaction.data.asset.votes = undefined;
-
 		context.senderWallet.setNonce(Utils.BigNumber.ONE);
 
-		await expect(context.handler.revertForSender(context.voteTransaction)).rejects.toThrow(
+		await assert.rejects(() => context.handler.revertForSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);
 	});
 
 	it("revertForSender should throw if asset is undefined", async (context) => {
 		context.voteTransaction.data.asset = undefined;
-
 		context.senderWallet.setNonce(Utils.BigNumber.ONE);
 
-		await assert.rejects(
-			() => context.handler.revertForSender(context.voteTransaction),
+		await assert.rejects(() => context.handler.revertForSender(context.voteTransaction),
 			Exceptions.Runtime.AssertionException,
 		);
 	});
