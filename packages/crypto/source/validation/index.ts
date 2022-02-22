@@ -70,6 +70,7 @@ export class Validator {
 		ajvKeywords(ajv);
 		addFormats(ajv);
 
+		// Register local keywords & formats...
 		for (const addKeyword of keywords) {
 			addKeyword(ajv);
 		}
