@@ -68,7 +68,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		schema,
 		skip: suite.skip,
 		spy: (owner: object, metod: string) => {
-			return new Spy(owner, metod)
+			return new Spy(owner, metod);
 		},
 		stub: (owner: object, method: string) => {
 			const result: Stub = new Stub(owner, method);
