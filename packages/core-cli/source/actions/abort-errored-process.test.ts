@@ -30,8 +30,7 @@ describe<{
 	it("should throw if the process does not exist", ({ action }) => {
 		const spyIsErrored = stub(processManager, "isErrored").returnValue(true);
 
-		// assert.throws(() => {action.execute(processName)},`The "${processName}" process has errored.`);
-		assert.throws(() => action.execute(processName), `Invalid error message`);
+		assert.throws(() => {action.execute(processName)},`The "${processName}" process has errored.`);
 		spyIsErrored.calledOnce();
 	});
 });
