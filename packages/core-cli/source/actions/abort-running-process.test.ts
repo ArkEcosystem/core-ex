@@ -7,7 +7,7 @@ import { AbortRunningProcess } from "./abort-running-process";
 
 describe<{
 	action: AbortRunningProcess;
-}>("AbortErroredProcess", ({ beforeEach, it, assert, stub }) => {
+}>("AbortRunningProcess", ({ beforeEach, it, assert, stub }) => {
 	const processName = "ark-core";
 
 	const processManager: Partial<ProcessManager> = {

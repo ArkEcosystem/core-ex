@@ -7,7 +7,7 @@ import { AbortMissingProcess } from "./abort-missing-process";
 
 describe<{
 	action: AbortMissingProcess;
-}>("AbortErroredProcess", ({ beforeEach, it, assert, stub }) => {
+}>("AbortMissingProcess", ({ beforeEach, it, assert, stub }) => {
 	const processName = "ark-core";
 
 	const processManager: Partial<ProcessManager> = {
