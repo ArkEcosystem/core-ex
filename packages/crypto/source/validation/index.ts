@@ -1,4 +1,4 @@
-import Ajv, { Format, KeywordDefinition } from "ajv";
+import Ajv from "ajv";
 import ajvKeywords from "ajv-keywords";
 import addFormats from "ajv-formats";
 import { ISchemaValidationResult } from "../interfaces";
@@ -35,26 +35,6 @@ export class Validator {
 		}
 
 		return this.validateSchema(ajv, schemaKeyRef, data);
-	}
-
-	public addFormat(name: string, format: Format): void {
-		this.ajv.addFormat(name, format);
-	}
-
-	public addKeyword(definition: KeywordDefinition): void {
-		this.ajv.addKeyword(definition);
-	}
-
-	public addSchema(schema: object | object[], key?: string): void {
-		this.ajv.addSchema(schema, key);
-	}
-
-	public removeKeyword(keyword: string): void {
-		this.ajv.removeKeyword(keyword);
-	}
-
-	public removeSchema(schemaKeyRef: string | boolean | object | RegExp): void {
-		this.ajv.removeSchema(schemaKeyRef);
 	}
 
 	public extendTransaction(schema: TransactionSchema, remove?: boolean) {
