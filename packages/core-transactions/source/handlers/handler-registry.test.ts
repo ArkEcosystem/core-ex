@@ -7,6 +7,7 @@ import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
+import {InvalidTransactionTypeError} from "../errors";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
@@ -144,6 +145,7 @@ describe<{
 	});
 
 	afterEach(() => {
+		Managers.configManager.getMilestone().aip11 = undefined;
 		try {
 			Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
 		} catch {}
@@ -370,9 +372,9 @@ describe<{
 			Enums.TransactionTypeGroup.Test,
 		);
 
-		assert.throws(() => {
+		await assert.rejects(() => {
 			transactionHandlerRegistry.getRegisteredHandlerByType(invalidInternalTransactionType);
-		}, "InvalidTransactionTypeError");
+		}, InvalidTransactionTypeError);
 	});
 
 	it("should return a activated custom handler", async (context) => {
@@ -396,7 +398,7 @@ describe<{
 		);
 		await assert.rejects(
 			() => transactionHandlerRegistry.getActivatedHandlerByType(invalidInternalTransactionType),
-			"InvalidTransactionTypeError",
+			InvalidTransactionTypeError,
 		);
 	});
 
