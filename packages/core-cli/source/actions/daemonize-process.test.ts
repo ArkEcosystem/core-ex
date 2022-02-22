@@ -1,26 +1,28 @@
 import { describe } from "@arkecosystem/core-test-framework";
-import { Ora, Options as OraOptions } from "ora";
+import { Options as OraOptions, Ora } from "ora";
 
-import { ProcessIdentifier } from "../contracts";
 import { Spinner } from "../components";
+import { ProcessIdentifier } from "../contracts";
 import { Container, Identifiers } from "../ioc";
 import { ProcessManager } from "../services";
-import { AbortUnknownProcess } from "./abort-unknown-process";
 import { AbortRunningProcess } from "./abort-running-process";
+import { AbortUnknownProcess } from "./abort-unknown-process";
 import { DaemonizeProcess } from "./daemonize-process";
+import os from "os";
 
 describe<{
 	action: DaemonizeProcess;
-}>("DaemonizeProcess", ({ beforeEach, it, assert, stub, spy }) => {
+}>("DaemonizeProcess", ({ beforeEach, afterEach, it, assert, stub, spy }) => {
 	const options = {
+		args: "core:run --daemon",
 		name: "ark-core",
 		script: "script",
-		args: "core:run --daemon",
 	};
 
 	const processManager: Partial<ProcessManager> = {
 		has: (id: ProcessIdentifier) => false,
 		isUnknown: (id: ProcessIdentifier) => false,
+		start: (options_: Record<string, any>, flags: Record<string, any>): any => {},
 	};
 
 	const abortUnknownProcess: Partial<AbortUnknownProcess> = {
@@ -38,6 +40,7 @@ describe<{
 	const spinner: Spinner = {
 		render: (options?: string | OraOptions | undefined): Ora => ora as Ora,
 	};
+
 
 	beforeEach((context) => {
 		const app = new Container();
@@ -72,26 +75,149 @@ describe<{
 		spyOnAbortRunningProcessExecute.calledOnce();
 	});
 
-	// it("should start process", ({ action }) => {
-	// 	assert.throws(() => action.execute(
-	// 		options,
-	// 		{},
-	// 	), "Running")
-	//
-	// 	const spyOnHas = spy(processManager, "has")
-	// });
+	it("should start process with the [no-daemon] flag if the daemon flag is not set", ({ action }) => {
+		const spyOnHas = spy(processManager, "has");
+		const spyOnStart = spy(processManager, "start");
 
-	// it("should not throw if the process is not unknown", ({ action }) => {
-	// 	const spyIsErrored = stub(processManager, "isUnknown").returnValue(false);
-	//
-	// 	action.execute(processName);1
-	// 	spyIsErrored.calledOnce();
-	// });
-	//
-	// it("should throw if the process is unknown", ({ action }) => {
-	// 	const spyIsErrored = stub(processManager, "isUnknown").returnValue(true);
-	//
-	// 	assert.throws(() => {action.execute(processName)},`The "${processName}" process has entered an unknown state.`);
-	// 	spyIsErrored.calledOnce();
-	// });
+		action.execute(
+			{
+				args: "core:run",
+				name: "ark-core",
+				script: "script",
+			},
+			{},
+		);
+
+		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledWith("ark-core");
+		spyOnStart.calledWith(
+			{
+				args: "core:run --daemon",
+				env: { CORE_ENV: undefined, NODE_ENV: "production" },
+				name: "ark-core",
+				node_args: undefined,
+				script: "script",
+			},
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+		);
+
+		spyOnHas.restore();
+		spyOnStart.restore();
+	});
+
+	it("should start process with the [no-daemon] flag if the daemon flag is to false", ({ action }) => {
+		const spyOnHas = spy(processManager, "has");
+		const spyOnStart = spy(processManager, "start");
+
+		action.execute(
+			{
+				args: "core:run --daemon",
+				name: "ark-core",
+				script: "script",
+			},
+			{ daemon: false },
+		);
+
+		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledWith("ark-core");
+		assert.true(spyOnHas.calledOnce);
+		spyOnStart.calledWith(
+			{
+				args: "core:run --daemon",
+				env: { CORE_ENV: undefined, NODE_ENV: "production" },
+				name: "ark-core",
+				node_args: undefined,
+				script: "script",
+			},
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+		);
+
+		spyOnHas.restore();
+		spyOnStart.restore();
+	});
+
+	it("should start process without the [--no-daemon] flag if the daemon flag is true", ({ action }) => {
+		const spyOnHas = spy(processManager, "has");
+		const spyOnStart = spy(processManager, "start");
+
+		action.execute(
+			{
+				name: "ark-core",
+				script: "script",
+				args: "core:run --daemon",
+			},
+			{ daemon: true },
+		);
+
+		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledWith("ark-core");
+		assert.true(spyOnHas.calledOnce);
+		spyOnStart.calledWith(
+			{
+				args: "core:run --daemon",
+				env: { CORE_ENV: undefined, NODE_ENV: "production" },
+				name: "ark-core",
+				node_args: undefined,
+				script: "script",
+			},
+			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core" },
+		);
+
+		spyOnHas.restore();
+		spyOnStart.restore();
+	});
+
+	it("should start process should run with potato settings", ({ action }) => {
+		const spyOnHas = spy(processManager, "has");
+		const spyOnStart = spy(processManager, "start");
+		stub(os, "totalmem").returnValue(2 * 1024 ** 3 - 1)
+
+		action.execute(
+			{
+				name: "ark-core",
+				script: "script",
+				args: "core:run --daemon",
+			},
+			{},
+		);
+
+		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledWith("ark-core");
+		assert.true(spyOnHas.calledOnce);
+		spyOnStart.calledWith(
+			{
+				args: "core:run --daemon",
+				env: {
+					CORE_ENV: undefined,
+					NODE_ENV: "production",
+				},
+				name: "ark-core",
+				node_args: {
+					max_old_space_size: 500,
+				},
+				script: "script",
+			},
+			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+		);
+
+		spyOnHas.restore();
+		spyOnStart.restore();
+	});
+
+	it("should throw if processManager.start throws", ({ action }) => {
+		const spyOnStart = stub(processManager, "start").callsFake(() => {
+			throw new Error("Dummy error")
+		})
+
+		assert.throws(() =>action.execute(
+			{
+				name: "ark-core",
+				script: "script",
+				args: "core:run --daemon",
+			},
+			{},
+		), "Dummy error");
+
+		spyOnStart.calledOnce()
+	});
 });
