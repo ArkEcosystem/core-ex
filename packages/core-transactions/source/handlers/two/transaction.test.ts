@@ -73,7 +73,7 @@ describe<{
 	handler: TestTransactionHandler;
 	pubKeyHash: number;
 	store: any;
-}>("General Tests", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("General Transaction Tests", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach(async (context) => {
 		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
@@ -106,12 +106,9 @@ describe<{
 			Container.Identifiers.TransactionHandlerRegistry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
-			Transactions.InternalTransactionType.from(1, Enums.TransactionTypeGroup.Test),
+			Transactions.InternalTransactionType.from(TestTransaction.type, Enums.TransactionTypeGroup.Test),
 			2,
 		);
-
-		// context.transferTransaction = new TestTransaction();
-		// context.transferTransaction.nonce =
 
 		context.transferTransaction = Transactions.BuilderFactory.transfer()
 			.version(2)
@@ -120,8 +117,6 @@ describe<{
 			.nonce(Utils.BigNumber.ONE.toString())
 			.sign(passphrases[0])
 			.build();
-		// context.senderWallet.setNonce(Utils.BigNumber.ONE);
-		context.transferTransaction.data.nonce = Utils.BigNumber.ONE;
 
 		context.multiSignatureTransferTransaction = Transactions.BuilderFactory.transfer()
 			.senderPublicKey(context.multiSignatureWallet.getPublicKey()!)
@@ -139,10 +134,7 @@ describe<{
 		Managers.configManager.set("network.pubKeyHash", context.pubKeyHash);
 		Managers.configManager.getMilestone().aip11 = undefined;
 		process.env.CORE_ENV = undefined;
-
-		try {
-			Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
-		} catch {}
+		Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
 	});
 
 	it("verify should be verified", async (context) => {
@@ -292,94 +284,6 @@ describe<{
 		await assert.resolves(() => context.handler.throwIfCannotBeApplied(instance, context.senderWallet));
 	});
 
-	describe("", () => {
-		beforeEach(async (context) => {
-			const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-				Container.Identifiers.TransactionHandlerRegistry,
-			);
-			context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
-				Transactions.InternalTransactionType.from(
-					Enums.TransactionType.Transfer,
-					Enums.TransactionTypeGroup.Core,
-				),
-				2,
-			);
-
-			context.transferTransaction = Transactions.BuilderFactory.transfer()
-				.amount("10000000")
-				.recipientId(context.recipientWallet.getAddress())
-				.sign("secret")
-				.nonce("0")
-				.build();
-
-			Managers.configManager.getMilestone().aip11 = true;
-		});
-
-		it("dynamicFees should correctly calculate the transaction fee based on transaction size and addonBytes", async (context) => {
-			const addonBytes = 137;
-
-			expect(
-				context.handler.dynamicFee({
-					transaction: context.transferTransaction,
-					addonBytes,
-					satoshiPerByte: 3,
-					height: 1,
-				}),
-			).toEqual(Utils.BigNumber.make(137 + context.transferTransaction.serialized.length / 2).times(3));
-
-			expect(
-				context.handler.dynamicFee({
-					transaction: context.transferTransaction,
-					addonBytes,
-					satoshiPerByte: 6,
-					height: 1,
-				}),
-			).toEqual(Utils.BigNumber.make(137 + context.transferTransaction.serialized.length / 2).times(6));
-
-			expect(
-				context.handler.dynamicFee({
-					transaction: context.transferTransaction,
-					addonBytes: 0,
-					satoshiPerByte: 9,
-					height: 1,
-				}),
-			).toEqual(Utils.BigNumber.make(context.transferTransaction.serialized.length / 2).times(9));
-		});
-
-		it("dynamicFees should default satoshiPerByte to 1 if value provided is <= 0", async (context) => {
-			expect(
-				context.handler.dynamicFee({
-					transaction: context.transferTransaction,
-					addonBytes: 0,
-					satoshiPerByte: -50,
-					height: 1,
-				}),
-			).toEqual(
-				context.handler.dynamicFee({
-					transaction: context.transferTransaction,
-					addonBytes: 0,
-					satoshiPerByte: 1,
-					height: 1,
-				}),
-			);
-			expect(
-				context.handler.dynamicFee({
-					transaction: context.transferTransaction,
-					addonBytes: 0,
-					satoshiPerByte: 0,
-					height: 1,
-				}),
-			).toEqual(
-				context.handler.dynamicFee({
-					transaction: context.transferTransaction,
-					addonBytes: 0,
-					satoshiPerByte: 1,
-					height: 1,
-				}),
-			);
-		});
-	});
-
 	it("apply should resolve", async (context) => {
 		await assert.resolves(() => context.handler.apply(context.transferTransaction));
 	});
@@ -478,5 +382,139 @@ describe<{
 
 	it("throwIfCannotEnterPool should resolve", async (context) => {
 		await assert.resolves(() => context.handler.throwIfCannotEnterPool(context.transferTransaction));
+	});
+});
+
+describe<{
+	app: Application;
+	senderWallet: Wallets.Wallet;
+	multiSignatureWallet: Wallets.Wallet;
+	recipientWallet: Wallets.Wallet;
+	walletRepository: Contracts.State.WalletRepository;
+	factoryBuilder: Factories.FactoryBuilder;
+	transferTransaction: Interfaces.ITransaction;
+	handler: TestTransactionHandler;
+	store: any;
+}>("Special Transaction Tests", ({ assert, afterEach, beforeEach, it, stub }) => {
+	beforeEach(async (context) => {
+		const mockLastBlockData: Partial<Interfaces.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
+		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
+
+		const config = Generators.generateCryptoConfigRaw();
+		Managers.configManager.setConfig(config);
+
+		context.app = initApp();
+
+		context.app.bind(Container.Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Container.Identifiers.TransactionHistoryService).toConstantValue(null);
+
+		context.walletRepository = context.app.get<Wallets.WalletRepository>(Container.Identifiers.WalletRepository);
+
+		context.factoryBuilder = new Factories.FactoryBuilder();
+		Factories.Factories.registerWalletFactory(context.factoryBuilder);
+		Factories.Factories.registerTransactionFactory(context.factoryBuilder);
+
+		context.senderWallet = buildSenderWallet(context.factoryBuilder);
+		context.multiSignatureWallet = buildMultiSignatureWallet();
+		context.recipientWallet = buildRecipientWallet(context.factoryBuilder);
+
+		context.walletRepository.index(context.senderWallet);
+		context.walletRepository.index(context.multiSignatureWallet);
+		context.walletRepository.index(context.recipientWallet);
+
+		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+			Container.Identifiers.TransactionHandlerRegistry,
+		);
+
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+			Transactions.InternalTransactionType.from(TestTransaction.type, Enums.TransactionTypeGroup.Test),
+			2,
+		);
+
+		context.transferTransaction = Transactions.BuilderFactory.transfer()
+			.amount("10000000")
+			.recipientId(context.recipientWallet.getAddress())
+			.sign("secret")
+			.nonce("0")
+			.build();
+
+		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
+			Transactions.InternalTransactionType.from(Enums.TransactionType.Transfer, Enums.TransactionTypeGroup.Core),
+			2,
+		);
+
+		Managers.configManager.getMilestone().aip11 = true;
+	});
+
+	afterEach(() => {
+		Managers.configManager.set("exceptions.transactions", []);
+		Managers.configManager.getMilestone().aip11 = undefined;
+		process.env.CORE_ENV = undefined;
+		Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
+	});
+
+	it("dynamicFees should correctly calculate the transaction fee based on transaction size and addonBytes", async (context) => {
+		const addonBytes = 137;
+
+		assert.equal(
+			context.handler.dynamicFee({
+				transaction: context.transferTransaction,
+				addonBytes,
+				satoshiPerByte: 3,
+				height: 1,
+			}),
+			Utils.BigNumber.make(137 + context.transferTransaction.serialized.length / 2).times(3),
+		);
+
+		assert.equal(
+			context.handler.dynamicFee({
+				transaction: context.transferTransaction,
+				addonBytes,
+				satoshiPerByte: 6,
+				height: 1,
+			}),
+			Utils.BigNumber.make(137 + context.transferTransaction.serialized.length / 2).times(6),
+		);
+
+		assert.equal(
+			context.handler.dynamicFee({
+				transaction: context.transferTransaction,
+				addonBytes: 0,
+				satoshiPerByte: 9,
+				height: 1,
+			}),
+			Utils.BigNumber.make(context.transferTransaction.serialized.length / 2).times(9),
+		);
+	});
+
+	it("dynamicFees should default satoshiPerByte to 1 if value provided is <= 0", async (context) => {
+		assert.equal(
+			context.handler.dynamicFee({
+				transaction: context.transferTransaction,
+				addonBytes: 0,
+				satoshiPerByte: -50,
+				height: 1,
+			}),
+			context.handler.dynamicFee({
+				transaction: context.transferTransaction,
+				addonBytes: 0,
+				satoshiPerByte: 1,
+				height: 1,
+			}),
+		);
+		assert.equal(
+			context.handler.dynamicFee({
+				transaction: context.transferTransaction,
+				addonBytes: 0,
+				satoshiPerByte: 0,
+				height: 1,
+			}),
+			context.handler.dynamicFee({
+				transaction: context.transferTransaction,
+				addonBytes: 0,
+				satoshiPerByte: 1,
+				height: 1,
+			}),
+		);
 	});
 });
