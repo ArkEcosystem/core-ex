@@ -86,10 +86,6 @@ export const assert = {
 					uvu.instance(error, item);
 				}
 
-				// if (typeof item === "function" && new item().name === "Error") {
-				// 	uvu.instance(error, item);
-				// }
-
 				if (typeof item === "string") {
 					uvu.ok(error.message.includes(item) || error.name.includes(item));
 				}
