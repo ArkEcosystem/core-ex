@@ -32,8 +32,8 @@ export class Stub {
 		return this;
 	}
 
-	public calledWith(message: string | object): void {
-		ok(this.subject.calledWith(message));
+	public calledWith(...args: any[]): void {
+		ok(this.subject.calledWith(...args));
 	}
 
 	public calledOnce(): void {
