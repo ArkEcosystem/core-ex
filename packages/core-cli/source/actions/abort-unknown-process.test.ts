@@ -30,7 +30,9 @@ describe<{
 	it("should throw if the process is unknown", ({ action }) => {
 		const spyIsErrored = stub(processManager, "isUnknown").returnValue(true);
 
-		assert.throws(() => {action.execute(processName)},`The "${processName}" process has entered an unknown state.`);
+		assert.throws(() => {
+			action.execute(processName);
+		}, `The "${processName}" process has entered an unknown state.`);
 		spyIsErrored.calledOnce();
 	});
 });

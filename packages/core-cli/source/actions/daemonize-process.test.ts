@@ -16,11 +16,11 @@ describe<{
 		name: "ark-core",
 		script: "script",
 		args: "core:run --daemon",
-	}
+	};
 
 	const processManager: Partial<ProcessManager> = {
 		has: (id: ProcessIdentifier) => false,
-		isUnknown: (id: ProcessIdentifier) => false
+		isUnknown: (id: ProcessIdentifier) => false,
 	};
 
 	const abortUnknownProcess: Partial<AbortUnknownProcess> = {
@@ -50,30 +50,24 @@ describe<{
 	});
 
 	it("should throw if the process has entered an unknown state", ({ action }) => {
-		const spyOnHas = stub(processManager, "has").returnValue(true)
+		const spyOnHas = stub(processManager, "has").returnValue(true);
 		const spyOnAbortUnknownProcessExecute = stub(abortUnknownProcess, "execute").callsFake(() => {
-			throw new Error("Unknown")
+			throw new Error("Unknown");
 		});
 
-		assert.throws(() => action.execute(
-			options,
-			{},
-		), "Unknown")
+		assert.throws(() => action.execute(options, {}), "Unknown");
 
 		spyOnHas.calledOnce();
 		spyOnAbortUnknownProcessExecute.calledOnce();
 	});
 
 	it("should throw if the process is running", ({ action }) => {
-		const spyOnHas = stub(processManager, "has").returnValue(true)
+		const spyOnHas = stub(processManager, "has").returnValue(true);
 		const spyOnAbortRunningProcessExecute = stub(abortRunningProcess, "execute").callsFake(() => {
-			throw new Error("Running")
+			throw new Error("Running");
 		});
 
-		assert.throws(() => action.execute(
-			options,
-			{},
-		), "Running")
+		assert.throws(() => action.execute(options, {}), "Running");
 		spyOnHas.calledOnce();
 		spyOnAbortRunningProcessExecute.calledOnce();
 	});

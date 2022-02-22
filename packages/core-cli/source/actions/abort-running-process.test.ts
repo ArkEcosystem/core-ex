@@ -30,7 +30,9 @@ describe<{
 	it("should throw if the process is not online", ({ action }) => {
 		const spyIsErrored = stub(processManager, "isOnline").returnValue(true);
 
-		assert.throws(() => {action.execute(processName)},`The "${processName}" process is already running.`);
+		assert.throws(() => {
+			action.execute(processName);
+		}, `The "${processName}" process is already running.`);
 		spyIsErrored.calledOnce();
 	});
 });

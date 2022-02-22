@@ -30,7 +30,9 @@ describe<{
 	it("should throw if the process is not running", ({ action }) => {
 		const spyIsErrored = stub(processManager, "isStopped").returnValue(true);
 
-		assert.throws(() => {action.execute(processName)},`The "${processName}" process is not running.`);
+		assert.throws(() => {
+			action.execute(processName);
+		}, `The "${processName}" process is not running.`);
 		spyIsErrored.calledOnce();
 	});
 });
