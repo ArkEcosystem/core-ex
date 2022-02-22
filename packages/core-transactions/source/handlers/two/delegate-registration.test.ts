@@ -85,7 +85,7 @@ describe<{
 		assert.equal(context.handler.dependencies(), []);
 	});
 
-	it("walletAttributesshould return array", async (context) => {
+	it("walletAttributes should return array", async (context) => {
 		const attributes = context.handler.walletAttributes();
 
 		assert.array(attributes);

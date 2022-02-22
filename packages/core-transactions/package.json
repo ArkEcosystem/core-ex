@@ -13,7 +13,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del dist",
-		"test": "uvu -r tsm source/handlers/two transaction.test.ts",
+		"test": "uvu -r tsm source/handlers/two vote.test.ts",
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
