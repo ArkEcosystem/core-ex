@@ -20,14 +20,14 @@ describe<{
 		context.action = app.resolve(AbortErroredProcess);
 	});
 
-	it("should not throw if the process does exist", ({ action }) => {
+	it("should not throw if the process is errored", ({ action }) => {
 		const spyIsErrored = stub(processManager, "isErrored").returnValue(false);
 
 		action.execute(processName);
 		spyIsErrored.calledOnce();
 	});
 
-	it("should throw if the process does not exist", ({ action }) => {
+	it("should throw if the process is not errored", ({ action }) => {
 		const spyIsErrored = stub(processManager, "isErrored").returnValue(true);
 
 		assert.throws(() => {action.execute(processName)},`The "${processName}" process has errored.`);
