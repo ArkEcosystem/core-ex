@@ -1,7 +1,7 @@
 import { TransactionFilter } from "./transaction-filter";
 import { Container } from "@arkecosystem/core-kernel";
 import { Enums, Utils } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 describe<{
 	container: Container.Container;

@@ -27,9 +27,6 @@
 		"typeorm": "0.2.25",
 		"uvu": "^0.5.3"
 	},
-	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*"
-	},
 	"engines": {
 		"node": ">=16.x"
 	}
