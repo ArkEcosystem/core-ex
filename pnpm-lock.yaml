@@ -1375,7 +1375,6 @@ importers:
       '@arkecosystem/core-api': workspace:*
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
-      '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-forger': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
@@ -1410,7 +1409,6 @@ importers:
       '@arkecosystem/core-api': link:../core-api
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
-      '@arkecosystem/core-database': link:../core-database
       '@arkecosystem/core-forger': link:../core-forger
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
