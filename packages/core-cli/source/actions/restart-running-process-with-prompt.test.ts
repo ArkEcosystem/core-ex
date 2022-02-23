@@ -1,8 +1,8 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
+import { Prompt } from "../components";
 import { ProcessIdentifier } from "../contracts";
 import { Container, Identifiers } from "../ioc";
-import { Prompt } from "../components";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 import { RestartRunningProcessWithPrompt } from "./restart-running-process-with-prompt";
@@ -21,17 +21,15 @@ describe<{
 	};
 
 	const prompt: Partial<Prompt> = {
-		render: async (options: object): Promise<{ confirm: boolean }> => {
-			return {
-				confirm: false,
-			};
-		},
+		render: async (options: object): Promise<{ confirm: boolean }> => ({
+			confirm: false,
+		}),
 	};
 
-	const spyOnExecute = spy(restartProcess, "execute");
+	let spyOnExecute;
 
 	beforeEach((context) => {
-		spyOnExecute.resetHistory();
+		spyOnExecute = spy(restartProcess, "execute");
 
 		const app = new Container();
 		app.bind(Identifiers.Application).toConstantValue(app);
@@ -47,11 +45,9 @@ describe<{
 
 		await action.execute(processName);
 
-		assert.equal(spyOnExecute.callCount, 0);
+		spyOnExecute.neverCalled();
 		spyIsOnline.calledOnce();
-		assert.equal(spyRender.callCount, 0);
-
-		spyRender.restore();
+		spyRender.neverCalled();
 	});
 
 	it("should not restart the process if it is not confirmed", async ({ action }) => {
@@ -60,7 +56,7 @@ describe<{
 
 		await action.execute(processName);
 
-		assert.equal(spyOnExecute.callCount, 0);
+		spyOnExecute.neverCalled();
 		spyIsOnline.calledOnce();
 		spyRender.calledOnce();
 	});
@@ -71,7 +67,7 @@ describe<{
 
 		await action.execute(processName);
 
-		assert.true(spyOnExecute.calledOnce);
+		spyOnExecute.calledOnce();
 		spyIsOnline.calledOnce();
 		spyRender.calledOnce();
 	});

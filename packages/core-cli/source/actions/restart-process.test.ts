@@ -24,12 +24,12 @@ describe<{
 		render: (options?: string | OraOptions | undefined): Ora => ora as Ora,
 	};
 
-	const spyOnSpinnerRender = spy(spinner, "render");
-	const spyOnSpinnerStop = spy(ora, "stop");
+	let spyOnSpinnerRender;
+	let spyOnSpinnerStop;
 
 	beforeEach((context) => {
-		spyOnSpinnerRender.resetHistory();
-		spyOnSpinnerStop.resetHistory();
+		spyOnSpinnerRender = spy(spinner, "render");
+		spyOnSpinnerStop = spy(ora, "stop");
 
 		const app = new Container();
 		app.bind(Identifiers.Application).toConstantValue(app);
@@ -43,12 +43,10 @@ describe<{
 
 		action.execute(processName);
 
-		assert.true(spyOnRestart.calledOnce);
+		spyOnRestart.calledOnce();
 		// TODO: Called with
-		assert.true(spyOnSpinnerRender.calledOnce);
-		assert.true(spyOnSpinnerStop.calledOnce);
-
-		spyOnRestart.restore();
+		spyOnSpinnerRender.calledOnce();
+		spyOnSpinnerStop.calledOnce();
 	});
 
 	it("should throw", ({ action }) => {
@@ -61,8 +59,8 @@ describe<{
 		}, "Dummy error");
 		spyOnRestart.calledOnce();
 
-		assert.true(spyOnSpinnerRender.calledOnce);
-		assert.true(spyOnSpinnerStop.calledOnce);
+		spyOnSpinnerRender.calledOnce();
+		spyOnSpinnerStop.calledOnce();
 	});
 
 	it("should throw with stderr", ({ action }) => {
@@ -78,7 +76,7 @@ describe<{
 		}, "Dummy error: error output");
 		spyOnRestart.calledOnce();
 
-		assert.true(spyOnSpinnerRender.calledOnce);
-		assert.true(spyOnSpinnerStop.calledOnce);
+		spyOnSpinnerRender.calledOnce();
+		spyOnSpinnerStop.calledOnce();
 	});
 });

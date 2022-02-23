@@ -87,11 +87,12 @@ describe<{
 			{},
 		);
 
-		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledOnce();
 		spyOnHas.calledWith("ark-core");
+		spyOnStart.calledOnce();
 		spyOnStart.calledWith(
 			{
-				args: "core:run --daemon",
+				args: "core:run",
 				env: { CORE_ENV: undefined, NODE_ENV: "production" },
 				name: "ark-core",
 				node_args: undefined,
@@ -99,9 +100,6 @@ describe<{
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
-
-		spyOnHas.restore();
-		spyOnStart.restore();
 	});
 
 	it("should start process with the [no-daemon] flag if the daemon flag is to false", ({ action }) => {
@@ -117,9 +115,8 @@ describe<{
 			{ daemon: false },
 		);
 
-		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledOnce();
 		spyOnHas.calledWith("ark-core");
-		assert.true(spyOnHas.calledOnce);
 		spyOnStart.calledWith(
 			{
 				args: "core:run --daemon",
@@ -130,9 +127,6 @@ describe<{
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
-
-		spyOnHas.restore();
-		spyOnStart.restore();
 	});
 
 	it("should start process without the [--no-daemon] flag if the daemon flag is true", ({ action }) => {
@@ -148,9 +142,8 @@ describe<{
 			{ daemon: true },
 		);
 
-		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledOnce();
 		spyOnHas.calledWith("ark-core");
-		assert.true(spyOnHas.calledOnce);
 		spyOnStart.calledWith(
 			{
 				args: "core:run --daemon",
@@ -161,9 +154,6 @@ describe<{
 			},
 			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core" },
 		);
-
-		spyOnHas.restore();
-		spyOnStart.restore();
 	});
 
 	it("should start process should run with potato settings", ({ action }) => {
@@ -180,9 +170,8 @@ describe<{
 			{},
 		);
 
-		assert.true(spyOnHas.calledOnce);
+		spyOnHas.calledOnce();
 		spyOnHas.calledWith("ark-core");
-		assert.true(spyOnHas.calledOnce);
 		spyOnStart.calledWith(
 			{
 				args: "core:run --daemon",
@@ -198,9 +187,6 @@ describe<{
 			},
 			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
-
-		spyOnHas.restore();
-		spyOnStart.restore();
 	});
 
 	it("should throw if processManager.start throws", ({ action }) => {

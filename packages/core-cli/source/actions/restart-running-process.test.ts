@@ -19,11 +19,8 @@ describe<{
 		execute: (processName: string) => {},
 	};
 
-	const spyOnExecute = spy(restartProcess, "execute");
 
 	beforeEach((context) => {
-		spyOnExecute.resetHistory();
-
 		const app = new Container();
 		app.bind(Identifiers.Application).toConstantValue(app);
 		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
@@ -32,20 +29,22 @@ describe<{
 	});
 
 	it("should not restart the process if it is not online", ({ action }) => {
+		const spyOnExecute = spy(restartProcess, "execute");
 		const spyIsOnline = stub(processManager, "isOnline").returnValue(false);
 
 		action.execute(processName);
 
-		assert.equal(spyOnExecute.callCount, 0);
+		spyOnExecute.neverCalled();
 		spyIsOnline.calledOnce();
 	});
 
 	it("should restart the process", ({ action }) => {
+		const spyOnExecute = spy(restartProcess, "execute");
 		const spyIsOnline = stub(processManager, "isOnline").returnValue(true);
 
 		action.execute(processName);
 
-		assert.true(spyOnExecute.calledOnce);
+		spyOnExecute.calledOnce();
 		spyIsOnline.calledOnce();
 	});
 });
