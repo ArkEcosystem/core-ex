@@ -1141,7 +1141,6 @@ importers:
       joi: 17.4.2
       pg: 8.7.1
       reflect-metadata: 0.1.13
-      sinon: ^13.0.1
       typeorm: 0.2.25
       uvu: ^0.5.3
     dependencies:
@@ -1152,7 +1151,6 @@ importers:
       joi: 17.4.2
       pg: 8.7.1
       reflect-metadata: 0.1.13
-      sinon: 13.0.1
       typeorm: 0.2.25
       uvu: 0.5.3
 
@@ -13087,17 +13085,6 @@ packages:
     dependencies:
       '@sinonjs/commons': 1.8.3
       '@sinonjs/fake-timers': 8.1.0
-      '@sinonjs/samsam': 6.1.1
-      diff: 5.0.0
-      nise: 5.1.1
-      supports-color: 7.2.0
-    dev: false
-
-  /sinon/13.0.1:
-    resolution: {integrity: sha512-8yx2wIvkBjIq/MGY1D9h1LMraYW+z1X0mb648KZnKSdvLasvDu7maa0dFaNYdTDczFgbjNw2tOmWdTk9saVfwQ==}
-    dependencies:
-      '@sinonjs/commons': 1.8.3
-      '@sinonjs/fake-timers': 9.1.0
       '@sinonjs/samsam': 6.1.1
       diff: 5.0.0
       nise: 5.1.1
