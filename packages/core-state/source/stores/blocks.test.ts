@@ -11,15 +11,15 @@ describe("BlockStore", ({ it, assert }) => {
 		const store = new BlockStore(100);
 		store.set(block);
 
-        assert.equal(store.count(), 1);
-        assert.equal(store.get(block.data.id), block.data);
-        assert.equal(store.get(block.data.height), block.data);
+		assert.equal(store.count(), 1);
+		assert.equal(store.get(block.data.id), block.data);
+		assert.equal(store.get(block.data.height), block.data);
 	});
 
 	it("should fail to push a block if its height is not 1 and there is no last block", () => {
 		const store = new BlockStore(2);
 
-        assert.throws(() => store.set({ data: { height: 3, id: "3" } } as Interfaces.IBlock));
+		assert.throws(() => store.set({ data: { height: 3, id: "3" } } as Interfaces.IBlock));
 	});
 
 	it("should fail to push a block if it does not contain an id", () => {

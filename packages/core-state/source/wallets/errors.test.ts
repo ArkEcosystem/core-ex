@@ -6,9 +6,13 @@ describe("WalletErrors", ({ it, assert }) => {
 		const message = "I am an error";
 		const error = new WalletsError(message);
 
-		assert.throws(() => {
-			throw error;
-		}, undefined, message);
+		assert.throws(
+			() => {
+				throw error;
+			},
+			undefined,
+			message,
+		);
 
 		assert.defined(error.stack);
 	});
@@ -17,9 +21,13 @@ describe("WalletErrors", ({ it, assert }) => {
 		const message = "custom message";
 		const error = new WalletIndexAlreadyRegisteredError(message);
 
-		assert.throws(() => {
-			throw error;
-		}, undefined, `The wallet index is already registered: ${message}`);
+		assert.throws(
+			() => {
+				throw error;
+			},
+			undefined,
+			`The wallet index is already registered: ${message}`,
+		);
 
 		assert.defined(error.stack);
 	});
@@ -28,9 +36,13 @@ describe("WalletErrors", ({ it, assert }) => {
 		const message = "custom message";
 		const error = new WalletIndexNotFoundError(message);
 
-		assert.throws(() => {
-			throw error;
-		}, undefined, `The wallet index does not exist: ${message}`);
+		assert.throws(
+			() => {
+				throw error;
+			},
+			undefined,
+			`The wallet index does not exist: ${message}`,
+		);
 
 		assert.defined(error.stack);
 	});

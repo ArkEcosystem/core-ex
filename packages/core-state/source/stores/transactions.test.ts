@@ -6,10 +6,10 @@ import { describe } from "@arkecosystem/core-test";
 let factory: Factories.FactoryBuilder;
 
 describe("TransactionStore", ({ it, assert, beforeEach }) => {
-    beforeEach(() => {
-        factory = new Factories.FactoryBuilder();
-        Factories.Factories.registerTransactionFactory(factory);
-    });
+	beforeEach(() => {
+		factory = new Factories.FactoryBuilder();
+		Factories.Factories.registerTransactionFactory(factory);
+	});
 
 	it("should push and get a transaction", () => {
 		const transaction: ITransaction = factory.get("Transfer").make();
