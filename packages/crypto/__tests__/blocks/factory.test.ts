@@ -39,10 +39,10 @@ describe("BlockFactory", () => {
 
 		it("should throw on invalid input data - block property has an unexpected value", () => {
 			const b1 = Object.assign({}, blockWithExceptions, { timestamp: "abcd" });
-			expect(() => BlockFactory.fromData(b1 as any)).toThrowError(/Invalid.*timestamp.*integer.*abcd/i);
+			expect(() => BlockFactory.fromData(b1 as any)).toThrowError(/Invalid.*timestamp.*integer.*undefined/i);
 
 			const b2 = Object.assign({}, blockWithExceptions, { totalAmount: "abcd" });
-			expect(() => BlockFactory.fromData(b2 as any)).toThrowError(/Invalid.*totalAmount.*bignumber.*abcd/i);
+			expect(() => BlockFactory.fromData(b2 as any)).toThrowError(/Invalid.*totalAmount.*bignumber.*undefined/i);
 		});
 
 		it("should throw on invalid input data - required block property is missing", () => {

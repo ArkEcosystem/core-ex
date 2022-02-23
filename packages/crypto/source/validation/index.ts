@@ -52,9 +52,11 @@ export class Validator {
 
 			validate(data);
 
-			const error = validate.errors ? validate.errors[0].message : undefined;
-
-			return { error, errors: validate.errors || undefined, value: data };
+			return {
+				error: validate.errors ? ajv.errorsText(validate.errors) : undefined, 
+				errors: validate.errors || undefined, 
+				value: data
+			};
 		} catch (error) {
 			return { error: error.stack, errors: [], value: undefined };
 		}
