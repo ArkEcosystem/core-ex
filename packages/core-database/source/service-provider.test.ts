@@ -33,7 +33,6 @@ describe<{
 	});
 
 	it.only("register should connect to database, bind triggers, and bind services", async (context) => {
-
 		// const typeorm = await import("typeorm");
 		const mockCreateConnection = spy(typeorm, "createConnection");
 		const mockGetCustomRepository = spy(typeorm, "getCustomRepository");
