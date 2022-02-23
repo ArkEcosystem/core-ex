@@ -1,9 +1,13 @@
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { BigNumber } from "@arkecosystem/utils";
 import { format } from "concordance";
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
 import * as uvu from "uvu/assert";
 import { z, ZodRawShape } from "zod";
+
+interface Constructable {
+	new (...arguments_: any): any;
+}
 
 export const assert = {
 	...uvu,
@@ -63,7 +67,7 @@ export const assert = {
 	null: (value: unknown): void => uvu.ok(value === null),
 	number: (value: unknown): void => uvu.type(value, "number"),
 	object: (value: unknown): void => uvu.type(value, "object"),
-	rejects: async (callback: Function, expected?: uvu.Message): Promise<void> => {
+	rejects: async (callback: Function, ...expected: (uvu.Message | Constructable)[]): Promise<void> => {
 		try {
 			await callback();
 
@@ -73,12 +77,18 @@ export const assert = {
 				throw error;
 			}
 
-			if (expected instanceof Error) {
-				uvu.instance(error, expected);
-			}
+			for (const item of expected) {
+				if (item instanceof Error) {
+					uvu.instance(error, item);
+				}
 
-			if (typeof expected === "string") {
-				uvu.ok(error.message.includes(expected));
+				if (typeof item === "function") {
+					uvu.instance(error, item);
+				}
+
+				if (typeof item === "string") {
+					uvu.ok(error.message.includes(item) || error.name.includes(item));
+				}
 			}
 
 			uvu.ok(true);
@@ -121,6 +131,13 @@ export const assert = {
 	startsWith: (value: string, prefix: string): void => uvu.ok(value.startsWith(prefix)),
 	string: (value: unknown): void => uvu.type(value, "string"),
 	stringArray: (values: unknown[]): void => uvu.ok(values.every((value) => typeof value === "string")),
+	throws: (function_: Function, expects?: uvu.Message | RegExp | Function): void => {
+		if (typeof expects === "string") {
+			expects = new RegExp(expects);
+		}
+
+		uvu.throws(function_, expects);
+	},
 	true: (value: unknown): void => uvu.is(value, true),
 	truthy: (value: unknown): void => uvu.ok(!!value),
 	undefined: (value: unknown): void => uvu.ok(value === undefined, "Expected value to be undefined."),

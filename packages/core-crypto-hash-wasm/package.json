@@ -1,0 +1,28 @@
+{
+	"name": "@arkecosystem/core-crypto-hash-wasm",
+	"version": "0.0.1",
+	"description": "Hashing powered by WASM",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "uvu -r tsm source .test.ts"
+	},
+	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"hash-wasm": "^4.9.0"
+	},
+	"devDependencies": {
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"uvu": "^0.5.3"
+	}
+}
