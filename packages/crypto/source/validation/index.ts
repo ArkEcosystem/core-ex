@@ -53,9 +53,9 @@ export class Validator {
 			validate(data);
 
 			return {
-				error: validate.errors ? ajv.errorsText(validate.errors) : undefined, 
-				errors: validate.errors || undefined, 
-				value: data
+				error: validate.errors ? ajv.errorsText(validate.errors) : undefined,
+				errors: validate.errors || undefined,
+				value: data,
 			};
 		} catch (error) {
 			return { error: error.stack, errors: [], value: undefined };
