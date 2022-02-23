@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Utils } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 import { BlockFilter } from "./block-filter";
 

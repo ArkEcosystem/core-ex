@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Blocks } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 import { DatabaseService } from "./database-service";
 import block1760000 from "../test/fixtures/block1760000";

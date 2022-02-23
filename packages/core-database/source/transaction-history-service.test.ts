@@ -1,6 +1,6 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Interfaces } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 import { TransactionHistoryService } from "./transaction-history-service";
 

@@ -1,5 +1,5 @@
 import { SnakeNamingStrategy } from "./snake-naming-strategy";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../../core-test-framework";
 
 describe("SnakeNamingStrategy.tableName", ({ assert, it }) => {
 	it("should convert class name to snake-case table name", () => {

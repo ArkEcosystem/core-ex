@@ -1,5 +1,5 @@
 import { QueryHelper } from "./query-helper";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../../core-test-framework";
 
 type UserEntity = {
 	id: number;

@@ -1,6 +1,6 @@
 import { Utils } from "@arkecosystem/crypto";
 import { FindOperator } from "typeorm";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../../core-test-framework";
 
 import { transformBigInt, transformVendorField } from "./transform";
 
