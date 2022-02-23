@@ -1301,6 +1301,7 @@ importers:
       '@arkecosystem/crypto': workspace:*
       delay: 4.4.1
       immutable: 4.0.0-rc.14
+      import-fresh: 3.3.0
       joi: 17.4.2
       uvu: ^0.5.3
     dependencies:
@@ -1313,6 +1314,7 @@ importers:
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       delay: 4.4.1
+      import-fresh: 3.3.0
       uvu: 0.5.3
 
   packages/core-test-framework:
