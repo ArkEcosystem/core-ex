@@ -505,9 +505,11 @@ importers:
   packages/core-logger-winston:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
+      joi: 17.4.2
       winston: ^3.6.0
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
+      joi: 17.4.2
       winston: 3.6.0
 
   packages/core-p2p:
