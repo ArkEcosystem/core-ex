@@ -15,7 +15,6 @@
 		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
-		"@arkecosystem/core": "workspace:*",
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
 		"@arkecosystem/core-forger": "workspace:*",

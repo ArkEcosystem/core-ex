@@ -1317,7 +1317,6 @@ importers:
 
   packages/core-test-framework:
     specifiers:
-      '@arkecosystem/core': workspace:*
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
       '@arkecosystem/core-forger': workspace:*
@@ -1350,7 +1349,6 @@ importers:
       xstate: 4.23.4
       zod: ~3.11.6
     dependencies:
-      '@arkecosystem/core': link:../core
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
       '@arkecosystem/core-forger': link:../core-forger
