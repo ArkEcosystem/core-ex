@@ -1153,6 +1153,8 @@ importers:
       reflect-metadata: 0.1.13
       typeorm: 0.2.25
       uvu: 0.5.3
+    devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
 
   packages/core-forger:
     specifiers:
