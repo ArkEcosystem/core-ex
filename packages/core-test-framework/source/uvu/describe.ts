@@ -34,6 +34,7 @@ type CallbackFunction<T> = (arguments_: CallbackArguments<T>) => void;
 
 const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, dataset?: unknown): void => {
 	let stubs: Stub[] = [];
+	let spies: Spy[] = [];
 
 	suite.before(() => {
 		nock.disableNetConnect();
@@ -50,7 +51,12 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			stub.restore();
 		}
 
+		for (const stub of spies) {
+			stub.restore();
+		}
+
 		stubs = [];
+		spies = [];
 	});
 
 	callback({
@@ -67,7 +73,13 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 		only: suite.only,
 		schema,
 		skip: suite.skip,
-		spy: (owner: object, method: string) => new Spy(owner, method),
+		spy: (owner: object, method: string) => {
+			const result: Spy = new Spy(owner, method);
+
+			spies.push(result);
+
+			return result;
+		},
 		stub: (owner: object, method: string) => {
 			const result: Stub = new Stub(owner, method);
 
