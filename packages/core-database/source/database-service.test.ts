@@ -31,7 +31,6 @@ describe<{
 			findByHeightRange: () => undefined,
 			findByHeightRangeWithTransactions: () => undefined,
 			findByHeightRangeWithTransactionsForDownload: () => undefined,
-			findByHeights: () => undefined,
 			findLatest: () => undefined,
 			findByIds: () => undefined,
 			findRecent: () => undefined,
