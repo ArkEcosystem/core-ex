@@ -1,6 +1,6 @@
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { BigNumber } from "@arkecosystem/utils";
 import { format } from "concordance";
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
 import * as uvu from "uvu/assert";
 import { z, ZodRawShape } from "zod";
@@ -121,12 +121,12 @@ export const assert = {
 	startsWith: (value: string, prefix: string): void => uvu.ok(value.startsWith(prefix)),
 	string: (value: unknown): void => uvu.type(value, "string"),
 	stringArray: (values: unknown[]): void => uvu.ok(values.every((value) => typeof value === "string")),
-	throws: (fn: Function, expects?: uvu.Message | RegExp | Function): void => {
+	throws: (function_: Function, expects?: uvu.Message | RegExp | Function): void => {
 		if (typeof expects === "string") {
 			expects = new RegExp(expects);
 		}
 
-		uvu.throws(fn, expects);
+		uvu.throws(function_, expects);
 	},
 	true: (value: unknown): void => uvu.is(value, true),
 	truthy: (value: unknown): void => uvu.ok(!!value),
