@@ -11,15 +11,13 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist",
-		"test": "uvu -r tsm source .test.ts"
+		"clean": "del dist"
 	},
 	"dependencies": {
 		"@arkecosystem/core": "workspace:*",
 		"@arkecosystem/core-api": "workspace:*",
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
-		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-forger": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
