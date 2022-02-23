@@ -42,7 +42,11 @@ export class Validator {
 		this.extendTransactionSchema(this.ajv, schema, remove);
 	}
 
-	private validateSchema<T = any>(ajv: Ajv, schemaKeyRef: string | SchemaObject, data: T): ISchemaValidationResult<T> {
+	private validateSchema<T = any>(
+		ajv: Ajv,
+		schemaKeyRef: string | SchemaObject,
+		data: T,
+	): ISchemaValidationResult<T> {
 		try {
 			const validate = this.getValidationFunction(ajv, schemaKeyRef);
 
@@ -63,7 +67,7 @@ export class Validator {
 			return ajv.compile(schemaKeyRef);
 		}
 
-		if (! this.compiledSchemas.has(schemaKeyRef)) {
+		if (!this.compiledSchemas.has(schemaKeyRef)) {
 			// `getSchema()` also compiles schema...
 			this.compiledSchemas.set(schemaKeyRef, ajv.getSchema(schemaKeyRef));
 		}
