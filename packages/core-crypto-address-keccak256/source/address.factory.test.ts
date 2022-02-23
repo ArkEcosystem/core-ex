@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
+import { Application } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test-framework";
 
 import { AddressFactory } from "./address.factory";
@@ -11,7 +11,7 @@ const mnemonic =
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.container = new Container.Container();
+		context.app = new Application(new Container.Container());
 	});
 
 	it("should derive an address from an mnemonic (schnorr)", async (context) => {
