@@ -2,15 +2,7 @@ import { describe } from "../../core-test-framework";
 import { defaults } from "./defaults";
 import { ServiceProvider } from "./service-provider";
 import { Application, Container, Providers } from "@arkecosystem/core-kernel";
-// import { AnySchema } from "joi";
-import typeorm from "typeorm";
-
-// jest.mock("typeorm", () =>
-// 	Object.assign(jest.requireActual("typeorm"), {
-// 		createConnection: spyFn,
-// 		getCustomRepository: spyFn,
-// 	}),
-// );
+import { typeorm } from "./typeorm";
 
 describe<{
 	app: Application;
@@ -33,19 +25,11 @@ describe<{
 	});
 
 	it.only("register should connect to database, bind triggers, and bind services", async (context) => {
-
-		// const typeorm = await import("typeorm");
 		const mockCreateConnection = spy(typeorm, "createConnection");
 		const mockGetCustomRepository = spy(typeorm, "getCustomRepository");
-		// try {
-		// 	// // @ts-ignore
-		// 	// typeorm.createConnection = spy();
-		// 	// // @ts-ignore
-		// 	// typeorm.getCustomRepository = spy();
-		// } catch (e) {
-		// 	console.log(e);
-		// 	throw e;
-		// }
+
+		typeorm.createConnection = spyFn();
+		typeorm.getCustomRepository = spyFn();
 
 		const serviceProvider = context.app.resolve(ServiceProvider);
 		const pluginConfiguration = context.app
@@ -53,12 +37,7 @@ describe<{
 			.from("core-database", { ...defaults });
 		serviceProvider.setConfig(pluginConfiguration);
 
-		try {
-			await serviceProvider.register();
-		} catch (e) {
-			console.log(e);
-			throw e;
-		}
+		await serviceProvider.register();
 
 		assert.true(mockCreateConnection.calledWith());
 		assert.true(mockGetCustomRepository.calledTimes(3));

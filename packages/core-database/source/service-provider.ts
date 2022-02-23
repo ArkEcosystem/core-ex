@@ -1,5 +1,5 @@
 import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
-import { Connection, createConnection, getCustomRepository } from "typeorm";
+import { typeorm } from "./typeorm";
 import Joi from "joi";
 
 import { BlockFilter } from "./block-filter";
@@ -52,7 +52,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return true;
 	}
 
-	public async connect(): Promise<Connection> {
+	public async connect(): Promise<typeorm.Connection> {
 		const connection: Record<string, any> = this.config().all().connection as any;
 		this.app
 			.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService)
@@ -63,7 +63,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			connection.logger = this.app.get(Container.Identifiers.DatabaseLogger);
 		}
 
-		return createConnection({
+		console.log(typeorm.createConnection)
+
+		return typeorm.createConnection({
 			...(connection as any),
 			namingStrategy: new SnakeNamingStrategy(),
 			migrations: [__dirname + "/migrations/*.js"],
@@ -74,15 +76,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public getRoundRepository(): RoundRepository {
-		return getCustomRepository(RoundRepository);
+		return typeorm.getCustomRepository(RoundRepository);
 	}
 
 	public getBlockRepository(): BlockRepository {
-		return getCustomRepository(BlockRepository);
+		return typeorm.getCustomRepository(BlockRepository);
 	}
 
 	public getTransactionRepository(): TransactionRepository {
-		return getCustomRepository(TransactionRepository);
+		return typeorm.getCustomRepository(TransactionRepository);
 	}
 
 	public configSchema(): object {
