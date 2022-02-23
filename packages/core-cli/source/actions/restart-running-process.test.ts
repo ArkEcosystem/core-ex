@@ -19,7 +19,6 @@ describe<{
 		execute: (processName: string) => {},
 	};
 
-
 	beforeEach((context) => {
 		const app = new Container();
 		app.bind(Identifiers.Application).toConstantValue(app);
