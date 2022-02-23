@@ -2,7 +2,7 @@
 	"core": {
 		"plugins": [
 			{
-				"package": "@arkecosystem/core-logger-pino"
+				"package": "@arkecosystem/core-logger-winston"
 			},
 			{
 				"package": "@arkecosystem/core-state"

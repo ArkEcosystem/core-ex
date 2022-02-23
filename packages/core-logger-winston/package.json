@@ -1,0 +1,23 @@
+{
+	"name": "@arkecosystem/core-logger-winston",
+	"version": "0.0.1",
+	"description": "Webhooks for ARK Core",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del dist"
+	},
+	"dependencies": {
+		"@arkecosystem/core-kernel": "workspace:*",
+		"winston": "^3.6.0"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}
