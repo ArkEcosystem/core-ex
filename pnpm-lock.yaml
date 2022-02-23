@@ -1068,11 +1068,13 @@ importers:
 
   packages/crypto-hash-bcrypto:
     specifiers:
+      '@arkecosystem/container': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       bcrypto: 5.4.0
       uvu: ^0.5.3
     dependencies:
+      '@arkecosystem/container': link:../container
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       bcrypto: 5.4.0
     devDependencies:
@@ -1081,11 +1083,13 @@ importers:
 
   packages/crypto-hash-noble:
     specifiers:
+      '@arkecosystem/container': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       '@noble/hashes': ^1.0.0
       uvu: ^0.5.3
     dependencies:
+      '@arkecosystem/container': link:../container
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       '@noble/hashes': 1.0.0
     devDependencies:
@@ -1094,11 +1098,13 @@ importers:
 
   packages/crypto-hash-wasm:
     specifiers:
+      '@arkecosystem/container': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-contracts': workspace:*
       hash-wasm: ^4.9.0
       uvu: ^0.5.3
     dependencies:
+      '@arkecosystem/container': link:../container
       '@arkecosystem/crypto-contracts': link:../crypto-contracts
       hash-wasm: 4.9.0
     devDependencies:
