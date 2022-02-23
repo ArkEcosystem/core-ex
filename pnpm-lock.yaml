@@ -1296,7 +1296,6 @@ importers:
     specifiers:
       '@arkecosystem/core-database': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-test': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
@@ -1312,7 +1311,6 @@ importers:
       immutable: 4.0.0-rc.14
       joi: 17.4.2
     devDependencies:
-      '@arkecosystem/core-test': link:../core-test
       '@arkecosystem/core-test-framework': link:../core-test-framework
       delay: 4.4.1
       uvu: 0.5.3

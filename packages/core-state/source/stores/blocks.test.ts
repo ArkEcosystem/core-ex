@@ -1,6 +1,6 @@
 import { BlockStore } from "./blocks";
 import { Interfaces } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
 
 describe("BlockStore", ({ it, assert }) => {
 	it("should push and get a block", () => {

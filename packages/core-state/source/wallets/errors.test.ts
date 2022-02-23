@@ -1,5 +1,5 @@
 import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError, WalletsError } from "./errors";
-import { describe } from "@arkecosystem/core-test";
+import { describe } from "@arkecosystem/core-test-framework";
 
 describe("WalletErrors", ({ it, assert }) => {
 	it("should construct base wallet error", () => {
@@ -10,7 +10,6 @@ describe("WalletErrors", ({ it, assert }) => {
 			() => {
 				throw error;
 			},
-			undefined,
 			message,
 		);
 
@@ -25,7 +24,6 @@ describe("WalletErrors", ({ it, assert }) => {
 			() => {
 				throw error;
 			},
-			undefined,
 			`The wallet index is already registered: ${message}`,
 		);
 
@@ -40,7 +38,6 @@ describe("WalletErrors", ({ it, assert }) => {
 			() => {
 				throw error;
 			},
-			undefined,
 			`The wallet index does not exist: ${message}`,
 		);
 
