@@ -39,21 +39,21 @@ describe<{
 
 		await serviceProvider.register();
 
-		assert.true(mockCreateConnection.calledWith());
-		assert.true(mockGetCustomRepository.calledTimes(3));
+		mockGetCustomRepository.calledTimes(3);
+		mockGetCustomRepository.calledTimes(3);
 
 		// assert.true(context.events.dispatch).toBeCalled();
 
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseConnection), true);
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseRoundRepository), true);
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseBlockRepository), true);
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseBlockFilter), true);
-		assert.is(context.app.isBound(Container.Identifiers.BlockHistoryService), true);
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseTransactionRepository), true);
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseTransactionFilter), true);
-		assert.is(context.app.isBound(Container.Identifiers.TransactionHistoryService), true);
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseModelConverter), true);
-		assert.is(context.app.isBound(Container.Identifiers.DatabaseService), true);
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseConnection));
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseRoundRepository));
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseBlockRepository));
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseBlockFilter));
+		assert.true(context.app.isBound(Container.Identifiers.BlockHistoryService));
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseTransactionRepository));
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseTransactionFilter));
+		assert.true(context.app.isBound(Container.Identifiers.TransactionHistoryService));
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseModelConverter));
+		assert.true(context.app.isBound(Container.Identifiers.DatabaseService));
 	});
 
 	it("boot should call DatabaseService.initialize method", async (context) => {
