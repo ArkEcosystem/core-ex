@@ -93,7 +93,6 @@ describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider.configSchema", ({ assert, beforeEach, it }) => {
-
 	beforeEach((context) => {
 		context.app = new Application(new Container.Container());
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
@@ -141,7 +140,9 @@ describe<{
 	it("should return value of process.env.CORE_DB_HOST if defined", async (context) => {
 		process.env.CORE_DB_HOST = "custom_hostname";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate((await import("./defaults")).defaults);
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(
+			(await import("./defaults")).defaults,
+		);
 
 		assert.undefined(result.error);
 		assert.equal(result.value.connection.host, "custom_hostname");
@@ -150,7 +151,9 @@ describe<{
 	it("should return value of process.env.CORE_DB_PORT if defined", async (context) => {
 		process.env.CORE_DB_PORT = "123";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate((await import("./defaults")).defaults);
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(
+			(await import("./defaults")).defaults,
+		);
 
 		assert.undefined(result.error);
 		assert.equal(result.value.connection.port, 123);
@@ -159,7 +162,9 @@ describe<{
 	it("should return value of process.env.CORE_DB_DATABASE if defined", async (context) => {
 		process.env.CORE_DB_DATABASE = "custom_database";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate((await import("./defaults")).defaults);
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(
+			(await import("./defaults")).defaults,
+		);
 
 		assert.undefined(result.error);
 		assert.equal(result.value.connection.database, "custom_database");
@@ -168,7 +173,9 @@ describe<{
 	it("should return value of process.env.CORE_DB_USERNAME if defined", async (context) => {
 		process.env.CORE_DB_USERNAME = "custom_username";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate((await import("./defaults")).defaults);
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(
+			(await import("./defaults")).defaults,
+		);
 
 		assert.undefined(result.error);
 		assert.equal(result.value.connection.username, "custom_username");
@@ -177,7 +184,9 @@ describe<{
 	it("should return value of process.env.CORE_DB_PASSWORD if defined", async (context) => {
 		process.env.CORE_DB_PASSWORD = "custom_password";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate((await import("./defaults")).defaults);
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(
+			(await import("./defaults")).defaults,
+		);
 
 		assert.undefined(result.error);
 		assert.equal(result.value.connection.password, "custom_password");
