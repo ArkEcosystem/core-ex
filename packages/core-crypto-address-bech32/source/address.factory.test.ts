@@ -5,7 +5,7 @@ import { KeyPairFactory as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecds
 import { KeyPairFactory as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { AddressFactory } from "./index";
+import { AddressFactory } from "./address.factory";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
@@ -20,7 +20,7 @@ describe<{ container: Container.Container }>("AddressFactory", ({ assert, before
 			network: {
 				// @ts-ignore
 				address: {
-					base58: 23,
+					bech32: "mod",
 				},
 			},
 		});
@@ -31,7 +31,7 @@ describe<{ container: Container.Container }>("AddressFactory", ({ assert, before
 
 		assert.is(
 			await context.container.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8",
+			"mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur",
 		);
 	});
 
@@ -40,7 +40,7 @@ describe<{ container: Container.Container }>("AddressFactory", ({ assert, before
 
 		assert.is(
 			await context.container.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
+			"mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
 		);
 	});
 
@@ -51,7 +51,7 @@ describe<{ container: Container.Container }>("AddressFactory", ({ assert, before
 			await context.container
 				.resolve(AddressFactory)
 				.fromPublicKey(Buffer.from("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex")),
-			"AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8",
+			"mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur",
 		);
 	});
 
@@ -64,15 +64,23 @@ describe<{ container: Container.Container }>("AddressFactory", ({ assert, before
 				.fromPublicKey(
 					Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
 				),
-			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
+			"mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
 		);
 	});
 
 	it("should validate addresses", async (context) => {
 		context.container.bind(BINDINGS.Identity.KeyPairFactory).to(ECDSA).inSingletonScope();
 
-		assert.true(await context.container.resolve(AddressFactory).validate("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu"));
-		assert.true(await context.container.resolve(AddressFactory).validate("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu"));
+		assert.true(
+			await context.container
+				.resolve(AddressFactory)
+				.validate("mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"),
+		);
+		assert.true(
+			await context.container
+				.resolve(AddressFactory)
+				.validate("mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur"),
+		);
 		assert.false(
 			await context.container
 				.resolve(AddressFactory)

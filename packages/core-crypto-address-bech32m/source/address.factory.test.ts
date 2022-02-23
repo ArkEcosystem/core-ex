@@ -5,7 +5,7 @@ import { KeyPairFactory as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecds
 import { KeyPairFactory as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { AddressFactory } from "./index";
+import { AddressFactory } from "./address.factory";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
