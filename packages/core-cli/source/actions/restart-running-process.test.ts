@@ -16,13 +16,13 @@ describe<{
 	};
 
 	const restartProcess: Partial<RestartProcess> = {
-		execute: (processName: string) => {}
-	}
+		execute: (processName: string) => {},
+	};
 
 	const spyOnExecute = spy(restartProcess, "execute");
 
 	beforeEach((context) => {
-		spyOnExecute.resetHistory()
+		spyOnExecute.resetHistory();
 
 		const app = new Container();
 		app.bind(Identifiers.Application).toConstantValue(app);
@@ -37,7 +37,7 @@ describe<{
 		action.execute(processName);
 
 		assert.equal(spyOnExecute.callCount, 0);
-		spyIsOnline.calledOnce()
+		spyIsOnline.calledOnce();
 	});
 
 	it("should restart the process", ({ action }) => {
@@ -46,6 +46,6 @@ describe<{
 		action.execute(processName);
 
 		assert.true(spyOnExecute.calledOnce);
-		spyIsOnline.calledOnce()
+		spyIsOnline.calledOnce();
 	});
 });
