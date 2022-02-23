@@ -14,7 +14,7 @@ describe<{
 	roundRepository: any;
 	events: any;
 	logger: any;
-}>("DatabaseService", ({ afterEach, assert, beforeEach, it, spy, stub }) => {
+}>("DatabaseService", ({ afterEach, assert, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
 		context.app = {
 			get: () => undefined,
@@ -84,7 +84,7 @@ describe<{
 	});
 
 	it("initialize should reset database when CORE_RESET_DATABASE variable is set", async (context) => {
-		context.connection.query = spy();
+		context.connection.query = spyFn();
 
 		const databaseService = context.container.resolve(DatabaseService);
 
@@ -98,7 +98,7 @@ describe<{
 	});
 
 	it("initialize should terminate app if exception was raised", async (context) => {
-		context.app.terminate = spy();
+		context.app.terminate = spyFn();
 
 		const databaseService = context.container.resolve(DatabaseService);
 
@@ -114,7 +114,7 @@ describe<{
 	});
 
 	it("disconnect should close connection", async (context) => {
-		context.connection.close = spy();
+		context.connection.close = spyFn();
 
 		const databaseService = context.container.resolve(DatabaseService);
 		await databaseService.disconnect();
@@ -123,7 +123,7 @@ describe<{
 	});
 
 	it("disconnect should emit disconnect events", async (context) => {
-		context.events.dispatch = spy();
+		context.events.dispatch = spyFn();
 
 		const databaseService = context.container.resolve(DatabaseService);
 		await databaseService.disconnect();
@@ -133,7 +133,7 @@ describe<{
 	});
 
 	it("reset should reset database", async (context) => {
-		context.connection.query = spy();
+		context.connection.query = spyFn();
 
 		const databaseService = context.container.resolve(DatabaseService);
 
@@ -152,7 +152,6 @@ describe<{
 		stub(context.transactionRepository, "find").returnValueOnce(block.transactions);
 
 		const result = await databaseService.getBlock(block.data.id);
-		Object.assign(result, { getBlockTimeStampLookup: block["getBlockTimeStampLookup"] });
 
 		context.blockRepository.findOne.calledWith(block.data.id);
 		context.transactionRepository.find.calledWith({ blockId: block.data.id });
@@ -212,7 +211,11 @@ describe<{
 		const block101 = { height: 101, transactions: [] };
 		const block102 = { height: 102, transactions: [] };
 
-		stub(context.blockRepository, "findByHeightRangeWithTransactionsForDownload").returnValueOnce([block100, block101, block102]);
+		stub(context.blockRepository, "findByHeightRangeWithTransactionsForDownload").returnValueOnce([
+			block100,
+			block101,
+			block102,
+		]);
 
 		const result = await databaseService.getBlocksForDownload(100, 3);
 
@@ -246,90 +249,94 @@ describe<{
 		assert.undefined(result);
 	});
 
-	it.only("getLastBlock should return last block from repository", async (context) => {
+	it("getLastBlock should return last block from repository", async (context) => {
 		const databaseService = context.container.resolve(DatabaseService);
 
 		const lastBlock = Blocks.BlockFactory.fromData(block1760000);
-		context.blockRepository.findLatest.mockResolvedValueOnce({ ...lastBlock.data });
-		context.transactionRepository.findByBlockIds.mockResolvedValueOnce(lastBlock.transactions);
+		stub(context.blockRepository, "findLatest").returnValueOnce({ ...lastBlock.data });
+		stub(context.transactionRepository, "findByBlockIds").returnValueOnce(lastBlock.transactions);
 
 		const result = await databaseService.getLastBlock();
-		Object.assign(result, { getBlockTimeStampLookup: lastBlock["getBlockTimeStampLookup"] });
 
-		expect(context.blockRepository.findLatest).toBeCalled();
-		expect(context.transactionRepository.findByBlockIds).toBeCalledWith([lastBlock.data.id]);
-		expect(result).toEqual(lastBlock);
+		context.blockRepository.findLatest.calledWith();
+		context.transactionRepository.findByBlockIds.calledWith([lastBlock.data.id]);
+		assert.equal(result, lastBlock);
 	});
 
 	it("getTopBlocks should return top blocks with transactions", async (context) => {
 		const databaseService = context.container.resolve(DatabaseService);
 
 		const block = Blocks.BlockFactory.fromData(block1760000);
-		context.blockRepository.findTop.mockResolvedValueOnce([block.data]);
+		stub(context.blockRepository, "findTop").returnValueOnce([block.data]);
 
 		const dbTransactions = block.transactions.map((t) => ({
 			id: t.data.id,
 			blockId: block.data.id,
 			serialized: t.serialized,
 		}));
-		context.transactionRepository.findByBlockIds.mockResolvedValueOnce(dbTransactions);
+		stub(context.transactionRepository, "findByBlockIds").returnValueOnce(dbTransactions);
 
 		const topCount = 1;
 		const result = await databaseService.getTopBlocks(topCount);
 
-		expect(context.blockRepository.findTop).toBeCalledWith(topCount);
-		expect(context.transactionRepository.findByBlockIds).toBeCalledWith([block.data.id]);
-		expect(result).toEqual([block.data]);
+		context.blockRepository.findTop.calledWith(topCount);
+		context.transactionRepository.findByBlockIds.calledWith([block.data.id]);
+		assert.equal(result, [block.data]);
 	});
 
 	it("getTopBlocks should return empty array when there are no blocks", async (context) => {
 		const databaseService = context.container.resolve(DatabaseService);
 
-		context.blockRepository.findTop.mockResolvedValueOnce([]);
+		stub(context.blockRepository, "findTop").returnValueOnce([]);
 
 		const topCount = 1;
 		const result = await databaseService.getTopBlocks(topCount);
 
-		expect(context.blockRepository.findTop).toBeCalledWith(topCount);
-		expect(result).toEqual([]);
+		context.blockRepository.findTop.calledWith(topCount);
+		assert.equal(result, []);
 	});
 
 	it("getTransaction should return transaction from transaction repository", async (context) => {
 		const databaseService = context.container.resolve(DatabaseService);
 
 		const dbTransaction = {};
-		context.transactionRepository.findOne.mockResolvedValueOnce(dbTransaction);
+		stub(context.transactionRepository, "findOne").returnValueOnce(dbTransaction);
 
 		const transactionId = "123";
 		const result = await databaseService.getTransaction(transactionId);
 
-		expect(context.transactionRepository.findOne).toBeCalledWith(transactionId);
-		expect(result).toBe(dbTransaction);
+		context.transactionRepository.findOne.calledWith(transactionId);
+		assert.is(result, dbTransaction);
 	});
 
 	it("saveRound should save delegates to round repository and fire events", async (context) => {
 		const databaseService = context.container.resolve(DatabaseService);
 
 		const round = 2;
-		const delegate1 = { publicKey: "delegate1 public key", getAttribute: spy() };
-		const delegate2 = { publicKey: "delegate2 public key", getAttribute: spy() };
-		delegate1.getAttribute.mockReturnValueOnce(round);
+		const delegate1 = { publicKey: "delegate1 public key", getAttribute: () => undefined };
+		const delegate2 = { publicKey: "delegate2 public key", getAttribute: () => undefined };
+
+		stub(delegate1, "getAttribute").returnValueOnce(round);
+		spy(context.roundRepository, "save");
+		spy(context.events, "dispatch");
 
 		const activeDelegates = [delegate1, delegate2];
 		await databaseService.saveRound(activeDelegates as any);
 
-		expect(delegate1.getAttribute).toBeCalledWith("delegate.round");
-		expect(context.roundRepository.save).toBeCalledWith(activeDelegates);
-		expect(context.events.dispatch).toBeCalledWith("round.created", activeDelegates);
+		delegate1.getAttribute.calledWith("delegate.round");
+		assert.true(context.roundRepository.save.calledWith(activeDelegates));
+		assert.true(context.events.dispatch.calledWith("round.created", activeDelegates));
 	});
 
 	it("deleteRound should delete round from round repository", async (context) => {
 		const databaseService = context.container.resolve(DatabaseService);
 
+		spy(context.roundRepository, "deleteFrom");
+
 		const round = 2;
 		await databaseService.deleteRound(round);
 
-		expect(context.roundRepository.deleteFrom).toBeCalledWith(round);
+		assert.true(context.roundRepository.deleteFrom.calledWith(round));
 	});
 
 	it("verifyBlockchain should return false when there are no blocks", async (context) => {
@@ -341,16 +348,16 @@ describe<{
 		const totalAmount = "0";
 
 		const blockStats = { numberOfTransactions, totalFee, totalAmount, count: numberOfBlocks };
-		context.blockRepository.getStatistics.mockResolvedValueOnce(blockStats);
+		stub(context.blockRepository, "getStatistics").returnValueOnce(blockStats);
 
 		const transactionStats = { totalFee, totalAmount, count: numberOfTransactions };
-		context.transactionRepository.getStatistics.mockResolvedValueOnce(transactionStats);
+		stub(context.transactionRepository, "getStatistics").returnValueOnce(transactionStats);
 
 		const result = await databaseService.verifyBlockchain();
 
-		expect(context.blockRepository.getStatistics).toBeCalledWith();
-		expect(context.transactionRepository.getStatistics).toBeCalledWith();
-		expect(result).toBe(false);
+		context.blockRepository.getStatistics.calledWith();
+		context.transactionRepository.getStatistics.calledWith();
+		assert.false(result);
 	});
 
 	it("verifyBlockchain should return false when there are discrepancies", async (context) => {
@@ -363,24 +370,24 @@ describe<{
 		const totalFee = "100000";
 		const totalAmount = "10000000";
 
-		context.blockRepository.count.mockResolvedValueOnce(numberOfBlocks + 1);
+		stub(context.blockRepository, "count").returnValueOnce(numberOfBlocks + 1);
 
 		const blockStats = { numberOfTransactions, totalFee, totalAmount, count: numberOfBlocks };
-		context.blockRepository.getStatistics.mockResolvedValueOnce(blockStats);
+		stub(context.blockRepository, "getStatistics").returnValueOnce(blockStats);
 
 		const transactionStats = {
 			totalFee: totalAmount,
 			totalAmount: totalFee,
 			count: numberOfTransactions + 1,
 		};
-		context.transactionRepository.getStatistics.mockResolvedValueOnce(transactionStats);
+		stub(context.transactionRepository, "getStatistics").returnValueOnce(transactionStats);
 
 		const result = await databaseService.verifyBlockchain(lastBlock);
 
-		expect(context.blockRepository.count).toBeCalledWith();
-		expect(context.blockRepository.getStatistics).toBeCalledWith();
-		expect(context.transactionRepository.getStatistics).toBeCalledWith();
-		expect(result).toBe(false);
+		context.blockRepository.count.calledWith();
+		context.blockRepository.getStatistics.calledWith();
+		context.transactionRepository.getStatistics.calledWith();
+		assert.false(result);
 	});
 
 	it("verifyBlockchain should check last block statistics", async (context) => {
@@ -393,19 +400,19 @@ describe<{
 		const totalFee = "100000";
 		const totalAmount = "10000000";
 
-		context.blockRepository.count.mockResolvedValueOnce(numberOfBlocks);
+		stub(context.blockRepository, "count").returnValueOnce(numberOfBlocks);
 
 		const blockStats = { numberOfTransactions, totalFee, totalAmount, count: numberOfBlocks };
-		context.blockRepository.getStatistics.mockResolvedValueOnce(blockStats);
+		stub(context.blockRepository, "getStatistics").returnValueOnce(blockStats);
 
 		const transactionStats = { totalFee, totalAmount, count: numberOfTransactions };
-		context.transactionRepository.getStatistics.mockResolvedValueOnce(transactionStats);
+		stub(context.transactionRepository, "getStatistics").returnValueOnce(transactionStats);
 
 		const result = await databaseService.verifyBlockchain(lastBlock);
 
-		expect(context.blockRepository.count).toBeCalled();
-		expect(context.blockRepository.getStatistics).toBeCalled();
-		expect(context.transactionRepository.getStatistics).toBeCalled();
-		expect(result).toBe(true);
+		context.blockRepository.count.calledWith();
+		context.blockRepository.getStatistics.calledWith();
+		context.transactionRepository.getStatistics.calledWith();
+		assert.true(result);
 	});
 });
