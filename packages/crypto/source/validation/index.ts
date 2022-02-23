@@ -1,4 +1,4 @@
-import Ajv from "ajv";
+import Ajv, { SchemaObject, ValidateFunction } from "ajv";
 import ajvKeywords from "ajv-keywords";
 import addFormats from "ajv-formats";
 import { ISchemaValidationResult } from "../interfaces";
@@ -9,7 +9,8 @@ import { schemas } from "./schemas";
 
 export class Validator {
 	private ajv: Ajv;
-	private readonly transactionSchemas: Map<string, TransactionSchema> = new Map<string, TransactionSchema>();
+	private readonly transactionSchemas = new Map<string, TransactionSchema>();
+	private compiledSchemas = new Map<string, ValidateFunction>();
 
 	private constructor(options: Record<string, any>) {
 		this.ajv = this.instantiateAjv(options);
@@ -23,11 +24,11 @@ export class Validator {
 		return this.ajv;
 	}
 
-	public validate<T = any>(schemaKeyRef: string | boolean | object, data: T): ISchemaValidationResult<T> {
+	public validate<T = any>(schemaKeyRef: string | SchemaObject, data: T): ISchemaValidationResult<T> {
 		return this.validateSchema(this.ajv, schemaKeyRef, data);
 	}
 
-	public validateException<T = any>(schemaKeyRef: string | boolean | object, data: T): ISchemaValidationResult<T> {
+	public validateException<T = any>(schemaKeyRef: string | SchemaObject, data: T): ISchemaValidationResult<T> {
 		const ajv = this.instantiateAjv({ allErrors: true, verbose: true });
 
 		for (const schema of this.transactionSchemas.values()) {
@@ -41,20 +42,33 @@ export class Validator {
 		this.extendTransactionSchema(this.ajv, schema, remove);
 	}
 
-	private validateSchema<T = any>(
-		ajv: Ajv,
-		schemaKeyRef: string | boolean | object,
-		data: T,
-	): ISchemaValidationResult<T> {
+	private validateSchema<T = any>(ajv: Ajv, schemaKeyRef: string | SchemaObject, data: T): ISchemaValidationResult<T> {
 		try {
-			ajv.validate(schemaKeyRef, data);
+			const validate = this.getValidationFunction(ajv, schemaKeyRef);
 
-			const error = ajv.errors ? ajv.errorsText() : undefined;
+			validate(data);
 
-			return { error, errors: ajv.errors || undefined, value: data };
+			const error = validate.errors ? validate.errors[0].message : undefined;
+
+			return { error, errors: validate.errors || undefined, value: data };
 		} catch (error) {
 			return { error: error.stack, errors: [], value: undefined };
 		}
+	}
+
+	private getValidationFunction(ajv: Ajv, schemaKeyRef: string | SchemaObject): ValidateFunction {
+		// Schemas passed as an object are only happening in a hapi-ajv plugin...
+		// Since they are user-defined, we will always compile these on runtime...
+		if (typeof schemaKeyRef !== "string") {
+			return ajv.compile(schemaKeyRef);
+		}
+
+		if (! this.compiledSchemas.has(schemaKeyRef)) {
+			// `getSchema()` also compiles schema...
+			this.compiledSchemas.set(schemaKeyRef, ajv.getSchema(schemaKeyRef));
+		}
+
+		return this.compiledSchemas.get(schemaKeyRef);
 	}
 
 	private instantiateAjv(options: Record<string, any>) {
