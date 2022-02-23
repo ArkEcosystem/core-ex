@@ -1,4 +1,5 @@
 import { Callback, Context, suite, Test } from "uvu";
+import sinon from "sinon";
 import { z as schema } from "zod";
 
 import { assert } from "./assert";
@@ -27,6 +28,7 @@ interface CallbackArguments<T> {
 	schema: typeof schema;
 	skip: Function;
 	spy: (owner?: object, method?: string) => Spy;
+	spyFn: sinon.SinonSpyStatic;
 	stub: (owner: object, method: string) => Stub;
 }
 
@@ -80,6 +82,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 
 			return result;
 		},
+		spyFn: sinon.spy,
 		stub: (owner: object, method: string) => {
 			const result: Stub = new Stub(owner, method);
 

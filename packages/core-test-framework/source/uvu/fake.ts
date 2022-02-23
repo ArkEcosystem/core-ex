@@ -1,10 +1,14 @@
-import { ok } from "uvu/assert";
+import assert from "uvu/assert";
 
 export class Fake<T> {
 	protected subject;
 
 	public calledWith(...arguments_: any[]): void {
-		ok(this.subject.calledWith(...arguments_));
+		assert.ok(this.subject.calledWith(...arguments_));
+	}
+
+	public notCalledWith(...arguments_: any[]): void {
+		assert.not.ok(this.subject.calledWith(...arguments_));
 	}
 
 	public calledOnce(): void {
@@ -12,7 +16,7 @@ export class Fake<T> {
 	}
 
 	public calledTimes(times: number): void {
-		ok(this.subject.callCount === times);
+		assert.ok(this.subject.callCount === times);
 	}
 
 	public neverCalled(): void {
