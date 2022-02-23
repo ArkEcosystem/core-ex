@@ -7,8 +7,8 @@ import importFresh from "import-fresh";
 let app: Application;
 
 const importDefaults = () =>
- 	// @ts-ignore
- 	importFresh("../distribution/defaults.js").defaults;
+	// @ts-ignore
+	importFresh("../distribution/defaults.js").defaults;
 
 describe("ServiceProvider", ({ beforeEach, it, assert, stub }) => {
 	let serviceProvider: ServiceProvider;
@@ -144,7 +144,10 @@ describe("ServiceProvider", ({ beforeEach, it, assert, stub }) => {
 				defaults.storage.maxLastTransactionIds = 0;
 				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-				assert.equal(result.error!.message, '"storage.maxLastTransactionIds" must be greater than or equal to 1');
+				assert.equal(
+					result.error!.message,
+					'"storage.maxLastTransactionIds" must be greater than or equal to 1',
+				);
 
 				delete defaults.storage.maxLastTransactionIds;
 				result = (serviceProvider.configSchema() as AnySchema).validate(defaults);
