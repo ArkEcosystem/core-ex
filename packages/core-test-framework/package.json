@@ -16,7 +16,6 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core": "workspace:*",
-		"@arkecosystem/core-api": "workspace:*",
 		"@arkecosystem/core-blockchain": "workspace:*",
 		"@arkecosystem/core-cli": "workspace:*",
 		"@arkecosystem/core-forger": "workspace:*",
