@@ -112,9 +112,7 @@ describe("ServiceProvider.configSchema", () => {
 
 	it("should validate schema using defaults", async () => {
 		jest.resetModules();
-		const result = (serviceProvider.configSchema() as AnySchema).validate(
-			(await import("./defaults")).defaults,
-		);
+		const result = (serviceProvider.configSchema() as AnySchema).validate((await import("./defaults")).defaults);
 
 		expect(result.error).toBeUndefined();
 
