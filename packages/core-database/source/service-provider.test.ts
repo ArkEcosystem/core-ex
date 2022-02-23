@@ -25,10 +25,8 @@ describe<{
 	});
 
 	it.only("register should connect to database, bind triggers, and bind services", async (context) => {
-		const mockCreateConnection = stub(typeorm, "createConnection").callsFake(() => {
-			console.log("hello world")
-		});
-		const mockGetCustomRepository = spy(typeorm, "getCustomRepository");
+		const mockCreateConnection = stub(typeorm, "createConnection").callsFake(spyFn());
+		const mockGetCustomRepository = stub(typeorm, "getCustomRepository").callsFake(spyFn());
 
 		// typeorm.createConnection = spyFn();
 		// typeorm.getCustomRepository = spyFn();

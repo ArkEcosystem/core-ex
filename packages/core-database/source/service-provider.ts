@@ -63,8 +63,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			connection.logger = this.app.get(Container.Identifiers.DatabaseLogger);
 		}
 
-		console.log(typeorm.createConnection)
-
 		return typeorm.createConnection({
 			...(connection as any),
 			namingStrategy: new SnakeNamingStrategy(),
