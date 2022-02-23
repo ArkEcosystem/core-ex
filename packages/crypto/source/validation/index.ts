@@ -82,7 +82,6 @@ export class Validator {
 			$data: true,
 			removeAdditional: true,
 			schemas,
-			jsPropertySyntax: true,
 			...options,
 		});
 
