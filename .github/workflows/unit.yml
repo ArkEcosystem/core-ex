@@ -1,5 +1,5 @@
 jobs:
-    test:
+    unit:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
