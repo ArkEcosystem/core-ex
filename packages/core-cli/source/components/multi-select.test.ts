@@ -7,7 +7,7 @@ import { MultiSelect } from "./multi-select";
 describe<{
 	component: MultiSelect
 	cli: Console
-}>("Listing", ({beforeEach, it, assert, spy}) => {
+}>("MultiSelect", ({beforeEach, it, assert, spy}) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.cli.app.rebind(Identifiers.MultiSelect).to(MultiSelect).inSingletonScope();
