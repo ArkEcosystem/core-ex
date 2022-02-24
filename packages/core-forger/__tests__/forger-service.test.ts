@@ -14,7 +14,7 @@ import { Slots } from "@packages/crypto/distribution/crypto";
 import { Address } from "@packages/crypto/source/identities";
 import { BuilderFactory } from "@packages/crypto/source/transactions";
 
-import { calculateActiveDelegates } from "./__utils__/calculate-active-delegates";
+import { calculateActiveDelegates } from "../test/calculate-active-delegates";
 
 let sandbox: Sandbox;
 

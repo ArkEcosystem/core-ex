@@ -6,8 +6,8 @@ import { Utils } from "@packages/core-kernel";
 import { Wallet } from "@packages/core-state/source/wallets";
 import { Crypto, Managers } from "@packages/crypto";
 
-import { calculateActiveDelegates } from "./__utils__/calculate-active-delegates";
-import { dummy } from "./__utils__/create-block-with-transactions";
+import { calculateActiveDelegates } from "../test/calculate-active-delegates";
+import { dummy } from "../test/create-block-with-transactions";
 import { mockLastBlock, setup } from "./setup";
 
 let delegateTracker: DelegateTracker;

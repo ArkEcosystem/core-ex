@@ -4,7 +4,7 @@ import { Client } from "@packages/core-forger/source/client";
 import { Application, Container } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus, Nes, Codecs } from "@arkecosystem/core-p2p";
 
-import { forgedBlockWithTransactions } from "./__utils__/create-block-with-transactions";
+import { forgedBlockWithTransactions } from "../test/create-block-with-transactions";
 
 import { nesClient } from "./mocks/nes";
 
