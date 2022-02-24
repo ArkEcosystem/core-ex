@@ -13,7 +13,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "uvu -r tsm source service-provider.test.ts",
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
@@ -26,6 +26,9 @@
 		"reflect-metadata": "0.1.13",
 		"typeorm": "0.2.25",
 		"uvu": "^0.5.3"
+	},
+	"devDependencies": {
+		"import-fresh": "3.3.0"
 	},
 	"engines": {
 		"node": ">=16.x"
