@@ -64,10 +64,6 @@ export class Two extends Transaction {
 		return super.staticFee(configuration, feeContext);
 	}
 
-	public async verify(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 && (await super.verify());
-	}
-
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;

@@ -511,7 +511,6 @@ export class Command extends Commands.Command {
 		return [
 			{
 				activeDelegates: options.delegates,
-				aip11: true,
 				block: {
 					idFullSha256: true,
 					maxPayload: options.maxBlockPayload,
@@ -543,8 +542,6 @@ export class Command extends Commands.Command {
 	}
 
 	private generateCryptoGenesisBlock(genesisWallet, delegates, options: Options) {
-		// we need to set aip11 and network.pubKeyHash for tx builder to build v2 txs without issue
-		Managers.configManager.getMilestone().aip11 = true;
 		Managers.configManager.set("network.pubKeyHash", options.pubKeyHash);
 		Managers.configManager.getMilestone().block = { idFullSha256: true }; // so that generated block has full sha256 id
 

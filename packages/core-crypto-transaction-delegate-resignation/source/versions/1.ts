@@ -4,7 +4,7 @@ import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
-export abstract class Two extends Transaction {
+export abstract class One extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.DelegateResignation;
 	public static key = "delegateResignation";
@@ -21,10 +21,6 @@ export abstract class Two extends Transaction {
 				type: { transactionType: TransactionType.DelegateResignation },
 			},
 		});
-	}
-
-	public async verify(): Promise<boolean> {
-		return this.configuration.getMilestone().aip11 && (await super.verify());
 	}
 
 	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
