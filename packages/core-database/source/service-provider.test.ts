@@ -13,7 +13,7 @@ describe<{
 	app: Application;
 	logger: any;
 	events: any;
-}>("ServiceProvider", ({ assert, beforeEach, it, spy, spyFn, stub }) => {
+}>("ServiceProvider", ({ assert, beforeEach, it, spyFn, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
 			debug: spyFn(),
@@ -43,8 +43,7 @@ describe<{
 
 		mockCreateConnection.calledOnce();
 		mockGetCustomRepository.calledTimes(3);
-
-		// assert.true(context.events.dispatch).calledWith();
+		assert.true(context.events.dispatch.calledWith());
 
 		assert.true(context.app.isBound(Container.Identifiers.DatabaseConnection));
 		assert.true(context.app.isBound(Container.Identifiers.DatabaseRoundRepository));
