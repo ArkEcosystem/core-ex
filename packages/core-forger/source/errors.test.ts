@@ -1,33 +1,33 @@
-import "jest-extended";
+import { describe } from "@arkecosystem/core-test-framework";
 
-import { ForgerError, HostNoResponseError, RelayCommunicationError } from "../source/errors";
+import { ForgerError, HostNoResponseError, RelayCommunicationError } from "./errors";
 
-describe("Errors", () => {
+describe("Errors", ({ assert, it, spy }) => {
 	it("should construct base ForgerError", () => {
 		const message = "I am an error";
 		const error = new ForgerError(message);
-		expect(() => {
+		assert.rejects(() => {
 			throw error;
-		}).toThrow(message);
-		expect(error.stack).toBeDefined();
+		}, message);
+		assert.defined(error.stack);
 	});
 
 	it("should construct RelayCommunicationError", () => {
 		const message = "custom message";
 		const endpoint = "test_endpoint";
 		const error = new RelayCommunicationError(endpoint, message);
-		expect(() => {
+		assert.rejects(() => {
 			throw error;
-		}).toThrow(`Request to ${endpoint} failed, because of '${message}'.`);
-		expect(error.stack).toBeDefined();
+		}, `Request to ${endpoint} failed, because of '${message}'.`);
+		assert.defined(error.stack);
 	});
 
 	it("should construct HostNoResponseError", () => {
 		const host = "custom host";
 		const error = new HostNoResponseError(host);
-		expect(() => {
+		assert.rejects(() => {
 			throw error;
-		}).toThrow(`${host} didn't respond. Trying again later.`);
-		expect(error.stack).toBeDefined();
+		}, `${host} didn't respond. Trying again later.`);
+		assert.defined(error.stack);
 	});
 });
