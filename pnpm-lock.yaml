@@ -1153,9 +1153,9 @@ importers:
       pg: 8.7.1
       reflect-metadata: 0.1.13
       typeorm: 0.2.25
-      uvu: 0.5.3
     devDependencies:
       import-fresh: 3.3.0
+      uvu: 0.5.3
 
   packages/core-forger:
     specifiers:
