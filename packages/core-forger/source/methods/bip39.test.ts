@@ -1,16 +1,17 @@
-import { BIP39 } from "../../source/methods/bip39";
+import { BIP39 } from "./bip39";
 import { Identities } from "@arkecosystem/crypto";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { dummy, optionsDefault, transactions } from "../../test/create-block-with-transactions";
 
 const passphrase: string = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";
 
-describe("Methods -> BIP39", () => {
+describe("Methods -> BIP39", ({ assert, it }) => {
 	it("should be ok with a plain text passphrase", () => {
 		const delegate = new BIP39(passphrase);
 
-		expect(delegate.publicKey).toBe(Identities.PublicKey.fromPassphrase(passphrase));
-		expect(delegate.address).toBe(Identities.Address.fromPassphrase(passphrase));
+		assert.is(delegate.publicKey, Identities.PublicKey.fromPassphrase(passphrase));
+		assert.is(delegate.address, Identities.Address.fromPassphrase(passphrase));
 	});
 
 	it.skip("should forge a block", () => {
@@ -18,12 +19,12 @@ describe("Methods -> BIP39", () => {
 
 		const block = delegate.forge(transactions, optionsDefault);
 
-		expect(block.verification).toEqual({
+		assert.equal(block.verification, {
 			containsMultiSignatures: false,
 			errors: [],
 			verified: true,
 		});
-		expect(block.transactions).toHaveLength(50);
-		expect(block.transactions[0].id).toBe(transactions[0].id);
+		assert.length(block.transactions, 50);
+		assert.is(block.transactions[0].id, transactions[0].id);
 	});
 });

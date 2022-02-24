@@ -1,4 +1,4 @@
-import { BIP39 } from "../../source/methods/bip39";
+import { BIP39 } from "../source/methods/bip39";
 import { TransactionFactory } from "@arkecosystem/core-test-framework/source/utils/transaction-factory";
 import { Utils } from "@arkecosystem/crypto";
 
