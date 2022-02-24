@@ -1,50 +1,51 @@
 import { Identities } from "@arkecosystem/crypto";
-import { BIP38 } from "../../source/methods/bip38";
+import { describe } from "@arkecosystem/core-test-framework";
+import { BIP38 } from "./bip38";
 
 import { dummy, expectedBlock, optionsDefault, transactions } from "../../test/create-block-with-transactions";
 
 const passphrase: string = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";
 const bip38: string = "6PYTQC4c2vBv6PGvV4HibNni6wNsHsGbR1qpL1DfkCNihsiWwXnjvJMU4B";
 
-describe("Methods -> BIP38", () => {
+describe("Methods -> BIP38", ({ assert, it, spy }) => {
 	it("should pass with a valid passphrase", () => {
 		const delegate = new BIP38(bip38, "bip38-password");
 
-		expect(delegate.publicKey).toBe(Identities.PublicKey.fromPassphrase(passphrase));
-		expect(delegate.address).toBe(Identities.Address.fromPassphrase(passphrase));
+		assert.is(delegate.publicKey, Identities.PublicKey.fromPassphrase(passphrase));
+		assert.is(delegate.address, Identities.Address.fromPassphrase(passphrase));
 	});
 
 	it("should fail with an invalid passphrase", () => {
-		expect(() => new BIP38(bip38, "invalid-password")).toThrow();
+		assert.rejects(() => new BIP38(bip38, "invalid-password"));
 	});
 
 	it.skip("should forge a block - bip38", () => {
 		const delegate = new BIP38(dummy.bip38Passphrase, "bip38-password");
 
-		const spyDecryptKeys = jest.spyOn(delegate as any, "decryptKeysWithOtp");
-		const spyEncryptKeys = jest.spyOn(delegate as any, "encryptKeysWithOtp");
+		const spyDecryptKeys = spy(delegate, "decryptKeysWithOtp");
+		const spyEncryptKeys = spy(delegate, "encryptKeysWithOtp");
 
 		const block = delegate.forge(transactions, optionsDefault);
 
-		expect(spyDecryptKeys).toHaveBeenCalledTimes(1);
-		expect(spyEncryptKeys).toHaveBeenCalledTimes(1);
+		assert.true(spyDecryptKeys.calledTimes(1));
+		assert.true(spyEncryptKeys.calledTimes(1));
 
 		for (const key of Object.keys(expectedBlock)) {
-			expect(block.data[key]).toEqual(expectedBlock[key]);
+			assert.equal(block.data[key], expectedBlock[key]);
 		}
-		expect(block.verification).toEqual({
+		assert.equal(block.verification, {
 			containsMultiSignatures: false,
 			errors: [],
 			verified: true,
 		});
-		expect(block.transactions).toHaveLength(50);
-		expect(block.transactions[0].id).toBe(transactions[0].id);
+		assert.length(block.transactions, 50);
+		assert.is(block.transactions[0].id, transactions[0].id);
 	});
 
 	it("should not forge a block if encryptedKeys are not set", () => {
 		const delegate = new BIP38(dummy.bip38Passphrase, "bip38-password");
 		delegate.encryptedKeys = undefined;
 
-		expect(() => delegate.forge(transactions, optionsDefault)).toThrow();
+		assert.rejects(() => delegate.forge(transactions, optionsDefault));
 	});
 });
