@@ -17,7 +17,8 @@ describe<{
 		const transaction = Blocks.BlockFactory.fromData(block1760000).transactions[0];
 		const models = modelConverter.getTransactionModels([transaction]);
 		models[0].nonce = Utils.BigNumber.make("1"); // set_row_nonce trigger
-		const data = modelConverter.getTransactionData(models);
+		const data = modelConverter
+			.getTransactionData(models);
 
 		assert.equal(data, [
 			{
