@@ -1,31 +1,28 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { describe, Sandbox } from "@arkecosystem/core-test-framework";
-import { LastForgedBlockRemoteAction } from "./last-forged-block";
-
-const mockBlock = {
-	data: {
-		id: "123",
-	},
-};
+import { NextSlotProcessAction } from "./next-slot";
 
 const mockForgerService = {
-	getLastForgedBlock: () => mockBlock,
+	getRemainingSlotTime: () => 1000,
 };
 
 describe<{
 	sandbox: Sandbox;
-	action: LastForgedBlockRemoteAction;
-}>("LastForgedBlockProcessAction", ({ assert, beforeEach, it }) => {
+	action: NextSlotProcessAction;
+}>("NextSlotProcessAction", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Container.Identifiers.ForgerService).toConstantValue(mockForgerService);
-		context.action = context.sandbox.app.resolve(LastForgedBlockRemoteAction);
-	});
 
-	it("should return last forged block", async (context) => {
+		context.sandbox.app.bind(Container.Identifiers.ForgerService).toConstantValue(mockForgerService);
+
+		context.action = context.sandbox.app.resolve(NextSlotProcessAction);
+	});
+	it("should return remaining time", async (context) => {
 		await assert.resolves(() => context.action.handler());
 		const result = await context.action.handler();
 
-		assert.equal(result, mockBlock.data);
+		assert.equal(result, {
+			remainingTime: 1000,
+		});
 	});
 });
