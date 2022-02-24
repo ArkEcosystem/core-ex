@@ -9,7 +9,7 @@ import { ModelConverter } from "./model-converter";
 import { BlockRepository, RoundRepository, TransactionRepository } from "./repositories";
 import { TransactionFilter } from "./transaction-filter";
 import { TransactionHistoryService } from "./transaction-history-service";
-import { typeorm } from "./typeorm.js";
+import { typeorm } from "./typeorm";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 import { WalletsTableService } from "./wallets-table-service";
 
@@ -52,9 +52,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return true;
 	}
 
-	public async connect(): Promise<typeorm.Connection> {
+	public async connect(): Promise<any> {
 		const connection: Record<string, any> = this.config().all().connection as any;
-		this.app
+
+		void this.app
 			.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService)
 			.dispatch(DatabaseEvent.PRE_CONNECT);
 
@@ -66,12 +67,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return typeorm.createConnection({
 			...(connection as any),
 			// TODO: expose entities to allow extending the models by plugins
-entities: [__dirname + "/models/*.js"],
-
-migrations: [__dirname + "/migrations/*.js"],
-
-migrationsRun: true,
-
+			entities: [__dirname + "/models/*.js"],
+			migrations: [__dirname + "/migrations/*.js"],
+			migrationsRun: true,
 			namingStrategy: new SnakeNamingStrategy(),
 		});
 	}
