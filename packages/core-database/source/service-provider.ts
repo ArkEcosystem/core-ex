@@ -1,5 +1,4 @@
 import { Container, Contracts, Providers } from "@arkecosystem/core-kernel";
-import { typeorm } from "./typeorm";
 import Joi from "joi";
 
 import { BlockFilter } from "./block-filter";
@@ -10,6 +9,7 @@ import { ModelConverter } from "./model-converter";
 import { BlockRepository, RoundRepository, TransactionRepository } from "./repositories";
 import { TransactionFilter } from "./transaction-filter";
 import { TransactionHistoryService } from "./transaction-history-service";
+import { typeorm } from "./typeorm.js";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 import { WalletsTableService } from "./wallets-table-service";
 
@@ -65,11 +65,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		return typeorm.createConnection({
 			...(connection as any),
-			namingStrategy: new SnakeNamingStrategy(),
-			migrations: [__dirname + "/migrations/*.js"],
-			migrationsRun: true,
 			// TODO: expose entities to allow extending the models by plugins
-			entities: [__dirname + "/models/*.js"],
+entities: [__dirname + "/models/*.js"],
+
+migrations: [__dirname + "/migrations/*.js"],
+
+migrationsRun: true,
+
+			namingStrategy: new SnakeNamingStrategy(),
 		});
 	}
 
@@ -88,15 +91,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): object {
 		return Joi.object({
 			connection: Joi.object({
-				type: Joi.string().required(),
-				host: Joi.string().required(),
-				port: Joi.number().integer().min(1).max(65535).required(),
 				database: Joi.string().required(),
-				username: Joi.string().required(),
-				password: Joi.string().required(),
 				entityPrefix: Joi.string().required(),
-				synchronize: Joi.bool().required(),
+				host: Joi.string().required(),
 				logging: Joi.bool().required(),
+				password: Joi.string().required(),
+				port: Joi.number().integer().min(1).max(65_535).required(),
+				synchronize: Joi.bool().required(),
+				type: Joi.string().required(),
+				username: Joi.string().required(),
 			}).required(),
 		}).unknown(true);
 	}
