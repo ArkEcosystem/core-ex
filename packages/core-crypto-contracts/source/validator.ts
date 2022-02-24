@@ -7,10 +7,7 @@ export interface ISchemaValidationResult<T = any> {
 }
 
 export interface IValidator {
-	validate<T = any>(
-		schemaKeyReference: string | boolean | object,
-		data: T,
-	): Promise<ISchemaValidationResult<T>>;
+	validate<T = any>(schemaKeyReference: string | boolean | object, data: T): Promise<ISchemaValidationResult<T>>;
 
 	addFormat(name: string, format: Ajv.FormatDefinition): void;
 

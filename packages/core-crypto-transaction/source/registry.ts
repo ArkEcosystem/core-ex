@@ -117,7 +117,7 @@ export class TransactionRegistry implements ITransactionRegistry {
 			// 	type: "array",
 			// });
 			// ajv.addSchema(schemas.block);
-		})
+		});
 	}
 }
 
