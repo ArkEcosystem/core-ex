@@ -23,7 +23,7 @@ exports["ajv.address"] = () => {
 };
 
 exports["ajv.alphanumeric"] = () => {
-	times(iterations, () => validator.validate("alphanumeric", "123456789"));
+	times(iterations, () => validator.validate("alphanumeric", "12345678"));
 };
 
 exports["ajv.base58"] = () => {
@@ -47,16 +47,17 @@ exports["ajv.hex"] = () => {
 };
 
 exports["ajv.publicKey"] = () => {
-	times(iterations, () => validator.validate("publicKey", "0123456789A0123456789A0123456789A0123456789A0123456789A0123456789A"));
+	times(iterations, () =>
+		validator.validate("publicKey", "0123456789A0123456789A0123456789A0123456789A0123456789A0123456789A"),
+	);
 };
 
 exports["ajv.transactionId"] = () => {
-	times(iterations, () => validator.validate("transactionId", "0123456789A0123456789A0123456789A0123456789A0123456789A012345678"));
+	times(iterations, () =>
+		validator.validate("transactionId", "0123456789A0123456789A0123456789A0123456789A0123456789A012345678"),
+	);
 };
 
 exports["ajv.uri"] = () => {
-	times(iterations, () => validator.validate("uri", [
-		"https://ark.io",
-		"https://ark.dev",
-	]));
+	times(iterations, () => validator.validate("uri", ["https://ark.io", "https://ark.dev"]));
 };
