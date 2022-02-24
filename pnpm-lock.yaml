@@ -1161,12 +1161,14 @@ importers:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
       joi: 17.4.2
       node-forge: 1.2.1
+      uvu: ^0.5.3
       wif: 2.0.6
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
@@ -1177,8 +1179,10 @@ importers:
       node-forge: 1.2.1
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      uvu: 0.5.3
 
   packages/core-kernel:
     specifiers:
