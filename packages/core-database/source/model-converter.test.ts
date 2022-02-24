@@ -27,7 +27,7 @@ describe<{
 		]);
 	});
 
-	it.only("getBlockData should convert block to model and back to data", (context) => {
+	it("getBlockData should convert block to model and back to data", (context) => {
 		const modelConverter = context.container.resolve(ModelConverter);
 		const block = Blocks.BlockFactory.fromData(block1760000);
 		const models = modelConverter.getBlockModels([block]);
