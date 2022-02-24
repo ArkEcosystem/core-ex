@@ -1,11 +1,11 @@
 import "jest-extended";
 
-import { DelegateTracker } from "@packages/core-forger/source/delegate-tracker";
-import { Container, Services } from "@packages/core-kernel";
-import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
-import { Wallet } from "@packages/core-state/source/wallets";
-import { Sandbox } from "@packages/core-test-framework/source";
-import { Managers } from "@packages/crypto/source";
+import { DelegateTracker } from "../source/delegate-tracker";
+import { Container, Services } from "@arkecosystem/core-kernel";
+import { Actions } from "@arkecosystem/core-state";
+import { Wallet } from "@arkecosystem/core-state/source/wallets";
+import { Sandbox } from "@arkecosystem/core-test-framework";
+import { Managers } from "@arkecosystem/crypto";
 
 export const mockLastBlock = {
 	data: { height: 3, timestamp: 16 },
@@ -68,7 +68,7 @@ export const setup = async (activeDelegates) => {
 
 	sandbox.app
 		.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-		.bind("getActiveDelegates", new GetActiveDelegatesAction(sandbox.app));
+		.bind("getActiveDelegates", new Actions.GetActiveDelegatesAction(sandbox.app));
 
 	const delegateTracker = sandbox.app.resolve(DelegateTracker);
 

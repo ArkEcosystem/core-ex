@@ -1,10 +1,10 @@
 import "jest-extended";
 
-import { DelegateTracker } from "@packages/core-forger/source/delegate-tracker";
-import { BIP39 } from "@packages/core-forger/source/methods/bip39";
-import { Utils } from "@packages/core-kernel";
-import { Wallet } from "@packages/core-state/source/wallets";
-import { Crypto, Managers } from "@packages/crypto";
+import { DelegateTracker } from "../source/delegate-tracker";
+import { BIP39 } from "../source/methods/bip39";
+import { Utils } from "@arkecosystem/core-kernel";
+import { Wallets } from "@arkecosystem/core-state";
+import { Crypto, Managers } from "@arkecosystem/crypto";
 
 import { calculateActiveDelegates } from "../test/calculate-active-delegates";
 import { dummy } from "../test/create-block-with-transactions";
@@ -60,7 +60,7 @@ describe("DelegateTracker", () => {
 
 			expect(loggerDebug).toHaveBeenCalledWith(
 				`Next Forgers: ${JSON.stringify(
-					activeDelegates.slice(2, 7).map((delegate: Wallet) => delegate.getPublicKey()),
+					activeDelegates.slice(2, 7).map((delegate: Wallets.Wallet) => delegate.getPublicKey()),
 				)}`,
 			);
 

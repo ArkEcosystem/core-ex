@@ -1,8 +1,8 @@
 import "jest-extended";
 
 import { Container } from "@arkecosystem/core-kernel";
-import { Sandbox } from "@packages/core-test-framework/source";
-import { NextSlotProcessAction } from "@packages/core-forger/source/process-actions/next-slot";
+import { Sandbox } from "@arkecosystem/core-test-framework/source";
+import { NextSlotProcessAction } from "../../source/process-actions/next-slot";
 
 let sandbox: Sandbox;
 let action: NextSlotProcessAction;

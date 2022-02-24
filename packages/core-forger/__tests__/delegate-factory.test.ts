@@ -1,5 +1,5 @@
-import { DelegateFactory } from "@packages/core-forger/source/delegate-factory";
-import { Identities } from "@packages/crypto";
+import { DelegateFactory } from "../source/delegate-factory";
+import { Identities } from "@arkecosystem/crypto";
 
 const passphrase38: string = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";
 const bip38: string = "6PYTQC4c2vBv6PGvV4HibNni6wNsHsGbR1qpL1DfkCNihsiWwXnjvJMU4B";

@@ -1,8 +1,8 @@
 import "jest-extended";
 
 import { Container } from "@arkecosystem/core-kernel";
-import { Sandbox } from "@packages/core-test-framework/source";
-import { LastForgedBlockRemoteAction } from "@packages/core-forger/source/process-actions/last-forged-block";
+import { Sandbox } from "@arkecosystem/core-test-framework/source";
+import { LastForgedBlockRemoteAction } from "../../source/process-actions/last-forged-block";
 
 let sandbox: Sandbox;
 let action: LastForgedBlockRemoteAction;

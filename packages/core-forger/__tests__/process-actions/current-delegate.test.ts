@@ -1,8 +1,8 @@
 import "jest-extended";
 
 import { Container } from "@arkecosystem/core-kernel";
-import { Sandbox } from "@packages/core-test-framework/source";
-import { CurrentDelegateProcessAction } from "@packages/core-forger/source/process-actions/current-delegate";
+import { Sandbox } from "@arkecosystem/core-test-framework/source";
+import { CurrentDelegateProcessAction } from "../../source/process-actions/current-delegate";
 
 let sandbox: Sandbox;
 let action: CurrentDelegateProcessAction;

@@ -1,9 +1,9 @@
 import "jest-extended";
 
-import { DelegateFactory } from "@packages/core-forger/source/delegate-factory";
-import { ServiceProvider } from "@packages/core-forger/source/service-provider";
-import { Application, Container, Providers } from "@packages/core-kernel";
-import { Pm2ProcessActionsService } from "@packages/core-kernel/source/services/process-actions/drivers/pm2";
+import { DelegateFactory } from "../source/delegate-factory";
+import { ServiceProvider } from "../source/service-provider";
+import { Application, Container, Providers } from "@arkecosystem/core-kernel";
+import { Pm2ProcessActionsService } from "@arkecosystem/core-kernel/source/services/process-actions/drivers/pm2";
 import { AnySchema } from "joi";
 
 describe("ServiceProvider", () => {

@@ -1,12 +1,12 @@
 import "jest-extended";
 
-import { Client } from "@packages/core-forger/source/client";
+import { Client } from "../source/client";
 import { Application, Container } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus, Nes, Codecs } from "@arkecosystem/core-p2p";
 
 import { forgedBlockWithTransactions } from "../test/create-block-with-transactions";
 
-import { nesClient } from "./mocks/nes";
+import { nesClient } from "../test/mocks/nes";
 
 jest.spyOn(Nes, "Client").mockImplementation((url) => nesClient as any);
 

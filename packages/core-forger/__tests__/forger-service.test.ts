@@ -1,18 +1,18 @@
 import "jest-extended";
 
-import { ForgeNewBlockAction, IsForgingAllowedAction } from "@packages/core-forger/source/actions";
-import { HostNoResponseError, RelayCommunicationError } from "@packages/core-forger/source/errors";
-import { ForgerService } from "@packages/core-forger/source/forger-service";
-import { Contracts } from "@packages/core-kernel";
-import { Container, Enums, Services, Utils } from "@packages/core-kernel";
-import { NetworkStateStatus } from "@packages/core-p2p";
-import { GetActiveDelegatesAction } from "@packages/core-state/source/actions";
-import { Sandbox } from "@packages/core-test-framework";
-import { Interfaces } from "@packages/crypto";
-import { Crypto, Managers } from "@packages/crypto";
-import { Slots } from "@packages/crypto/distribution/crypto";
-import { Address } from "@packages/crypto/source/identities";
-import { BuilderFactory } from "@packages/crypto/source/transactions";
+import { ForgeNewBlockAction, IsForgingAllowedAction } from "../source/actions";
+import { HostNoResponseError, RelayCommunicationError } from "../source/errors";
+import { ForgerService } from "../source/forger-service";
+import { Contracts } from "@arkecosystem/core-kernel";
+import { Container, Enums, Services, Utils } from "@arkecosystem/core-kernel";
+import { NetworkStateStatus } from "@arkecosystem/core-p2p";
+import { GetActiveDelegatesAction } from "@arkecosystem/core-state/source/actions";
+import { Sandbox } from "@arkecosystem/core-test-framework";
+import { Interfaces } from "@arkecosystem/crypto";
+import { Crypto, Managers } from "@arkecosystem/crypto";
+import { Slots } from "@arkecosystem/crypto/distribution/crypto";
+import { Address } from "@arkecosystem/crypto/source/identities";
+import { BuilderFactory } from "@arkecosystem/crypto/source/transactions";
 
 import { calculateActiveDelegates } from "../test/calculate-active-delegates";
 

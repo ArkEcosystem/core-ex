@@ -5,8 +5,8 @@
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
-  	"types": "distribution/index.d.ts",
-  	"files": [
+	"types": "distribution/index.d.ts",
+	"files": [
 		"/distribution"
 	],
 	"scripts": {
@@ -26,7 +26,8 @@
 		"wif": "2.0.6"
 	},
 	"devDependencies": {
-	  	"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/core-state": "workspace:*",
 		"@types/node-forge": "0.10.4",
 		"@types/wif": "2.0.2",
 		"uvu": "^0.5.3"
