@@ -58,7 +58,7 @@ describe("BlockFactory", () => {
 			const txId = b.transactions[1].id;
 
 			delete b.transactions[1].id;
-	
+
 			expect(() => BlockFactory.fromData(b as any)).toThrowError(
 				/Invalid.*transactions\/1.*required property.*id/i,
 			);
