@@ -68,7 +68,8 @@ export class Block implements IBlock {
 		for (const err of result.errors) {
 			let fatal = false;
 
-			const match = err.instancePath.match(/\.transactions\[(\d+)]/);
+			const match = err.instancePath.match(/\/transactions\/(\d+)\/?.*/);
+
 			if (match === null) {
 				fatal = true;
 			} else {

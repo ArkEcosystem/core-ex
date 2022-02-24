@@ -52,6 +52,20 @@ describe("BlockFactory", () => {
 				/Invalid.*required property.*generatorPublicKey/i,
 			);
 		});
+
+		it("should throw on invalid transaction data", () => {
+			const b = Object.assign({}, dummyBlock);
+			const txId = b.transactions[1].id;
+
+			delete b.transactions[1].id;
+	
+			expect(() => BlockFactory.fromData(b as any)).toThrowError(
+				/Invalid.*transactions\/1.*required property.*id/i,
+			);
+
+			// Revert changes...
+			b.transactions[1].id = txId;
+		});
 	});
 
 	describe(".fromJson", () => {
