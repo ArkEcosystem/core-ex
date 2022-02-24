@@ -12,7 +12,7 @@
 	"scripts": {
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del dist"
+		"clean": "del distribution"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
@@ -20,6 +20,7 @@
 		"@arkecosystem/core-crypto-contracts": "workspace:*",
 		"@arkecosystem/core-crypto-errors": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
 		"@arkecosystem/utils": "workspace:*"
 	},
