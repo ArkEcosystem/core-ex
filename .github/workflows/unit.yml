@@ -1,5 +1,5 @@
 jobs:
-    unit:
+    test:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
@@ -86,7 +86,7 @@ jobs:
             matrix:
                 node-version:
                     - 16.x
-name: Unit
+name: CI
 on:
     pull_request:
         types:

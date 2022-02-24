@@ -4,7 +4,7 @@ const YAML = require("yaml");
 
 const workflow = {
 	jobs: {
-		unit: {
+		test: {
 			concurrency: {
 				"cancel-in-progress": true,
 				group: `\${{ github.head_ref }}-unit`,
@@ -43,7 +43,7 @@ const workflow = {
 			},
 		},
 	},
-	name: "Unit",
+	name: "CI",
 	on: {
 		pull_request: {
 			types: ["ready_for_review", "synchronize", "opened"],
@@ -66,7 +66,7 @@ for (const directory of directories) {
 		continue;
 	}
 
-	workflow.jobs.unit.steps.push({
+	workflow.jobs.test.steps.push({
 		name: `Test ${directory}`,
 		run: `cd ${directory} && pnpm run test && cd ..`,
 	});
