@@ -33,7 +33,7 @@ const workflow = {
 				},
 				{
 					name: "Build",
-					run: "pnpm run build && cd packages",
+					run: "pnpm run build",
 				},
 			],
 			strategy: {
@@ -68,7 +68,7 @@ for (const directory of directories) {
 
 	workflow.jobs.unit.steps.push({
 		name: `Test ${directory}`,
-		run: `cd ${directory} && pnpm run test && cd ..`,
+		run: `cd packages/${directory} && pnpm run test`,
 	});
 }
 
