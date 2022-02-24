@@ -33,6 +33,6 @@ describe<{
 		const models = modelConverter.getBlockModels([block]);
 		const data = modelConverter.getBlockData(models);
 
-		assert.equal(data, [block.data]);
+		assert.equal(data.map(item => ({ ...item })), [block.data]);
 	});
 });
