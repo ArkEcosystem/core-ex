@@ -6,7 +6,7 @@ import { Box } from "./box";
 describe<{
 	component: Box
 	cli: Console
-}>("Ask", ({beforeEach, it, assert, spy}) => {
+}>("Box", ({beforeEach, it, assert, spy}) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.cli.app.rebind(Identifiers.Box).to(Box).inSingletonScope();
