@@ -22,32 +22,32 @@ describe<{
 	logger: any;
 	client: any;
 	handlerProvider: any;
-}>("ForgerService", ({ assert, beforeEach, it, stub }) => {
+}>("ForgerService", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
 	const mockHost = { hostname: "127.0.0.1", port: 4000 };
 
 	beforeEach((context) => {
 		context.logger = {
-			error: jest.fn(),
-			debug: jest.fn(),
-			info: jest.fn(),
-			warning: jest.fn(),
+			error: spyFn(),
+			debug: spyFn(),
+			info: spyFn(),
+			warning: spyFn(),
 		};
 
 		context.client = {
-			register: jest.fn(),
-			dispose: jest.fn(),
-			broadcastBlock: jest.fn(),
-			syncWithNetwork: jest.fn(),
-			getRound: jest.fn(),
-			getNetworkState: jest.fn(),
-			getTransactions: jest.fn(),
-			emitEvent: jest.fn(),
-			selectHost: jest.fn(),
+			register: spyFn(),
+			dispose: spyFn(),
+			broadcastBlock: spyFn(),
+			syncWithNetwork: spyFn(),
+			getRound: stubFn(),
+			getNetworkState: stubFn(),
+			getTransactions: stubFn(),
+			emitEvent: spyFn(),
+			selectHost: spyFn(),
 		};
 
 		context.handlerProvider = {
-			isRegistrationRequired: jest.fn(),
-			registerHandlers: jest.fn(),
+			isRegistrationRequired: stubFn(),
+			registerHandlers: spyFn(),
 		};
 
 		context.sandbox = new Sandbox();
@@ -82,14 +82,13 @@ describe<{
 			}
 		};
 
-		jest.spyOn(Utils.forgingInfoCalculator, "getBlockTimeLookup").mockResolvedValue(getTimeStampForBlock);
+		stub(Utils.forgingInfoCalculator, "getBlockTimeLookup").returnValue(getTimeStampForBlock);
 
 		context.forgerService = context.sandbox.app.resolve<ForgerService>(ForgerService);
 
-		jest.spyOn(context.sandbox.app, "resolve").mockReturnValueOnce(context.client); // forger-service only resolves Client
+		stub(context.sandbox.app, "resolve").returnValueOnce(context.client); // forger-service only resolves Client
 
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		stub(Crypto.Slots, "getTimeInMsUntilNextSlot").returnValue(0);
 
 		context.delegates = calculateActiveDelegates();
 
@@ -133,55 +132,53 @@ describe<{
 		};
 	});
 
-	afterEach(() => {
-		jest.resetAllMocks();
-	});
-
 	it("GetRound should return undefined", (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
 
-		expect(context.forgerService.getRound()).toBeUndefined();
+		assert.undefined(context.forgerService.getRound());
 	});
 
 	it("GetRemainingSlotTime should return undefined", (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
 
-		expect(context.forgerService.getRemainingSlotTime()).toBeUndefined();
+		assert.undefined(context.forgerService.getRemainingSlotTime());
 	});
 
 	it("GetLastForgedBlock should return undefined", (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
 
-		expect(context.forgerService.getLastForgedBlock()).toBeUndefined();
+		assert.undefined(context.forgerService.getLastForgedBlock());
 	});
 
 	it("Register should register an associated client", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
 
-		expect(context.client.register).toBeCalledTimes(1);
-		expect(context.client.register).toBeCalledWith([mockHost]);
+		context.client.register.calledWith([mockHost]);
 	});
 
 	it("Dispose should dispose of an associated client", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
-		const spyDisposeClient = jest.spyOn((context.forgerService as any).client, "dispose");
+
 		// @ts-ignore
-		expect(context.forgerService.isStopped).toEqual(false);
+		assert.false(context.forgerService.isStopped);
+
 		context.forgerService.dispose();
-		expect(spyDisposeClient).toHaveBeenCalled();
+
+		context.client.dispose.calledWith();
+
 		// @ts-ignore
-		expect(context.forgerService.isStopped).toEqual(true);
+		assert.true(context.forgerService.isStopped);
 	});
 
 	it("Boot should register handlers, set delegates, and log active delegates info message", async (context) => {
-		context.handlerProvider.isRegistrationRequired.mockReturnValue(true);
+		context.handlerProvider.isRegistrationRequired.returns(true);
 
 		context.forgerService.register({ hosts: [mockHost] });
-		context.client.getRound.mockReturnValueOnce({ delegates: context.delegates });
+		context.client.getRound.returns({ delegates: context.delegates });
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		expect((context.forgerService as any).delegates).toEqual(context.delegates);
+		assert.equal((context.forgerService as any).delegates, context.delegates);
 
 		const expectedInfoMessage = `Loaded ${Utils.pluralize(
 			"active delegate",
@@ -189,26 +186,26 @@ describe<{
 			true,
 		)}: ${context.delegates.map((wallet) => `${wallet.delegate.username} (${wallet.publicKey})`).join(", ")}`;
 
-		expect(context.handlerProvider.registerHandlers).toBeCalled();
-		expect(context.logger.info).toHaveBeenCalledWith(expectedInfoMessage);
+		context.handlerProvider.registerHandlers.calledWith();
+		context.logger.info.calledWith(expectedInfoMessage);
 	});
 
 	it("Boot should skip logging when the service is already initialised", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
-		context.client.getRound.mockReturnValueOnce({ delegates: context.delegates });
+		context.client.getRound.returns({ delegates: context.delegates });
 		(context.forgerService as any).initialized = true;
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
-		expect(context.logger.info).not.toHaveBeenCalledWith(`Forger Manager started.`);
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
+		assert.true(context.logger.info.neverCalledWith(`Forger Manager started.`));
 	});
 
 	it("Boot should not log when there are no active delegates", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
-		context.client.getRound.mockReturnValueOnce({ delegates: context.delegates });
+		context.client.getRound.returns({ delegates: context.delegates });
 
-		await expect(context.forgerService.boot([])).toResolve();
-		expect(context.logger.info).toHaveBeenCalledTimes(1);
-		expect(context.logger.info).toHaveBeenCalledWith(`Forger Manager started.`);
+		await assert.resolves(() => context.forgerService.boot([]));
+
+		assert.true(context.logger.info.calledOnceWith(`Forger Manager started.`));
 	});
 
 	it("Boot should log inactive delegates correctly", async (context) => {
@@ -216,7 +213,7 @@ describe<{
 
 		const round = { data: { delegates: context.delegates.slice(0, numberActive) } };
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		const expectedInactiveDelegatesMessage = `Loaded ${Utils.pluralize(
 			"inactive delegate",
@@ -228,18 +225,18 @@ describe<{
 			.join(", ")}`;
 
 		context.forgerService.register({ hosts: [mockHost] });
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		expect(context.logger.info).toHaveBeenCalledWith(expectedInactiveDelegatesMessage);
+		assert.true(context.logger.info.calledOnceWith(expectedInactiveDelegatesMessage));
 	});
 
 	it("Boot should catch and log errors", async (context) => {
-		context.client.getRound.mockRejectedValueOnce(new Error("oops"));
-
+		context.client.getRound.rejects(() => new Error("oops"));
 		context.forgerService.register({ hosts: [mockHost] });
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
 
-		expect(context.logger.warning).toHaveBeenCalledWith(`Waiting for a responsive host`);
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
+
+		assert.true(context.logger.warning.calledWith(`Waiting for a responsive host`));
 	});
 
 	it("Boot should set correct timeout to check slots", async (context) => {
@@ -261,22 +258,16 @@ describe<{
 
 	it("GetTransactionsForForging should log error when transactions are empty", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
+		context.client.getTransactions.returns([]);
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
-		await expect(context.forgerService.getTransactionsForForging()).resolves.toEqual([]);
-		expect(context.logger.error).toHaveBeenCalledWith(
-			`Could not get unconfirmed transactions from transaction pool.`,
-		);
+		await assert.resolves(() => context.forgerService.getTransactionsForForging());
+		assert.equal(await context.forgerService.getTransactionsForForging(), []);
+
+		assert.true(context.logger.error.calledWith(`Could not get unconfirmed transactions from transaction pool.`));
 	});
 
 	it("GetTransactionsForForging should log and return valid transactions", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
-
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
 
 		const recipientAddress = Identities.Address.fromPassphrase("recipient's secret");
 		const transaction = Transactions.BuilderFactory.transfer()
@@ -291,46 +282,49 @@ describe<{
 			poolSize: 10,
 			count: 10,
 		};
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue(mockTransaction);
-		await expect(context.forgerService.getTransactionsForForging()).resolves.toEqual([transaction.data]);
-		expect(context.logger.error).not.toHaveBeenCalled();
+
+		context.client.getTransactions.returns(mockTransaction);
+
+		await assert.resolves(() => context.forgerService.getTransactionsForForging());
+		assert.equal(await context.forgerService.getTransactionsForForging(), [transaction.data]);
+
+		assert.true(context.logger.error.notCalled);
+
 		const expectedLogInfo =
 			`Received ${Utils.pluralize("transaction", 1, true)} ` +
 			`from the pool containing ${Utils.pluralize("transaction", mockTransaction.poolSize, true)} total`;
-		expect(context.logger.debug).toHaveBeenCalledWith(expectedLogInfo);
+		assert.true(context.logger.debug.calledWith(expectedLogInfo));
 	});
 
 	it("isForgingAllowed should not allow forging when network status is unknown", async (context) => {
-		expect(
+		assert.false(
 			// @ts-ignore
-			context.forgerService.isForgingAllowed({ status: NetworkStateStatus.Unknown }, delegates[0]),
-		).toEqual(false);
-		expect(context.logger.info).toHaveBeenCalledWith(
-			"Failed to get network state from context.client. Will not forge.",
+			context.forgerService.isForgingAllowed({ status: NetworkStateStatus.Unknown }, context.delegates[0]),
 		);
+		assert.true(context.logger.info.calledWith("Failed to get network state from client. Will not forge."));
 	});
 
 	it("isForgingAllowed should not allow forging when network status is a cold start", async (context) => {
-		expect(
+		assert.false(
 			// @ts-ignore
-			context.forgerService.isForgingAllowed({ status: NetworkStateStatus.ColdStart }, delegates[0]),
-		).toEqual(false);
-		expect(context.logger.info).toHaveBeenCalledWith("Skipping slot because of cold start. Will not forge.");
+			context.forgerService.isForgingAllowed({ status: NetworkStateStatus.ColdStart }, context.delegates[0]),
+		);
+		assert.true(context.logger.info.calledWith("Skipping slot because of cold start. Will not forge."));
 	});
 
 	it("isForgingAllowed should not allow forging when network status is below minimum peers", async (context) => {
-		expect(
-			// @ts-ignore
-			context.forgerService.isForgingAllowed({ status: NetworkStateStatus.BelowMinimumPeers }, delegates[0]),
-		).toEqual(false);
-		expect(context.logger.info).toHaveBeenCalledWith(
-			"Network reach is not sufficient to get quorum. Will not forge.",
+		assert.false(
+			context.forgerService.isForgingAllowed(
+				// @ts-ignore
+				{ status: NetworkStateStatus.BelowMinimumPeers },
+				context.delegates[0],
+			),
 		);
+		assert.true(context.logger.info.calledWith("Network reach is not sufficient to get quorum. Will not forge."));
 	});
 
 	it("isForgingAllowed should log double forge warning for any overheight block headers", async (context) => {
-		context.client.getRound.mockReturnValueOnce({ delegates: context.delegates });
+		context.client.getRound.returns({ delegates: context.delegates });
 		context.forgerService.register({ hosts: [mockHost] });
 		await context.forgerService.boot(context.delegates);
 
@@ -346,20 +340,20 @@ describe<{
 		context.mockNetworkState.getQuorum = () => 0.99;
 		context.mockNetworkState.getOverHeightBlockHeaders = () => overHeightBlockHeaders;
 
-		expect(
+		assert.true(
 			// @ts-ignore
-			context.forgerService.isForgingAllowed(mockNetworkState, delegates[0]),
-		).toEqual(true);
+			context.forgerService.isForgingAllowed(context.mockNetworkState, context.delegates[0]),
+		);
 		const expectedOverHeightInfo = `Detected ${Utils.pluralize(
 			"distinct overheight block header",
 			overHeightBlockHeaders.length,
 			true,
 		)}.`;
-		expect(context.logger.info).toHaveBeenCalledWith(expectedOverHeightInfo);
+		assert.true(context.logger.info.calledWith(expectedOverHeightInfo));
 
 		const expectedDoubleForgeWarning = `Possible double forging delegate: ${context.delegates[0].delegate.username} (${context.delegates[0].publicKey}) - Block: ${overHeightBlockHeaders[0].id}.`;
 
-		expect(context.logger.warning).toHaveBeenCalledWith(expectedDoubleForgeWarning);
+		assert.true(context.logger.warning.calledWith(expectedDoubleForgeWarning));
 	});
 
 	it("isForgingAllowed should not allow forging if quorum is not met", async (context) => {
@@ -375,10 +369,10 @@ describe<{
 		await context.forgerService.boot(context.delegates);
 
 		(context.mockNetworkState.getQuorum = () => 0.6),
-			expect(
+			assert.false(
 				// @ts-ignore
 				context.forgerService.isForgingAllowed(context.mockNetworkState, delegates[0]),
-			).toEqual(false);
+			);
 
 		expect(context.logger.info).toHaveBeenCalledWith("Not enough quorum to forge next block. Will not forge.");
 
@@ -388,7 +382,7 @@ describe<{
 	});
 
 	it("isForgingAllowed should allow forging if quorum is met", async (context) => {
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
@@ -397,18 +391,17 @@ describe<{
 		context.forgerService.register({ hosts: [mockHost] });
 		await context.forgerService.boot(context.delegates);
 
-		expect(
+		assert.true(
 			// @ts-ignore
-			context.forgerService.isForgingAllowed(context.mockNetworkState, delegates[0]),
-		).toEqual(true);
+			context.forgerService.isForgingAllowed(context.mockNetworkState, context.delegates[0]),
+		);
 
-		expect(context.logger.debug).not.toHaveBeenCalled();
-
-		expect(context.logger.warning).not.toHaveBeenCalled();
+		assert.true(context.logger.debug.notCalled);
+		assert.true(context.logger.warning.notCalled);
 	});
 
 	it("isForgingAllowed should allow forging if quorum is met, not log warning if overheight delegate is not the same", async (context) => {
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
@@ -428,14 +421,13 @@ describe<{
 
 		context.mockNetworkState.getOverHeightBlockHeaders = () => overHeightBlockHeaders;
 
-		expect(
+		assert.true(
 			// @ts-ignore
-			context.forgerService.isForgingAllowed(context.mockNetworkState, delegates[1]),
-		).toEqual(true);
+			context.forgerService.isForgingAllowed(context.mockNetworkState, context.delegates[1]),
+		);
 
-		expect(context.logger.debug).not.toHaveBeenCalled();
-
-		expect(context.logger.warning).not.toHaveBeenCalled();
+		assert.true(context.logger.debug.notCalled);
+		assert.true(context.logger.warning.notCalled);
 	});
 
 	it("checkSlot should do nothing when the forging service is stopped", async (context) => {
@@ -443,12 +435,12 @@ describe<{
 
 		await context.forgerService.dispose();
 
-		await expect(context.forgerService.checkSlot()).toResolve();
+		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(context.logger.info).not.toHaveBeenCalled();
-		expect(context.logger.warning).not.toHaveBeenCalled();
-		expect(context.logger.error).not.toHaveBeenCalled();
-		expect(context.logger.debug).not.toHaveBeenCalled();
+		assert.true(context.logger.info.notCalled);
+		assert.true(context.logger.warning.notCalled);
+		assert.true(context.logger.error.notCalled);
+		assert.true(context.logger.debug.notCalled);
 	});
 
 	it("checkSlot should set timer if forging is not yet allowed", async (context) => {
@@ -473,17 +465,16 @@ describe<{
 		await expect(context.forgerService.checkSlot()).toResolve();
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 200);
 
-		expect(context.logger.info).not.toHaveBeenCalled();
-		expect(context.logger.warning).not.toHaveBeenCalled();
-		expect(context.logger.error).not.toHaveBeenCalled();
-		expect(context.logger.debug).not.toHaveBeenCalled();
+		assert.true(context.logger.info.notCalled);
+		assert.true(context.logger.warning.notCalled);
+		assert.true(context.logger.error.notCalled);
+		assert.true(context.logger.debug.notCalled);
 
 		jest.useRealTimers();
 	});
 
 	it("checkSlot should set timer and log nextForger which is active on node", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const round = {
 			data: {
@@ -498,37 +489,37 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
-		await expect(context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 2))).toResolve();
-		expect(context.logger.info).not.toHaveBeenCalledWith(`Forger Manager started.`);
+		await assert.resolves(() =>
+			context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 2)),
+		);
+		// expect(context.logger.info).not.toHaveBeenCalledWith(`Forger Manager started.`);
+		assert.true(context.logger.info.neverCalledWith(`Forger Manager started.`));
 
-		jest.useFakeTimers();
-		// @ts-ignore
-		const spyClientSyncWithNetwork = jest.spyOn(context.forgerService.client, "syncWithNetwork");
+		// @TODO jest.useFakeTimers();
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		await expect(context.forgerService.checkSlot()).toResolve();
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(spyClientSyncWithNetwork).toHaveBeenCalled();
+		assert.true(context.client.syncWithNetwork.calledOnce);
 
 		const expectedInfoMessage = `Next forging delegate ${
 			context.delegates[context.delegates.length - 3].delegate.username
 		} (${context.delegates[context.delegates.length - 3].publicKey}) is active on this node.`;
 
-		expect(context.logger.info).toHaveBeenCalledWith(expectedInfoMessage);
-		expect(context.logger.warning).not.toHaveBeenCalled();
-		expect(context.logger.error).not.toHaveBeenCalled();
+		assert.true(context.logger.info.calledWith(expectedInfoMessage));
+		assert.true(context.logger.warning.notCalled);
+		assert.true(context.logger.error.notCalled);
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should set timer and not log message if nextForger is not active", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const round = {
 			data: {
@@ -543,46 +534,40 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
-		await expect(context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 3))).toResolve();
-		expect(context.logger.info).not.toHaveBeenCalledWith(`Forger Manager started.`);
+		await assert.resolves(() => context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 3)));
+		assert.false(context.logger.info.calledWith(`Forger Manager started.`));
 
-		jest.useFakeTimers();
-		// @ts-ignore
-		const spyClientSyncWithNetwork = jest.spyOn(context.forgerService.client, "syncWithNetwork");
-		spyClientSyncWithNetwork.mockReset();
+		// @TODO jest.useFakeTimers();
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		await expect(context.forgerService.checkSlot()).toResolve();
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(spyClientSyncWithNetwork).not.toHaveBeenCalled();
+		assert.true(context.client.syncWithNetwork.notCalled);
 
 		const expectedInfoMessage = `Next forging delegate ${
 			context.delegates[context.delegates.length - 3].delegate.username
 		} (${context.delegates[context.delegates.length - 3].publicKey}) is active on this node.`;
 
-		expect(context.logger.info).not.toHaveBeenCalledWith(expectedInfoMessage);
-		expect(context.logger.warning).not.toHaveBeenCalled();
-		expect(context.logger.error).not.toHaveBeenCalled();
-		expect(context.logger.debug).not.toHaveBeenCalledWith(
-			`Sending wake-up check to relay node ${mockHost.hostname}`,
-		);
+		assert.false(context.logger.info.calledWith(expectedInfoMessage));
+		assert.true(context.logger.warning.notCalled);
+		assert.true(context.logger.error.notCalled);
+		assert.false(context.logger.info.calledWith(`Sending wake-up check to relay node ${mockHost.hostname}`,));
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should forge valid blocks when forging is allowed", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 		context.delegates[context.delegates.length - 2] = Object.assign(
 			nextDelegateToForge,
@@ -606,30 +591,25 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
+		context.client.getTransactions.returns([]);
 
-		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
+		const spyForgeNewBlock = spy(context.forgerService, "forgeNewBlock");
 
-		// @ts-ignore
-		const spyGetNetworkState = jest.spyOn(context.forgerService.client, "getNetworkState");
-		// @ts-ignore
-		spyGetNetworkState.mockResolvedValue(context.mockNetworkState);
+		context.client.getNetworkState.returns(context.mockNetworkState);
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		jest.useFakeTimers();
-		// @ts-ignore
-		await expect(context.forgerService.checkSlot()).toResolve();
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		expect(spyForgeNewBlock).toHaveBeenCalledWith(
+		// @TODO jest.useFakeTimers();
+
+		await assert.resolves(() => context.forgerService.checkSlot());
+
+		spyForgeNewBlock.calledWith(
 			context.delegates[context.delegates.length - 2],
 			round.data,
 			context.mockNetworkState,
@@ -638,9 +618,9 @@ describe<{
 		const loggerWarningMessage = `The NetworkState height (${context.mockNetworkState.getNodeHeight()}) and round height (${
 			round.data.lastBlock.height
 		}) are out of sync. This indicates delayed blocks on the network.`;
-		expect(context.logger.warning).toHaveBeenCalledWith(loggerWarningMessage);
+		assert.true(context.logger.warning.calledWith(loggerWarningMessage));
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should not log warning message when nodeHeight does not equal last block height", async (context) => {
