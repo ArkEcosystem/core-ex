@@ -4,17 +4,17 @@ import { yellow } from "kleur";
 import { Identifiers } from "../ioc";
 import { Title } from "./title";
 describe<{
-	component: Title
-	cli: Console
-}>("Title", ({beforeEach, it, assert, spy}) => {
+	component: Title;
+	cli: Console;
+}>("Title", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.cli.app.rebind(Identifiers.Title).to(Title).inSingletonScope();
 		context.component = context.cli.app.get(Identifiers.Title);
 	});
 
-	it("should render the component", async ({component, cli}) => {
-		const spyOnLog = spy(cli.app.get(Identifiers.Logger), "log")
+	it("should render the component", async ({ component, cli }) => {
+		const spyOnLog = spy(cli.app.get(Identifiers.Logger), "log");
 
 		await component.render("Hello World");
 
@@ -22,4 +22,3 @@ describe<{
 		spyOnLog.calledWith(yellow("==========="));
 	});
 });
-

@@ -5,9 +5,9 @@ import { Identifiers } from "../ioc";
 import { Select } from "./select";
 
 describe<{
-	component: Select
-	cli: Console
-}>("Log", ({beforeEach, it, assert, spy}) => {
+	component: Select;
+	cli: Console;
+}>("Log", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.cli.app.rebind(Identifiers.Prompt).to(Select).inSingletonScope();
@@ -18,7 +18,7 @@ describe<{
 	// it("should render the component", async ({component, cli}) => {
 	// 	prompts.inject(["#0000ff"]);
 
-	// 	assert.equal( 
+	// 	assert.equal(
 	// 		await component.render("Pick a color", [
 	// 			{ description: "This option has a description", title: "Red", value: "#ff0000" },
 	// 			{ disabled: true, title: "Green", value: "#00ff00" },
@@ -27,4 +27,3 @@ describe<{
 	// 	"#0000ff");
 	// });
 });
-

@@ -1,6 +1,5 @@
 import { join } from "path";
-import 
-{ Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "@arkecosystem/core-test-framework";
 import envPaths from "env-paths";
 import { ensureDirSync, writeJSON } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -8,7 +7,7 @@ import { dirSync, setGracefulCleanup } from "tmp";
 import { DiscoverConfig } from "./discover-config";
 
 describe<{
-	cmd: DiscoverConfig
+	cmd: DiscoverConfig;
 }>("DiscoverConfig", ({ beforeEach, afterAll, it, assert, stub }) => {
 	let configPath;
 	const config = { network: "testnet", token: "token" };
@@ -23,7 +22,7 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should return undefined if configuration can't be found", async ({cmd}) => {
+	it("should return undefined if configuration can't be found", async ({ cmd }) => {
 		assert.undefined(await cmd.discover());
 	});
 
@@ -40,7 +39,7 @@ describe<{
 	// 	assert.equal(await cmd.discover("token", "testnet"), config);
 	// });
 
-	it("should return configuration if found on CORE_PATH_CONFIG location", async ({cmd}) => {
+	it("should return configuration if found on CORE_PATH_CONFIG location", async ({ cmd }) => {
 		process.env.CORE_PATH_CONFIG = join(configPath, "testnet");
 
 		ensureDirSync(join(configPath, "testnet"));

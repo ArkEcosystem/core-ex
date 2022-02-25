@@ -11,23 +11,23 @@ describe<{
 	dataPath: string;
 	tempPath: string;
 	source: NPM;
-}>("NPM", ({beforeEach, afterEach, afterAll, it, assert, spy, stub}) => {
+}>("NPM", ({ beforeEach, afterEach, afterAll, it, assert, spy, stub }) => {
 	beforeEach((context) => {
 		context.dataPath = dirSync().name;
 		context.tempPath = dirSync().name;
-	
+
 		context.source = new NPM({ data: context.dataPath, temp: context.tempPath });
-	
+
 		nock.cleanAll();
 	});
-	
+
 	afterEach(() => nock.enableNetConnect());
 
 	afterAll(() => {
 		setGracefulCleanup();
 	});
 
-	it("#exists - should return true if the file exists", async ({source}) => {
+	it("#exists - should return true if the file exists", async ({ source }) => {
 		nock(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
@@ -49,7 +49,7 @@ describe<{
 		assert.true(await source.exists("@arkecosystem/utils"));
 	});
 
-	it("#exists - should return true if the file by version exists", async ({source}) => {
+	it("#exists - should return true if the file by version exists", async ({ source }) => {
 		nock(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
@@ -71,7 +71,7 @@ describe<{
 		assert.true(await source.exists("@arkecosystem/utils", "0.9.1"));
 	});
 
-	it("#exists - should return false if the file by version doesn't exists", async ({source}) => {
+	it("#exists - should return false if the file by version doesn't exists", async ({ source }) => {
 		nock(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {
@@ -93,11 +93,11 @@ describe<{
 		assert.false(await source.exists("@arkecosystem/utils", "0.5.5"));
 	});
 
-	it("#exists - should return false if the file does not exists", async ({source}) => {
+	it("#exists - should return false if the file does not exists", async ({ source }) => {
 		assert.false(await source.exists("does not exist"));
 	});
 
-	it("#update - should successfully install the plugin", async ({source, tempPath, dataPath}) => {
+	it("#update - should successfully install the plugin", async ({ source, tempPath, dataPath }) => {
 		nock(/.*/)
 			.get("/@arkecosystem/utils")
 			.reply(200, {

@@ -4,9 +4,9 @@ import { Identifiers } from "../ioc";
 import { Toggle } from "./toggle";
 
 describe<{
-	component: Toggle
-	cli: Console
-}>("Log", ({beforeEach, it, assert, spy}) => {
+	component: Toggle;
+	cli: Console;
+}>("Log", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.cli.app.rebind(Identifiers.Toggle).to(Toggle).inSingletonScope();
@@ -20,4 +20,3 @@ describe<{
 	// 	assert.equal(await component.render("Hello World"), "yes");
 	// });
 });
-

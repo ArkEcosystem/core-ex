@@ -24,7 +24,7 @@ describe<{ DiscoverCommands; cmd: DiscoverCommands }>("DiscoverCommands", ({ bef
 		assert.gt(Object.keys(commands).length, 0);
 	});
 
-	it("#from - should not discover commands if no packages are passed in", ({cmd}) => {
+	it("#from - should not discover commands if no packages are passed in", ({ cmd }) => {
 		const commands = cmd.from([]);
 
 		assert.object(commands);
