@@ -1,0 +1,38 @@
+{
+	"name": "@arkecosystem/core-fees-dynamic",
+	"version": "0.0.1",
+	"description": "Transaction Pool Manager for ARK Core",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"test": "cross-env CORE_ENV=test jest --forceExit"
+	},
+	"dependencies": {
+		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/core-transactions": "workspace:*",
+		"@arkecosystem/crypto": "workspace:*",
+		"better-sqlite3": "7.4.3",
+		"fs-extra": "8.1.0",
+		"joi": "17.4.2"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "5.4.3",
+		"@types/fs-extra": "8.1.2"
+	},
+	"engines": {
+		"node": ">=16.x"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "transactionPool"
+		}
+	}
+}
