@@ -13,11 +13,11 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	private readonly feeRegistry: FeeRegistry;
 
 	public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
-        this.#throwIfCannot("pool entrance", transaction);
-    }
+		this.#throwIfCannot("pool entrance", transaction);
+	}
 
 	public async throwIfCannotBroadcast(transaction: Interfaces.ITransaction): Promise<void> {
-        this.#throwIfCannot("broadcast", transaction);
+		this.#throwIfCannot("broadcast", transaction);
 	}
 
 	#throwIfCannot(action: string, transaction: Interfaces.ITransaction): void {
