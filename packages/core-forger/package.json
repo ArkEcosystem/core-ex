@@ -27,7 +27,6 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-state": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"@types/node-forge": "0.10.4",
 		"@types/wif": "2.0.2",
 		"sinon": "^12.0.1",
