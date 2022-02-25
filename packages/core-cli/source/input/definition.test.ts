@@ -3,13 +3,13 @@ import Joi from "joi";
 
 import { InputDefinition } from "./definition";
 
-describe("InputDefinition", ({it, assert}) => {
+describe("InputDefinition", ({ it, assert }) => {
 	it("should get all arguments", () => {
 		const definition = new InputDefinition();
 		definition.setArgument("firstName", "description", Joi.string());
 		definition.setArgument("lastName", "description", Joi.string());
 
-		assert.equal(definition.getArguments(),{
+		assert.equal(definition.getArguments(), {
 			firstName: { description: "description", schema: Joi.string() },
 			lastName: { description: "description", schema: Joi.string() },
 		});
@@ -19,18 +19,18 @@ describe("InputDefinition", ({it, assert}) => {
 		const definition = new InputDefinition();
 		definition.setArgument("firstName", "description", Joi.string());
 
-		assert.equal(definition.getArgument("firstName"),{ description: "description", schema: Joi.string() });
+		assert.equal(definition.getArgument("firstName"), { description: "description", schema: Joi.string() });
 	});
 
 	it("should set the value of an argument by name", () => {
 		const definition = new InputDefinition();
 		definition.setArgument("firstName", "description", Joi.string());
 
-		assert.equal(definition.getArgument("firstName"),{ description: "description", schema: Joi.string() });
+		assert.equal(definition.getArgument("firstName"), { description: "description", schema: Joi.string() });
 
 		definition.setArgument("firstName", "description", Joi.number());
 
-		assert.equal(definition.getArgument("firstName"),{ description: "description", schema: Joi.number() });
+		assert.equal(definition.getArgument("firstName"), { description: "description", schema: Joi.number() });
 	});
 
 	it("should check if an argument exists", () => {
@@ -48,7 +48,7 @@ describe("InputDefinition", ({it, assert}) => {
 		definition.setFlag("firstName", "description", Joi.string());
 		definition.setFlag("lastName", "description", Joi.string());
 
-		assert.equal(definition.getFlags(),{
+		assert.equal(definition.getFlags(), {
 			firstName: { description: "description", schema: Joi.string() },
 			lastName: { description: "description", schema: Joi.string() },
 		});
@@ -58,18 +58,18 @@ describe("InputDefinition", ({it, assert}) => {
 		const definition = new InputDefinition();
 		definition.setFlag("firstName", "description", Joi.string());
 
-		assert.equal(definition.getFlag("firstName"),{ description: "description", schema: Joi.string() });
+		assert.equal(definition.getFlag("firstName"), { description: "description", schema: Joi.string() });
 	});
 
 	it("should set the value of a flag by name", () => {
 		const definition = new InputDefinition();
 		definition.setFlag("firstName", "description", Joi.string());
 
-		assert.equal(definition.getFlag("firstName"),{ description: "description", schema: Joi.string() });
+		assert.equal(definition.getFlag("firstName"), { description: "description", schema: Joi.string() });
 
 		definition.setFlag("firstName", "description", Joi.number());
 
-		assert.equal(definition.getFlag("firstName"),{ description: "description", schema: Joi.number() });
+		assert.equal(definition.getFlag("firstName"), { description: "description", schema: Joi.number() });
 	});
 
 	it("should check if a flag exists", () => {

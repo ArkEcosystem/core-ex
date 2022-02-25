@@ -3,15 +3,15 @@ import { Console, describe } from "@arkecosystem/core-test-framework";
 import { Output } from "./output";
 
 describe<{
-	output: Output
-}>("Output", ({beforeEach, it, assert, spy}) => {
+	output: Output;
+}>("Output", ({ beforeEach, it, assert, spy }) => {
 	beforeEach((context) => {
 		const cli = new Console();
-	
+
 		context.output = cli.app.resolve(Output);
 	});
 
-	it("should mute and unmute the output", ({output}) => {
+	it("should mute and unmute the output", ({ output }) => {
 		const spyWrite = spy(process.stdout, "write");
 
 		console.log("this should be written to stdout");
@@ -28,15 +28,15 @@ describe<{
 		spyWrite.neverCalled();
 	});
 
-	it("should get and set the verbosity level", ({output}) => {
-		assert.equal(output.getVerbosity(),1);
+	it("should get and set the verbosity level", ({ output }) => {
+		assert.equal(output.getVerbosity(), 1);
 
 		output.setVerbosity(2);
 
-		assert.equal(output.getVerbosity(),2);
+		assert.equal(output.getVerbosity(), 2);
 	});
 
-	it("should determine if the verbosity level is quiet", ({output}) => {
+	it("should determine if the verbosity level is quiet", ({ output }) => {
 		output.setVerbosity(0);
 
 		assert.true(output.isQuiet());
@@ -46,7 +46,7 @@ describe<{
 		assert.false(output.isQuiet());
 	});
 
-	it("should determine if the verbosity level is normal", ({output}) => {
+	it("should determine if the verbosity level is normal", ({ output }) => {
 		output.setVerbosity(1);
 
 		assert.true(output.isNormal());
@@ -56,7 +56,7 @@ describe<{
 		assert.false(output.isNormal());
 	});
 
-	it("should determine if the verbosity level is verbose", ({output}) => {
+	it("should determine if the verbosity level is verbose", ({ output }) => {
 		output.setVerbosity(2);
 
 		assert.true(output.isVerbose());
@@ -66,7 +66,7 @@ describe<{
 		assert.false(output.isVerbose());
 	});
 
-	it("should determine if the verbosity level is debug", ({output}) => {
+	it("should determine if the verbosity level is debug", ({ output }) => {
 		output.setVerbosity(3);
 
 		assert.true(output.isDebug());
