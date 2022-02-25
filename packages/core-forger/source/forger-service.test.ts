@@ -1026,8 +1026,8 @@ describe<{
 		const spyNextSlot = jest.spyOn(Crypto.Slots, "getSlotNumber");
 		spyNextSlot.mockReturnValue(0);
 
-		await assert.resolves(
-			() =>	context.forgerService.forgeNewBlock(nextDelegateToForge as any, mockEndingRound, context.mockNetworkState),
+		await assert.resolves(() =>
+			context.forgerService.forgeNewBlock(nextDelegateToForge as any, mockEndingRound, context.mockNetworkState),
 		);
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
