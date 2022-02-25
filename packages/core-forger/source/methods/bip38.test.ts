@@ -15,8 +15,8 @@ describe("Methods -> BIP38", ({ assert, it, spy }) => {
 		assert.is(delegate.address, Identities.Address.fromPassphrase(passphrase));
 	});
 
-	it("should fail with an invalid passphrase", () => {
-		assert.rejects(() => new BIP38(bip38, "invalid-password"));
+	it("should fail with an invalid passphrase", async () => {
+		await assert.rejects(() => new BIP38(bip38, "invalid-password"));
 	});
 
 	it.skip("should forge a block - bip38", () => {
@@ -42,10 +42,10 @@ describe("Methods -> BIP38", ({ assert, it, spy }) => {
 		assert.is(block.transactions[0].id, transactions[0].id);
 	});
 
-	it("should not forge a block if encryptedKeys are not set", () => {
+	it("should not forge a block if encryptedKeys are not set", async () => {
 		const delegate = new BIP38(dummy.bip38Passphrase, "bip38-password");
 		delegate.encryptedKeys = undefined;
 
-		assert.rejects(() => delegate.forge(transactions, optionsDefault));
+		await assert.rejects(() => delegate.forge(transactions, optionsDefault));
 	});
 });

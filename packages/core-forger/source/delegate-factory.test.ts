@@ -14,12 +14,12 @@ describe("DelegateFactory", ({ assert, it }) => {
 		assert.equal(delegate.address, Identities.Address.fromPassphrase(passphrase38));
 	});
 
-	it("bip38 should fail with an invalid passphrase", () => {
-		assert.rejects(() => DelegateFactory.fromBIP38(bip38, "invalid-password"));
+	it("bip38 should fail with an invalid passphrase", async () => {
+		await assert.rejects(() => DelegateFactory.fromBIP38(bip38, "invalid-password"));
 	});
 
-	it("bip38 should fail with an invalid bip38", () => {
-		assert.rejects(() => DelegateFactory.fromBIP38("wrong", "bip38-password"), "not bip38");
+	it("bip38 should fail with an invalid bip38", async () => {
+		await assert.rejects(() => DelegateFactory.fromBIP38("wrong", "bip38-password"), "not bip38");
 	});
 
 	it("bip39 should be ok with a plain text passphrase", () => {
@@ -29,7 +29,7 @@ describe("DelegateFactory", ({ assert, it }) => {
 		assert.equal(delegate.address, Identities.Address.fromPassphrase(passphrase39));
 	});
 
-	it("bip39 should throw if given a bip38 passphrase", () => {
-		assert.rejects(() => DelegateFactory.fromBIP39(bip38), "seems to be bip38");
+	it("bip39 should throw if given a bip38 passphrase", async () => {
+		await assert.rejects(() => DelegateFactory.fromBIP39(bip38), "seems to be bip38");
 	});
 });
