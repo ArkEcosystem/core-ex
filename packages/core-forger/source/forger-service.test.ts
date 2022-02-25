@@ -539,7 +539,9 @@ describe<{
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 3)));
+		await assert.resolves(() =>
+			context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 3)),
+		);
 		assert.false(context.logger.info.calledWith(`Forger Manager started.`));
 
 		// @TODO jest.useFakeTimers();
@@ -556,7 +558,7 @@ describe<{
 		assert.false(context.logger.info.calledWith(expectedInfoMessage));
 		assert.true(context.logger.warning.notCalled);
 		assert.true(context.logger.error.notCalled);
-		assert.false(context.logger.info.calledWith(`Sending wake-up check to relay node ${mockHost.hostname}`,));
+		assert.false(context.logger.info.calledWith(`Sending wake-up check to relay node ${mockHost.hostname}`));
 
 		// @TODO jest.useRealTimers();
 	});
