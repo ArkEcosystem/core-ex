@@ -7,13 +7,13 @@ import { Application, Container } from "./index";
 class StubClass {}
 
 describe<{
-	app: Application
-}>("ActionFactory", ({beforeEach, it, assert}) => {
+	app: Application;
+}>("ActionFactory", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container())
+		context.app = new Application(new Container.Container());
 	});
 
-	it("should bind a value to the IoC container", ({app}) => {
+	it("should bind a value to the IoC container", ({ app }) => {
 		assert.false(app.isBound("key"));
 
 		app.bind("key").toConstantValue("value");
@@ -21,12 +21,12 @@ describe<{
 		assert.true(app.isBound("key"));
 	});
 
-	it("should rebind a value to the IoC container", ({app}) => {
+	it("should rebind a value to the IoC container", ({ app }) => {
 		assert.false(app.isBound("key"));
 
 		app.rebind("key").toConstantValue("value");
 
-		assert.equal(app.get("key"),"value");
+		assert.equal(app.get("key"), "value");
 		assert.true(app.isBound("key"));
 
 		app.rebind("key").toConstantValue("value-new");
@@ -34,7 +34,7 @@ describe<{
 		assert.equal(app.get("key"), "value-new");
 	});
 
-	it("should unbind a value from the IoC container", ({app}) => {
+	it("should unbind a value from the IoC container", ({ app }) => {
 		app.bind("key").toConstantValue("value");
 
 		assert.true(app.isBound("key"));
@@ -44,29 +44,29 @@ describe<{
 		assert.false(app.isBound("key"));
 	});
 
-	it("should get a value from the IoC container", ({app}) => {
+	it("should get a value from the IoC container", ({ app }) => {
 		app.bind("key").toConstantValue("value");
 
 		assert.equal(app.get("key"), "value");
 	});
 
-	it("should resolve a value from the IoC container", ({app}) => {
+	it("should resolve a value from the IoC container", ({ app }) => {
 		assert.instance(app.resolve(StubClass), StubClass);
 	});
 
-	it("should get core paths", ({app}) => {
+	it("should get core paths", ({ app }) => {
 		const paths = envPaths("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
 
 		assert.equal(app.getCorePath("data"), paths.data);
-		assert.equal(app.getCorePath("config"),paths.config);
-		assert.equal(app.getCorePath("cache"),paths.cache);
-		assert.equal(app.getCorePath("log"),paths.log);
-		assert.equal(app.getCorePath("temp"),paths.temp);
+		assert.equal(app.getCorePath("config"), paths.config);
+		assert.equal(app.getCorePath("cache"), paths.cache);
+		assert.equal(app.getCorePath("log"), paths.log);
+		assert.equal(app.getCorePath("temp"), paths.temp);
 	});
 
-	it("should get console paths with a file", ({app}) => {
+	it("should get console paths with a file", ({ app }) => {
 		const paths = envPaths("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
@@ -78,7 +78,7 @@ describe<{
 		assert.equal(app.getCorePath("temp", "file"), `${paths.temp}/file`);
 	});
 
-	it("should get console paths", ({app}) => {
+	it("should get console paths", ({ app }) => {
 		const paths = envPaths("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);
@@ -90,7 +90,7 @@ describe<{
 		assert.equal(app.getConsolePath("temp"), paths.temp);
 	});
 
-	it("should get console paths with a file", ({app}) => {
+	it("should get console paths with a file", ({ app }) => {
 		const paths = envPaths("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);

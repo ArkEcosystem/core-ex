@@ -5,21 +5,20 @@ import { setGracefulCleanup } from "tmp";
 import execa from "execa";
 
 describe<{
-	installer: Installer
-}>("Installer", ({beforeEach, afterAll, it , spy, stub, assert}) => {
-
+	installer: Installer;
+}>("Installer", ({ beforeEach, afterAll, it, spy, stub, assert }) => {
 	beforeEach((context) => {
 		const cli = new Console();
-	
+
 		context.installer = cli.app.resolve(Installer);
 	});
 
-	afterAll(() => setGracefulCleanup())
+	afterAll(() => setGracefulCleanup());
 
-	it("#install - should install latest package when tag isn't provided", ({installer}) => {
+	it("#install - should install latest package when tag isn't provided", ({ installer }) => {
 		stub(installer, "installPeerDependencies");
 
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			stdout: "stdout",
 			exitCode: 0,
 		});
@@ -29,10 +28,10 @@ describe<{
 		spySync.calledWith("yarn global add @arkecosystem/core@latest --force", { shell: true });
 	});
 
-	it("#install - should install specific package when tag is provided", ({installer}) => {
+	it("#install - should install specific package when tag is provided", ({ installer }) => {
 		stub(installer, "installPeerDependencies");
 
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			stdout: "stdout",
 			exitCode: 0,
 		});
@@ -42,10 +41,10 @@ describe<{
 		spySync.calledWith("yarn global add @arkecosystem/core@3.0.0 --force", { shell: true });
 	});
 
-	it("#install - should throw when exit code isn't 0", ({installer}) => {
+	it("#install - should throw when exit code isn't 0", ({ installer }) => {
 		stub(installer, "installPeerDependencies");
 
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			stderr: "stderr",
 			exitCode: 1,
 		});
@@ -55,12 +54,10 @@ describe<{
 		spySync.calledWith("yarn global add @arkecosystem/core@latest --force", { shell: true });
 	});
 
-
-
-	it("#installPeerDependencies - should install each peer dependency", ({installer}) => {
+	it("#installPeerDependencies - should install each peer dependency", ({ installer }) => {
 		const spyInstallRangeLatest = stub(installer, "installRangeLatest");
 
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			stdout: JSON.stringify({ data: { pm2: "4.5.0", somepkg: "^1.0.0" } }),
 			exitCode: 0,
 		});
@@ -75,10 +72,10 @@ describe<{
 		spyInstallRangeLatest.calledWith("somepkg", "^1.0.0");
 	});
 
-	it("#installPeerDependencies - should not install peer dependencies when there aren't any", ({installer}) => {
-		const spyInstallRangeLatest = stub(installer, "installRangeLatest")
+	it("#installPeerDependencies - should not install peer dependencies when there aren't any", ({ installer }) => {
+		const spyInstallRangeLatest = stub(installer, "installRangeLatest");
 
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			stdout: JSON.stringify({}),
 			exitCode: 0,
 		});
@@ -92,8 +89,8 @@ describe<{
 		spyInstallRangeLatest.neverCalled();
 	});
 
-	it("#installPeerDependencies - should throw error when yarn command fails", ({installer}) => {
-		const spySync= stub(execa, "sync").returnValue({
+	it("#installPeerDependencies - should throw error when yarn command fails", ({ installer }) => {
+		const spySync = stub(execa, "sync").returnValue({
 			stderr: "stderr",
 			exitCode: 1,
 		});
@@ -105,10 +102,10 @@ describe<{
 		});
 	});
 
-	it("#installRangeLatest - should install highest matching version", ({installer}) => {
+	it("#installRangeLatest - should install highest matching version", ({ installer }) => {
 		const spyInstall = stub(installer, "install");
 
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			stdout: JSON.stringify({ data: ["3.0.0", "3.1.0", "3.0.0-next.9"] }),
 			exitCode: 0,
 		});
@@ -122,8 +119,8 @@ describe<{
 		spyInstall.calledWith("@arkecosystem/core", "3.1.0");
 	});
 
-	it("#installRangeLatest - should throw error when command fails", ({installer}) => {
-		const spySync= stub(execa, "sync").returnValue({
+	it("#installRangeLatest - should throw error when command fails", ({ installer }) => {
+		const spySync = stub(execa, "sync").returnValue({
 			stderr: "stderr",
 			exitCode: 1,
 		});
@@ -135,14 +132,17 @@ describe<{
 		});
 	});
 
-	it("#installRangeLatest - should throw error when there is no version matching requested range", ({installer}) => {
-		const spySync= stub(execa, "sync").returnValue({
+	it("#installRangeLatest - should throw error when there is no version matching requested range", ({
+		installer,
+	}) => {
+		const spySync = stub(execa, "sync").returnValue({
 			stdout: JSON.stringify({ data: ["3.0.0", "3.0.0-next.9"] }),
 			exitCode: 0,
 		});
 
-		assert.throws(() => installer.installRangeLatest("@arkecosystem/core", "^4.0.0 <4.4.0"),
-			"No @arkecosystem/core version to satisfy ^4.0.0 <4.4.0".replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'),
+		assert.throws(
+			() => installer.installRangeLatest("@arkecosystem/core", "^4.0.0 <4.4.0"),
+			"No @arkecosystem/core version to satisfy ^4.0.0 <4.4.0".replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"),
 		);
 
 		spySync.calledWith("yarn info @arkecosystem/core versions --json", {

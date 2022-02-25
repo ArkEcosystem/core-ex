@@ -5,15 +5,15 @@ import { ProcessDescription } from "../contracts";
 import { ProcessManager } from "./process-manager";
 
 describe<{
-	processManager: ProcessManager
-}>("ProcessManager", ({beforeAll, it, stub, assert}) => {
+	processManager: ProcessManager;
+}>("ProcessManager", ({ beforeAll, it, stub, assert }) => {
 	beforeAll((context) => {
 		const cli = new Console();
-	
+
 		context.processManager = cli.app.resolve(ProcessManager);
 	});
 
-	it("#list - should return an empty array if stdout is empty", ({processManager}) => {
+	it("#list - should return an empty array if stdout is empty", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -30,9 +30,9 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#list - should return an empty array if stdout is empty after trimming", ({processManager}) => {
+	it("#list - should return an empty array if stdout is empty after trimming", ({ processManager }) => {
 		// Arrange...
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
 			stdout: "\n",
@@ -47,7 +47,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#list - should return an empty array if stdout is invalid JSON", ({processManager}) => {
+	it("#list - should return an empty array if stdout is invalid JSON", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -64,7 +64,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#list - should return an empty array if an exception is thrown", ({processManager}) => {
+	it("#list - should return an empty array if an exception is thrown", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").callsFake(() => {
 			throw new Error("Whoops");
@@ -79,7 +79,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#list - should return an array if stdout is valid JSON", ({processManager}) => {
+	it("#list - should return an array if stdout is valid JSON", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -91,11 +91,11 @@ describe<{
 		const processes: ProcessDescription[] | undefined = processManager.list();
 
 		// Assert...
-		assert.equal(processes,[{ key: "value" }]);
+		assert.equal(processes, [{ key: "value" }]);
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#describe - should return an object if the process exists", ({processManager}) => {
+	it("#describe - should return an object if the process exists", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -111,7 +111,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#describe - should return undefined if the process does not exist", ({processManager}) => {
+	it("#describe - should return undefined if the process does not exist", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -127,7 +127,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#describe - should return undefined if stdout is an empty array", ({processManager}) => {
+	it("#describe - should return undefined if stdout is an empty array", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -143,7 +143,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#describe - return undefined if an exception is thrown", ({processManager}) => {
+	it("#describe - return undefined if an exception is thrown", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").callsFake(() => {
 			throw new Error("Whoops");
@@ -157,7 +157,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#start - should be OK if failed is false", ({processManager}) => {
+	it("#start - should be OK if failed is false", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -178,7 +178,7 @@ describe<{
 		spySync.calledWith("pm2 start stub.js --name='stub'", { shell: true });
 	});
 
-	it("#start - should respect the given node_args", ({processManager}) => {
+	it("#start - should respect the given node_args", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -197,13 +197,10 @@ describe<{
 
 		// Assert...
 		assert.false(failed);
-		spySync.calledWith(
-			"pm2 start stub.js --node-args=\"--max_old_space_size=500\" --name='stub'",
-			{ shell: true },
-		);
+		spySync.calledWith("pm2 start stub.js --node-args=\"--max_old_space_size=500\" --name='stub'", { shell: true });
 	});
 
-	it("#start - should respect the given args", ({processManager}) => {
+	it("#start - should respect the given args", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -227,7 +224,7 @@ describe<{
 		});
 	});
 
-	it("#start - should ignore the flags if they are undefined", ({processManager}) => {
+	it("#start - should ignore the flags if they are undefined", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -236,18 +233,16 @@ describe<{
 		});
 
 		// Act...
-		const { failed } = processManager.start(
-			{
-				script: "stub.js",
-			},
-		);
+		const { failed } = processManager.start({
+			script: "stub.js",
+		});
 
 		// Assert...
 		assert.false(failed);
 		spySync.calledWith("pm2 start stub.js", { shell: true });
 	});
 
-	it("#stop - should be OK if failed is false", ({processManager}) => {
+	it("#stop - should be OK if failed is false", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -263,7 +258,7 @@ describe<{
 		spySync.calledWith("pm2 stop stub", { shell: true });
 	});
 
-	it("#stop - should respect the given flags", ({processManager}) => {
+	it("#stop - should respect the given flags", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -279,7 +274,7 @@ describe<{
 		spySync.calledWith("pm2 stop stub --key='value'", { shell: true });
 	});
 
-	it("#restart - should be OK if failed is false", ({processManager}) => {
+	it("#restart - should be OK if failed is false", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -295,7 +290,7 @@ describe<{
 		spySync.calledWith("pm2 restart stub --update-env", { shell: true });
 	});
 
-	it("#restart - should respect the given flags", ({processManager}) => {
+	it("#restart - should respect the given flags", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -311,7 +306,7 @@ describe<{
 		spySync.calledWith("pm2 restart stub --key='value'", { shell: true });
 	});
 
-	it("#restart - should ignore the flags if they are empty", ({processManager}) => {
+	it("#restart - should ignore the flags if they are empty", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -327,9 +322,9 @@ describe<{
 		spySync.calledWith("pm2 restart stub", { shell: true });
 	});
 
-	it("#reload - should reload", ({processManager}) => {
+	it("#reload - should reload", ({ processManager }) => {
 		// Arrange...
-		const spySync= stub(execa, "sync").returnValue({
+		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
 			stderr: undefined,
 			stdout: null,
@@ -343,7 +338,7 @@ describe<{
 		spySync.calledWith("pm2 reload stub", { shell: true });
 	});
 
-	it("#reset - should reset", ({processManager}) => {
+	it("#reset - should reset", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -359,7 +354,7 @@ describe<{
 		spySync.calledWith("pm2 reset stub", { shell: true });
 	});
 
-	it("#delete - should delete", ({processManager}) => {
+	it("#delete - should delete", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -375,7 +370,7 @@ describe<{
 		spySync.calledWith("pm2 delete stub", { shell: true });
 	});
 
-	it("#flush - should flush", ({processManager}) => {
+	it("#flush - should flush", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -391,7 +386,7 @@ describe<{
 		spySync.calledWith("pm2 flush", { shell: true });
 	});
 
-	it("#reloadLogs - should reload logs", ({processManager}) => {
+	it("#reloadLogs - should reload logs", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -407,23 +402,23 @@ describe<{
 		spySync.calledWith("pm2 reloadLogs", { shell: true });
 	});
 
-		it("#ping - should ping", ({processManager}) => {
-			// Arrange...
-			const spySync = stub(execa, "sync").returnValue({
-				failed: false,
-				stderr: undefined,
-				stdout: null,
-			});
-
-			// Act...
-			const { failed } = processManager.ping();
-
-			// Assert...
-			assert.false(failed);
-			spySync.calledWith("pm2 ping", { shell: true });
+	it("#ping - should ping", ({ processManager }) => {
+		// Arrange...
+		const spySync = stub(execa, "sync").returnValue({
+			failed: false,
+			stderr: undefined,
+			stdout: null,
 		});
 
-	it("#update - should update", ({processManager}) => {
+		// Act...
+		const { failed } = processManager.ping();
+
+		// Assert...
+		assert.false(failed);
+		spySync.calledWith("pm2 ping", { shell: true });
+	});
+
+	it("#update - should update", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -456,7 +451,7 @@ describe<{
 	// 	spyExeca.calledWith("pm2 trigger ark-core module.name params", { shell: true });
 	// });
 
-	it("#status - should return the status if the process exists", ({processManager}) => {
+	it("#status - should return the status if the process exists", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -472,7 +467,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#status - return undefined if an exception is thrown", ({processManager}) => {
+	it("#status - return undefined if an exception is thrown", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").callsFake(() => {
 			throw new Error("Whoops");
@@ -486,7 +481,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#status - return undefined if process doesn't exists", ({processManager}) => {
+	it("#status - return undefined if process doesn't exists", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -502,7 +497,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isOnline - should return true", ({processManager}) => {
+	it("#isOnline - should return true", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -518,7 +513,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isStopped - should return true", ({processManager}) => {
+	it("#isStopped - should return true", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -534,7 +529,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isStopping - should return true", ({processManager}) => {
+	it("#isStopping - should return true", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -550,7 +545,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isWaiting - shoudl return true", ({processManager}) => {
+	it("#isWaiting - shoudl return true", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -566,7 +561,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isLaunching - shoudl return true", ({processManager}) => {
+	it("#isLaunching - shoudl return true", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -582,7 +577,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isErrored - shoudl return true", ({processManager}) => {
+	it("#isErrored - shoudl return true", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -598,7 +593,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isOneLaunch - should return true", ({processManager}) => {
+	it("#isOneLaunch - should return true", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -614,7 +609,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isUnknown - should return true if the process has a status of [unknown]", ({processManager}) => {
+	it("#isUnknown - should return true if the process has a status of [unknown]", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -630,7 +625,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isUnknown - should return false if the process has a status other than [unknown]", ({processManager}) => {
+	it("#isUnknown - should return false if the process has a status other than [unknown]", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -646,7 +641,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#isUnknown - return true if an exception is thrown", ({processManager}) => {
+	it("#isUnknown - return true if an exception is thrown", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").callsFake(() => {
 			throw new Error("Whoops");
@@ -660,7 +655,7 @@ describe<{
 		spySync.calledWith("pm2 jlist", { shell: true });
 	});
 
-	it("#has - should return true if the process ID is a number", ({processManager}) => {
+	it("#has - should return true if the process ID is a number", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -676,7 +671,7 @@ describe<{
 		spySync.calledWith("pm2 id stub | awk '{ print $2 }'", { shell: true });
 	});
 
-	it("#has - return false if the process ID is not a number", ({processManager}) => {
+	it("#has - return false if the process ID is not a number", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -692,7 +687,7 @@ describe<{
 		spySync.calledWith("pm2 id stub | awk '{ print $2 }'", { shell: true });
 	});
 
-	it("#has - should return false if an exception is thrown", ({processManager}) => {
+	it("#has - should return false if an exception is thrown", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").callsFake(() => {
 			throw new Error("Whoops");
@@ -706,7 +701,7 @@ describe<{
 		spySync.calledWith("pm2 id stub | awk '{ print $2 }'", { shell: true });
 	});
 
-	it("#missing - return true if the process ID is not a number", ({processManager}) => {
+	it("#missing - return true if the process ID is not a number", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,
@@ -722,7 +717,7 @@ describe<{
 		spySync.calledWith("pm2 id stub | awk '{ print $2 }'", { shell: true });
 	});
 
-	it("#missing - return false if the process ID is a number", ({processManager}) => {
+	it("#missing - return false if the process ID is a number", ({ processManager }) => {
 		// Arrange...
 		const spySync = stub(execa, "sync").returnValue({
 			failed: false,

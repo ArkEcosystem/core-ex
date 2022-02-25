@@ -9,28 +9,24 @@ import execa from "execa";
 import { versionNext } from "../../test/fixtures/latest-version";
 import { assert } from "console";
 
-
-
-
-
 describe<{
 	cli: Console;
 	updater: Updater;
 	config: Config;
-}>("Updater", ({beforeAll, beforeEach, afterAll, it, stub, spy, assert}) => {
+}>("Updater", ({ beforeAll, beforeEach, afterAll, it, stub, spy, assert }) => {
 	beforeEach((context) => {
 		nock.cleanAll();
-	
+
 		context.cli = new Console();
 		context.updater = context.cli.app.resolve(Updater);
 		context.config = context.cli.app.get(Identifiers.Config);
 	});
-		
+
 	beforeAll(() => nock.disableNetConnect());
-	
+
 	afterAll(() => nock.enableNetConnect());
 
-	it("#check - should forget the latest version if it has one from a previous check", async ({config, updater}) => {
+	it("#check - should forget the latest version if it has one from a previous check", async ({ config, updater }) => {
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, versionNext);
 
 		config.set("latestVersion", {});
@@ -41,7 +37,7 @@ describe<{
 		spyForget.calledWith("latestVersion");
 	});
 
-	it("#check - should return false if the latest version cannot be retrieved", async ({cli, updater}) => {
+	it("#check - should return false if the latest version cannot be retrieved", async ({ cli, updater }) => {
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, {});
 
 		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");

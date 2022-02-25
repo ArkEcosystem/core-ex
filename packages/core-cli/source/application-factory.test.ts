@@ -2,7 +2,7 @@ import { describe } from "@arkecosystem/core-test-framework";
 
 import { Application, ApplicationFactory, Container, Utils } from "./index";
 
-describe("ApplicationFactory", ({it, stub, assert}) => {
+describe("ApplicationFactory", ({ it, stub, assert }) => {
 	it("should create an application instance with the given container", () => {
 		assert.instance(
 			ApplicationFactory.make(new Container.Container(), {
@@ -10,7 +10,8 @@ describe("ApplicationFactory", ({it, stub, assert}) => {
 				name: "@arkecosystem/core",
 				version: "3.0.0-next.0",
 			}),
-		Application);
+			Application,
+		);
 	});
 
 	it("should expose the ProcessFactory", () => {
