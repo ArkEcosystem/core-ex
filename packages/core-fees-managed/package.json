@@ -1,5 +1,5 @@
 {
-	"name": "@arkecosystem/core-fees-dynamic",
+	"name": "@arkecosystem/core-fees-managed",
 	"version": "0.0.1",
 	"description": "Transaction Pool Manager for ARK Core",
 	"license": "MIT",
@@ -15,6 +15,7 @@
 		"clean": "del distribution"
 	},
 	"dependencies": {
+		"@arkecosystem/core-fees": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/crypto": "workspace:*"

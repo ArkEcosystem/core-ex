@@ -23,7 +23,7 @@ export const Identifiers = {
 	CacheService: Symbol.for("Service<Cache>"),
 
 	// Config
-ConfigFlags: Symbol.for("Config<Flags>"),
+	ConfigFlags: Symbol.for("Config<Flags>"),
 
 	ConfigManager: Symbol.for("Manager<Config>"),
 
@@ -43,97 +43,7 @@ ConfigFlags: Symbol.for("Config<Flags>"),
 	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),
 
 	// Factories
-CacheFactory: Symbol.for("Factory<Cache>"),
-
-
-
-EventDispatcherService: Symbol.for("Service<EventDispatcher>"),
-
-
-FilesystemManager: Symbol.for("Manager<Filesystem>"),
-
-
-FilesystemService: Symbol.for("Service<Filesystem>"),
-
-
-// Database
-DatabaseLogger: Symbol.for("Database<Logger>"),
-
-
-
-ForgerService: Symbol.for("Service<Forger>"),
-
-
-
-DatabaseConnection: Symbol.for("Database<Connection>"),
-
-
-
-LogManager: Symbol.for("Manager<Log>"),
-
-
-
-DatabaseBlockRepository: Symbol.for("Database<BlockRepository>"),
-
-
-
-LogService: Symbol.for("Service<Log>"),
-
-
-
-DatabaseBlockFilter: Symbol.for("Database<BlockFilter>"),
-
-
-// Plugins
-PluginConfiguration: Symbol.for("PluginConfiguration"),
-
-
-DatabaseInteraction: Symbol.for("Database<DatabaseInteraction>"),
-
-
-MixinService: Symbol.for("Service<Mixin>"),
-
-
-// Kernel
-ConfigRepository: Symbol.for("Repository<Config>"),
-
-
-
-PaginationService: Symbol.for("Service<PaginationService>"),
-
-
-DatabaseModelConverter: Symbol.for("Database<ModelConverter>"),
-
-
-ProcessActionsManager: Symbol.for("Manager<ProcessAction>"),
-
-
-BlockProcessor: Symbol.for("Block<Processor>"),
-
-
-QueueManager: Symbol.for("Manager<Queue>"),
-
-
-// State - @todo: better names that won't clash
-BlockState: Symbol.for("State<Block>"),
-
-
-
-ValidationManager: Symbol.for("Manager<Validation>"),
-
-
-
-DatabaseRoundRepository: Symbol.for("Database<RoundRepository>"),
-
-
-
-PeerFactory: Symbol.for("Factory<Peer>"),
-
-
-
-DatabaseTransactionFilter: Symbol.for("Database<TransactionFilter>"),
-
-
+	CacheFactory: Symbol.for("Factory<Cache>"),
 
 	EventDispatcherService: Symbol.for("Service<EventDispatcher>"),
 
@@ -141,45 +51,51 @@ DatabaseTransactionFilter: Symbol.for("Database<TransactionFilter>"),
 
 	FilesystemService: Symbol.for("Service<Filesystem>"),
 
+	// Database
+	DatabaseLogger: Symbol.for("Database<Logger>"),
 
 	ForgerService: Symbol.for("Service<Forger>"),
 
+	DatabaseConnection: Symbol.for("Database<Connection>"),
 
 	LogManager: Symbol.for("Manager<Log>"),
 
+	DatabaseBlockRepository: Symbol.for("Database<BlockRepository>"),
 
 	LogService: Symbol.for("Service<Log>"),
 
-	DposPreviousRoundStateProvider: Symbol("Provider<DposPreviousRoundState>"),
+	DatabaseBlockFilter: Symbol.for("Database<BlockFilter>"),
 
 	// Plugins
 	PluginConfiguration: Symbol.for("PluginConfiguration"),
 
-	// Derived states
-DposState: Symbol.for("State<DposState>"),
+	DatabaseInteraction: Symbol.for("Database<DatabaseInteraction>"),
 
 	MixinService: Symbol.for("Service<Mixin>"),
 
-StandardCriteriaService: Symbol.for("Service<StandardCriteriaService>"),
+	// Kernel
+	ConfigRepository: Symbol.for("Repository<Config>"),
 
 	PaginationService: Symbol.for("Service<PaginationService>"),
 
-PeerChunkCache: Symbol.for("Peer<ChunkCache>"),
+	DatabaseModelConverter: Symbol.for("Database<ModelConverter>"),
 
 	ProcessActionsManager: Symbol.for("Manager<ProcessAction>"),
 
-TriggerService: Symbol.for("Service<Actions>"),
+	BlockProcessor: Symbol.for("Block<Processor>"),
 
 	QueueManager: Symbol.for("Manager<Queue>"),
 
-// P2P - @todo: better names that won't clash
-PeerCommunicator: Symbol.for("Peer<Communicator>"),
+	// State - @todo: better names that won't clash
+	BlockState: Symbol.for("State<Block>"),
 
 	ValidationManager: Symbol.for("Manager<Validation>"),
 
+	DatabaseRoundRepository: Symbol.for("Database<RoundRepository>"),
 
 	PeerFactory: Symbol.for("Factory<Peer>"),
 
+	DatabaseTransactionFilter: Symbol.for("Database<TransactionFilter>"),
 
 	PipelineService: Symbol.for("Service<Pipeline>"),
 
@@ -191,6 +107,7 @@ PeerCommunicator: Symbol.for("Peer<Communicator>"),
 
 	QueueService: Symbol.for("Service<Queue>"),
 
+	DatabaseInterceptor: Symbol.for("State<DatabaseInterceptor>"),
 
 	ScheduleService: Symbol.for("Service<Schedule>"),
 
@@ -203,16 +120,20 @@ PeerCommunicator: Symbol.for("Peer<Communicator>"),
 
 	StandardCriteriaService: Symbol.for("Service<StandardCriteriaService>"),
 
-	TransactionValidator: Symbol.for("State<TransactionValidator>"),
+	PeerChunkCache: Symbol.for("Peer<ChunkCache>"),
 
 	TriggerService: Symbol.for("Service<Actions>"),
 
+	// P2P - @todo: better names that won't clash
+	PeerCommunicator: Symbol.for("Peer<Communicator>"),
 
 	ValidationService: Symbol.for("Service<Validation>"),
 
+	PeerConnector: Symbol.for("Peer<Connector>"),
 
 	TransactionHistoryService: Symbol.for("Service<TransactionHistory>"),
 
+	P2PServer: Symbol.for("Server<P2P>"),
 
 	PipelineFactory: Symbol.for("Factory<Pipeline>"),
 
@@ -259,6 +180,7 @@ PeerCommunicator: Symbol.for("Peer<Communicator>"),
 
 	WalletRepository: Symbol.for("Repository<Wallet>"),
 
+	TransactionHandlerProvider: Symbol.for("Provider<TransactionHandler>"),
 
 	WalletRepositoryIndexerIndex: Symbol.for("IndexerIndex<Repository<Wallet>>"),
 
@@ -284,29 +206,7 @@ PeerCommunicator: Symbol.for("Peer<Communicator>"),
 
 	TransactionPoolSenderMempoolFactory: Symbol.for("TransactionPool<SenderMempoolFactory>"),
 
-
-
-TransactionPoolQuery: Symbol.for("TransactionPool<Query>"),
-
-
-
-TransactionPoolSenderMempool: Symbol.for("TransactionPool<SenderMempool>"),
-
-
-
-FeeMatcher: Symbol.for("FeeMatcher"), // @TODO
-
-
-
-TransactionPoolSenderMempoolFactory: Symbol.for("TransactionPool<SenderMempoolFactory>"),
-
-
-TransactionPoolSenderState: Symbol.for("TransactionPool<SenderState>"),
-
-	// Transaction Pool
-TransactionPoolService: Symbol.for("TransactionPool<Service>"),
-
-	TransactionPoolStorage: Symbol.for("TransactionPool<Storage>"),
+	TransactionPoolSenderState: Symbol.for("TransactionPool<SenderState>"),
 
 	// Transaction Pool
 	TransactionPoolService: Symbol.for("TransactionPool<Service>"),
@@ -319,15 +219,12 @@ TransactionPoolService: Symbol.for("TransactionPool<Service>"),
 
 	TransactionPoolWorkerIpcSubprocessFactory: Symbol.for("TransactionPool<WorkerIpcSubprocessFactory>"),
 
-
 	TransactionPoolWorkerPool: Symbol.for("TransactionPool<WorkerPool>"),
 
 	// Transactions - @todo: better names that won't clash
-WalletAttributes: Symbol.for("Wallet<Attributes>"),
+	WalletAttributes: Symbol.for("Wallet<Attributes>"),
 
 	WatcherDatabaseService: Symbol.for("Watcher<DatabaseService>"),
-
-
 	// Watcher
-WatcherEventListener: Symbol.for("Watcher<EventListener>"),
+	WatcherEventListener: Symbol.for("Watcher<EventListener>"),
 };
