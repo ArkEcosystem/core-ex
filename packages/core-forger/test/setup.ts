@@ -1,11 +1,10 @@
-import "jest-extended";
-
 import { DelegateTracker } from "../source/delegate-tracker";
 import { Container, Services } from "@arkecosystem/core-kernel";
 import { Actions } from "@arkecosystem/core-state";
 import { Wallet } from "@arkecosystem/core-state/source/wallets";
 import { Sandbox } from "@arkecosystem/core-test-framework";
 import { Managers } from "@arkecosystem/crypto";
+import { spy } from "sinon";
 
 export const mockLastBlock = {
 	data: { height: 3, timestamp: 16 },
@@ -14,14 +13,10 @@ export const mockLastBlock = {
 export const setup = async (activeDelegates) => {
 	const sandbox = new Sandbox();
 
-	const error: jest.SpyInstance = jest.fn();
-	const debug: jest.SpyInstance = jest.fn();
-	const warning: jest.SpyInstance = jest.fn();
-
 	const logger = {
-		error,
-		debug,
-		warning,
+		error: spy(),
+		debug: spy(),
+		warning: spy(),
 	};
 
 	sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
