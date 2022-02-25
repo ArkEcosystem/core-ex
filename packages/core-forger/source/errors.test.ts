@@ -2,7 +2,7 @@ import { describe } from "../../core-test-framework/source";
 
 import { ForgerError, HostNoResponseError, RelayCommunicationError } from "./errors";
 
-describe("Errors", ({ assert, it}) => {
+describe("Errors", ({ assert, it }) => {
 	it("should construct base ForgerError", async () => {
 		const message = "I am an error";
 		const error = new ForgerError(message);
