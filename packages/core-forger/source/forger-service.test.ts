@@ -240,19 +240,20 @@ describe<{
 	});
 
 	it("Boot should set correct timeout to check slots", async (context) => {
-		jest.useFakeTimers();
+		// @TODO jest.useFakeTimers();
 
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
 		});
 
 		context.forgerService.register({ hosts: [mockHost] });
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		jest.runAllTimers();
+		// @TODO jest.runAllTimers();
 
+		// @TODO
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), expect.toBeWithin(0, 2000));
 	});
 
@@ -357,9 +358,9 @@ describe<{
 	});
 
 	it("isForgingAllowed should not allow forging if quorum is not met", async (context) => {
-		jest.useFakeTimers();
+		// @TODO jest.useFakeTimers();
 
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
@@ -371,14 +372,12 @@ describe<{
 		(context.mockNetworkState.getQuorum = () => 0.6),
 			assert.false(
 				// @ts-ignore
-				context.forgerService.isForgingAllowed(context.mockNetworkState, delegates[0]),
+				context.forgerService.isForgingAllowed(context.mockNetworkState, context.delegates[0]),
 			);
 
-		expect(context.logger.info).toHaveBeenCalledWith("Not enough quorum to forge next block. Will not forge.");
-
-		expect(context.logger.debug).toHaveBeenCalledWith(`Network State: ${context.mockNetworkState.toJson()}`);
-
-		expect(context.logger.warning).not.toHaveBeenCalled();
+		assert.true(context.logger.info.calledWith("Not enough quorum to forge next block. Will not forge."));
+		assert.true(context.logger.debug.calledWith(`Network State: ${context.mockNetworkState.toJson()}`));
+		assert.true(context.logger.warning.notCalled);
 	});
 
 	it("isForgingAllowed should allow forging if quorum is met", async (context) => {
@@ -447,22 +446,24 @@ describe<{
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
 		});
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 		expect(context.logger.info).not.toHaveBeenCalledWith(`Forger Manager started.`);
 
-		jest.useFakeTimers();
+		// @TODO jest.useFakeTimers();
 
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
 		});
-		await expect(context.forgerService.checkSlot()).toResolve();
+		await assert.resolves(() => context.forgerService.checkSlot());
+
+		// @TODO
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 200);
 
 		assert.true(context.logger.info.notCalled);
@@ -470,7 +471,7 @@ describe<{
 		assert.true(context.logger.error.notCalled);
 		assert.true(context.logger.debug.notCalled);
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should set timer and log nextForger which is active on node", async (context) => {
@@ -497,7 +498,6 @@ describe<{
 		await assert.resolves(() =>
 			context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 2)),
 		);
-		// expect(context.logger.info).not.toHaveBeenCalledWith(`Forger Manager started.`);
 		assert.true(context.logger.info.neverCalledWith(`Forger Manager started.`));
 
 		// @TODO jest.useFakeTimers();
@@ -626,8 +626,7 @@ describe<{
 	});
 
 	it("checkSlot should not log warning message when nodeHeight does not equal last block height", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
@@ -671,10 +670,12 @@ describe<{
 		// @ts-ignore
 		spyGetNetworkState.mockResolvedValue(context.mockNetworkState);
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await expect(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		jest.useFakeTimers();
+
+		// @TODO jest.useFakeTimers();
+
 		// @ts-ignore
 		await context.forgerService.checkSlot();
 
@@ -687,12 +688,11 @@ describe<{
 		const loggerWarningMessage = `The NetworkState height (${context.mockNetworkState.nodeHeight}) and round height (${round.data.lastBlock.height}) are out of sync. This indicates delayed blocks on the network.`;
 		expect(context.logger.warning).not.toHaveBeenCalledWith(loggerWarningMessage);
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should not allow forging when blocked by network status", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
@@ -738,18 +738,17 @@ describe<{
 		// @ts-ignore
 		spyGetNetworkState.mockResolvedValue(context.mockNetworkState);
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await expect(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
 		// @ts-ignore
-		await expect(context.forgerService.checkSlot()).toResolve();
+		await expect(() => context.forgerService.checkSlot());
 
 		expect(spyForgeNewBlock).not.toHaveBeenCalled();
 	});
 
 	it("checkSlot should catch network errors and set timeout to check slot later", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
@@ -795,12 +794,14 @@ describe<{
 			throw new HostNoResponseError(`blockchain isn't ready`);
 		});
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await expect(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		jest.useFakeTimers();
+
+		// @TODO jest.useFakeTimers();
+
 		// @ts-ignore
-		await expect(context.forgerService.checkSlot()).toResolve();
+		await expect(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -808,12 +809,11 @@ describe<{
 
 		expect(context.logger.info).toHaveBeenCalledWith(`Waiting for relay to become ready.`);
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should log warning when error isn't a network error", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
@@ -861,12 +861,14 @@ describe<{
 			throw new RelayCommunicationError(mockEndpoint, mockError);
 		});
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await expect(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		jest.useFakeTimers();
+
+		// @TODO jest.useFakeTimers();
+
 		// @ts-ignore
-		await expect(context.forgerService.checkSlot()).toResolve();
+		await expect(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -876,12 +878,11 @@ describe<{
 			`Request to ${mockEndpoint} failed, because of '${mockError}'.`,
 		);
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should log error when error thrown during attempted forge isn't a network error", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
@@ -932,12 +933,14 @@ describe<{
 			throw new Error(mockError);
 		});
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await expect(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		jest.useFakeTimers();
+
+		// @TODO jest.useFakeTimers();
+
 		// @ts-ignore
-		await expect(context.forgerService.checkSlot()).toResolve();
+		await expect(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -949,12 +952,11 @@ describe<{
 		const infoMessage = `Round: ${round.data.current.toLocaleString()}, height: ${round.data.lastBlock.height.toLocaleString()}`;
 		expect(context.logger.info).toHaveBeenCalledWith(infoMessage);
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should not error when there is no round info", async (context) => {
-		const slotSpy = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		slotSpy.mockReturnValue(0);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
@@ -982,12 +984,14 @@ describe<{
 
 		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
 
-		await expect(context.forgerService.boot(context.delegates)).toResolve();
+		await expect(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.mockResolvedValueOnce(round as Contracts.P2P.CurrentRound);
-		jest.useFakeTimers();
+
+		// @TODO jest.useFakeTimers();
+
 		// @ts-ignore
-		await expect(context.forgerService.checkSlot()).toResolve();
+		await expect(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -998,11 +1002,11 @@ describe<{
 		expect(spyClientEmitEvent).toHaveBeenCalledWith(Enums.ForgerEvent.Failed, { error: expect.any(String) });
 		expect(context.logger.info).not.toHaveBeenCalled();
 
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 
 	it("ForgeNewBlock should fail to forge when delegate is already in next slot", async (context) => {
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
@@ -1023,10 +1027,10 @@ describe<{
 			forge: jest.fn().mockReturnValue(mockBlock),
 		};
 
-		// @ts-ignore
-		await expect(
+		await assert.resolves(() =>
+			// @ts-ignore
 			context.forgerService.forgeNewBlock(nextDelegateToForge, mockPrevRound, context.mockNetworkState),
-		).toResolve();
+		);
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
 
@@ -1036,7 +1040,7 @@ describe<{
 	});
 
 	it("ForgeNewBlock should fail to forge when there is not enough time left in slot", async (context) => {
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
@@ -1073,10 +1077,9 @@ describe<{
 	});
 
 	it("ForgeNewBlock should forge valid new blocks", async (context) => {
-		context.client.getRound.mockReturnValueOnce({ delegates: context.delegates });
+		context.client.getRound.returns({ delegates: context.delegates });
 		const timeLeftInMs = 3000;
-		const spyTimeTillNextSlot = jest.spyOn(Crypto.Slots, "getTimeInMsUntilNextSlot");
-		spyTimeTillNextSlot.mockReturnValue(timeLeftInMs);
+		Crypto.Slots.getTimeInMsUntilNextSlot.returns(timeLeftInMs);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
@@ -1121,7 +1124,7 @@ describe<{
 	});
 
 	it("ForgeNewBlock should forge valid new blocks when passed specific milestones", async (context) => {
-		context.client.getRound.mockReturnValueOnce({
+		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 3,
 			lastBlock: { height: 100 },
@@ -1139,7 +1142,7 @@ describe<{
 
 		context.mockNetworkState.lastBlockId = "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538";
 
-		jest.useFakeTimers();
+		// @TODO jest.useFakeTimers();
 		await context.forgerService.boot(context.delegates);
 
 		const address = `Delegate-Wallet-${2}`;
@@ -1174,6 +1177,6 @@ describe<{
 			Enums.TransactionEvent.Forged,
 			context.transaction.data,
 		);
-		jest.useRealTimers();
+		// @TODO jest.useRealTimers();
 	});
 });
