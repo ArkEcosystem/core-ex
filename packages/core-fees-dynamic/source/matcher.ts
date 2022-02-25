@@ -40,24 +40,29 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 
 			if (transaction.data.fee.isGreaterThanEqual(minFeePool)) {
 				this.logger.debug(`${transaction} eligible to enter pool (fee ${feeString} >= ${minFeeString})`);
+
 				return;
 			}
 
 			this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} < ${minFeeString})`);
+
 			throw new TransactionFeeToLowError(transaction);
 		} else {
 			const staticFeeString = Utils.formatSatoshi(transaction.staticFee);
 
 			if (transaction.data.fee.isEqualTo(transaction.staticFee)) {
 				this.logger.debug(`${transaction} eligible to enter pool (fee ${feeString} = ${staticFeeString})`);
+
 				return;
 			}
 			if (transaction.data.fee.isLessThan(transaction.staticFee)) {
 				this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} < ${staticFeeString})`);
+
 				throw new TransactionFeeToLowError(transaction);
 			}
 
 			this.logger.notice(`${transaction} not eligible to enter pool (fee ${feeString} > ${staticFeeString})`);
+
 			throw new TransactionFeeToHighError(transaction);
 		}
 	}
