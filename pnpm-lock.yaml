@@ -1157,15 +1157,15 @@ importers:
       import-fresh: 3.3.0
       uvu: 0.5.3
 
-  packages/core-fees-dynamic:
+  packages/core-fees:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
+      '@arkecosystem/utils': workspace:*
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto': link:../crypto
+      '@arkecosystem/utils': link:../utils
 
   packages/core-forger:
     specifiers:
