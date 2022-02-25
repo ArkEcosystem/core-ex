@@ -27,8 +27,8 @@ describe("Methods -> BIP38", ({ assert, it, spy }) => {
 
 		const block = delegate.forge(transactions, optionsDefault);
 
-		assert.true(spyDecryptKeys.calledTimes(1));
-		assert.true(spyEncryptKeys.calledTimes(1));
+		spyDecryptKeys.calledTimes(1);
+		spyEncryptKeys.calledTimes(1);
 
 		for (const key of Object.keys(expectedBlock)) {
 			assert.equal(block.data[key], expectedBlock[key]);
