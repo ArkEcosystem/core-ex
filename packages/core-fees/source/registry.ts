@@ -1,19 +1,15 @@
 import { Container } from "@arkecosystem/core-kernel";
-import { BigNumber } from "@arkecosystem/utils";
+import { BigNumber, get, set } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class FeeRegistry {
-	readonly #registry: Record<number, Record<number, BigNumber>> = {};
+	readonly #registry: Record<string, Record<number, BigNumber>> = {};
 
-	public get(type: number, version: number): BigNumber {
-		return this.#registry[type][version];
+	public get(type: string, transaction: number, version: number): BigNumber {
+		return get(this.#registry, `${type}.${transaction}.${version}`);
 	}
 
-	public set(type: number, version: number, fee: BigNumber): void {
-		if (this.#registry[type] === undefined) {
-			this.#registry[type] = {};
-		}
-
-		this.#registry[type][version] = fee;
+	public set(type: string, transaction: string, version: number, fee: BigNumber): void {
+		set(this.#registry, `${type}.${transaction}.${version}`, fee);
 	}
 }
