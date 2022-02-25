@@ -1162,21 +1162,10 @@ importers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
-      '@types/better-sqlite3': 5.4.3
-      '@types/fs-extra': 8.1.2
-      better-sqlite3: 7.4.3
-      fs-extra: 8.1.0
-      joi: 17.4.2
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto': link:../crypto
-      better-sqlite3: 7.4.3
-      fs-extra: 8.1.0
-      joi: 17.4.2
-    devDependencies:
-      '@types/better-sqlite3': 5.4.3
-      '@types/fs-extra': 8.1.2
 
   packages/core-forger:
     specifiers:
