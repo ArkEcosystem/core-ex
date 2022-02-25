@@ -1,5 +1,5 @@
 import { Identities } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../../core-test-framework/source";
 import { BIP38 } from "./bip38";
 
 import { dummy, expectedBlock, optionsDefault, transactions } from "../../test/create-block-with-transactions";

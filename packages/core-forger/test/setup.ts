@@ -2,7 +2,7 @@ import { DelegateTracker } from "../source/delegate-tracker";
 import { Container, Services } from "@arkecosystem/core-kernel";
 import { Actions } from "@arkecosystem/core-state";
 import { Wallet } from "@arkecosystem/core-state/source/wallets";
-import { Sandbox } from "@arkecosystem/core-test-framework";
+import { Sandbox } from "../../core-test-framework/source";
 import { Managers } from "@arkecosystem/crypto";
 import { spy } from "sinon";
 

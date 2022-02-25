@@ -2,7 +2,7 @@ import { SinonSpyStatic } from "sinon";
 import { Utils } from "@arkecosystem/core-kernel";
 import { Wallets } from "@arkecosystem/core-state";
 import { Crypto, Managers } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework/source";
 
 import { DelegateTracker } from "./delegate-tracker";
 import { BIP39 } from "./methods/bip39";

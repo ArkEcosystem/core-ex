@@ -7,7 +7,7 @@ import { Contracts } from "@arkecosystem/core-kernel";
 import { Container, Enums, Services, Utils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { GetActiveDelegatesAction } from "@arkecosystem/core-state/source/actions";
-import { Sandbox } from "@arkecosystem/core-test-framework";
+import { Sandbox } from "../../../core-test-framework/source";
 import { Interfaces } from "@arkecosystem/crypto";
 import { Crypto, Managers } from "@arkecosystem/crypto";
 import { Slots } from "@arkecosystem/crypto/distribution/crypto";
