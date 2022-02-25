@@ -631,7 +631,7 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 		context.delegates[context.delegates.length - 2] = Object.assign(
 			nextDelegateToForge,
@@ -654,25 +654,19 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
+		context.client.getTransactions.returns([]);
 
 		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
 
-		// @ts-ignore
-		const spyGetNetworkState = jest.spyOn(context.forgerService.client, "getNetworkState");
-		// @ts-ignore
-		spyGetNetworkState.mockResolvedValue(context.mockNetworkState);
+		context.client.getNetworkState.returns(context.mockNetworkState);
 
-		await expect(() => context.forgerService.boot(context.delegates));
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		// @TODO jest.useFakeTimers();
 
@@ -697,7 +691,7 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 		context.delegates[context.delegates.length - 2] = Object.assign(
 			nextDelegateToForge,
@@ -720,29 +714,23 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
+		context.client.getTransactions.returns([]);
 
 		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
 
 		context.mockNetworkState.status = NetworkStateStatus.Unknown;
 
-		// @ts-ignore
-		const spyGetNetworkState = jest.spyOn(context.forgerService.client, "getNetworkState");
-		// @ts-ignore
-		spyGetNetworkState.mockResolvedValue(context.mockNetworkState);
+		context.client.getNetworkState.returns(context.mockNetworkState);
 
-		await expect(() => context.forgerService.boot(context.delegates));
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
-		// @ts-ignore
-		await expect(() => context.forgerService.checkSlot());
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+
+		await assert.resolves(() => context.forgerService.checkSlot());
 
 		expect(spyForgeNewBlock).not.toHaveBeenCalled();
 	});
@@ -753,7 +741,7 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 		context.delegates[context.delegates.length - 2] = Object.assign(
 			nextDelegateToForge,
@@ -776,32 +764,23 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
+		context.client.getTransactions.returns([]);
 
 		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
 
-		// @ts-ignore
-		const spyGetNetworkState = jest.spyOn(context.forgerService.client, "getNetworkState");
-		// @ts-ignore
-		spyGetNetworkState.mockImplementation(() => {
-			throw new HostNoResponseError(`blockchain isn't ready`);
-		});
+		context.client.getNetworkState.reject(() => new HostNoResponseError(`blockchain isn't ready`));
 
-		await expect(() => context.forgerService.boot(context.delegates));
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		// @TODO jest.useFakeTimers();
 
-		// @ts-ignore
-		await expect(() => context.forgerService.checkSlot());
+		await assert.resolves(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -818,7 +797,7 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 		context.delegates[context.delegates.length - 2] = Object.assign(
 			nextDelegateToForge,
@@ -841,34 +820,25 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
+		context.client.getTransactions.returns([]);
 
 		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
 
-		// @ts-ignore
-		const spyGetNetworkState = jest.spyOn(context.forgerService.client, "getNetworkState");
 		const mockEndpoint = `Test - Endpoint`;
 		const mockError = `custom error`;
-		// @ts-ignore
-		spyGetNetworkState.mockImplementation(() => {
-			throw new RelayCommunicationError(mockEndpoint, mockError);
-		});
+		context.client.getNetworkState.reject(() => new RelayCommunicationError(mockEndpoint, mockError));
 
-		await expect(() => context.forgerService.boot(context.delegates));
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		// @TODO jest.useFakeTimers();
 
-		// @ts-ignore
-		await expect(() => context.forgerService.checkSlot());
+		await assert.resolves(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -887,7 +857,7 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 		context.delegates[context.delegates.length - 2] = Object.assign(
 			nextDelegateToForge,
@@ -911,14 +881,11 @@ describe<{
 			},
 		};
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
+		context.client.getTransactions.returns([]);
 
 		// @ts-ignore
 		const spyClientEmitEvent = jest.spyOn(context.forgerService.client, "emitEvent");
@@ -933,14 +900,13 @@ describe<{
 			throw new Error(mockError);
 		});
 
-		await expect(() => context.forgerService.boot(context.delegates));
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.mockResolvedValueOnce(round.data as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
 		// @TODO jest.useFakeTimers();
 
-		// @ts-ignore
-		await expect(() => context.forgerService.checkSlot());
+		await assert.resolves(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -961,7 +927,7 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 		context.delegates[context.delegates.length - 2] = Object.assign(
 			nextDelegateToForge,
@@ -970,28 +936,24 @@ describe<{
 
 		const round = undefined;
 
-		context.client.getRound.mockResolvedValueOnce(round as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		// @ts-ignore
-		const spyGetTransactions = jest.spyOn(context.forgerService.client, "getTransactions");
-		// @ts-ignore
-		spyGetTransactions.mockResolvedValue([]);
+		context.client.getTransactions.returns([]);
 
 		// @ts-ignore
 		const spyClientEmitEvent = jest.spyOn(context.forgerService.client, "emitEvent");
 
 		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
 
-		await expect(() => context.forgerService.boot(context.delegates));
+		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.mockResolvedValueOnce(round as Contracts.P2P.CurrentRound);
+		context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
 
 		// @TODO jest.useFakeTimers();
 
-		// @ts-ignore
-		await expect(() => context.forgerService.checkSlot());
+		await assert.resolves(() => context.forgerService.checkSlot());
 
 		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
 
@@ -1014,7 +976,7 @@ describe<{
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		context.client.getTransactions.mockResolvedValueOnce(context.mockTransaction);
+		context.client.getTransactions.returns(context.mockTransaction);
 
 		await context.forgerService.boot(context.delegates);
 
@@ -1024,7 +986,7 @@ describe<{
 		const mockPrevRound = { ...context.mockRound, timestamp: Crypto.Slots.getTime() - 9 };
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 
 		await assert.resolves(() =>
@@ -1048,7 +1010,7 @@ describe<{
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		context.client.getTransactions.mockResolvedValueOnce(context.mockTransaction);
+		context.client.getTransactions.returns(context.mockTransaction);
 
 		await context.forgerService.boot(context.delegates);
 
@@ -1058,16 +1020,15 @@ describe<{
 		const mockEndingRound = { ...context.mockRound, timestamp: Crypto.Slots.getTime() - 7 };
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 
 		const spyNextSlot = jest.spyOn(Crypto.Slots, "getSlotNumber");
 		spyNextSlot.mockReturnValue(0);
 
-		// @ts-ignore
-		await expect(
-			context.forgerService.forgeNewBlock(nextDelegateToForge as any, mockEndingRound, context.mockNetworkState),
-		).toResolve();
+		await assert.resolves(
+			() =>	context.forgerService.forgeNewBlock(nextDelegateToForge as any, mockEndingRound, context.mockNetworkState),
+		);
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
 
@@ -1083,7 +1044,7 @@ describe<{
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		context.client.getTransactions.mockResolvedValueOnce(context.mockTransaction);
+		context.client.getTransactions.returns(context.mockTransaction);
 
 		await context.forgerService.boot(context.delegates);
 
@@ -1092,17 +1053,18 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 
 		const spyNextSlot = jest.spyOn(Crypto.Slots, "getSlotNumber");
 		spyNextSlot.mockReturnValue(0);
 
 		context.client.emitEvent.mockReset();
-		// @ts-ignore
-		await expect(
-			context.forgerService.forgeNewBlock(nextDelegateToForge, context.mockRound, context.mockNetworkState),
-		).toResolve();
+
+		await assert.resolves(
+			// @ts-ignore
+			() => context.forgerService.forgeNewBlock(nextDelegateToForge, context.mockRound, context.mockNetworkState),
+		);
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
 
@@ -1138,7 +1100,7 @@ describe<{
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		context.client.getTransactions.mockResolvedValueOnce(context.mockTransaction);
+		context.client.getTransactions.returns(context.mockTransaction);
 
 		context.mockNetworkState.lastBlockId = "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538";
 
@@ -1150,7 +1112,7 @@ describe<{
 		const mockBlock = { data: {} } as Interfaces.IBlock;
 		const nextDelegateToForge = {
 			publicKey: context.delegates[2].publicKey,
-			forge: jest.fn().mockReturnValue(mockBlock),
+			forge: stubFn().returns(mockBlock),
 		};
 
 		const spyNextSlot = jest.spyOn(Crypto.Slots, "getSlotNumber");
