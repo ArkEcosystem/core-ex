@@ -1,5 +1,5 @@
 import { BIP39 } from "../source/methods/bip39";
-import { TransactionFactory } from "@arkecosystem/core-test-framework/source/utils/transaction-factory";
+import { TransactionFactory } from "../../core-test-framework/source";
 import { Utils } from "@arkecosystem/crypto";
 
 export const dummy = {
