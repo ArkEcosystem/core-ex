@@ -8,8 +8,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Container.Identifiers.Fee.Matcher).to(FeeMatcher).inSingletonScope();
 		this.app
 			.bind(Container.Identifiers.TransactionPoolProcessorExtension)
-			.to(ProcessorExtension)
-			.inSingletonScope();
+			.to(ProcessorExtension);
 	}
 
 	public async required(): Promise<boolean> {
