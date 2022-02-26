@@ -51,11 +51,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		throw new TransactionFeeToLowError(transaction);
 	}
 
-	#dynamicFee({
-		addonBytes,
-		satoshiPerByte,
-		transaction,
-	}: Contracts.Shared.DynamicFeeContext): Utils.BigNumber {
+	#dynamicFee({ addonBytes, satoshiPerByte, transaction }: Contracts.Shared.DynamicFeeContext): Utils.BigNumber {
 		addonBytes = addonBytes || 0;
 
 		if (satoshiPerByte <= 0) {
