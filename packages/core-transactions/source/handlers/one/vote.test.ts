@@ -95,14 +95,12 @@ describe<{
 		context.walletRepository.index(context.delegateWallet2);
 
 		context.voteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.votesAsset(["+" + context.delegateWallet1.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
 		context.multiSignatureVoteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.senderPublicKey(context.multiSignatureWallet.getPublicKey()!)
 			.votesAsset(["+" + context.delegateWallet1.getPublicKey()!])
 			.nonce("1")
@@ -112,14 +110,12 @@ describe<{
 			.build();
 
 		context.unvoteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.votesAsset(["-" + context.delegateWallet1.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
 		context.multiSignatureUnvoteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.senderPublicKey(context.multiSignatureWallet.getPublicKey()!)
 			.votesAsset(["-" + context.delegateWallet1.getPublicKey()!])
 			.nonce("1")
@@ -129,28 +125,24 @@ describe<{
 			.build();
 
 		context.voteUnvoteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.votesAsset(["+" + context.delegateWallet1.getPublicKey()!, "-" + context.delegateWallet1.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
 		context.unvoteVoteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.votesAsset(["-" + context.delegateWallet1.getPublicKey()!, "+" + context.delegateWallet2.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
 		context.voteVoteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.votesAsset(["+" + context.delegateWallet1.getPublicKey()!, "+" + context.delegateWallet2.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])
 			.build();
 
 		context.unvoteUnvoteTransaction = Transactions.BuilderFactory.vote()
-			.version(2)
 			.votesAsset(["-" + context.delegateWallet1.getPublicKey()!, "-" + context.delegateWallet2.getPublicKey()!])
 			.nonce("1")
 			.sign(passphrases[0])

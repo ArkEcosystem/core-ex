@@ -30,7 +30,6 @@ describe<{
 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.delegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
-			.version(2)
 			.usernameAsset("dummy")
 			.nonce("1")
 			.sign(passphrases[0])
