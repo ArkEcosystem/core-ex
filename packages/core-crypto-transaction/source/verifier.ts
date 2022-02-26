@@ -6,7 +6,6 @@ import {
 	ITransactionData,
 	ITransactionUtils,
 	ITransactionVerifier,
-	IVerifyOptions,
 	Signatory,
 } from "@arkecosystem/core-crypto-contracts";
 
@@ -23,10 +22,6 @@ export class Verifier implements ITransactionVerifier {
 
 	@Container.inject(BINDINGS.Transaction.Utils)
 	private readonly utils: ITransactionUtils;
-
-	public async verify(data: ITransactionData, options?: IVerifyOptions): Promise<boolean> {
-		return this.verifyHash(data, options?.disableVersionCheck);
-	}
 
 	public async verifySignatures(
 		transaction: ITransactionData,
