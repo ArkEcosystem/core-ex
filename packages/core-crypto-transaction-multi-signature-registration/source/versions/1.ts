@@ -15,7 +15,7 @@ export class One extends Transaction {
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.MultiSignature;
 	public static key = "multiSignature";
-	public static version = 2;
+	public static version = 1;
 
 	protected static defaultStaticFee: BigNumber = BigNumber.make("500000000");
 
