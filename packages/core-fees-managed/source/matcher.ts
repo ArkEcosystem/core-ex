@@ -29,7 +29,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	async #throwIfCannot(action: string, transaction: Interfaces.ITransaction): Promise<void> {
 		const feeString = Utils.formatSatoshi(transaction.data.fee);
 
-		const addonBytes: number = this.feeRegistry.get("managed", transaction.key, transaction.data.version);
+		const addonBytes: number = this.feeRegistry.get(transaction.key, transaction.data.version);
 		const height: number = this.stateStore.getLastHeight();
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
