@@ -26,7 +26,6 @@ import {
 	MultiSignatureRegistrationTransactionHandler,
 	TransferTransactionHandler,
 	VoteTransactionHandler,
-
 } from "../source/handlers/one";
 
 const logger = {
