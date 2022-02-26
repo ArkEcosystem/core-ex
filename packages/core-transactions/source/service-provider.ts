@@ -53,7 +53,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Container.Identifiers.TransactionHandler).to(One.MultiPaymentTransactionHandler);
 		this.app.bind(Container.Identifiers.TransactionHandler).to(One.DelegateResignationTransactionHandler);
 
-
 		this.app
 			.bind(Container.Identifiers.TransactionHandlerConstructors)
 			.toDynamicValue(ServiceProvider.getTransactionHandlerConstructorsBinding());
