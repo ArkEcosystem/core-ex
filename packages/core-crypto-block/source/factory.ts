@@ -9,6 +9,7 @@ import {
 	IHashFactory,
 	IKeyPair,
 	ITransaction,
+	IValidator,
 	Signatory,
 } from "@arkecosystem/core-crypto-contracts";
 import { BigNumber } from "@arkecosystem/utils";
@@ -42,6 +43,9 @@ export class BlockFactory implements IBlockFactory {
 
 	@Container.inject(BINDINGS.SignatureFactory)
 	private readonly signatureFactory: Signatory;
+
+	@Container.inject(BINDINGS.Validator)
+	private readonly validator: IValidator;
 
 	// @todo: add a proper type hint for data
 	public async make(data: any, keys: IKeyPair): Promise<IBlock | undefined> {
@@ -86,7 +90,7 @@ export class BlockFactory implements IBlockFactory {
 		data: IBlockData,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): Promise<IBlock | undefined> {
-		if (await applySchema(data)) {
+		if (await applySchema(data, this.validator)) {
 			const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
 			const block: IBlock = this.blockFactory({
 				...(await this.deserializer.deserialize(serialized, false, options)),
@@ -105,7 +109,7 @@ export class BlockFactory implements IBlockFactory {
 			serialized,
 		);
 
-		const validated: IBlockData | undefined = await applySchema(deserialized.data);
+		const validated: IBlockData | undefined = await applySchema(deserialized.data, this.validator);
 
 		if (validated) {
 			deserialized.data = validated;

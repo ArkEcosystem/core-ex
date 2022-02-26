@@ -1,7 +1,6 @@
-import { IBlockData } from "@arkecosystem/core-crypto-contracts";
+import { IBlockData, IValidator } from "@arkecosystem/core-crypto-contracts";
 import { BlockSchemaError } from "@arkecosystem/core-crypto-errors";
 import { BigNumber } from "@arkecosystem/utils";
-import { Validator } from "@arkecosystem/core-validation";
 
 export const toBytesHex = (data): string => {
 	const temporary: string = data ? BigNumber.make(data).toString(16) : "";
@@ -9,8 +8,8 @@ export const toBytesHex = (data): string => {
 	return "0".repeat(16 - temporary.length) + temporary;
 };
 
-export const applySchema = async (data: IBlockData): Promise<IBlockData | undefined> => {
-	const result = await new Validator().validate("block", data);
+export const applySchema = async (data: IBlockData, validator: IValidator): Promise<IBlockData | undefined> => {
+	const result = await validator.validate("block", data);
 
 	if (!result.error) {
 		return result.value;
