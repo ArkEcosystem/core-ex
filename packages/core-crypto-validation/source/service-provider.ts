@@ -7,32 +7,30 @@ import { schemas } from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const validator: IValidator = this.app.get(BINDINGS.Validator);
+		await this.registerFormats();
 
-		await this.registerFormats(validator);
+		await this.registerKeywords();
 
-		await this.registerKeywords(validator);
-
-		await this.registerSchemas(validator);
+		await this.registerSchemas();
 	}
 
-	private async registerFormats(validator: IValidator): Promise<void> {
+	private async registerFormats(): Promise<void> {
 		for (const [name, format] of Object.entries(registerFormats(this.app.get(BINDINGS.Configuration)))) {
 			// @ts-ignore
-			validator.addFormat(name, format);
+			this.app.get<IValidator>(BINDINGS.Validator).addFormat(name, format);
 		}
 	}
 
-	private async registerKeywords(validator: IValidator): Promise<void> {
+	private async registerKeywords(): Promise<void> {
 		for (const [name, format] of Object.entries(registerKeywords(this.app.get(BINDINGS.Configuration)))) {
 			// @ts-ignore
-			validator.addFormat(name, format);
+			this.app.get<IValidator>(BINDINGS.Validator).addFormat(name, format);
 		}
 	}
 
-	private async registerSchemas(validator: IValidator): Promise<void> {
+	private async registerSchemas(): Promise<void> {
 		for (const schema of Object.values(schemas)) {
-			validator.addSchema(schema);
+			this.app.get<IValidator>(BINDINGS.Validator).addSchema(schema);
 		}
 	}
 }
