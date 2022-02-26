@@ -1,17 +1,9 @@
 import { FeeRegistry, TransactionFeeToLowError } from "@arkecosystem/core-fees";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
 import { Interfaces, Utils } from "@arkecosystem/crypto";
 
 @Container.injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "blockchain")
-	private readonly handlerRegistry: Handlers.Registry;
-
-	@Container.inject(Container.Identifiers.StateStore)
-	private readonly stateStore: Contracts.State.StateStore;
-
 	@Container.inject(Container.Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
@@ -29,18 +21,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	async #throwIfCannot(action: string, transaction: Interfaces.ITransaction): Promise<void> {
 		const feeString = Utils.formatSatoshi(transaction.data.fee);
 
-		const addonBytes: number = this.feeRegistry.get(transaction.key, transaction.data.version);
-		const height: number = this.stateStore.getLastHeight();
+		const minFee: Utils.BigNumber = this.#calculateMinFee(transaction);
+		const minFeeString = Utils.formatSatoshi(minFee);
 
-		const minFeeBroadcast: Utils.BigNumber = this.#dynamicFee({
-			addonBytes,
-			height,
-			satoshiPerByte: 3000, // @TODO
-			transaction,
-		});
-		const minFeeString = Utils.formatSatoshi(minFeeBroadcast);
-
-		if (transaction.data.fee.isGreaterThanEqual(minFeeBroadcast)) {
+		if (transaction.data.fee.isGreaterThanEqual(minFee)) {
 			this.logger.debug(`${transaction} eligible for ${action} (fee ${feeString} >= ${minFeeString})`);
 
 			return;
@@ -51,18 +35,12 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		throw new TransactionFeeToLowError(transaction);
 	}
 
-	#dynamicFee({
-		addonBytes,
-		satoshiPerByte,
-		transaction,
-	}: Contracts.Shared.DynamicFeeContext): Utils.BigNumber {
-		addonBytes = addonBytes || 0;
-
-		if (satoshiPerByte <= 0) {
-			satoshiPerByte = 1;
-		}
+	#calculateMinFee(transaction: Interfaces.ITransaction): Utils.BigNumber {
+		const addonBytes = this.feeRegistry.get(transaction.key, transaction.data.version) || 0;
+		const satoshiPerByte = 3000; // @TODO
 
 		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
+
 		return Utils.BigNumber.make(addonBytes + transactionSizeInBytes).times(satoshiPerByte);
 	}
 }
