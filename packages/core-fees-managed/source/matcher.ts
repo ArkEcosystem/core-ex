@@ -31,9 +31,8 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 
 		const addonBytes: number = this.feeRegistry.get(transaction.key, transaction.data.version);
 		const height: number = this.stateStore.getLastHeight();
-		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		const minFeeBroadcast: Utils.BigNumber = handler.dynamicFee({
+		const minFeeBroadcast: Utils.BigNumber = this.#dynamicFee({
 			addonBytes,
 			height,
 			satoshiPerByte: 3000, // @TODO
@@ -50,5 +49,20 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		this.logger.notice(`${transaction} not eligible for ${action} (fee ${feeString} < ${minFeeString})`);
 
 		throw new TransactionFeeToLowError(transaction);
+	}
+
+	#dynamicFee({
+		addonBytes,
+		satoshiPerByte,
+		transaction,
+	}: Contracts.Shared.DynamicFeeContext): Utils.BigNumber {
+		addonBytes = addonBytes || 0;
+
+		if (satoshiPerByte <= 0) {
+			satoshiPerByte = 1;
+		}
+
+		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
+		return Utils.BigNumber.make(addonBytes + transactionSizeInBytes).times(satoshiPerByte);
 	}
 }
