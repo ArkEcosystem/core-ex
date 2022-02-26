@@ -3,7 +3,7 @@ import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
 import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 import { Providers } from "@arkecosystem/core-kernel";
 
-import { One } from "./versions/2";
+import { One } from "./versions/1";
 
 export * from "./builder";
 
