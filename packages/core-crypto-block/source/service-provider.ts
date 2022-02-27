@@ -11,11 +11,11 @@ import { Serializer } from "./serializer";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
-		.bind(INTERNAL_FACTORY)
-		.toFactory<IBlock>(
-			(context: Container.interfaces.Context) => (data) =>
-				new Block(context.container.get<IConfiguration>(BINDINGS.Configuration), data),
-		);
+			.bind(INTERNAL_FACTORY)
+			.toFactory<IBlock>(
+				(context: Container.interfaces.Context) => (data) =>
+					new Block(context.container.get<IConfiguration>(BINDINGS.Configuration), data),
+			);
 
 		this.app.bind(BINDINGS.Block.Deserializer).to(Deserializer).inSingletonScope();
 		this.app.bind(BINDINGS.Block.Factory).to(BlockFactory).inSingletonScope();
