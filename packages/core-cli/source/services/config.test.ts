@@ -1,7 +1,7 @@
-import { Console, describe } from "../../../core-test-framework";
 import { writeFileSync } from "fs";
 import { setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../core-test-framework";
 import { Config } from "./config";
 
 describe<{
@@ -18,19 +18,18 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	// TODO: check later
-	// it("should return all configurations", ({config}) => {
-	// 	assert.equal(config.all(), {
-	// 		channel: "next",
-	// 		plugins: [],
-	// 		token: "ark",
-	// 	});
-	// });
+	it("should return all configurations", ({ config }) => {
+		assert.equal(config.all(), {
+			channel: "next",
+			plugins: [],
+			token: "ark",
+		});
+	});
 
-	// it("should setup a new config with default values", ({config}) => {
-	// 	assert.equal(config.get("token"),"ark");
-	// 	assert.equal(config.get("channel"),["latest", "next"]);
-	// });
+	it("should setup a new config with default values", ({ config }) => {
+		assert.equal(config.get("token"), "ark");
+		assert.equal(config.get("channel"), "next");
+	});
 
 	it("should set and get a value", ({ config }) => {
 		assert.equal(config.get("token"), "ark");
