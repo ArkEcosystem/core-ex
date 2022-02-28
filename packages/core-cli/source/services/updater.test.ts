@@ -5,7 +5,7 @@ import { Config } from "./config";
 import nock from "nock";
 import prompts from "prompts";
 
-import execa from "execa";
+import { execa } from "../execa";
 import { versionNext } from "../../test/fixtures/latest-version";
 import { assert } from "console";
 

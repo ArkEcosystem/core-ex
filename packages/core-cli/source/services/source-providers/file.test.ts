@@ -1,5 +1,5 @@
 import { describe } from "../../../../core-test-framework";
-import execa from "execa";
+import { execa } from "../../execa";
 import fs from "fs-extra";
 import { join } from "path";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";

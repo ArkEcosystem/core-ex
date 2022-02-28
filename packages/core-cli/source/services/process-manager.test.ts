@@ -1,5 +1,5 @@
 import { Console, describe } from "../../../core-test-framework";
-import execa from "execa";
+import { execa } from "../execa";
 
 import { ProcessDescription } from "../contracts";
 import { ProcessManager } from "./process-manager";
@@ -434,22 +434,21 @@ describe<{
 		spySync.calledWith("pm2 update", { shell: true });
 	});
 
-	// TODO: resolve later
-	// it("#trigger - should trigger", async ({processManager}) => {
-	// 	// Arrange...
-	// 	const spyExeca = stub(execa, "default").returnValue({
-	// 		stdout: null,
-	// 		stderr: undefined,
-	// 		failed: false,
-	// 	});
+	it("#trigger - should trigger", async ({ processManager }) => {
+		// Arrange...
+		const spyExeca = stub(execa, "run").resolvedValue({
+			stdout: null,
+			stderr: undefined,
+			failed: false,
+		});
 
-	// 	// Act...
-	// 	const { failed } = await processManager.trigger("ark-core", "module.name", "params");
+		// Act...
+		const { failed } = await processManager.trigger("ark-core", "module.name", "params");
 
-	// 	// Assert...
-	// 	assert.false(failed);
-	// 	spyExeca.calledWith("pm2 trigger ark-core module.name params", { shell: true });
-	// });
+		// Assert...
+		assert.false(failed);
+		spyExeca.calledWith("pm2 trigger ark-core module.name params", { shell: true });
+	});
 
 	it("#status - should return the status if the process exists", ({ processManager }) => {
 		// Arrange...

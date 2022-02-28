@@ -2,7 +2,7 @@ import { Console, describe } from "../../../core-test-framework";
 import { Installer } from "./installer";
 import { setGracefulCleanup } from "tmp";
 
-import execa from "execa";
+import { execa } from "../execa";
 
 describe<{
 	installer: Installer;
