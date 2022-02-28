@@ -1,6 +1,5 @@
-import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
 import Interfaces, { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/core-kernel";
 
 import {
 	RetryTransactionError,
@@ -20,7 +19,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
 	@Container.tagged("state", "copy-on-write")
-	private readonly handlerRegistry!: Handlers.Registry;
+	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
 	@Container.inject(Container.Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
@@ -59,7 +58,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionHasExpiredError(transaction, expirationHeight);
 		}
 
-		const handler: Handlers.TransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
+		const handler: Contracts.Transactions.ITransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
 			transaction.data,
 		);
 
@@ -81,7 +80,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public async revert(transaction: Interfaces.ITransaction): Promise<void> {
 		try {
-			const handler: Handlers.TransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
+			const handler: Contracts.Transactions.ITransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
 				transaction.data,
 			);
 
