@@ -67,7 +67,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			 version: "4.0.0-next.0" ,
+			version: "4.0.0-next.0",
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
@@ -91,7 +91,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			 version: "4.0.0-next.0" ,
+			version: "4.0.0-next.0",
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
@@ -122,7 +122,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			 version: "4.0.0-next.0" ,
+			version: "4.0.0-next.0",
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
@@ -155,7 +155,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			 version: "4.0.0-next.0" ,
+			version: "4.0.0-next.0",
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
