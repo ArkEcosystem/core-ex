@@ -4,6 +4,7 @@ import { Console, describe } from "../../../core-test-framework";
 import { Identifiers, interfaces } from "../ioc";
 import { ProcessManager } from "../services";
 import { Process } from "./process";
+import Tail from "nodejs-tail";
 
 describe<{
 	cli: Console;
@@ -155,10 +156,12 @@ describe<{
 				version: "1.0.0",
 			},
 		});
+		const spyWatch = stub(Tail.prototype, "watch");
 		const spyLog = spy(console, "log");
 
 		await process.log(false, 15);
 
+		spyWatch.calledOnce();
 		spyLog.calledWith("Tailing last 15 lines for [ark-core] process (change the value with --lines option)");
 	});
 
@@ -176,11 +179,12 @@ describe<{
 				version: "1.0.0",
 			},
 		});
-
+		const spyWatch = stub(Tail.prototype, "watch");
 		const spyLog = spy(console, "log");
 
 		await process.log(true, 15);
 
+		spyWatch.calledOnce();
 		spyLog.calledWith("Tailing last 15 lines for [ark-core] process (change the value with --lines option)");
 	});
 });
