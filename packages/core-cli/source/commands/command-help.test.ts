@@ -1,4 +1,4 @@
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "../../../core-test-framework";
 import { setGracefulCleanup } from "tmp";
 
 import { Command, CommandWithoutDefinition } from "../../test/stubs";

@@ -1,4 +1,4 @@
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "../../../core-test-framework";
 import prompts from "prompts";
 
 import { Identifiers } from "../ioc";

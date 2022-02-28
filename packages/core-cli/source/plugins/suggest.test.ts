@@ -1,4 +1,4 @@
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "../../../core-test-framework";
 import { blue, red } from "kleur";
 import prompts from "prompts";
 

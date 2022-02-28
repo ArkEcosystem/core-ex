@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../../core-test-framework";
 
 import { ProcessIdentifier } from "../contracts";
 import { Container, Identifiers } from "../ioc";

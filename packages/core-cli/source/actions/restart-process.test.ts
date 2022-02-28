@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../../core-test-framework";
 import { Options as OraOptions, Ora } from "ora";
 
 import { Spinner } from "../components";

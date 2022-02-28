@@ -1,5 +1,5 @@
 import { join } from "path";
-import { Console, describe } from "@arkecosystem/core-test-framework";
+import { Console, describe } from "../../../core-test-framework";
 import envPaths from "env-paths";
 import { ensureDirSync, writeJSON } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
