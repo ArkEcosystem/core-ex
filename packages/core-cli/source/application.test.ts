@@ -1,5 +1,5 @@
 import { describe } from "../../core-test-framework";
-import envPaths from "env-paths";
+import { envPaths } from "./env-paths";
 
 import { Application, Container } from "./index";
 
@@ -55,7 +55,7 @@ describe<{
 	});
 
 	it("should get core paths", ({ app }) => {
-		const paths = envPaths("ark", { suffix: "core" });
+		const paths = envPaths.get("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
 
@@ -67,7 +67,7 @@ describe<{
 	});
 
 	it("should get console paths with a file", ({ app }) => {
-		const paths = envPaths("ark", { suffix: "core" });
+		const paths = envPaths.get("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ApplicationPaths).toConstantValue(paths);
 
@@ -79,7 +79,7 @@ describe<{
 	});
 
 	it("should get console paths", ({ app }) => {
-		const paths = envPaths("ark", { suffix: "core" });
+		const paths = envPaths.get("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);
 
@@ -91,7 +91,7 @@ describe<{
 	});
 
 	it("should get console paths with a file", ({ app }) => {
-		const paths = envPaths("ark", { suffix: "core" });
+		const paths = envPaths.get("ark", { suffix: "core" });
 
 		app.bind(Container.Identifiers.ConsolePaths).toConstantValue(paths);
 
