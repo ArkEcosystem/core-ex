@@ -5,6 +5,7 @@ import { injectable, Identifiers } from "../ioc";
 import { Command } from "./command";
 import { Output } from "../output";
 import { DiscoverCommands } from "./discover-commands";
+import { DiscoverNetwork } from "./discover-network";
 import { DiscoverConfig } from "./discover-config";
 
 @injectable()
@@ -157,16 +158,18 @@ describe<{
 		spyOnExecute.calledOnce();
 	});
 
-	// it("should run the command and try to detect a network", async () => {
-	// 	cmd.input.setFlag("token", "ark");
-	// 	cmd.input.setFlag("network", undefined);
+	it("should run the command and try to detect a network", async ({ cmd }) => {
+		// @ts-ignore
+		cmd.input.setFlag("token", "ark");
+		// @ts-ignore
+		cmd.input.setFlag("network", undefined);
 
-	// 	const spyOnDiscover = jest.spyOn(DiscoverNetwork.prototype, "discover").mockImplementation();
+		const spyOnDiscover = stub(DiscoverNetwork.prototype, "discover");
 
-	// 	await expect(cmd.run()).toResolve();
+		await assert.resolves(() => cmd.run());
 
-	// 	expect(spyOnDiscover).toHaveBeenCalled();
-	// });
+		spyOnDiscover.calledOnce();
+	});
 
 	it("should run the command and throw an error", async ({ cmd }) => {
 		stub(cmd, "initialize").callsFake(() => {
