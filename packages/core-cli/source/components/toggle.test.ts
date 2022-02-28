@@ -1,5 +1,6 @@
-import { Console, describe } from "../../../core-test-framework";
+import prompts from "prompts";
 
+import { Console, describe } from "../../../core-test-framework";
 import { Identifiers } from "../ioc";
 import { Toggle } from "./toggle";
 
@@ -13,10 +14,9 @@ describe<{
 		context.component = context.cli.app.get(Identifiers.Toggle);
 	});
 
-	// TODO: Check later
-	// it("should render the component", async ({component, cli}) => {
-	// 	const spyOnLog = spy(cli.app.get(Identifiers.Logger), "log")
+	it("should render the component", async ({ component, cli }) => {
+		prompts.inject(["yes"]);
 
-	// 	assert.equal(await component.render("Hello World"), "yes");
-	// });
+		assert.equal(await component.render("Hello World"), "yes");
+	});
 });
