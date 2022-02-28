@@ -1,12 +1,11 @@
-import { Console, describe } from "../../../core-test-framework";
 import Joi from "joi";
 
-import { injectable, Identifiers } from "../ioc";
-import { Command } from "./command";
+import { Console, describe } from "../../../core-test-framework";
+import { Identifiers,injectable } from "../ioc";
 import { Output } from "../output";
-import { DiscoverCommands } from "./discover-commands";
-import { DiscoverNetwork } from "./discover-network";
+import { Command } from "./command";
 import { DiscoverConfig } from "./discover-config";
+import { DiscoverNetwork } from "./discover-network";
 
 @injectable()
 class StubCommand extends Command {
@@ -28,8 +27,8 @@ describe<{
 	cmd: Command;
 }>("Command", ({ beforeEach, it, assert, spy, stub }) => {
 	const output: Partial<Output> = {
-		setVerbosity: () => {},
 		isQuiet: () => false,
+		setVerbosity: () => {},
 	};
 
 	const box = {
@@ -124,8 +123,8 @@ describe<{
 		cmd,
 	}) => {
 		const spyOnDiscover = stub(DiscoverConfig.prototype, "discover").resolvedValue({
-			token: "token",
 			network: "testnet",
+			token: "token",
 		});
 
 		await cmd.run();
@@ -162,7 +161,7 @@ describe<{
 		// @ts-ignore
 		cmd.input.setFlag("token", "ark");
 		// @ts-ignore
-		cmd.input.setFlag("network", undefined);
+		cmd.input.setFlag("network");
 
 		const spyOnDiscover = stub(DiscoverNetwork.prototype, "discover");
 
@@ -215,7 +214,7 @@ describe<{
 	});
 
 	it("#getFlags - should get all flags", ({ cmd }) => {
-		assert.equal(cmd.getFlags(), { network: "testnet", hello: "world", v: 0 });
+		assert.equal(cmd.getFlags(), { hello: "world", network: "testnet", v: 0 });
 	});
 
 	it("#getFlag - should get the value of a flag", ({ cmd }) => {

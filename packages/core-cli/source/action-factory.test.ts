@@ -1,5 +1,4 @@
 import { Console, describe } from "../../core-test-framework";
-
 import { ActionFactory } from "./action-factory";
 import { Identifiers } from "./ioc";
 

@@ -1,9 +1,9 @@
 import { join } from "path";
-import { Console, describe } from "../../../core-test-framework";
-import { envPaths } from "../env-paths";
 import { ensureDirSync, writeJSON } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../core-test-framework";
+import { envPaths as environmentPaths } from "../env-paths";
 import { DiscoverConfig } from "./discover-config";
 
 describe<{
@@ -27,7 +27,7 @@ describe<{
 	});
 
 	it("should return configuration if found on default config location", async ({ cmd }) => {
-		stub(envPaths, "get").returnValue({
+		stub(environmentPaths, "get").returnValue({
 			config: configPath,
 		});
 

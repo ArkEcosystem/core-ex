@@ -1,5 +1,4 @@
 import { Console, describe } from "../../../core-test-framework";
-
 import { Output } from "./output";
 
 describe<{

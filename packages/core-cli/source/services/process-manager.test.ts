@@ -1,7 +1,6 @@
 import { Console, describe } from "../../../core-test-framework";
-import { execa } from "../execa";
-
 import { ProcessDescription } from "../contracts";
+import { execa } from "../execa";
 import { ProcessManager } from "./process-manager";
 
 describe<{
@@ -437,9 +436,9 @@ describe<{
 	it("#trigger - should trigger", async ({ processManager }) => {
 		// Arrange...
 		const spyExeca = stub(execa, "run").resolvedValue({
-			stdout: null,
-			stderr: undefined,
 			failed: false,
+			stderr: undefined,
+			stdout: null,
 		});
 
 		// Act...

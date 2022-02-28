@@ -1,8 +1,8 @@
-import { Console, describe } from "../../../core-test-framework";
-import { Installer } from "./installer";
 import { setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../core-test-framework";
 import { execa } from "../execa";
+import { Installer } from "./installer";
 
 describe<{
 	installer: Installer;
@@ -19,8 +19,8 @@ describe<{
 		stub(installer, "installPeerDependencies");
 
 		const spySync = stub(execa, "sync").returnValue({
-			stdout: "stdout",
 			exitCode: 0,
+			stdout: "stdout",
 		});
 
 		installer.install("@arkecosystem/core");
@@ -32,8 +32,8 @@ describe<{
 		stub(installer, "installPeerDependencies");
 
 		const spySync = stub(execa, "sync").returnValue({
-			stdout: "stdout",
 			exitCode: 0,
+			stdout: "stdout",
 		});
 
 		installer.install("@arkecosystem/core", "3.0.0");
@@ -45,8 +45,8 @@ describe<{
 		stub(installer, "installPeerDependencies");
 
 		const spySync = stub(execa, "sync").returnValue({
-			stderr: "stderr",
 			exitCode: 1,
+			stderr: "stderr",
 		});
 
 		assert.throws(() => installer.install("@arkecosystem/core"), "stderr");
@@ -58,8 +58,8 @@ describe<{
 		const spyInstallRangeLatest = stub(installer, "installRangeLatest");
 
 		const spySync = stub(execa, "sync").returnValue({
-			stdout: JSON.stringify({ data: { pm2: "4.5.0", somepkg: "^1.0.0" } }),
 			exitCode: 0,
+			stdout: JSON.stringify({ data: { pm2: "4.5.0", somepkg: "^1.0.0" } }),
 		});
 
 		installer.installPeerDependencies("@arkecosystem/core", "3.0.0");
@@ -76,8 +76,8 @@ describe<{
 		const spyInstallRangeLatest = stub(installer, "installRangeLatest");
 
 		const spySync = stub(execa, "sync").returnValue({
-			stdout: JSON.stringify({}),
 			exitCode: 0,
+			stdout: JSON.stringify({}),
 		});
 
 		installer.installPeerDependencies("@arkecosystem/core", "3.0.0");
@@ -91,8 +91,8 @@ describe<{
 
 	it("#installPeerDependencies - should throw error when yarn command fails", ({ installer }) => {
 		const spySync = stub(execa, "sync").returnValue({
-			stderr: "stderr",
 			exitCode: 1,
+			stderr: "stderr",
 		});
 
 		assert.throws(() => installer.installPeerDependencies("@arkecosystem/core"), "stderr");
@@ -106,8 +106,8 @@ describe<{
 		const spyInstall = stub(installer, "install");
 
 		const spySync = stub(execa, "sync").returnValue({
-			stdout: JSON.stringify({ data: ["3.0.0", "3.1.0", "3.0.0-next.9"] }),
 			exitCode: 0,
+			stdout: JSON.stringify({ data: ["3.0.0", "3.1.0", "3.0.0-next.9"] }),
 		});
 
 		installer.installRangeLatest("@arkecosystem/core", "^3.0.0 <3.4.0");
@@ -121,8 +121,8 @@ describe<{
 
 	it("#installRangeLatest - should throw error when command fails", ({ installer }) => {
 		const spySync = stub(execa, "sync").returnValue({
-			stderr: "stderr",
 			exitCode: 1,
+			stderr: "stderr",
 		});
 
 		assert.throws(() => installer.installRangeLatest("@arkecosystem/core", "^3.0.0 <3.4.0"), "stderr");
@@ -136,13 +136,13 @@ describe<{
 		installer,
 	}) => {
 		const spySync = stub(execa, "sync").returnValue({
-			stdout: JSON.stringify({ data: ["3.0.0", "3.0.0-next.9"] }),
 			exitCode: 0,
+			stdout: JSON.stringify({ data: ["3.0.0", "3.0.0-next.9"] }),
 		});
 
 		assert.throws(
 			() => installer.installRangeLatest("@arkecosystem/core", "^4.0.0 <4.4.0"),
-			"No @arkecosystem/core version to satisfy ^4.0.0 <4.4.0".replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"),
+			"No @arkecosystem/core version to satisfy ^4.0.0 <4.4.0".replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&"),
 		);
 
 		spySync.calledWith("yarn info @arkecosystem/core versions --json", {

@@ -1,6 +1,7 @@
-import { describe } from "../../../core-test-framework";
 import { Options as OraOptions, Ora } from "ora";
+import os from "os";
 
+import { describe } from "../../../core-test-framework";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
 import { Container, Identifiers } from "../ioc";
@@ -8,7 +9,6 @@ import { ProcessManager } from "../services";
 import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";
 import { DaemonizeProcess } from "./daemonize-process";
-import os from "os";
 
 describe<{
 	action: DaemonizeProcess;
@@ -135,9 +135,9 @@ describe<{
 
 		action.execute(
 			{
+				args: "core:run --daemon",
 				name: "ark-core",
 				script: "script",
-				args: "core:run --daemon",
 			},
 			{ daemon: true },
 		);
@@ -152,7 +152,7 @@ describe<{
 				node_args: undefined,
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core" },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core" },
 		);
 	});
 
@@ -163,9 +163,9 @@ describe<{
 
 		action.execute(
 			{
+				args: "core:run --daemon",
 				name: "ark-core",
 				script: "script",
-				args: "core:run --daemon",
 			},
 			{},
 		);
@@ -185,7 +185,7 @@ describe<{
 				},
 				script: "script",
 			},
-			{ "kill-timeout": 30000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core", "no-daemon": true },
 		);
 	});
 
@@ -198,9 +198,9 @@ describe<{
 			() =>
 				action.execute(
 					{
+						args: "core:run --daemon",
 						name: "ark-core",
 						script: "script",
-						args: "core:run --daemon",
 					},
 					{},
 				),

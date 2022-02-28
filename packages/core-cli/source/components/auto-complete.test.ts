@@ -1,6 +1,6 @@
-import { Console, describe } from "../../../core-test-framework";
 import prompts from "prompts";
 
+import { Console, describe } from "../../../core-test-framework";
 import { Identifiers } from "../ioc";
 import { AutoComplete } from "./auto-complete";
 

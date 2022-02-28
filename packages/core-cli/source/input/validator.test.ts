@@ -1,6 +1,6 @@
-import { Console, describe } from "../../../core-test-framework";
 import Joi from "joi";
 
+import { Console, describe } from "../../../core-test-framework";
 import { InputValidator } from "./validator";
 
 describe<{

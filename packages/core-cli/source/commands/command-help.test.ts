@@ -1,6 +1,6 @@
-import { Console, describe } from "../../../core-test-framework";
 import { setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../core-test-framework";
 import { Command, CommandWithoutDefinition } from "../../test/stubs";
 import { CommandHelp } from "./command-help";
 

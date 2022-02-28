@@ -1,5 +1,4 @@
 import { describe } from "../../../core-test-framework";
-
 import { ProcessIdentifier } from "../contracts";
 import { Container, Identifiers } from "../ioc";
 import { ProcessManager } from "../services";

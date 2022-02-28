@@ -1,5 +1,4 @@
 import { Console, describe } from "../../../core-test-framework";
-
 import { Identifiers } from "../ioc";
 import { Log } from "./log";
 

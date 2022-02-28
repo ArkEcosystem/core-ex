@@ -1,6 +1,6 @@
-import { Console, describe } from "../../../core-test-framework";
 import { white } from "kleur";
 
+import { Console, describe } from "../../../core-test-framework";
 import { Identifiers } from "../ioc";
 import { Success } from "./success";
 

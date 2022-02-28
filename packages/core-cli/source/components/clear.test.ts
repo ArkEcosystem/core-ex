@@ -1,5 +1,4 @@
 import { Console, describe } from "../../../core-test-framework";
-
 import { Identifiers } from "../ioc";
 import { Clear } from "./clear";
 
@@ -18,7 +17,7 @@ describe<{
 
 		component.render();
 
-		spyOnWrite.calledWith("\x1b[2J");
-		spyOnWrite.calledWith("\x1b[0f");
+		spyOnWrite.calledWith("\u001B[2J");
+		spyOnWrite.calledWith("\u001B[0f");
 	});
 });

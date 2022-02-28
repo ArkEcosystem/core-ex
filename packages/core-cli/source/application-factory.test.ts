@@ -1,5 +1,4 @@
 import { describe } from "../../core-test-framework";
-
 import { Application, ApplicationFactory, Container, Utils } from "./index";
 
 describe("ApplicationFactory", ({ it, stub, assert }) => {

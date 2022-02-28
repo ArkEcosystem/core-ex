@@ -1,9 +1,9 @@
-import { describe } from "../../../../core-test-framework";
-import { execa } from "../../execa";
-import fs from "fs-extra";
 import { join } from "path";
+import fs from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { describe } from "../../../../core-test-framework";
+import { execa } from "../../execa";
 import { Git } from "./git";
 
 describe<{

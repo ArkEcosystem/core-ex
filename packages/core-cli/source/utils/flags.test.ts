@@ -42,8 +42,8 @@ describe("castFlagsToString", ({ it, assert }) => {
 		assert.equal(
 			castFlagsToString(
 				{
-					key: "value",
 					ignore: "value",
+					key: "value",
 				},
 				["ignore"],
 			),

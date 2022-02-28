@@ -1,13 +1,11 @@
-import { Identifiers } from "../ioc";
-import { Console, describe } from "../../../core-test-framework";
-import { Updater } from "./updater";
-import { Config } from "./config";
 import nock from "nock";
 import prompts from "prompts";
 
-import { execa } from "../execa";
+import { Console, describe } from "../../../core-test-framework";
 import { versionNext } from "../../test/fixtures/latest-version";
-import { assert } from "console";
+import { Identifiers } from "../ioc";
+import { Config } from "./config";
+import { Updater } from "./updater";
 
 describe<{
 	cli: Console;
@@ -69,7 +67,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			...{ version: "4.0.0-next.0" },
+			 version: "4.0.0-next.0" ,
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
@@ -93,7 +91,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			...{ version: "4.0.0-next.0" },
+			 version: "4.0.0-next.0" ,
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
@@ -124,7 +122,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			...{ version: "4.0.0-next.0" },
+			 version: "4.0.0-next.0" ,
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
@@ -157,7 +155,7 @@ describe<{
 		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
 		response.versions["4.0.0-next.0"] = {
 			...response.versions["2.5.0-next.10"],
-			...{ version: "4.0.0-next.0" },
+			 version: "4.0.0-next.0" ,
 		};
 
 		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);

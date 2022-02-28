@@ -1,7 +1,7 @@
-import { Console, describe } from "../../../core-test-framework";
 import { blue, red } from "kleur";
 import prompts from "prompts";
 
+import { Console, describe } from "../../../core-test-framework";
 import { Identifiers } from "../ioc";
 import { SuggestCommand } from "./suggest";
 

@@ -1,10 +1,10 @@
-import { describe } from "../../../../core-test-framework";
-import { execa } from "../../execa";
+import { join, resolve } from "path";
 import fs from "fs-extra";
 import nock from "nock";
-import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { describe } from "../../../../core-test-framework";
+import { execa } from "../../execa";
 import { NPM } from "./npm";
 
 describe<{
