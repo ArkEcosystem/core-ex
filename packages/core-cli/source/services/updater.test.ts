@@ -37,150 +37,147 @@ describe<{
 		spyForget.calledWith("latestVersion");
 	});
 
-	// TODO: check later
-	// it("#check - should return false if the latest version cannot be retrieved", async ({ cli, updater }) => {
-	// 	nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, {});
+	it("#check - should return false if the latest version cannot be retrieved", async ({ cli, updater }) => {
+		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, {});
 
-	// 	const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
+		const spyWarning = spy(cli.app.get(Identifiers.Warning), "render");
 
-	// 	assert.false(updater.check());
-	// 	spyWarning.calledWith('We were unable to find any releases for the "next" channel.');
-	// });
+		assert.false(await updater.check());
+		spyWarning.calledWith('We were unable to find any releases for the "next" channel.');
+	});
 
-	// it("#check - should return false if the latest version is already installed", async ({updater}) => {
-	// 	nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, versionNext);
+	it("#check - should return false if the latest version is already installed", async ({ updater }) => {
+		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, versionNext);
 
-	// 	assert.false(await updater.check());
-	// });
+		assert.false(await updater.check());
+	});
 
-	// it("#check - should return false if the last check has been within the last 24 hours ago", async ({config, updater}) => {
-	// 	nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, versionNext);
+	it("#check - should return false if the last check has been within the last 24 hours ago", async ({
+		config,
+		updater,
+	}) => {
+		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, versionNext);
 
-	// 	config.set("lastUpdateCheck", Date.now());
+		config.set("lastUpdateCheck", Date.now());
 
-	// 	assert.false(await updater.check());
-	// });
+		assert.false(await updater.check());
+	});
 
-	// it("#check - should return true if a new version is available", async ({config, updater}) => {
-	// 	const response = { ...versionNext };
-	// 	response["dist-tags"].next = "4.0.0-next.0";
-	// 	response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-	// 	response.versions["4.0.0-next.0"] = {
-	// 		...response.versions["2.5.0-next.10"],
-	// 		...{ version: "4.0.0-next.0" },
-	// 	};
+	it("#check - should return true if a new version is available", async ({ config, updater }) => {
+		const response = { ...versionNext };
+		response["dist-tags"].next = "4.0.0-next.0";
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
+		response.versions["4.0.0-next.0"] = {
+			...response.versions["2.5.0-next.10"],
+			...{ version: "4.0.0-next.0" },
+		};
 
-	// 	nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
+		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
-	// 	config.set("latestVersion", {});
+		config.set("latestVersion", {});
 
-	// 	const spySet = spy(config, "set");
+		const spySet = spy(config, "set");
 
-	// 	assert.true(await updater.check());
-	// 	spySet.calledOnce();
-	// });
+		assert.true(await updater.check());
+		spySet.calledTimes(2);
+	});
 
-	// it("#update - should return early if the latest version is not present", async ({updater}) => {
-	// 	assert.false(await updater.update());
-	// });
+	it("#update - should return early if the latest version is not present", async ({ updater }) => {
+		assert.false(await updater.update());
+	});
 
-	// it("#update - should update without a prompt if a new version is available", async ({cli, updater}) => {
-	// 	// Arrange...
-	// 	const response = { ...versionNext };
-	// 	response["dist-tags"].next = "4.0.0-next.0";
-	// 	response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-	// 	response.versions["4.0.0-next.0"] = {
-	// 		...response.versions["2.5.0-next.10"],
-	// 		...{ version: "4.0.0-next.0" },
-	// 	};
+	it("#update - should update without a prompt if a new version is available", async ({ cli, updater }) => {
+		// Arrange...
+		const response = { ...versionNext };
+		response["dist-tags"].next = "4.0.0-next.0";
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
+		response.versions["4.0.0-next.0"] = {
+			...response.versions["2.5.0-next.10"],
+			...{ version: "4.0.0-next.0" },
+		};
 
-	// 	nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
+		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
-	// 	const spySync = stub(execa, "sync").returnValue({
-	// 		stdout: '"null"',
-	// 		stderr: undefined,
-	// 		exitCode: 0,
-	// 	});
-	// 	const spySpinner = spy(cli.app.get(Identifiers.Spinner), "render");
-	// 	const spyInstaller = spy(cli.app.get(Identifiers.Installer), "install");
-	// 	const spyProcessManager = spy(cli.app.get(Identifiers.ProcessManager), "update");
+		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
+			start: () => {},
+			succeed: () => {},
+		});
+		const spyInstaller = stub(cli.app.get(Identifiers.Installer), "install");
+		const spyProcessManager = stub(cli.app.get(Identifiers.ProcessManager), "update");
 
-	// 	// Act...
-	// 	await updater.check();
+		// Act...
+		await updater.check();
 
-	// 	const update = await updater.update(true, true);
+		const update = await updater.update(true, true);
 
-	// 	// Assert...
-	// 	assert.true(update);
-	// 	spySync.calledOnce();
-	// 	spySpinner.calledOnce();
-	// 	spyInstaller.calledOnce();
-	// 	spyProcessManager.calledOnce();
-	// });
+		// // Assert...
+		assert.true(update);
+		spySpinner.calledOnce();
+		spyInstaller.calledOnce();
+		spyProcessManager.calledOnce();
+	});
 
-	// it("#update - should update with a prompt if a new version is available", async ({cli, updater}) => {
-	// 	// Arrange...
-	// 	const response = { ...versionNext };
-	// 	response["dist-tags"].next = "4.0.0-next.0";
-	// 	response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-	// 	response.versions["4.0.0-next.0"] = {
-	// 		...response.versions["2.5.0-next.10"],
-	// 		...{ version: "4.0.0-next.0" },
-	// 	};
+	it("#update - should update with a prompt if a new version is available", async ({ cli, updater }) => {
+		// Arrange...
+		const response = { ...versionNext };
+		response["dist-tags"].next = "4.0.0-next.0";
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
+		response.versions["4.0.0-next.0"] = {
+			...response.versions["2.5.0-next.10"],
+			...{ version: "4.0.0-next.0" },
+		};
 
-	// 	nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
+		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
-	// 	const spySync = stub(execa, "sync").returnValue({
-	// 		stdout: '"null"',
-	// 		stderr: undefined,
-	// 		exitCode: 0,
-	// 	});
-	// 	const spySpinner = spy(cli.app.get(Identifiers.Spinner), "render");
-	// 	const spyInstaller = spy(cli.app.get(Identifiers.Installer), "install");
+		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
+			start: () => {},
+			succeed: () => {},
+		});
+		const spyInstaller = stub(cli.app.get(Identifiers.Installer), "install");
+		const spyProcessManager = stub(cli.app.get(Identifiers.ProcessManager), "update");
 
-	// 	prompts.inject([true]);
+		prompts.inject([true]);
 
-	// 	// Act...
-	// 	await updater.check();
+		// Act...
+		await updater.check();
 
-	// 	const update = await updater.update();
+		const update = await updater.update();
 
-	// 	// Assert...
-	// 	assert.true(update);
-	// 	spySync.calledOnce();
-	// 	spySpinner.calledOnce();
-	// 	spyInstaller.calledOnce();
-	// });
+		// Assert...
+		assert.true(update);
+		spySpinner.calledOnce();
+		spyInstaller.calledOnce();
+		spyProcessManager.neverCalled();
+	});
 
-	// it("#update - should fail to update without a confirmation", async ({cli, updater}) => {
-	// 	// Arrange...
-	// 	const response = { ...versionNext };
-	// 	response["dist-tags"].next = "4.0.0-next.0";
-	// 	response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
-	// 	response.versions["4.0.0-next.0"] = {
-	// 		...response.versions["2.5.0-next.10"],
-	// 		...{ version: "4.0.0-next.0" },
-	// 	};
+	it("#update - should fail to update without a confirmation", async ({ cli, updater }) => {
+		// Arrange...
+		const response = { ...versionNext };
+		response["dist-tags"].next = "4.0.0-next.0";
+		response.versions["4.0.0-next.0"] = { ...response.versions["2.5.0-next.10"] };
+		response.versions["4.0.0-next.0"] = {
+			...response.versions["2.5.0-next.10"],
+			...{ version: "4.0.0-next.0" },
+		};
 
-	// 	nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
+		nock(/.*/).get("/@arkecosystem%2Fcore").reply(200, response);
 
-	// 	const spySync = stub(execa, "sync").returnValue({
-	// 		stdout: '"null"',
-	// 		stderr: undefined,
-	// 		exitCode: 0,
-	// 	});
-	// 	const spySpinner = spy(cli.app.get(Identifiers.Spinner), "render");
-	// 	const spyInstaller = spy(cli.app.get(Identifiers.Installer), "install");
+		const spySpinner = stub(cli.app.get(Identifiers.Spinner), "render").returnValue({
+			start: () => {},
+			succeed: () => {},
+		});
+		const spyInstaller = stub(cli.app.get(Identifiers.Installer), "install");
+		const spyProcessManager = stub(cli.app.get(Identifiers.ProcessManager), "update");
 
-	// 	prompts.inject([false]);
+		prompts.inject([false]);
 
-	// 	// Act...
-	// 	await updater.check();
-	// 	await assert.rejects(() => updater.update(), "You'll need to confirm the update to continue.");
+		// Act...
+		await updater.check();
+		await assert.rejects(() => updater.update(), "You'll need to confirm the update to continue.");
 
-	// 	// Assert...
-	// 	spySync.neverCalled();
-	// 	spySpinner.neverCalled();
-	// 	spyInstaller.neverCalled();
-	// });
+		// Assert...
+		spySpinner.neverCalled();
+		spyInstaller.neverCalled();
+		spyProcessManager.neverCalled();
+	});
 });
