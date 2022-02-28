@@ -58,9 +58,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionHasExpiredError(transaction, expirationHeight);
 		}
 
-		const handler: Contracts.Transactions.ITransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
-			transaction.data,
-		);
+		const handler: Contracts.Transactions.ITransactionHandler =
+			await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		if (await this.triggers.call("verifyTransaction", { handler, transaction })) {
 			if (this.corrupt) {
@@ -80,9 +79,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public async revert(transaction: Interfaces.ITransaction): Promise<void> {
 		try {
-			const handler: Contracts.Transactions.ITransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
-				transaction.data,
-			);
+			const handler: Contracts.Transactions.ITransactionHandler =
+				await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 			await this.triggers.call("revertTransaction", { handler, transaction });
 		} catch (error) {

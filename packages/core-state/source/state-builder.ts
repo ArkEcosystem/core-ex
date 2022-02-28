@@ -39,7 +39,11 @@ export class StateBuilder {
 		this.events = this.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
 
 		const registeredHandlers = this.app
-			.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(Container.Identifiers.TransactionHandlerRegistry, "state", "blockchain")
+			.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
+				Container.Identifiers.TransactionHandlerRegistry,
+				"state",
+				"blockchain",
+			)
 			.getRegisteredHandlers();
 		const steps = registeredHandlers.length + 3;
 

@@ -19,7 +19,10 @@ export class TransactionRegistry implements ITransactionRegistry {
 	@Container.inject(BINDINGS.Validator)
 	private readonly validator: IValidator;
 
-	private readonly transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>> = new Map();
+	private readonly transactionTypes: Map<
+		Contracts.Transactions.InternalTransactionType,
+		Map<number, TransactionConstructor>
+	> = new Map();
 
 	readonly #transactionSchemas = new Map<string, TransactionSchema>();
 
@@ -34,7 +37,8 @@ export class TransactionRegistry implements ITransactionRegistry {
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.InternalTransactionType = Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.InternalTransactionType =
+			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 		for (const registeredConstructors of this.transactionTypes.values()) {
 			if (registeredConstructors.size > 0) {
 				const first = [...registeredConstructors.values()][0];
@@ -70,7 +74,8 @@ export class TransactionRegistry implements ITransactionRegistry {
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.InternalTransactionType = Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.InternalTransactionType =
+			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 		if (!this.transactionTypes.has(internalType)) {
 			throw new UnkownTransactionError(internalType.toString());
 		}

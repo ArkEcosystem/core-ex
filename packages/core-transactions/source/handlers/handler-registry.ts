@@ -24,7 +24,10 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 		return this.handlers;
 	}
 
-	public getRegisteredHandlerByType(internalType: Contracts.Transactions.InternalTransactionType, version = 1): TransactionHandler {
+	public getRegisteredHandlerByType(
+		internalType: Contracts.Transactions.InternalTransactionType,
+		version = 1,
+	): TransactionHandler {
 		for (const handler of this.handlers) {
 			const transactionConstructor = handler.getConstructor();
 			Utils.assert.defined<number>(transactionConstructor.type);
@@ -62,7 +65,10 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 	}
 
 	public async getActivatedHandlerForData(transactionData: Interfaces.ITransactionData): Promise<TransactionHandler> {
-		const internalType = Contracts.Transactions.InternalTransactionType.from(transactionData.type, transactionData.typeGroup);
+		const internalType = Contracts.Transactions.InternalTransactionType.from(
+			transactionData.type,
+			transactionData.typeGroup,
+		);
 		return this.getActivatedHandlerByType(internalType, transactionData.version);
 	}
 }

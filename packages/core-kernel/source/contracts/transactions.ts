@@ -8,10 +8,7 @@ export type TransactionHandlerConstructor = new () => ITransactionHandler;
 export interface ITransactionHandler {
 	verify(transaction: Interfaces.ITransaction): Promise<boolean>;
 
-	throwIfCannotBeApplied(
-		transaction: Interfaces.ITransaction,
-		sender: Wallet,
-	): Promise<void>;
+	throwIfCannotBeApplied(transaction: Interfaces.ITransaction, sender: Wallet): Promise<void>;
 
 	apply(transaction: Interfaces.ITransaction): Promise<void>;
 
@@ -56,10 +53,7 @@ export interface ITransactionHandlerRegistry {
 
 	getActivatedHandlers(): Promise<ITransactionHandler[]>;
 
-	getActivatedHandlerByType(
-		internalType: InternalTransactionType,
-		version?: number,
-	): Promise<ITransactionHandler>;
+	getActivatedHandlerByType(internalType: InternalTransactionType, version?: number): Promise<ITransactionHandler>;
 
 	getActivatedHandlerForData(transactionData: Interfaces.ITransactionData): Promise<ITransactionHandler>;
 }

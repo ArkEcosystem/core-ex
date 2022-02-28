@@ -1,5 +1,5 @@
 import { ITransaction } from "@arkecosystem/core-crypto-contracts";
-import { FeeRegistry,TransactionFeeToHighError, TransactionFeeToLowError  } from "@arkecosystem/core-fees";
+import { FeeRegistry, TransactionFeeToHighError, TransactionFeeToLowError } from "@arkecosystem/core-fees";
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 

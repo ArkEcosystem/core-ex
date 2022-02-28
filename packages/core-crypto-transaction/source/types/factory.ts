@@ -7,9 +7,14 @@ import { Transaction } from "./transaction";
 type TransactionConstructor = typeof Transaction;
 
 export class TransactionTypeFactory {
-	private static transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;
+	private static transactionTypes: Map<
+		Contracts.Transactions.InternalTransactionType,
+		Map<number, TransactionConstructor>
+	>;
 
-	public static initialize(transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>) {
+	public static initialize(
+		transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>,
+	) {
 		this.transactionTypes = transactionTypes;
 	}
 
@@ -22,7 +27,8 @@ export class TransactionTypeFactory {
 	}
 
 	public static get(type: number, typeGroup?: number, version?: number): TransactionConstructor | undefined {
-		const internalType: Contracts.Transactions.InternalTransactionType = Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
+		const internalType: Contracts.Transactions.InternalTransactionType =
+			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 
 		if (!this.transactionTypes.has(internalType)) {
 			throw new UnkownTransactionError(internalType.toString());
