@@ -721,7 +721,7 @@ describe<{
 
 		context.client.getTransactions.returns([]);
 
-		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
+		const spyForgeNewBlock = stub(context.forgerService, "forgeNewBlock");
 
 		context.mockNetworkState.status = NetworkStateStatus.Unknown;
 
@@ -733,7 +733,7 @@ describe<{
 
 		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(spyForgeNewBlock).not.toHaveBeenCalled();
+		spyForgeNewBlock.neverCalled();
 	});
 
 	it("checkSlot should catch network errors and set timeout to check slot later", async (context) => {
@@ -771,25 +771,23 @@ describe<{
 
 		context.client.getTransactions.returns([]);
 
-		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
+		const spyForgeNewBlock = spy(context.forgerService, "forgeNewBlock");
 
-		context.client.getNetworkState.reject(() => new HostNoResponseError(`blockchain isn't ready`));
+		context.client.getNetworkState.rejects(new HostNoResponseError(`blockchain isn't ready`));
 
 		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		// @TODO jest.useFakeTimers();
+		context.forgerService.checkLater = spyFn();
 
 		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
+		assert.true(context.forgerService.checkLater.calledWith(2000));
 
-		expect(spyForgeNewBlock).not.toHaveBeenCalled();
+		spyForgeNewBlock.neverCalled();
 
-		expect(context.logger.info).toHaveBeenCalledWith(`Waiting for relay to become ready.`);
-
-		// @TODO jest.useRealTimers();
+		assert.true(context.logger.info.calledWith(`Waiting for relay to become ready.`));
 	});
 
 	it("checkSlot should log warning when error isn't a network error", async (context) => {
@@ -827,29 +825,25 @@ describe<{
 
 		context.client.getTransactions.returns([]);
 
-		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
+		const spyForgeNewBlock = stub(context.forgerService, "forgeNewBlock");
 
 		const mockEndpoint = `Test - Endpoint`;
 		const mockError = `custom error`;
-		context.client.getNetworkState.reject(() => new RelayCommunicationError(mockEndpoint, mockError));
+		context.client.getNetworkState.rejects(new RelayCommunicationError(mockEndpoint, mockError));
 
 		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		// @TODO jest.useFakeTimers();
+		context.forgerService.checkLater = spyFn();
 
 		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
+		assert.true(context.forgerService.checkLater.calledWith(2000));
 
-		expect(spyForgeNewBlock).not.toHaveBeenCalled();
+		spyForgeNewBlock.neverCalled();
 
-		expect(context.logger.warning).toHaveBeenCalledWith(
-			`Request to ${mockEndpoint} failed, because of '${mockError}'.`,
-		);
-
-		// @TODO jest.useRealTimers();
+		assert.true(context.logger.warning.calledWith(`Request to ${mockEndpoint} failed, because of '${mockError}'.`));
 	});
 
 	it("checkSlot should log error when error thrown during attempted forge isn't a network error", async (context) => {
@@ -888,41 +882,31 @@ describe<{
 
 		context.client.getTransactions.returns([]);
 
-		// @ts-ignore
-		const spyClientEmitEvent = jest.spyOn(context.forgerService.client, "emitEvent");
+		const spyForgeNewBlock = spy(context.forgerService, "forgeNewBlock");
 
-		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
-
-		// @ts-ignore
-		const spyGetNetworkState = jest.spyOn(context.forgerService.client, "getNetworkState");
 		const mockError = `custom error`;
-		// @ts-ignore
-		spyGetNetworkState.mockImplementation(() => {
-			throw new Error(mockError);
-		});
+		context.client.getNetworkState.rejects(new Error(mockError));
 
 		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		// @TODO jest.useFakeTimers();
+		context.forgerService.checkLater = spyFn();
 
 		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
+		assert.true(context.forgerService.checkLater.calledWith(2000));
 
-		expect(spyForgeNewBlock).not.toHaveBeenCalled();
+		spyForgeNewBlock.neverCalled();
 
-		expect(context.logger.error).toHaveBeenCalled();
+		assert.true(context.logger.error.calledOnce);
 
-		expect(spyClientEmitEvent).toHaveBeenCalledWith(Enums.ForgerEvent.Failed, { error: mockError });
+		assert.true(context.forgerService.client.emitEvent.calledWith(Enums.ForgerEvent.Failed, { error: mockError }));
 		const infoMessage = `Round: ${round.data.current.toLocaleString()}, height: ${round.data.lastBlock.height.toLocaleString()}`;
-		expect(context.logger.info).toHaveBeenCalledWith(infoMessage);
-
-		// @TODO jest.useRealTimers();
+		assert.true(context.logger.info.calledWith(infoMessage));
 	});
 
-	it("checkSlot should not error when there is no round info", async (context) => {
+	it.only("checkSlot should not error when there is no round info", async (context) => {
 		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
@@ -943,29 +927,21 @@ describe<{
 
 		context.client.getTransactions.returns([]);
 
-		// @ts-ignore
-		const spyClientEmitEvent = jest.spyOn(context.forgerService.client, "emitEvent");
-
-		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
+		const spyForgeNewBlock = spy(context.forgerService, "forgeNewBlock");
 
 		await assert.resolves(() => context.forgerService.boot(context.delegates));
 
 		context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
 
-		// @TODO jest.useFakeTimers();
+		context.forgerService.checkLater = spyFn();
 
 		await assert.resolves(() => context.forgerService.checkSlot());
 
-		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
-
-		expect(spyForgeNewBlock).not.toHaveBeenCalled();
-
-		expect(context.logger.error).toHaveBeenCalled();
-
-		expect(spyClientEmitEvent).toHaveBeenCalledWith(Enums.ForgerEvent.Failed, { error: expect.any(String) });
-		expect(context.logger.info).not.toHaveBeenCalled();
-
-		// @TODO jest.useRealTimers();
+		assert.true(context.forgerService.checkLater.calledWith(2000));
+		spyForgeNewBlock.neverCalled();
+		assert.true(context.logger.error.calledOnce);
+		assert.true(context.forgerService.client.emitEvent.calledWith(Enums.ForgerEvent.Failed, { error: "Cannot read properties of undefined (reading 'delegates')" }));
+		assert.true(context.logger.info.notCalled);
 	});
 
 	it("ForgeNewBlock should fail to forge when delegate is already in next slot", async (context) => {
