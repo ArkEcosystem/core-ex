@@ -248,7 +248,9 @@ export class BlockProcessor {
 			"state",
 			"blockchain",
 		);
-		const generatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(block.data.generatorPublicKey);
+		const generatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+			block.data.generatorPublicKey,
+		);
 
 		let generatorUsername: string;
 		try {

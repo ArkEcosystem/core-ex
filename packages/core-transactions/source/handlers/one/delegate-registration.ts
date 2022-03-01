@@ -72,7 +72,9 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 		const forgedBlocks = await this.blockRepository.getDelegatesForgedBlocks();
 		const lastForgedBlocks = await this.blockRepository.getLastForgedBlocks();
 		for (const block of forgedBlocks) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(block.generatorPublicKey);
+			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				block.generatorPublicKey,
+			);
 
 			// Genesis wallet is empty
 			if (!wallet.hasAttribute("delegate")) {
@@ -86,7 +88,9 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 		}
 
 		for (const block of lastForgedBlocks) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(block.generatorPublicKey);
+			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				block.generatorPublicKey,
+			);
 
 			// Genesis wallet is empty
 			if (!wallet.hasAttribute("delegate")) {
@@ -170,7 +174,9 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		AppUtils.assert.defined<string>(transaction.data.asset?.delegate?.username);
 
@@ -191,7 +197,9 @@ export class DelegateRegistrationTransactionHandler extends TransactionHandler {
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		sender.forgetAttribute("delegate");
 

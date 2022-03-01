@@ -88,7 +88,9 @@ export abstract class TransactionHandler {
 	public async applyToSender(transaction: Interfaces.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Interfaces.ITransactionData = transaction.data;
 
@@ -112,7 +114,9 @@ export abstract class TransactionHandler {
 	public async revertForSender(transaction: Interfaces.ITransaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Interfaces.ITransactionData = transaction.data;
 

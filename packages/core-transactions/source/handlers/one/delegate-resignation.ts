@@ -38,7 +38,9 @@ export class DelegateResignationTransactionHandler extends TransactionHandler {
 		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				transaction.senderPublicKey,
+			);
 			wallet.setAttribute("delegate.resigned", true);
 			this.walletRepository.index(wallet);
 		}
