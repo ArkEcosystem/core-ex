@@ -7,6 +7,7 @@ import { describe, Sandbox } from "../../core-test-framework/source";
 import { ForgerService } from "./forger-service";
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
+import sinon from "sinon";
 
 import { calculateActiveDelegates } from "../test/calculate-active-delegates";
 
@@ -239,22 +240,24 @@ describe<{
 		assert.true(context.logger.warning.calledWith(`Waiting for a responsive host`));
 	});
 
-	it.only("Boot should set correct timeout to check slots", async (context) => {
-		// @TODO jest.useFakeTimers();
+	it("Boot should set correct timeout to check slots", async (context) => {
+		context.forgerService.checkLater = spyFn();
+		const fakeTimers = sinon.useFakeTimers();
 
-		context.client.getRound.returns({
-			delegates: context.delegates,
-			timestamp: Crypto.Slots.getTime() - 7,
-			lastBlock: { height: 100 },
-		});
+		try {
+			context.client.getRound.returns({
+				delegates: context.delegates,
+				timestamp: Crypto.Slots.getTime() - 7,
+				lastBlock: { height: 100 },
+			});
 
-		context.forgerService.register({ hosts: [mockHost] });
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+			context.forgerService.register({ hosts: [mockHost] });
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		// @TODO jest.runAllTimers();
-
-		// @TODO
-		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), expect.toBeWithin(0, 2000));
+			assert.true(context.forgerService.checkLater.calledWith(1000));
+		} finally {
+			fakeTimers.restore();
+		}
 	});
 
 	it("GetTransactionsForForging should log error when transactions are empty", async (context) => {
@@ -442,7 +445,7 @@ describe<{
 		assert.true(context.logger.debug.notCalled);
 	});
 
-	it("checkSlot should set timer if forging is not yet allowed", async (context) => {
+	it.only("checkSlot should set timer if forging is not yet allowed", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
@@ -452,26 +455,29 @@ describe<{
 			lastBlock: { height: 100 },
 		});
 		await assert.resolves(() => context.forgerService.boot(context.delegates));
-		expect(context.logger.info).not.toHaveBeenCalledWith(`Forger Manager started.`);
-
-		// @TODO jest.useFakeTimers();
+		// expect(context.logger.info).not.toHaveBeenCalledWith();
+		assert.false(context.logger.info.calledWith(`Forger Manager started.`));
 
 		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
 		});
-		await assert.resolves(() => context.forgerService.checkSlot());
 
-		// @TODO
-		expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 200);
+		context.forgerService.checkLater = spyFn();
+		const fakeTimers = sinon.useFakeTimers();
+		try {
+			await assert.resolves(() => context.forgerService.checkSlot());
 
-		assert.true(context.logger.info.notCalled);
-		assert.true(context.logger.warning.notCalled);
-		assert.true(context.logger.error.notCalled);
-		assert.true(context.logger.debug.notCalled);
+			assert.true(context.forgerService.checkLater.calledWith(200));
 
-		// @TODO jest.useRealTimers();
+			assert.true(context.logger.info.notCalled);
+			assert.true(context.logger.warning.notCalled);
+			assert.true(context.logger.error.notCalled);
+			assert.true(context.logger.debug.notCalled);
+		} finally {
+			fakeTimers.restore();
+		}
 	});
 
 	it("checkSlot should set timer and log nextForger which is active on node", async (context) => {
