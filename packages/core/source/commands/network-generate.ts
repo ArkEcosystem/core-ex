@@ -854,7 +854,7 @@ export class Command extends Commands.Command {
 
 	private async signBlock(block, keys: Interfaces.IKeyPair): Promise<string> {
 		return this.app
-			.get<Signatory>(BINDINGS.SignatureFactory)
+			.get<Signatory>(BINDINGS.Signature)
 			.sign(
 				await this.app
 					.get<IHashFactory>(BINDINGS.HashFactory)

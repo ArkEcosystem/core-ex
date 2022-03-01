@@ -36,7 +36,7 @@ export class BlockFactory implements IBlockFactory {
 	@Container.inject(BINDINGS.HashFactory)
 	private readonly hashFactory: IHashFactory;
 
-	@Container.inject(BINDINGS.SignatureFactory)
+	@Container.inject(BINDINGS.Signature)
 	private readonly signatureFactory: Signatory;
 
 	@Container.inject(BINDINGS.Validator)

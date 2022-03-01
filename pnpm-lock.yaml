@@ -570,9 +570,11 @@ importers:
     specifiers:
       '@arkecosystem/utils': workspace:*
       ajv: 6.12.6
+      bytebuffer: 5.0.1
     dependencies:
       '@arkecosystem/utils': link:../utils
       ajv: 6.12.6
+      bytebuffer: 5.0.1
 
   packages/core-crypto-errors:
     specifiers:

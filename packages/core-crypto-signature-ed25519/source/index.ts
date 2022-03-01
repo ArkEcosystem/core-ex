@@ -5,6 +5,6 @@ import { Signatory } from "./signatory";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(BINDINGS.SignatureFactory).to(Signatory).inSingletonScope();
+		this.app.bind(BINDINGS.Signature).to(Signatory).inSingletonScope();
 	}
 }

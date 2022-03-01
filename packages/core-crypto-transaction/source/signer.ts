@@ -12,7 +12,7 @@ import { numberToHex } from "./helpers";
 
 @Container.injectable()
 export class Signer {
-	@Container.inject(BINDINGS.SignatureFactory)
+	@Container.inject(BINDINGS.Signature)
 	private readonly signatureFactory: Signatory;
 
 	@Container.inject(BINDINGS.Transaction.Utils)

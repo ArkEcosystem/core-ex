@@ -1,9 +1,10 @@
 import { Container } from "@arkecosystem/core-container";
-import { Signatory as Contract } from "@arkecosystem/core-crypto-contracts";
+import { ISignature } from "@arkecosystem/core-crypto-contracts";
 import { secp256k1 } from "bcrypto";
+import ByteBuffer from "bytebuffer";
 
 @Container.injectable()
-export class Signatory implements Contract {
+export class Signature implements ISignature {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return secp256k1.signatureExport(secp256k1.sign(message, privateKey)).toString("hex");
 	}
@@ -44,5 +45,13 @@ export class Signatory implements Contract {
 		}
 
 		return secp256k1.verify(message, signatureRS, publicKey);
+	}
+
+	public serialize(buffer: ByteBuffer, signature: string): void {
+        buffer.append(signature, "hex");
+	}
+
+	public deserialize(buffer: ByteBuffer): string {
+		return buffer.readBytes(33).toString("hex");
 	}
 }

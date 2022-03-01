@@ -14,7 +14,7 @@ import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetEr
 
 @Container.injectable()
 export class Verifier implements ITransactionVerifier {
-	@Container.inject(BINDINGS.SignatureFactory)
+	@Container.inject(BINDINGS.Signature)
 	private readonly signatureFactory: Signatory;
 
 	@Container.inject(BINDINGS.Validator)
