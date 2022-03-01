@@ -145,7 +145,7 @@ export class MemoryQueue extends EventEmitter implements Queue {
 					executionTime: performance.now() - start,
 					error: error,
 				});
-				console.log(error)
+
 				this.logger.warning(`Queue error occurs when handling job: ${job}`);
 
 				this.emit("jobError", job, error);
