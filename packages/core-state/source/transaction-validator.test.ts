@@ -10,11 +10,11 @@ let transactionValidator: TransactionValidator;
 let applySpy: SinonSpy;
 
 describe("Transaction Validator", ({ it, beforeAll, assert }) => {
-    beforeAll(async () => {
-        const initialEnv = await setUp();
-        transactionValidator = initialEnv.transactionValidator;
-        applySpy = initialEnv.spies.applySpy;
-    });
+	beforeAll(async () => {
+		const initialEnv = await setUp();
+		transactionValidator = initialEnv.transactionValidator;
+		applySpy = initialEnv.spies.applySpy;
+	});
 
 	it("should validate transactions", async () => {
 		const transaction = makeVoteTransactions(1, [
@@ -23,7 +23,7 @@ describe("Transaction Validator", ({ it, beforeAll, assert }) => {
 
 		await transactionValidator.validate(transaction[0]);
 
-        assert.true(applySpy.calledWith(transaction[0]));
+		assert.true(applySpy.calledWith(transaction[0]));
 	});
 
 	it("should throw when transaction id doesn't match deserialised", () => {

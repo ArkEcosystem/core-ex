@@ -60,7 +60,7 @@ describe("dposPreviousRound.getAllDelegates", ({ it, beforeAll, beforeEach, asse
 describe("dposPreviousRound.getRoundDelegates", ({ it, beforeAll, beforeEach, assert }) => {
 	beforeAll(beforeAllCallback);
 	beforeEach(beforeEachCallback);
-	
+
 	it("should get round delegates", async () => {
 		const previousRound = await dposPreviousRoundStateProv([], round);
 

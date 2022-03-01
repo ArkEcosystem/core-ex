@@ -36,8 +36,8 @@ describe("dpos", ({ it, beforeAll, beforeEach, assert, skip }) => {
 			for (let i = 0; i < 5; i++) {
 				const delegate = delegates[4 - i];
 				const total = CryptoUtils.BigNumber.make(5 - i)
-						.times(1000)
-						.times(SATOSHI);
+					.times(1000)
+					.times(SATOSHI);
 
 				assert.equal(delegate.getAttribute<CryptoUtils.BigNumber>("delegate.voteBalance"), total);
 			}
@@ -58,7 +58,7 @@ describe("buildDelegateRanking", ({ it, assert, beforeAll, beforeEach }) => {
 
 		buildDelegateAndVoteWallets(5, walletRepo);
 	});
-	
+
 	it("should build ranking and sort delegates by vote balance", async () => {
 		dposState.buildVoteBalances();
 		dposState.buildDelegateRanking();
@@ -85,7 +85,7 @@ describe("buildDelegateRanking", ({ it, assert, beforeAll, beforeEach }) => {
 		walletRepo.index(delegates[2]);
 
 		assert.throws(
-			() => dposState.buildDelegateRanking(), 
+			() => dposState.buildDelegateRanking(),
 			'The balance and public key of both delegates are identical! Delegate "delegate2" appears twice in the list.',
 		);
 	});
@@ -124,7 +124,7 @@ describe("setDelegatesRound", ({ it, assert, beforeAll, beforeEach }) => {
 
 		assert.throws(
 			() => dposState.setDelegatesRound(round),
-			`Expected to find 51 delegates but only found 5.This indicates an issue with the genesis block & delegates`
+			`Expected to find 51 delegates but only found 5.This indicates an issue with the genesis block & delegates`,
 		);
 	});
 
