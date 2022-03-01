@@ -5,7 +5,7 @@ import {
 	ISerializeOptions,
 	ITransactionData,
 	ITransactionUtils,
-	Signatory,
+	ISignature,
 } from "@arkecosystem/core-crypto-contracts";
 
 import { numberToHex } from "./helpers";
@@ -13,7 +13,7 @@ import { numberToHex } from "./helpers";
 @Container.injectable()
 export class Signer {
 	@Container.inject(BINDINGS.Signature)
-	private readonly signatureFactory: Signatory;
+	private readonly signatureFactory: ISignature;
 
 	@Container.inject(BINDINGS.Transaction.Utils)
 	private readonly utils: ITransactionUtils;
