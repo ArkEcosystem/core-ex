@@ -1206,6 +1206,7 @@ importers:
       '@arkecosystem/crypto': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      import-fresh: 3.3.0
       joi: 17.4.2
       node-forge: 1.2.1
       sinon: ^12.0.1
@@ -1223,6 +1224,7 @@ importers:
       '@arkecosystem/core-state': link:../core-state
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      import-fresh: 3.3.0
       sinon: 12.0.1
       uvu: 0.5.3
 

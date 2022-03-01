@@ -13,7 +13,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "uvu -r tsm source service-provider.test.ts",
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
@@ -29,6 +29,7 @@
 		"@arkecosystem/core-state": "workspace:*",
 		"@types/node-forge": "0.10.4",
 		"@types/wif": "2.0.2",
+		"import-fresh": "3.3.0",
 		"sinon": "^12.0.1",
 		"uvu": "^0.5.3"
 	},
