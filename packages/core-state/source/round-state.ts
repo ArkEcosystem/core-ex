@@ -1,4 +1,3 @@
-import assert from "assert";
 import Interfaces, {
 	BINDINGS,
 	IAddressFactory,
@@ -9,6 +8,7 @@ import Interfaces, {
 import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
+import assert from "assert";
 
 @Container.injectable()
 export class RoundState {
