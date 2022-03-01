@@ -445,7 +445,7 @@ describe<{
 		assert.true(context.logger.debug.notCalled);
 	});
 
-	it.only("checkSlot should set timer if forging is not yet allowed", async (context) => {
+	it("checkSlot should set timer if forging is not yet allowed", async (context) => {
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
@@ -666,7 +666,7 @@ describe<{
 
 		context.client.getTransactions.returns([]);
 
-		const spyForgeNewBlock = jest.spyOn(context.forgerService, "forgeNewBlock");
+		const spyForgeNewBlock = spy(context.forgerService, "forgeNewBlock");
 
 		context.client.getNetworkState.returns(context.mockNetworkState);
 
@@ -674,21 +674,16 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		// @TODO jest.useFakeTimers();
-
-		// @ts-ignore
 		await context.forgerService.checkSlot();
 
-		expect(spyForgeNewBlock).toHaveBeenCalledWith(
+		spyForgeNewBlock.calledWith(
 			context.delegates[context.delegates.length - 2],
 			round.data,
 			context.mockNetworkState,
 		);
 
 		const loggerWarningMessage = `The NetworkState height (${context.mockNetworkState.nodeHeight}) and round height (${round.data.lastBlock.height}) are out of sync. This indicates delayed blocks on the network.`;
-		expect(context.logger.warning).not.toHaveBeenCalledWith(loggerWarningMessage);
-
-		// @TODO jest.useRealTimers();
+		assert.false(context.logger.warning.calledWith(loggerWarningMessage));
 	});
 
 	it("checkSlot should not allow forging when blocked by network status", async (context) => {
