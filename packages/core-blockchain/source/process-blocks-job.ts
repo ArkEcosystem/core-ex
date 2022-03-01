@@ -82,7 +82,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 				this.blockchain.getLastBlock().data,
 				this.blocks[0],
 				blockTimeLookup,
-				this.configuration,
+				this.slots,
 			)
 		) {
 			this.logger.warning(
@@ -90,7 +90,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 					this.blockchain.getLastBlock().data,
 					this.blocks[0],
 					blockTimeLookup,
-					this.configuration,
+					this.slots,
 				),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
