@@ -26,7 +26,6 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",
-		"delay": "4.4.1",
 		"import-fresh": "3.3.0",
 		"uvu": "^0.5.3"
 	},
