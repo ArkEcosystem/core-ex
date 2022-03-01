@@ -65,5 +65,15 @@ export interface IAddressSerializer {
 export interface IPublicKeySerializer {
 	serialize(buffer: ByteBuffer, publicKey: string): void;
 
-	deserialize(buffer: ByteBuffer): string;
+	deserialize(buffer: ByteBuffer): Buffer;
+}
+
+export interface ISignature {
+	sign(message: Buffer, privateKey: Buffer): Promise<string>;
+
+	verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
+
+	serialize(buffer: ByteBuffer, signature: string): void;
+
+	deserialize(buffer: ByteBuffer): Buffer;
 }
