@@ -19,7 +19,6 @@ describe<{
 	mockTransaction;
 	transaction;
 	mockRound;
-	round;
 	logger: any;
 	client: any;
 	handlerProvider: any;
@@ -92,16 +91,6 @@ describe<{
 		stub(Crypto.Slots, "getTimeInMsUntilNextSlot").returnValue(0);
 
 		context.delegates = calculateActiveDelegates();
-
-		context.round = {
-			data: {
-				delegates: context.delegates,
-				timestamp: Crypto.Slots.getTime() - 3,
-				reward: 0,
-				lastBlock: { height: 100 },
-			},
-			canForge: false,
-		};
 
 		context.mockNetworkState = {
 			status: NetworkStateStatus.Default,
@@ -241,23 +230,25 @@ describe<{
 	});
 
 	it("Boot should set correct timeout to check slots", async (context) => {
-		context.forgerService.checkLater = spyFn();
-		const fakeTimers = sinon.useFakeTimers();
+		context.client.getRound.returns({
+			delegates: context.delegates,
+			timestamp: Crypto.Slots.getTime() - 7,
+			lastBlock: { height: 100 },
+		});
 
+		context.forgerService.register({ hosts: [mockHost] });
+
+		const timeoutSpy = spy(global, "setTimeout");
 		try {
-			context.client.getRound.returns({
-				delegates: context.delegates,
-				timestamp: Crypto.Slots.getTime() - 7,
-				lastBlock: { height: 100 },
-			});
-
-			context.forgerService.register({ hosts: [mockHost] });
 			await assert.resolves(() => context.forgerService.boot(context.delegates));
-
-			assert.true(context.forgerService.checkLater.calledWith(1000));
 		} finally {
-			fakeTimers.restore();
+			timeoutSpy.restore();
 		}
+
+		timeoutSpy.calledWith(
+			sinon.match.func,
+			sinon.match((value) => 0 <= value && value < 2000),
+		);
 	});
 
 	it("GetTransactionsForForging should log error when transactions are empty", async (context) => {
@@ -891,22 +882,25 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		context.forgerService.checkLater = spyFn();
+		const timeoutSpy = spy(global, "setTimeout");
+		try {
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			timeoutSpy.restore();
+		}
 
-		await assert.resolves(() => context.forgerService.checkSlot());
-
-		assert.true(context.forgerService.checkLater.calledWith(2000));
-
+		timeoutSpy.calledWith(sinon.match.func, 2000);
 		spyForgeNewBlock.neverCalled();
-
 		assert.true(context.logger.error.calledOnce);
-
 		assert.true(context.forgerService.client.emitEvent.calledWith(Enums.ForgerEvent.Failed, { error: mockError }));
-		const infoMessage = `Round: ${round.data.current.toLocaleString()}, height: ${round.data.lastBlock.height.toLocaleString()}`;
-		assert.true(context.logger.info.calledWith(infoMessage));
+		assert.true(
+			context.logger.info.calledWith(
+				`Round: ${round.data.current.toLocaleString()}, height: ${round.data.lastBlock.height.toLocaleString()}`,
+			),
+		);
 	});
 
-	it.only("checkSlot should not error when there is no round info", async (context) => {
+	it("checkSlot should not error when there is no round info", async (context) => {
 		Crypto.Slots.getTimeInMsUntilNextSlot.returns(0);
 
 		const mockBlock = { data: {} } as Interfaces.IBlock;
@@ -933,12 +927,11 @@ describe<{
 
 		context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
 
-		const clock = sinon.useFakeTimers();
-		const timeoutSpy = spy(clock, "setTimeout");
+		const timeoutSpy = spy(global, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
-			clock.restore();
+			timeoutSpy.restore();
 		}
 
 		timeoutSpy.calledWith(sinon.match.func, 2000);
@@ -983,7 +976,7 @@ describe<{
 
 		const failedForgeMessage = `Failed to forge new block by delegate ${prettyName}, because already in next slot.`;
 
-		expect(context.logger.warning).toHaveBeenCalledWith(failedForgeMessage);
+		assert.true(context.logger.warning.calledWith(failedForgeMessage));
 	});
 
 	it("ForgeNewBlock should fail to forge when there is not enough time left in slot", async (context) => {
@@ -1008,8 +1001,7 @@ describe<{
 			forge: stubFn().returns(mockBlock),
 		};
 
-		const spyNextSlot = jest.spyOn(Crypto.Slots, "getSlotNumber");
-		spyNextSlot.mockReturnValue(0);
+		stub(Crypto.Slots, "getSlotNumber").returnValue(0);
 
 		await assert.resolves(() =>
 			context.forgerService.forgeNewBlock(nextDelegateToForge as any, mockEndingRound, context.mockNetworkState),
@@ -1017,8 +1009,12 @@ describe<{
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
 
-		expect(context.logger.warning).toHaveBeenCalledWith(
-			expect.stringContaining(`Failed to forge new block by delegate ${prettyName}, because there were`),
+		assert.true(
+			context.logger.warning.calledWith(
+				sinon.match((s) =>
+					s.includes(`Failed to forge new block by delegate ${prettyName}, because there were`),
+				),
+			),
 		);
 	});
 
@@ -1041,10 +1037,7 @@ describe<{
 			forge: stubFn().returns(mockBlock),
 		};
 
-		const spyNextSlot = jest.spyOn(Crypto.Slots, "getSlotNumber");
-		spyNextSlot.mockReturnValue(0);
-
-		context.client.emitEvent.mockReset();
+		stub(Crypto.Slots, "getSlotNumber").returnValue(0);
 
 		await assert.resolves(
 			// @ts-ignore
@@ -1056,18 +1049,11 @@ describe<{
 		const infoForgeMessageOne = `Forged new block`;
 		const infoForgeMessageTwo = ` by delegate ${prettyName}`;
 
-		expect(context.logger.info).toHaveBeenCalledWith(expect.stringContaining(infoForgeMessageOne));
-		expect(context.logger.info).toHaveBeenCalledWith(expect.stringContaining(infoForgeMessageTwo));
-
-		expect(context.client.broadcastBlock).toHaveBeenCalledWith(mockBlock);
-
-		expect(context.client.emitEvent).toHaveBeenNthCalledWith(1, Enums.BlockEvent.Forged, expect.anything());
-
-		expect(context.client.emitEvent).toHaveBeenNthCalledWith(
-			2,
-			Enums.TransactionEvent.Forged,
-			context.transaction.data,
-		);
+		assert.true(context.logger.info.calledWith(sinon.match((s) => s.includes(infoForgeMessageOne))));
+		assert.true(context.logger.info.calledWith(sinon.match((s) => s.includes(infoForgeMessageTwo))));
+		assert.true(context.client.broadcastBlock.calledWith(mockBlock));
+		assert.true(context.client.emitEvent.calledWith(Enums.BlockEvent.Forged, sinon.match.any));
+		assert.true(context.client.emitEvent.calledWith(Enums.TransactionEvent.Forged, context.transaction.data));
 	});
 
 	it("ForgeNewBlock should forge valid new blocks when passed specific milestones", async (context) => {
@@ -1077,9 +1063,9 @@ describe<{
 			lastBlock: { height: 100 },
 		});
 
-		const spyMilestone = jest.spyOn(Managers.configManager, "getMilestone");
-		spyMilestone.mockReturnValue({
-			...Managers.configManager.getMilestone(1),
+		const milestone = Managers.configManager.getMilestone(1);
+		stub(Managers.configManager, "getMilestone").returnValue({
+			...milestone,
 			block: { version: 0, idFullSha256: true },
 		});
 
@@ -1089,7 +1075,6 @@ describe<{
 
 		context.mockNetworkState.lastBlockId = "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538";
 
-		// @TODO jest.useFakeTimers();
 		await context.forgerService.boot(context.delegates);
 
 		const address = `Delegate-Wallet-${2}`;
@@ -1100,30 +1085,35 @@ describe<{
 			forge: stubFn().returns(mockBlock),
 		};
 
-		const spyNextSlot = jest.spyOn(Crypto.Slots, "getSlotNumber");
-		spyNextSlot.mockReturnValueOnce(0).mockReturnValueOnce(0);
+		const mockRound = {
+			data: {
+				delegates: context.delegates,
+				timestamp: Crypto.Slots.getTime() - 3,
+				reward: 0,
+				lastBlock: { height: 100 },
+			},
+			canForge: false,
+		};
 
-		context.client.emitEvent.mockReset();
-		// @ts-ignore
-		await context.forgerService.forgeNewBlock(nextDelegateToForge, round.data, context.mockNetworkState);
+		stub(Crypto.Slots, "getSlotNumber").returnValue(0);
+		await assert.resolves(() =>
+			context.forgerService.forgeNewBlock(
+				// @ts-ignore
+				nextDelegateToForge,
+				mockRound.data,
+				context.mockNetworkState,
+			),
+		);
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
 
 		const infoForgeMessageOne = `Forged new block`;
 		const infoForgeMessageTwo = ` by delegate ${prettyName}`;
 
-		expect(context.logger.info).toHaveBeenCalledWith(expect.stringContaining(infoForgeMessageOne));
-		expect(context.logger.info).toHaveBeenCalledWith(expect.stringContaining(infoForgeMessageTwo));
-
-		expect(context.client.broadcastBlock).toHaveBeenCalledWith(mockBlock);
-
-		expect(context.client.emitEvent).toHaveBeenNthCalledWith(1, Enums.BlockEvent.Forged, expect.anything());
-
-		expect(context.client.emitEvent).toHaveBeenNthCalledWith(
-			2,
-			Enums.TransactionEvent.Forged,
-			context.transaction.data,
-		);
-		// @TODO jest.useRealTimers();
+		assert.true(context.logger.info.calledWith(sinon.match((s) => s.includes(infoForgeMessageOne))));
+		assert.true(context.logger.info.calledWith(sinon.match((s) => s.includes(infoForgeMessageTwo))));
+		assert.true(context.client.broadcastBlock.calledWith(mockBlock));
+		assert.true(context.client.emitEvent.calledWith(Enums.BlockEvent.Forged, sinon.match.any));
+		assert.true(context.client.emitEvent.calledWith(Enums.TransactionEvent.Forged, context.transaction.data));
 	});
 });
