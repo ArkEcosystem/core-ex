@@ -811,7 +811,6 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-
 		const timeoutSpy = spy(global, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
