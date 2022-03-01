@@ -1,9 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import {
-	ISerializeOptions,
-	TransactionType,
-	TransactionTypeGroup,
-} from "@arkecosystem/core-crypto-contracts";
+import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
