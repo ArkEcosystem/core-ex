@@ -48,7 +48,7 @@ describe("WalletIndex", ({ it, beforeAll, beforeEach, assert }) => {
 		walletIndex.index(wallet);
 
 		assert.equal(walletIndex.walletKeys(wallet), [wallet.getAddress()]);
-	});	
+	});
 });
 
 describe("set", ({ it, beforeAll, beforeEach, assert }) => {
@@ -89,13 +89,13 @@ describe("forget", ({ it, beforeAll, beforeEach, assert }) => {
 	beforeAll(beforeAllCallback);
 
 	it("should index and forget wallets", () => {
-		assert.false(walletIndex.has(wallet.getAddress()))
+		assert.false(walletIndex.has(wallet.getAddress()));
 
 		walletIndex.index(wallet);
-		assert.true(walletIndex.has(wallet.getAddress()))
+		assert.true(walletIndex.has(wallet.getAddress()));
 
 		walletIndex.forget(wallet.getAddress());
-		assert.false(walletIndex.has(wallet.getAddress()))
+		assert.false(walletIndex.has(wallet.getAddress()));
 	});
 
 	it("should not throw if key is not indexed", () => {

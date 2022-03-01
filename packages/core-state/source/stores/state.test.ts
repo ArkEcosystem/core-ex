@@ -26,7 +26,7 @@ const beforeEachCallback = async () => {
 
 describe("getBlockchain", ({ it, beforeEach, assert }) => {
 	beforeEach(beforeEachCallback);
-	
+
 	it("should return initial state", () => {
 		assert.equal(stateStorage.getBlockchain(), {});
 	});
@@ -552,7 +552,7 @@ describe("pingBlock", ({ it, beforeEach, assert }) => {
 			last: currentTime,
 			block: blocks[5].data,
 		};
-		
+
 		clock.tick(100);
 
 		assert.true(stateStorage.pingBlock(blocks[5].data));
@@ -610,9 +610,9 @@ describe("pushPingBlock", ({ it, beforeEach, assert }) => {
 		};
 
 		stateStorage.pushPingBlock(blocks[5].data);
-		assert.true(logger.calledWith(
-			`Previous block ${blocks[3].data.height.toLocaleString()} pinged blockchain 1 times`,
-		));
+		assert.true(
+			logger.calledWith(`Previous block ${blocks[3].data.height.toLocaleString()} pinged blockchain 1 times`),
+		);
 
 		const blockPing = stateStorage.getBlockPing()!;
 		assert.object(blockPing);
@@ -630,9 +630,9 @@ describe("pushPingBlock", ({ it, beforeEach, assert }) => {
 		};
 
 		stateStorage.pushPingBlock(blocks[5].data, true);
-		assert.true(logger.calledWith(
-			`Previous block ${blocks[3].data.height.toLocaleString()} pinged blockchain 0 times`,
-		));
+		assert.true(
+			logger.calledWith(`Previous block ${blocks[3].data.height.toLocaleString()} pinged blockchain 0 times`),
+		);
 
 		const blockPing = stateStorage.getBlockPing()!;
 		assert.object(blockPing);
@@ -670,7 +670,7 @@ describe("setWakeUpTimeout", ({ it, beforeEach, assert, spy }) => {
 		const clock = Sinon.useFakeTimers();
 
 		const callback = () => {};
-		const spyFn = spy(callback)
+		const spyFn = spy(callback);
 		const spyOnClearWakeUpTimeout = spy(stateStorage, "clearWakeUpTimeout");
 
 		stateStorage.setWakeUpTimeout(() => {}, 100);
