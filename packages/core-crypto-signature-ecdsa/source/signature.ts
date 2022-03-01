@@ -52,6 +52,16 @@ export class Signature implements ISignature {
 	}
 
 	public deserialize(buffer: ByteBuffer): string {
-		return buffer.readBytes(33).toString("hex");
+        const signatureLength = (): number => {
+            buffer.mark();
+
+            const lengthHex: string = buffer.skip(1).readBytes(1).toString("hex");
+
+            buffer.reset();
+
+            return parseInt(lengthHex, 16) + 2;
+        };
+
+		return buffer.readBytes(signatureLength()).toString("hex");
 	}
 }
