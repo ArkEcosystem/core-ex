@@ -9,6 +9,6 @@ export class AddressSerializer implements IAddressSerializer {
 	}
 
 	public deserialize(buffer: ByteBuffer): Buffer {
-		return buffer.readBuffer(52);
+		return buffer.readBuffer(20);
 	}
 }
