@@ -343,10 +343,10 @@ importers:
       tmp: 0.2.1
       uvu: 0.5.3
 
-  packages/core-cli/_migrate_these_tests/services/plugins/@namespace/package2:
+  packages/core-cli/test/plugins/@namespace/package2:
     specifiers: {}
 
-  packages/core-cli/_migrate_these_tests/services/plugins/package1:
+  packages/core-cli/test/plugins/package1:
     specifiers: {}
 
   packages/core-container:
