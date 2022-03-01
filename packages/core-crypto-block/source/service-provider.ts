@@ -12,9 +12,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
 			.bind(INTERNAL_FACTORY)
-			.toFactory<IBlock>(
-				(context: Container.interfaces.Context) => (data) => context.container.resolve(Block).init(data),
-			);
+			// @ts-ignore
+			.toFactory<IBlock>(async (context: Container.interfaces.Context) => (data) => context.container.resolve(Block).init(data));
 
 		this.app.bind(BINDINGS.Block.Deserializer).to(Deserializer).inSingletonScope();
 		this.app.bind(BINDINGS.Block.Factory).to(BlockFactory).inSingletonScope();
