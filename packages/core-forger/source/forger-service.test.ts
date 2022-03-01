@@ -933,11 +933,15 @@ describe<{
 
 		context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
 
-		context.forgerService.checkLater = spyFn();
+		const clock = sinon.useFakeTimers();
+		const timeoutSpy = spy(clock, "setTimeout");
+		try {
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			clock.restore();
+		}
 
-		await assert.resolves(() => context.forgerService.checkSlot());
-
-		assert.true(context.forgerService.checkLater.calledWith(2000));
+		timeoutSpy.calledWith(sinon.match.func, 2000);
 		spyForgeNewBlock.neverCalled();
 		assert.true(context.logger.error.calledOnce);
 		assert.true(context.forgerService.client.emitEvent.calledWith(Enums.ForgerEvent.Failed, { error: "Cannot read properties of undefined (reading 'delegates')" }));
