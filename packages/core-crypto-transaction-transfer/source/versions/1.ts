@@ -48,7 +48,7 @@ export class TransferTransaction extends Transaction {
 		if (data.recipientId) {
 			const { addressBuffer } = await this.addressFactory.toBuffer(data.recipientId);
 
-			this.addressSerializer.serialize(addressBuffer, addressBuffer);
+			this.addressSerializer.serialize(buff, addressBuffer);
 		}
 
 		return buff;
