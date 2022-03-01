@@ -4,10 +4,6 @@ import { Signature } from "./signature";
 
 describe("Signature", ({ assert, it }) => {
 	it("should sign and verify", async () => {
-		console.log(await new Signature().sign(
-			Buffer.from("64726e3da8", "hex"),
-			Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex"),
-		))
 		assert.true(
 			await new Signature().verify(
 				Buffer.from(
