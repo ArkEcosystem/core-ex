@@ -93,8 +93,8 @@ describe<{
 		// @ts-ignore
 		DelegateFactory.fromBIP39.restore();
 		const stub1 = sinon.stub(DelegateFactory, "fromBIP39");
-		stub1.onFirstCall().returns(anotherBip39DelegateMock)
-		stub1.onSecondCall().returns(bip39DelegateMock)
+		stub1.onFirstCall().returns(anotherBip39DelegateMock);
+		stub1.onSecondCall().returns(bip39DelegateMock);
 
 		await context.serviceProvider.boot();
 
@@ -310,4 +310,3 @@ describe<{
 		assert.undefined(result.error);
 	});
 });
-
