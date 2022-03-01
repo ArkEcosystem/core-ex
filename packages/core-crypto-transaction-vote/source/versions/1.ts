@@ -1,10 +1,13 @@
 import { Container } from "@arkecosystem/core-container";
-import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
+import { BINDINGS, IPublicKeySerializer, ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @Container.injectable()
 export class VoteTransaction extends Transaction {
+	@Container.inject(BINDINGS.Identity.PublicKeySerializer)
+	private readonly publicKeySerializer: IPublicKeySerializer;
+
 	public static typeGroup: number = TransactionTypeGroup.Core;
 	public static type: number = TransactionType.Vote;
 	public static key = "vote";
@@ -59,7 +62,8 @@ export class VoteTransaction extends Transaction {
 		data.asset = { votes: [] };
 
 		for (let index = 0; index < votelength; index++) {
-			let vote: string = buf.readBuffer(33).toString("hex"); // 33=schnorr,34=ecdsa
+			// @TODO
+			let vote: string = this.publicKeySerializer.deserialize(buf).toString("hex"); // 33=schnorr,34=ecdsa
 			vote = (vote[1] === "1" ? "+" : "-") + vote.slice(2);
 
 			if (data.asset && data.asset.votes) {
