@@ -203,9 +203,15 @@ describe("Wallet Repository", ({ it, assert, beforeEach, beforeAll }) => {
 	});
 
 	it("should throw when looking up a username which doesn't exist", () => {
-		assert.throws(() => walletRepo.findByUsername("iDontExist"), "Wallet iDontExist doesn't exist in index usernames");
+		assert.throws(
+			() => walletRepo.findByUsername("iDontExist"),
+			"Wallet iDontExist doesn't exist in index usernames",
+		);
 
-		assert.throws(() => walletRepo.findByIndex("usernames", "iDontExist"), "Wallet iDontExist doesn't exist in index usernames");
+		assert.throws(
+			() => walletRepo.findByIndex("usernames", "iDontExist"),
+			"Wallet iDontExist doesn't exist in index usernames",
+		);
 	});
 });
 

@@ -61,9 +61,9 @@ describe("Wallet Repository Copy On Write", ({ it, assert, beforeEach, beforeAll
 		const allWallets = [wallet1, wallet2, wallet3];
 		walletRepo.index(allWallets);
 
-		assert.true(walletRepoCopyOnWrite.allByUsername().some(w => w.getAddress() === wallet1.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some(w => w.getAddress() === wallet2.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some(w => w.getAddress() === wallet3.getAddress()));
+		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet1.getAddress()));
+		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet2.getAddress()));
+		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
 
 		const wallet4 = walletRepoCopyOnWrite.createWallet("klm");
 		wallet4.setAttribute("delegate.username", "username4");
@@ -71,10 +71,10 @@ describe("Wallet Repository Copy On Write", ({ it, assert, beforeEach, beforeAll
 		walletRepo.index(wallet4);
 		allWallets.push(wallet4);
 
-		assert.true(walletRepoCopyOnWrite.allByUsername().some(w => w.getAddress() === wallet1.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some(w => w.getAddress() === wallet2.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some(w => w.getAddress() === wallet3.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some(w => w.getAddress() === wallet4.getAddress()));
+		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet1.getAddress()));
+		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet2.getAddress()));
+		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
+		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet4.getAddress()));
 	});
 
 	// TODO: test behaves differently to WalletRepository due to inheritance
@@ -139,7 +139,10 @@ describe("index", ({ it, assert, beforeEach, beforeAll }) => {
 
 		walletRepoCopyOnWrite.index(wallet);
 
-		assert.not.equal(walletRepo.findByAddress(wallet.getAddress()), walletRepoCopyOnWrite.findByAddress(wallet.getAddress()));
+		assert.not.equal(
+			walletRepo.findByAddress(wallet.getAddress()),
+			walletRepoCopyOnWrite.findByAddress(wallet.getAddress()),
+		);
 	});
 });
 
