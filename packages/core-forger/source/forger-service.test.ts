@@ -944,7 +944,11 @@ describe<{
 		timeoutSpy.calledWith(sinon.match.func, 2000);
 		spyForgeNewBlock.neverCalled();
 		assert.true(context.logger.error.calledOnce);
-		assert.true(context.forgerService.client.emitEvent.calledWith(Enums.ForgerEvent.Failed, { error: "Cannot read properties of undefined (reading 'delegates')" }));
+		assert.true(
+			context.forgerService.client.emitEvent.calledWith(Enums.ForgerEvent.Failed, {
+				error: "Cannot read properties of undefined (reading 'delegates')",
+			}),
+		);
 		assert.true(context.logger.info.notCalled);
 	});
 
