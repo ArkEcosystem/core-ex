@@ -61,3 +61,9 @@ export interface IAddressSerializer {
 
 	deserialize(buffer: ByteBuffer): Buffer;
 }
+
+export interface IPublicKeySerializer {
+	serialize(buffer: ByteBuffer, publicKey: string): void;
+
+	deserialize(buffer: ByteBuffer): string;
+}

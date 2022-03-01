@@ -7,5 +7,5 @@ export interface ISignature {
 
 	serialize(buffer: ByteBuffer, signature: string): void;
 
-	deserialize(buffer: ByteBuffer): string;
+	deserialize(buffer: ByteBuffer): Buffer;
 }
