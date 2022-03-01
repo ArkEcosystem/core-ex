@@ -18,6 +18,6 @@ export class Signature implements ISignature {
 	}
 
 	public deserialize(buffer: ByteBuffer): string {
-		return buffer.readBytes(32).toString("hex");
+		return buffer.readBytes(96).toString("hex");
 	}
 }
