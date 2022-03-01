@@ -77,14 +77,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			this.configuration,
 		);
 
-		if (
-			!Utils.isBlockChained(
-				this.blockchain.getLastBlock().data,
-				this.blocks[0],
-				blockTimeLookup,
-				this.slots,
-			)
-		) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup, this.slots)) {
 			this.logger.warning(
 				Utils.getBlockNotChainedErrorMessage(
 					this.blockchain.getLastBlock().data,
