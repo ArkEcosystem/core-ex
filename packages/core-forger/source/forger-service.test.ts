@@ -352,8 +352,6 @@ describe<{
 	});
 
 	it("isForgingAllowed should not allow forging if quorum is not met", async (context) => {
-		// @TODO jest.useFakeTimers();
-
 		context.client.getRound.returns({
 			delegates: context.delegates,
 			timestamp: Crypto.Slots.getTime() - 7,
@@ -455,20 +453,18 @@ describe<{
 			lastBlock: { height: 100 },
 		});
 
-		context.forgerService.checkLater = spyFn();
-		const fakeTimers = sinon.useFakeTimers();
+		const timeoutSpy = spy(global, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
-
-			assert.true(context.forgerService.checkLater.calledWith(200));
-
-			assert.true(context.logger.info.notCalled);
-			assert.true(context.logger.warning.notCalled);
-			assert.true(context.logger.error.notCalled);
-			assert.true(context.logger.debug.notCalled);
 		} finally {
-			fakeTimers.restore();
+			timeoutSpy.restore();
 		}
+
+		timeoutSpy.calledWith(sinon.match.func, 200);
+		assert.true(context.logger.info.notCalled);
+		assert.true(context.logger.warning.notCalled);
+		assert.true(context.logger.error.notCalled);
+		assert.true(context.logger.debug.notCalled);
 	});
 
 	it("checkSlot should set timer and log nextForger which is active on node", async (context) => {
@@ -497,8 +493,6 @@ describe<{
 		);
 		assert.true(context.logger.info.neverCalledWith(`Forger Manager started.`));
 
-		// @TODO jest.useFakeTimers();
-
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 		await assert.resolves(() => context.forgerService.checkSlot());
 
@@ -511,8 +505,6 @@ describe<{
 		assert.true(context.logger.info.calledWith(expectedInfoMessage));
 		assert.true(context.logger.warning.notCalled);
 		assert.true(context.logger.error.notCalled);
-
-		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should set timer and not log message if nextForger is not active", async (context) => {
@@ -541,8 +533,6 @@ describe<{
 		);
 		assert.false(context.logger.info.calledWith(`Forger Manager started.`));
 
-		// @TODO jest.useFakeTimers();
-
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 		await assert.resolves(() => context.forgerService.checkSlot());
 
@@ -556,8 +546,6 @@ describe<{
 		assert.true(context.logger.warning.notCalled);
 		assert.true(context.logger.error.notCalled);
 		assert.false(context.logger.info.calledWith(`Sending wake-up check to relay node ${mockHost.hostname}`));
-
-		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should forge valid blocks when forging is allowed", async (context) => {
@@ -604,8 +592,6 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		// @TODO jest.useFakeTimers();
-
 		await assert.resolves(() => context.forgerService.checkSlot());
 
 		spyForgeNewBlock.calledWith(
@@ -618,8 +604,6 @@ describe<{
 			round.data.lastBlock.height
 		}) are out of sync. This indicates delayed blocks on the network.`;
 		assert.true(context.logger.warning.calledWith(loggerWarningMessage));
-
-		// @TODO jest.useRealTimers();
 	});
 
 	it("checkSlot should not log warning message when nodeHeight does not equal last block height", async (context) => {
@@ -770,14 +754,15 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		context.forgerService.checkLater = spyFn();
+		const timeoutSpy = spy(global, "setTimeout");
+		try {
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			timeoutSpy.restore();
+		}
 
-		await assert.resolves(() => context.forgerService.checkSlot());
-
-		assert.true(context.forgerService.checkLater.calledWith(2000));
-
+		timeoutSpy.calledWith(sinon.match.func, 2000);
 		spyForgeNewBlock.neverCalled();
-
 		assert.true(context.logger.info.calledWith(`Waiting for relay to become ready.`));
 	});
 
@@ -826,11 +811,14 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		context.forgerService.checkLater = spyFn();
 
-		await assert.resolves(() => context.forgerService.checkSlot());
-
-		assert.true(context.forgerService.checkLater.calledWith(2000));
+		const timeoutSpy = spy(global, "setTimeout");
+		try {
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			timeoutSpy.restore();
+		}
+		timeoutSpy.calledWith(sinon.match.func, 2000);
 
 		spyForgeNewBlock.neverCalled();
 
@@ -1045,7 +1033,6 @@ describe<{
 		);
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
-
 		const infoForgeMessageOne = `Forged new block`;
 		const infoForgeMessageTwo = ` by delegate ${prettyName}`;
 
@@ -1106,7 +1093,6 @@ describe<{
 		);
 
 		const prettyName = `Username: ${address} (${nextDelegateToForge.publicKey})`;
-
 		const infoForgeMessageOne = `Forged new block`;
 		const infoForgeMessageTwo = ` by delegate ${prettyName}`;
 
