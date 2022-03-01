@@ -1,5 +1,12 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IBlockData, IBlockDeserializer, IPublicKeySerializer, ISignature, ITransaction } from "@arkecosystem/core-crypto-contracts";
+import {
+	BINDINGS,
+	IBlockData,
+	IBlockDeserializer,
+	IPublicKeySerializer,
+	ISignature,
+	ITransaction,
+} from "@arkecosystem/core-crypto-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 import ByteBuffer from "bytebuffer";

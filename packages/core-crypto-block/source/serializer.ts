@@ -1,5 +1,13 @@
 import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IBlock, IBlockData, IBlockSerializer, IPublicKeySerializer, ISignature, ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import {
+	BINDINGS,
+	IBlock,
+	IBlockData,
+	IBlockSerializer,
+	IPublicKeySerializer,
+	ISignature,
+	ITransactionData,
+} from "@arkecosystem/core-crypto-contracts";
 import { PreviousBlockIdFormatError } from "@arkecosystem/core-crypto-errors";
 import { Utils } from "@arkecosystem/core-crypto-transaction";
 import assert from "assert";
@@ -93,7 +101,7 @@ export class Serializer implements IBlockSerializer {
 		buff.writeUint64(block.reward.toString());
 		buff.writeUint32(block.payloadLength);
 		buff.append(block.payloadHash, "hex");
-		this.publicKeySerializer.serialize(buff, block.generatorPublicKey)
+		this.publicKeySerializer.serialize(buff, block.generatorPublicKey);
 
 		assert.strictEqual(buff.offset, this.headerSize(block));
 	}
