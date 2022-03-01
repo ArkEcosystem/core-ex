@@ -18,6 +18,6 @@ export class Signature implements ISignature {
 	}
 
 	public deserialize(buffer: ByteBuffer): Buffer {
-		return buffer.readBytes(64);
+		return buffer.readBuffer(64);
 	}
 }
