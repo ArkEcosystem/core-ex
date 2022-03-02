@@ -34,24 +34,24 @@ const saveDefaultTransactions = (): (() => void) => {
 describe("StateBuilder", ({ it, beforeAll, beforeEach, assert }) => {
 	beforeAll(async () => {
 		const initialEnv = await setUp();
-	
+
 		walletRepo = initialEnv.walletRepo;
 		stateBuilder = initialEnv.stateBuilder;
 		sandbox = initialEnv.sandbox;
-	
+
 		getBlockRewardsSpy = initialEnv.spies.getBlockRewardsSpy;
 		getSentTransactionSpy = initialEnv.spies.getSentTransactionSpy;
 		getRegisteredHandlersSpy = initialEnv.spies.getRegisteredHandlersSpy;
 		dispatchSpy = initialEnv.spies.dispatchSpy;
 		loggerWarningSpy = initialEnv.spies.logger.warning;
 		loggerInfoSpy = initialEnv.spies.logger.info;
-	
+
 		restoreDefaultSentTransactions = saveDefaultTransactions();
 	});
 
 	beforeEach(() => {
 		walletRepo.reset();
-		
+
 		loggerWarningSpy.resetHistory();
 		dispatchSpy.resetHistory();
 
@@ -118,7 +118,11 @@ describe("StateBuilder", ({ it, beforeAll, beforeEach, assert }) => {
 
 		await stateBuilder.run();
 
-		assert.true(loggerWarningSpy.calledWith("Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-135555'"));
+		assert.true(
+			loggerWarningSpy.calledWith(
+				"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-135555'",
+			),
+		);
 		assert.false(dispatchSpy.called);
 	});
 
@@ -182,9 +186,9 @@ describe("StateBuilder", ({ it, beforeAll, beforeEach, assert }) => {
 
 		await stateBuilder.run();
 
-		assert.true(loggerWarningSpy.calledWith(
-			"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'",
-		));
+		assert.true(
+			loggerWarningSpy.calledWith("Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'"),
+		);
 		assert.false(dispatchSpy.called);
 	});
 
@@ -245,9 +249,9 @@ describe("StateBuilder", ({ it, beforeAll, beforeEach, assert }) => {
 
 		await stateBuilder.run();
 
-		assert.true(loggerWarningSpy.calledWith(
-			"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'",
-		));
+		assert.true(
+			loggerWarningSpy.calledWith("Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'"),
+		);
 		assert.false(dispatchSpy.called);
 	});
 
@@ -267,9 +271,11 @@ describe("StateBuilder", ({ it, beforeAll, beforeEach, assert }) => {
 
 		await stateBuilder.run();
 
-		assert.true(loggerWarningSpy.calledWith(
-			"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative vote balance of '-100'",
-		));
+		assert.true(
+			loggerWarningSpy.calledWith(
+				"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative vote balance of '-100'",
+			),
+		);
 	});
 
 	it("should capitalise registered handlers", async () => {
