@@ -14,7 +14,6 @@ export class Client {
 
 	public hosts: RelayHost[] = [];
 
-	// @ts-ignore
 	private host: RelayHost;
 
 	public register(hosts: RelayHost[]) {
