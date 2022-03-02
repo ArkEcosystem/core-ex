@@ -38,7 +38,7 @@ describe<{
 		const expectedOptions = { ws: { maxPayload: 20971520 } };
 
 		expect(Nes.Client).toHaveBeenCalledWith(expectedUrl, expectedOptions);
-		expect(context.client.hosts).toEqual([{ ...host, socket: expect.anything() }]);
+		assert.equal(context.client.hosts, [{ ...host, socket: expect.anything() }]);
 	});
 
 	it("register should register IPv6 hosts", async (context) => {
@@ -48,7 +48,7 @@ describe<{
 		const expectedOptions = { ws: { maxPayload: 20971520 } };
 
 		expect(Nes.Client).toHaveBeenCalledWith(expectedUrl, expectedOptions);
-		expect(context.client.hosts).toEqual([{ ...hostIPv6, socket: expect.anything() }]);
+		assert.equal(context.client.hosts, [{ ...hostIPv6, socket: expect.anything() }]);
 	});
 
 	it("register on error the socket should call logger", (context) => {
@@ -124,7 +124,7 @@ describe<{
 
 		context.client.register(hosts);
 		context.client.selectHost();
-		expect((context.client as any).host).toEqual(hosts[4]);
+		assert.equal((context.client as any).host, hosts[4]);
 	});
 
 	it("selectHost should log debug message when no sockets are open", async (context) => {
@@ -205,7 +205,7 @@ describe<{
 		context.client.register([host]);
 		const networkState = await context.client.getNetworkState();
 
-		expect(networkState.status).toEqual(NetworkStateStatus.Unknown);
+		assert.equal(networkState.status, NetworkStateStatus.Unknown);
 	});
 
 	it("emitEvent should emit events from localhost", async (context) => {

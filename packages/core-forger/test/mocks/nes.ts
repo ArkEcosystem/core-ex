@@ -1,12 +1,14 @@
+import sinon from "sinon";
+
 export const nesClient = {
-	connect: jest.fn().mockReturnValue(new Promise<void>((resolve) => resolve())),
-	disconnect: jest.fn(),
-	request: jest.fn().mockReturnValue({ payload: Buffer.from(JSON.stringify({})) }),
-	onError: jest.fn(),
-	_isReady: jest.fn().mockReturnValue(true),
-	setMaxPayload: jest.fn(),
+	connect: sinon.stub().returns(new Promise<void>((resolve) => resolve())),
+	disconnect: sinon.spy(),
+	request: sinon.stub().returns({ payload: Buffer.from(JSON.stringify({})) }),
+	onError: sinon.spy(),
+	_isReady: sinon.stub().returns(true),
+	setMaxPayload: sinon.spy(),
 };
 
 export default {
-	Client: jest.fn().mockImplementation(() => nesClient),
+	Client: sinon.stub().callsFake(() => nesClient),
 };
