@@ -1,6 +1,7 @@
 import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import { Codecs, Nes, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
+import { Codecs, NetworkState, NetworkStateStatus } from "@arkecosystem/core-p2p";
 import { Blocks, Interfaces } from "@arkecosystem/crypto";
+import { nes } from "./nes";
 
 import { HostNoResponseError, RelayCommunicationError } from "./errors";
 import { RelayHost } from "./interfaces";
@@ -21,7 +22,7 @@ export class Client {
 		this.hosts = hosts.map((host: RelayHost) => {
 			const url = `ws://${Utils.IpAddress.normalizeAddress(host.hostname)}:${host.port}`;
 			const options = { ws: { maxPayload: MAX_PAYLOAD_CLIENT } };
-			const connection = new Nes.Client(url, options);
+			const connection = new nes.Client(url, options);
 			connection.connect().catch((e) => {}); // connect promise can fail when p2p is not ready, it's fine it will retry
 
 			connection.onError = (e) => {
@@ -38,7 +39,7 @@ export class Client {
 
 	public dispose(): void {
 		for (const host of this.hosts) {
-			const socket: Nes.Client | undefined = host.socket;
+			const socket: nes.Client | undefined = host.socket;
 
 			if (socket) {
 				socket.disconnect();
@@ -146,7 +147,7 @@ export class Client {
 
 	private async emit<T = object>(event: string, payload: Record<string, any> = {}, timeout = 4000): Promise<T> {
 		try {
-			Utils.assert.defined<Nes.Client>(this.host.socket);
+			Utils.assert.defined<nes.Client>(this.host.socket);
 
 			const codec = this.getCodec(event);
 

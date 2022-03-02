@@ -1,4 +1,4 @@
-import { Nes } from "@arkecosystem/core-p2p";
+import { nes } from "./nes";
 import { Interfaces } from "@arkecosystem/crypto";
 
 export interface RelayHost {
@@ -6,7 +6,7 @@ export interface RelayHost {
 
 	port: number;
 
-	socket?: Nes.Client;
+	socket?: nes.Client;
 }
 
 export interface Delegate {
