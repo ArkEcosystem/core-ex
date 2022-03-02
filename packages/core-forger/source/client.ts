@@ -141,7 +141,7 @@ export class Client {
 			)}.`,
 		);
 
-		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join(','));
+		throw new HostNoResponseError(this.hosts.map((host) => host.hostname).join(","));
 	}
 
 	private async emit<T = object>(event: string, payload: Record<string, any> = {}, timeout = 4000): Promise<T> {
