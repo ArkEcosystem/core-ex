@@ -1,21 +1,19 @@
-import "jest-extended";
-
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { Utils } from "@arkecosystem/crypto";
-import { Services } from "@packages/core-kernel";
-import { Wallet, WalletEvent } from "@packages/core-state/source/wallets";
-import { getWalletAttributeSet } from "@packages/core-test-framework/source/internal/wallet-attributes";
-
-import { Setup, setUp } from "../setup";
+import { Services } from "@arkecosystem/core-kernel";
+import { Wallet, WalletEvent } from "../wallets";
+import { getWalletAttributeSet } from "@arkecosystem/core-test-framework/source/internal/wallet-attributes";
+import { Setup, setUp } from "../../test/setup";
+import { describe } from "@arkecosystem/core-test-framework";
 
 let setup: Setup;
 
-beforeAll(async () => {
-	setup = await setUp();
-});
-
-describe("Models - Wallet", () => {
+describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 	let attributeMap;
+
+	beforeAll(async () => {
+		setup = await setUp();
+	});	
 
 	beforeEach(() => {
 		attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
@@ -24,77 +22,78 @@ describe("Models - Wallet", () => {
 	it("returns the address", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
-		expect(wallet.getAddress()).toBe(address);
+
+		assert.equal(wallet.getAddress(), address);
 	});
 
 	it("should set and get publicKey", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.getPublicKey()).toBeUndefined();
+		assert.undefined(wallet.getPublicKey());
 
 		wallet.setPublicKey("publicKey");
-		expect(wallet.getPublicKey()).toEqual("publicKey");
+		assert.equal(wallet.getPublicKey(), "publicKey");
 	});
 
 	it("should set and get balance", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.getBalance()).toEqual(Utils.BigNumber.ZERO);
+		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
 
 		wallet.setBalance(Utils.BigNumber.ONE);
-		expect(wallet.getBalance()).toEqual(Utils.BigNumber.ONE);
+		assert.equal(wallet.getBalance(), Utils.BigNumber.ONE);
 	});
 
 	it("should set and get nonce", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.getNonce()).toEqual(Utils.BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
 
 		wallet.setNonce(Utils.BigNumber.ONE);
-		expect(wallet.getNonce()).toEqual(Utils.BigNumber.ONE);
+		assert.equal(wallet.getNonce(), Utils.BigNumber.ONE);
 	});
 
 	it("should increase balance", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.getBalance()).toEqual(Utils.BigNumber.ZERO);
+		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
 
-		expect(wallet.increaseBalance(Utils.BigNumber.ONE)).toBe(wallet);
-		expect(wallet.getBalance()).toEqual(Utils.BigNumber.ONE);
+		assert.equal(wallet.increaseBalance(Utils.BigNumber.ONE), wallet);
+		assert.equal(wallet.getBalance(), Utils.BigNumber.ONE);
 	});
 
 	it("should decrease balance", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.getBalance()).toEqual(Utils.BigNumber.ZERO);
-
-		expect(wallet.decreaseBalance(Utils.BigNumber.ONE)).toBe(wallet);
-		expect(wallet.getBalance()).toEqual(Utils.BigNumber.make("-1"));
+		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
+		assert.equal(wallet.decreaseBalance(Utils.BigNumber.ONE), wallet);
+		assert.equal(wallet.getBalance(), Utils.BigNumber.make("-1"));
 	});
 
 	it("should increase nonce", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.getNonce()).toEqual(Utils.BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
 
 		wallet.increaseNonce();
-		expect(wallet.getNonce()).toEqual(Utils.BigNumber.ONE);
+
+		assert.equal(wallet.getNonce(), Utils.BigNumber.ONE);
 	});
 
 	it("should decrease nonce", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.getNonce()).toEqual(Utils.BigNumber.ZERO);
+		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
 
 		wallet.decreaseNonce();
-		expect(wallet.getNonce()).toEqual(Utils.BigNumber.make("-1"));
+		assert.equal(wallet.getNonce(), Utils.BigNumber.make("-1"));
 	});
 
 	it("should get, set and forget custom attributes", () => {
@@ -106,17 +105,18 @@ describe("Models - Wallet", () => {
 		const wallet = new Wallet(address, custromAttributeMap);
 		const testAttribute = { test: true };
 		wallet.setAttribute("customAttribute", testAttribute);
-		expect(wallet.hasAttribute("customAttribute")).toBe(true);
-		expect(wallet.getAttribute("customAttribute")).toBe(testAttribute);
+
+		assert.true(wallet.hasAttribute("customAttribute"));
+		assert.equal(wallet.getAttribute("customAttribute"), testAttribute);
 
 		wallet.forgetAttribute("customAttribute");
 
-		expect(wallet.hasAttribute("customAttribute")).toBe(false);
+		assert.false(wallet.hasAttribute("customAttribute"));
 
 		customAttributeSet.forget("customAttribute");
 
-		expect(() => wallet.hasAttribute("customAttribute")).toThrow();
-		expect(() => wallet.getAttribute("customAttribute")).toThrow();
+		assert.throws(() => wallet.hasAttribute("customAttribute"));
+		assert.throws(() => wallet.getAttribute("customAttribute"));
 	});
 
 	it("should get all attributes", () => {
@@ -126,186 +126,195 @@ describe("Models - Wallet", () => {
 		wallet.setAttribute("delegate", {});
 		wallet.setAttribute("vote", {});
 
-		expect(wallet.getAttributes()).toEqual({ delegate: {}, vote: {} });
+		assert.equal(wallet.getAttributes(), { delegate: {}, vote: {} });
 	});
 
 	it("should return whether wallet is delegate", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.isDelegate()).toBe(false);
+		assert.false(wallet.isDelegate());
 		wallet.setAttribute("delegate", {});
-		expect(wallet.isDelegate()).toBe(true);
+		assert.true(wallet.isDelegate());
 	});
 
 	it("should return whether wallet has voted", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.hasVoted()).toBe(false);
+		assert.false(wallet.hasVoted());
 		wallet.setAttribute("vote", {});
-		expect(wallet.hasVoted()).toBe(true);
+		assert.true(wallet.hasVoted());
 	});
 
 	it("should return whether the wallet has multisignature", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
 
-		expect(wallet.hasMultiSignature()).toBe(false);
+		assert.false(wallet.hasMultiSignature());
 		wallet.setAttribute("multiSignature", {});
-		expect(wallet.hasMultiSignature()).toBe(true);
+		assert.true(wallet.hasMultiSignature());
 	});
 
 	it("should be cloneable", () => {
 		const address = "Abcde";
 		const wallet = new Wallet(address, attributeMap);
+		wallet.setPublicKey("test");
 
-		expect(wallet.clone()).toEqual(wallet);
+		assert.equal(wallet.clone(), wallet);
 	});
 });
 
-describe("Original", () => {
+describe("Original", ({ it, beforeAll, beforeEach, assert, afterEach }) => {
 	let wallet: Wallet;
+
+	beforeAll(async () => {
+		setup = await setUp();
+	});
 
 	beforeEach(() => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
-		);
-		wallet = new Wallet("Abcde", attributeMap, events);
+		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
 
-		jest.resetAllMocks();
+		wallet = new Wallet("Abcde", attributeMap, events);
 	});
+
+	afterEach(() => {
+		setup.spies.dispatchSyncSpy.resetHistory();
+	})
 
 	it("should emit on setPublicKey", async () => {
 		wallet.setPublicKey("dummyPublicKey");
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: "dummyPublicKey",
 			key: "publicKey",
 			previousValue: undefined,
 			value: "dummyPublicKey",
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on setBalance", async () => {
 		wallet.setBalance(Utils.BigNumber.ONE);
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "balance",
 			previousValue: Utils.BigNumber.ZERO,
 			value: Utils.BigNumber.ONE,
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on increaseBalance", async () => {
 		wallet.increaseBalance(Utils.BigNumber.ONE);
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "balance",
 			previousValue: Utils.BigNumber.ZERO,
 			value: Utils.BigNumber.ONE,
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on decreaseBalance", async () => {
 		wallet.decreaseBalance(Utils.BigNumber.ONE);
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "balance",
 			previousValue: Utils.BigNumber.ZERO,
 			value: Utils.BigNumber.make("-1"),
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on setNonce", async () => {
 		wallet.setNonce(Utils.BigNumber.ONE);
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "nonce",
 			previousValue: Utils.BigNumber.ZERO,
 			value: Utils.BigNumber.ONE,
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on increaseNonce", async () => {
 		wallet.increaseNonce();
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "nonce",
 			previousValue: Utils.BigNumber.ZERO,
 			value: Utils.BigNumber.ONE,
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on decreaseNonce", async () => {
 		wallet.decreaseNonce();
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "nonce",
 			previousValue: Utils.BigNumber.ZERO,
 			value: Utils.BigNumber.make("-1"),
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on setAttribute", async () => {
 		wallet.setAttribute("delegate.username", "dummy");
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(1);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "delegate.username",
-			previousValue: undefined,
 			value: "dummy",
 			wallet,
-		});
+		}));
 	});
 
 	it("should emit on forgetAttribute", async () => {
 		wallet.setAttribute("delegate.username", "dummy");
 		wallet.forgetAttribute("delegate.username");
 
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledTimes(2);
-		expect(setup.spies.dispatchSyncSpy).toHaveBeenCalledWith(WalletEvent.PropertySet, {
+		assert.true(setup.spies.dispatchSyncSpy.calledTwice);
+		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 			publicKey: undefined,
 			key: "delegate.username",
 			previousValue: "dummy",
-			value: undefined,
 			wallet,
-		});
+		}));
 	});
 
 	it("should clone", async () => {
 		wallet.setAttribute("delegate.username", "dummy");
 		const clone = wallet.clone();
 
-		expect(clone.getAddress()).toEqual("Abcde");
-		expect(clone.getAttribute("delegate.username")).toEqual("dummy");
+		assert.equal(clone.getAddress(), "Abcde");
+		assert.equal(clone.getAttribute("delegate.username"), "dummy");
 	});
 });
 
-describe("Clone", () => {
+describe("Clone", ({ it, beforeAll, beforeEach, assert }) => {
 	let clone;
+
+	beforeAll(async () => {
+		setup = await setUp();
+	});
 
 	beforeEach(() => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
@@ -314,26 +323,24 @@ describe("Clone", () => {
 		);
 		const wallet = new Wallet("Abcde", attributeMap, events);
 		clone = wallet.clone();
-
-		jest.resetAllMocks();
 	});
 
 	it("should emit on property set", async () => {
 		clone.nonce = Utils.BigNumber.make("3");
 
-		expect(setup.spies.dispatchSyncSpy).not.toHaveBeenCalled();
+		assert.false(setup.spies.dispatchSyncSpy.called);
 	});
 
 	it("should emit on setAttribute", async () => {
 		clone.setAttribute("delegate.username", "dummy");
 
-		expect(setup.spies.dispatchSyncSpy).not.toHaveBeenCalled();
+		assert.false(setup.spies.dispatchSyncSpy.called);
 	});
 
 	it("should emit on forgetAttribute", async () => {
 		clone.setAttribute("delegate.username", "dummy");
 		clone.forgetAttribute("delegate.username");
 
-		expect(setup.spies.dispatchSyncSpy).not.toHaveBeenCalled();
+		assert.false(setup.spies.dispatchSyncSpy.called);
 	});
 });
