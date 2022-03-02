@@ -42,7 +42,7 @@ describe<{
 		const expectedOptions = { ws: { maxPayload: 20971520 } };
 
 		context.nes.calledWith(expectedUrl, expectedOptions);
-		assert.equal(context.client.hosts,[{ ...host, socket: expect.anything() }]);
+		assert.equal(context.client.hosts, [{ ...host, socket: expect.anything() }]);
 	});
 
 	it("register should register IPv6 hosts", async (context) => {
@@ -52,7 +52,7 @@ describe<{
 		const expectedOptions = { ws: { maxPayload: 20971520 } };
 
 		context.mockClient.calledWith(expectedUrl, expectedOptions);
-		assert.equal(context.client.hosts,[{ ...hostIPv6, socket: expect.anything() }]);
+		assert.equal(context.client.hosts, [{ ...hostIPv6, socket: expect.anything() }]);
 	});
 
 	it("register on error the socket should call logger", (context) => {
