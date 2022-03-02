@@ -1,12 +1,11 @@
 import { Application, Container } from "@arkecosystem/core-kernel";
-import { Codecs, Nes, NetworkStateStatus } from "@arkecosystem/core-p2p";
+import * as P2P from "@arkecosystem/core-p2p";
+import sinon from "sinon";
 
-import { Client } from "./client";
 import { describe } from "../../core-test-framework/source";
 import { forgedBlockWithTransactions } from "../test/create-block-with-transactions";
-
-import { nesClient } from "../test/mocks/nes";
-import sinon from "sinon";
+import { Client } from "./client";
+import { nes } from "./nes";
 
 describe<{
 	app: Application;
@@ -16,6 +15,8 @@ describe<{
 	hostIPv6: any;
 	hosts: any;
 	hostsIPv6: any;
+	nesClient: any;
+	mockClient: any;
 }>("Client", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
 	beforeEach((context) => {
 		context.host = { hostname: "127.0.0.1", port: 4000, socket: undefined };
@@ -24,36 +25,51 @@ describe<{
 		context.hostsIPv6 = [context.hostIPv6];
 
 		context.logger = {
-			error: spyFn(),
 			debug: spyFn(),
+			error: spyFn(),
 		};
+
+		context.nesClient = {
+			connect: sinon.stub().returns(new Promise<void>((resolve) => resolve())),
+			disconnect: sinon.spy(),
+			request: sinon.stub().returns({ payload: Buffer.from(JSON.stringify({})) }),
+			onError: sinon.spy(),
+			_isReady: sinon.stub().returns(true),
+			setMaxPayload: sinon.spy(),
+		};
+
+		context.mockClient = stub(nes, "Client").callsFake((url) => context.nesClient);
 
 		context.app = new Application(new Container.Container());
 		context.app.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
 
 		context.client = context.app.resolve<Client>(Client);
-
-		stub(Nes, "Client").callsFake((url) => nesClient as any);
 	});
 
 	it("register should register hosts", async (context) => {
 		context.client.register(context.hosts);
 
 		const expectedUrl = `ws://${context.host.hostname}:${context.host.port}`;
-		const expectedOptions = { ws: { maxPayload: 20971520 } };
+		const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
-		assert.true(Nes.Client.calledWith(expectedUrl, expectedOptions));
-		assert.equal(context.client.hosts, [{ ...context.host, socket: expect.anything() }]);
+		context.mockClient.calledWith(expectedUrl, expectedOptions);
+		assert.length(context.client.hosts, 1);
+		assert.equal(context.client.hosts[0].hostname, context.host.hostname);
+		assert.equal(context.client.hosts[0].port, context.host.port);
+		assert.defined(context.client.hosts[0].socket);
 	});
 
 	it("register should register IPv6 hosts", async (context) => {
 		context.client.register(context.hostsIPv6);
 
 		const expectedUrl = `ws://[${context.hostIPv6.hostname}]:${context.hostIPv6.port}`;
-		const expectedOptions = { ws: { maxPayload: 20971520 } };
+		const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
-		expect(Nes.Client).toHaveBeenCalledWith(expectedUrl, expectedOptions);
-		assert.equal(context.client.hosts, [{ ...context.hostIPv6, socket: expect.anything() }]);
+		context.mockClient.calledWith(expectedUrl, expectedOptions);
+		assert.length(context.client.hosts, 1);
+		assert.equal(context.client.hosts[0].hostname, context.hostIPv6.hostname);
+		assert.equal(context.client.hosts[0].port, context.hostIPv6.port);
+		assert.defined(context.client.hosts[0].socket);
 	});
 
 	it("register on error the socket should call logger", (context) => {
@@ -71,7 +87,7 @@ describe<{
 
 		assert.true(context.client.hosts[0].socket.disconnect.called);
 		assert.true(context.client.hosts[1].socket.disconnect.called);
-		assert.true(nesClient.disconnect.called);
+		assert.true(context.nesClient.disconnect.called);
 	});
 
 	it("broadcastBlock should log broadcast as debug message", async (context) => {
@@ -105,14 +121,14 @@ describe<{
 	it("broadcastBlock should broadcast valid blocks without error", async (context) => {
 		context.client.register([context.host]);
 
-		nesClient.request.returns({
-			payload: Codecs.postBlock.response.serialize({ status: true, height: 100 }),
+		context.nesClient.request.returns({
+			payload: P2P.Codecs.postBlock.response.serialize({ height: 100, status: true }),
 		});
 
 		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 
 		assert.true(
-			nesClient.request.calledWith({
+			context.nesClient.request.calledWith({
 				path: "p2p.blocks.postBlock",
 				payload: sinon.match.instanceOf(Buffer),
 			}),
@@ -124,7 +140,7 @@ describe<{
 	it("broadcastBlock should not broadcast blocks on socket.request error", async (context) => {
 		context.client.register([context.host]);
 
-		nesClient.request.rejects(new Error("oops"));
+		context.nesClient.request.rejects(new Error("oops"));
 
 		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 
@@ -148,7 +164,10 @@ describe<{
 			context.host,
 			context.host,
 		];
-		hosts[4].socket._isReady = () => true;
+		for (const host of hosts) {
+			host.socket = { _isReady: () => false };
+		}
+		hosts[4].socket = { _isReady: () => true };
 
 		context.client.register(hosts);
 		context.client.selectHost();
@@ -168,15 +187,17 @@ describe<{
 			context.host,
 			context.host,
 		];
-		hosts.forEach((host) => {
-			host.socket._isReady = () => false;
-		});
 
 		context.client.register(hosts);
 
+		// Force not ready status
+		for (const host of hosts) {
+			host.socket = { _isReady: () => false };
+		}
+
 		await assert.rejects(
 			() => context.client.selectHost(),
-			`${hosts.map((host) => host.hostname).join()} didn't respond. Trying again later.`,
+			`${context.hosts.map((host) => host.hostname).join(",")} didn't respond. Trying again later.`,
 		);
 		assert.true(
 			context.logger.debug.calledWith(
@@ -191,7 +212,7 @@ describe<{
 		context.client.register([context.host]);
 		await context.client.getTransactions();
 		assert.true(
-			nesClient.request.calledWith({
+			context.nesClient.request.calledWith({
 				path: "p2p.internal.getUnconfirmedTransactions",
 				payload: Buffer.from(JSON.stringify({})),
 			}),
@@ -205,7 +226,7 @@ describe<{
 		await context.client.getRound();
 
 		assert.true(
-			nesClient.request.calledWith({
+			context.nesClient.request.calledWith({
 				path: "p2p.internal.getCurrentRound",
 				payload: Buffer.from(JSON.stringify({})),
 			}),
@@ -214,11 +235,11 @@ describe<{
 
 	it("syncWithNetwork should broadcast internal getRound transaction", async (context) => {
 		context.client.register([context.host]);
-		context.host.socket._isReady = () => true;
+
 		await context.client.syncWithNetwork();
 
 		assert.true(
-			nesClient.request.calledWith({
+			context.nesClient.request.calledWith({
 				path: "p2p.internal.syncBlockchain",
 				payload: Buffer.from(JSON.stringify({})),
 			}),
@@ -228,8 +249,7 @@ describe<{
 
 	it("syncWithNetwork should log error message if syncing fails", async (context) => {
 		const errorMessage = "Fake Error";
-		nesClient.request.returns(new Error(errorMessage));
-		context.host.socket._isReady = () => true;
+		context.nesClient.request.rejects(new Error(errorMessage));
 		context.client.register([context.host]);
 
 		await assert.resolves(() => context.client.syncWithNetwork());
@@ -246,7 +266,7 @@ describe<{
 		await context.client.getNetworkState();
 
 		assert.true(
-			nesClient.request.calledWith({
+			context.nesClient.request.calledWith({
 				path: "p2p.internal.getNetworkState",
 				payload: Buffer.from(JSON.stringify({})),
 			}),
@@ -255,12 +275,12 @@ describe<{
 
 	it("getNetworkState should return valid network state on error", async (context) => {
 		const errorMessage = "Fake Error";
-		nesClient.request.rejects(new Error(errorMessage));
+		context.nesClient.request.rejects(new Error(errorMessage));
 
 		context.client.register([context.host]);
 		const networkState = await context.client.getNetworkState();
 
-		assert.equal(networkState.status, NetworkStateStatus.Unknown);
+		assert.equal(networkState.status, P2P.NetworkStateStatus.Unknown);
 	});
 
 	it("emitEvent should emit events from localhost", async (context) => {
@@ -272,12 +292,12 @@ describe<{
 		await context.client.emitEvent("test-event", data);
 
 		assert.true(
-			nesClient.request.calledWith({
+			context.nesClient.request.calledWith({
 				path: "p2p.internal.emitEvent",
 				payload: Buffer.from(
 					JSON.stringify({
-						event: "test-event",
 						body: data,
+						event: "test-event",
 					}),
 				),
 			}),
@@ -296,7 +316,7 @@ describe<{
 
 	it("emitEvent should log error if emitting fails", async (context) => {
 		const errorMessage = "Fake Error";
-		nesClient.request.rejects(new Error(errorMessage));
+		context.nesClient.request.rejects(new Error(errorMessage));
 
 		context.host.hostname = "127.0.0.1";
 		context.client.register([context.host]);
