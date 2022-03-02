@@ -1,18 +1,16 @@
-import "jest-extended";
-
-import { Enums, Utils } from "@packages/core-kernel";
-import { StateBuilder } from "@packages/core-state/source/state-builder";
-import { WalletRepository } from "@packages/core-state/source/wallets";
-import { Sandbox } from "@packages/core-test-framework/source";
-import { Managers } from "@packages/crypto";
-
-import { setUp, setUpDefaults } from "./setup";
+import { Enums, Utils } from "@arkecosystem/core-kernel";
+import { StateBuilder } from "./state-builder";
+import { WalletRepository } from "./wallets";
+import { Sandbox, describe } from "@arkecosystem/core-test-framework";
+import { Managers } from "@arkecosystem/crypto";
+import { setUp, setUpDefaults } from "../test/setup";
+import { SinonSpy } from "sinon";
 
 let stateBuilder: StateBuilder;
-let getBlockRewardsSpy: jest.SpyInstance;
-let getSentTransactionSpy: jest.SpyInstance;
-let getRegisteredHandlersSpy: jest.SpyInstance;
-let dispatchSpy: jest.SpyInstance;
+let getBlockRewardsSpy: SinonSpy;
+let getSentTransactionSpy: SinonSpy;
+let getRegisteredHandlersSpy: SinonSpy;
+let dispatchSpy: SinonSpy;
 
 const getBlockRewardsDefault = setUpDefaults.getBlockRewards[0];
 const getSentTransactionDefault = setUpDefaults.getSentTransaction[0];
@@ -22,8 +20,8 @@ const senderKey = getSentTransactionDefault.senderPublicKey;
 
 let sandbox: Sandbox;
 
-let loggerWarningSpy: jest.SpyInstance;
-let loggerInfoSpy: jest.SpyInstance;
+let loggerWarningSpy: SinonSpy;
+let loggerInfoSpy: SinonSpy;
 
 let walletRepo: WalletRepository;
 let restoreDefaultSentTransactions: () => void;
@@ -33,29 +31,29 @@ const saveDefaultTransactions = (): (() => void) => {
 	return () => (setUpDefaults.getSentTransaction = saveTransaction);
 };
 
-beforeAll(async () => {
-	const initialEnv = await setUp();
+describe("StateBuilder", ({ it, beforeAll, beforeEach, assert }) => {
+	beforeAll(async () => {
+		const initialEnv = await setUp();
+	
+		walletRepo = initialEnv.walletRepo;
+		stateBuilder = initialEnv.stateBuilder;
+		sandbox = initialEnv.sandbox;
+	
+		getBlockRewardsSpy = initialEnv.spies.getBlockRewardsSpy;
+		getSentTransactionSpy = initialEnv.spies.getSentTransactionSpy;
+		getRegisteredHandlersSpy = initialEnv.spies.getRegisteredHandlersSpy;
+		dispatchSpy = initialEnv.spies.dispatchSpy;
+		loggerWarningSpy = initialEnv.spies.logger.warning;
+		loggerInfoSpy = initialEnv.spies.logger.info;
+	
+		restoreDefaultSentTransactions = saveDefaultTransactions();
+	});
 
-	walletRepo = initialEnv.walletRepo;
-	stateBuilder = initialEnv.stateBuilder;
-	sandbox = initialEnv.sandbox;
-
-	getBlockRewardsSpy = initialEnv.spies.getBlockRewardsSpy;
-	getSentTransactionSpy = initialEnv.spies.getSentTransactionSpy;
-	getRegisteredHandlersSpy = initialEnv.spies.getRegisteredHandlersSpy;
-	dispatchSpy = initialEnv.spies.dispatchSpy;
-	loggerWarningSpy = initialEnv.spies.logger.warning;
-	loggerInfoSpy = initialEnv.spies.logger.info;
-
-	restoreDefaultSentTransactions = saveDefaultTransactions();
-});
-
-afterAll(() => jest.clearAllMocks());
-
-describe("StateBuilder", () => {
 	beforeEach(() => {
-		jest.clearAllMocks();
 		walletRepo.reset();
+		
+		loggerWarningSpy.resetHistory();
+		dispatchSpy.resetHistory();
 
 		sandbox.app.config("crypto.exceptions.negativeBalances", {});
 
@@ -69,19 +67,19 @@ describe("StateBuilder", () => {
 	it("should call block repository to get initial block rewards", async () => {
 		await stateBuilder.run();
 
-		expect(getBlockRewardsSpy).toHaveBeenCalled();
+		assert.true(getBlockRewardsSpy.called);
 	});
 
 	it("should get registered handlers", async () => {
 		await stateBuilder.run();
 
-		expect(getRegisteredHandlersSpy).toHaveBeenCalled();
+		assert.true(getRegisteredHandlersSpy.called);
 	});
 
 	it("should get sent transactions", async () => {
 		await stateBuilder.run();
 
-		expect(getSentTransactionSpy).toHaveBeenCalled();
+		assert.true(getSentTransactionSpy.called);
 	});
 
 	it("should apply block rewards to generator wallet", async () => {
@@ -92,7 +90,7 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(wallet.getBalance()).toEqual(expectedBalance);
+		assert.equal(wallet.getBalance(), expectedBalance);
 	});
 
 	it("should apply the transaction data to the sender", async () => {
@@ -107,8 +105,8 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(wallet.getNonce()).toEqual(getSentTransactionDefault.nonce);
-		expect(wallet.getBalance()).toEqual(expectedBalance);
+		assert.equal(wallet.getNonce(), getSentTransactionDefault.nonce);
+		assert.equal(wallet.getBalance(), expectedBalance);
 	});
 
 	it("should fail if any wallet balance is negative and not whitelisted", async () => {
@@ -120,10 +118,8 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).toHaveBeenCalledWith(
-			"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-135555'",
-		);
-		expect(dispatchSpy).not.toHaveBeenCalled();
+		assert.true(loggerWarningSpy.calledWith("Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-135555'"));
+		assert.false(dispatchSpy.called);
 	});
 
 	it("should not fail for negative genesis wallet balances", async () => {
@@ -139,8 +135,8 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).not.toHaveBeenCalled();
-		expect(dispatchSpy).toHaveBeenCalledWith(Enums.StateEvent.BuilderFinished);
+		assert.false(loggerWarningSpy.called);
+		assert.true(dispatchSpy.calledWith(Enums.StateEvent.BuilderFinished));
 	});
 
 	it("should not fail if the publicKey is whitelisted", async () => {
@@ -163,8 +159,8 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).not.toHaveBeenCalled();
-		expect(dispatchSpy).toHaveBeenCalledWith(Enums.StateEvent.BuilderFinished);
+		assert.false(loggerWarningSpy.called);
+		assert.true(dispatchSpy.calledWith(Enums.StateEvent.BuilderFinished));
 	});
 
 	it("should fail if the whitelisted key doesn't have the allowed negative balance", async () => {
@@ -186,10 +182,10 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).toHaveBeenCalledWith(
+		assert.true(loggerWarningSpy.calledWith(
 			"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'",
-		);
-		expect(dispatchSpy).not.toHaveBeenCalled();
+		));
+		assert.false(dispatchSpy.called);
 	});
 
 	it("should not fail if the whitelisted key has the allowed negative balance", async () => {
@@ -211,8 +207,8 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).not.toHaveBeenCalled();
-		expect(dispatchSpy).toHaveBeenCalled();
+		assert.false(loggerWarningSpy.called);
+		assert.true(dispatchSpy.called);
 	});
 
 	it("should not fail if delegates vote balance isn't below 0", async () => {
@@ -225,8 +221,8 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).not.toHaveBeenCalled();
-		expect(dispatchSpy).toHaveBeenCalled();
+		assert.false(loggerWarningSpy.called);
+		assert.true(dispatchSpy.called);
 	});
 
 	it("should fail if the wallet has no public key", async () => {
@@ -249,16 +245,16 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).toHaveBeenCalledWith(
+		assert.true(loggerWarningSpy.calledWith(
 			"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'",
-		);
-		expect(dispatchSpy).not.toHaveBeenCalled();
+		));
+		assert.false(dispatchSpy.called);
 	});
 
 	it("should emit an event when the builder is finished", async () => {
 		await stateBuilder.run();
 
-		expect(dispatchSpy).toHaveBeenCalledWith(Enums.StateEvent.BuilderFinished);
+		assert.true(dispatchSpy.calledWith(Enums.StateEvent.BuilderFinished));
 	});
 
 	it("should exit app if any vote balance is negative", async () => {
@@ -271,9 +267,9 @@ describe("StateBuilder", () => {
 
 		await stateBuilder.run();
 
-		expect(loggerWarningSpy).toHaveBeenCalledWith(
+		assert.true(loggerWarningSpy.calledWith(
 			"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative vote balance of '-100'",
-		);
+		));
 	});
 
 	it("should capitalise registered handlers", async () => {
@@ -288,8 +284,8 @@ describe("StateBuilder", () => {
 
 		setUpDefaults.getSentTransaction = [];
 
-		await expect(stateBuilder.run()).toResolve();
+		await assert.resolves(() => stateBuilder.run());
 
-		expect(loggerInfoSpy).toHaveBeenNthCalledWith(3, `State Generation - Step 3 of 4: Test v1`);
+		assert.true(loggerInfoSpy.calledWith(`State Generation - Step 3 of 4: Test v1`));
 	});
 });
