@@ -13,15 +13,19 @@ describe<{
 	app: Application;
 	client: Client;
 	logger: any;
+	host: any;
+	hostIPv6: any;
+	hosts: any;
+	hostsIPv6: any;
 	nes: any;
 	mockClient: any;
 }>("Client", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
-	const host = { hostname: "127.0.0.1", port: 4000, socket: undefined };
-	const hostIPv6 = { hostname: "::1", port: 4000, socket: undefined };
-	const hosts = [host];
-	const hostsIPv6 = [hostIPv6];
-
 	beforeEach((context) => {
+		context.host = { hostname: "127.0.0.1", port: 4000, socket: undefined };
+		context.hostIPv6 = { hostname: "::1", port: 4000, socket: undefined };
+		context.hosts = [context.host];
+		context.hostsIPv6 = [context.hostIPv6];
+
 		context.logger = {
 			debug: spyFn(),
 			error: spyFn(),
@@ -33,30 +37,32 @@ describe<{
 		context.app.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
 
 		context.client = context.app.resolve<Client>(Client);
+
+		stub(Nes, "Client").callsFake((url) => nesClient as any);
 	});
 
 	it.only("register should register hosts", async (context) => {
-		context.client.register(hosts);
+		context.client.register(context.hosts);
 
-		const expectedUrl = `ws://${host.hostname}:${host.port}`;
+		const expectedUrl = `ws://${context.host.hostname}:${context.host.port}`;
 		const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
 		context.mockClient.calledWith(expectedUrl, expectedOptions);
-		assert.equal(context.client.hosts, [{ ...host, socket: expect.anything() }]);
+		assert.equal(context.client.hosts, [{ ...context.host, socket: expect.anything() }]);
 	});
 
 	it("register should register IPv6 hosts", async (context) => {
-		context.client.register(hostsIPv6);
+		context.client.register(context.hostsIPv6);
 
-		const expectedUrl = `ws://[${hostIPv6.hostname}]:${hostIPv6.port}`;
+		const expectedUrl = `ws://[${context.hostIPv6.hostname}]:${context.hostIPv6.port}`;
 		const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
 		context.mockClient.calledWith(expectedUrl, expectedOptions);
-		assert.equal(context.client.hosts, [{ ...hostIPv6, socket: expect.anything() }]);
+		assert.equal(context.client.hosts, [{ ...context.hostIPv6, socket: expect.anything() }]);
 	});
 
 	it("register on error the socket should call logger", (context) => {
-		context.client.register(hosts);
+		context.client.register(context.hosts);
 
 		const fakeError = { message: "Fake Error" };
 		context.client.hosts[0].socket.onError(fakeError);
@@ -65,7 +71,7 @@ describe<{
 	});
 
 	it("dispose should call disconnect on all sockets", (context) => {
-		context.client.register([host, { hostname: "127.0.0.5", port: 4000 }]);
+		context.client.register([context.host, { hostname: "127.0.0.5", port: 4000 }]);
 		context.client.dispose();
 
 		assert.true(context.client.hosts[0].socket.disconnect.called);
@@ -74,33 +80,35 @@ describe<{
 	});
 
 	it("broadcastBlock should log broadcast as debug message", async (context) => {
-		context.client.register(hosts);
+		context.client.register(context.hosts);
 
 		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 		assert.true(
 			context.logger.debug.calledWith(
 				`Broadcasting block ${forgedBlockWithTransactions.data.height.toLocaleString()} (${
 					forgedBlockWithTransactions.data.id
-				}) with ${forgedBlockWithTransactions.data.numberOfTransactions} transactions to ${host.hostname}`,
+				}) with ${forgedBlockWithTransactions.data.numberOfTransactions} transactions to ${
+					context.host.hostname
+				}`,
 			),
 		);
 	});
 
 	it("broadcastBlock should not broadcast block when there is an issue with socket", async (context) => {
-		context.client.register(hosts);
+		context.client.register(context.hosts);
 
-		host.socket = {};
+		context.host.socket = {};
 		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 
 		assert.true(
 			context.logger.error.calledWith(
-				`Broadcast block failed: Request to ${host.hostname}:${host.port}<p2p.blocks.postBlock> failed, because of 'this.host.socket.request is not a function'.`,
+				`Broadcast block failed: Request to ${context.host.hostname}:${context.host.port}<p2p.blocks.postBlock> failed, because of 'this.host.socket.request is not a function'.`,
 			),
 		);
 	});
 
 	it("broadcastBlock should broadcast valid blocks without error", async (context) => {
-		context.client.register([host]);
+		context.client.register([context.host]);
 
 		nesClient.request.returns({
 			payload: Codecs.postBlock.response.serialize({ height: 100, status: true }),
@@ -119,7 +127,7 @@ describe<{
 	});
 
 	it("broadcastBlock should not broadcast blocks on socket.request error", async (context) => {
-		context.client.register([host]);
+		context.client.register([context.host]);
 
 		nesClient.request.rejects(new Error("oops"));
 
@@ -127,13 +135,27 @@ describe<{
 
 		assert.true(
 			context.logger.error.calledWith(
-				`Broadcast block failed: Request to ${host.hostname}:${host.port}<p2p.blocks.postBlock> failed, because of 'oops'.`,
+				`Broadcast block failed: Request to ${context.host.hostname}:${context.host.port}<p2p.blocks.postBlock> failed, because of 'oops'.`,
 			),
 		);
 	});
 
 	it("selectHost should select the first open socket", async (context) => {
-		const hosts = [host, host, host, host, host, host, host, host, host, host];
+		let hosts = [
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+		];
+		for (const host of hosts) {
+			host.socket._isReady = () => false;
+		}
 		hosts[4].socket._isReady = () => true;
 
 		context.client.register(hosts);
@@ -142,7 +164,18 @@ describe<{
 	});
 
 	it("selectHost should log debug message when no sockets are open", async (context) => {
-		const hosts = [host, host, host, host, host, host, host, host, host, host];
+		let hosts = [
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+		];
 		for (const host of hosts) {
 			host.socket._isReady = () => false;
 		}
@@ -163,7 +196,7 @@ describe<{
 	});
 
 	it("getTransactions should call p2p.internal.getUnconfirmedTransactions endpoint", async (context) => {
-		context.client.register([host]);
+		context.client.register([context.host]);
 		await context.client.getTransactions();
 		assert.true(
 			nesClient.request.calledWith({
@@ -174,8 +207,8 @@ describe<{
 	});
 
 	it("getRound should broadcast internal getRound transaction", async (context) => {
-		context.client.register([host]);
-		host.socket._isReady = () => true;
+		context.client.register([context.host]);
+		context.host.socket._isReady = () => true;
 
 		await context.client.getRound();
 
@@ -188,8 +221,8 @@ describe<{
 	});
 
 	it("syncWithNetwork should broadcast internal getRound transaction", async (context) => {
-		context.client.register([host]);
-		host.socket._isReady = () => true;
+		context.client.register([context.host]);
+		context.host.socket._isReady = () => true;
 		await context.client.syncWithNetwork();
 
 		assert.true(
@@ -198,14 +231,14 @@ describe<{
 				payload: Buffer.from(JSON.stringify({})),
 			}),
 		);
-		assert.true(context.logger.debug.calledWith(`Sending wake-up check to relay node ${host.hostname}`));
+		assert.true(context.logger.debug.calledWith(`Sending wake-up check to relay node ${context.host.hostname}`));
 	});
 
 	it("syncWithNetwork should log error message if syncing fails", async (context) => {
 		const errorMessage = "Fake Error";
 		nesClient.request.returns(new Error(errorMessage));
-		host.socket._isReady = () => true;
-		context.client.register([host]);
+		context.host.socket._isReady = () => true;
+		context.client.register([context.host]);
 
 		await assert.resolves(() => context.client.syncWithNetwork());
 
@@ -217,7 +250,7 @@ describe<{
 	});
 
 	it("getNetworkState should emit internal getNetworkState event", async (context) => {
-		context.client.register([host]);
+		context.client.register([context.host]);
 		await context.client.getNetworkState();
 
 		assert.true(
@@ -232,15 +265,15 @@ describe<{
 		const errorMessage = "Fake Error";
 		nesClient.request.rejects(new Error(errorMessage));
 
-		context.client.register([host]);
+		context.client.register([context.host]);
 		const networkState = await context.client.getNetworkState();
 
 		assert.equal(networkState.status, NetworkStateStatus.Unknown);
 	});
 
 	it("emitEvent should emit events from localhost", async (context) => {
-		host.hostname = "127.0.0.1";
-		context.client.register([host]);
+		context.host.hostname = "127.0.0.1";
+		context.client.register([context.host]);
 
 		const data = { activeDelegates: ["delegate-one"] };
 
@@ -260,8 +293,8 @@ describe<{
 	});
 
 	it("emitEvent should not emit events which are not from localhost", async (context) => {
-		host.hostname = "127.0.0.2";
-		context.client.register([host]);
+		context.host.hostname = "127.0.0.2";
+		context.client.register([context.host]);
 
 		const data = { activeDelegates: ["delegate-one"] };
 		await context.client.emitEvent("test-event", data);
@@ -273,13 +306,17 @@ describe<{
 		const errorMessage = "Fake Error";
 		nesClient.request.rejects(new Error(errorMessage));
 
-		host.hostname = "127.0.0.1";
-		context.client.register([host]);
+		context.host.hostname = "127.0.0.1";
+		context.client.register([context.host]);
 
 		const event = "test-event";
 		const data = { activeDelegates: ["delegate-one"] };
 		await context.client.emitEvent(event, data);
 
-		assert.true(context.logger.error.calledWith(`Failed to emit "${event}" to "${host.hostname}:${host.port}"`));
+		assert.true(
+			context.logger.error.calledWith(
+				`Failed to emit "${event}" to "${context.host.hostname}:${context.host.port}"`,
+			),
+		);
 	});
 });
