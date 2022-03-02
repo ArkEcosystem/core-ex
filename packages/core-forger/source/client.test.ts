@@ -6,8 +6,7 @@ import { describe } from "../../core-test-framework/source";
 import { forgedBlockWithTransactions } from "../test/create-block-with-transactions";
 
 import { nesClient } from "../test/mocks/nes";
-
-// jest.spyOn(Nes, "Client").mockImplementation((url) => nesClient as any);
+import sinon from "sinon";
 
 describe<{
 	app: Application;
@@ -37,7 +36,7 @@ describe<{
 		const expectedUrl = `ws://${host.hostname}:${host.port}`;
 		const expectedOptions = { ws: { maxPayload: 20971520 } };
 
-		expect(Nes.Client).toHaveBeenCalledWith(expectedUrl, expectedOptions);
+		assert.true(Nes.Client.calledWith(expectedUrl, expectedOptions));
 		assert.equal(context.client.hosts, [{ ...host, socket: expect.anything() }]);
 	});
 
