@@ -17,7 +17,6 @@ describe<{
 	hosts: any;
 	hostsIPv6: any;
 }>("Client", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
-
 	beforeEach((context) => {
 		context.host = { hostname: "127.0.0.1", port: 4000, socket: undefined };
 		context.hostIPv6 = { hostname: "::1", port: 4000, socket: undefined };
@@ -83,7 +82,9 @@ describe<{
 			context.logger.debug.calledWith(
 				`Broadcasting block ${forgedBlockWithTransactions.data.height.toLocaleString()} (${
 					forgedBlockWithTransactions.data.id
-				}) with ${forgedBlockWithTransactions.data.numberOfTransactions} transactions to ${context.host.hostname}`,
+				}) with ${forgedBlockWithTransactions.data.numberOfTransactions} transactions to ${
+					context.host.hostname
+				}`,
 			),
 		);
 	});
@@ -135,7 +136,18 @@ describe<{
 	});
 
 	it("selectHost should select the first open socket", async (context) => {
-		let hosts = [context.host, context.host, context.host, context.host, context.host, context.host, context.host, context.host, context.host, context.host];
+		let hosts = [
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+		];
 		hosts[4].socket._isReady = () => true;
 
 		context.client.register(hosts);
@@ -144,7 +156,18 @@ describe<{
 	});
 
 	it("selectHost should log debug message when no sockets are open", async (context) => {
-		let hosts = [context.host, context.host, context.host, context.host, context.host, context.host, context.host, context.host, context.host, context.host];
+		let hosts = [
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+			context.host,
+		];
 		hosts.forEach((host) => {
 			host.socket._isReady = () => false;
 		});
@@ -282,6 +305,10 @@ describe<{
 		const data = { activeDelegates: ["delegate-one"] };
 		await context.client.emitEvent(event, data);
 
-		assert.true(context.logger.error.calledWith(`Failed to emit "${event}" to "${context.host.hostname}:${context.host.port}"`));
+		assert.true(
+			context.logger.error.calledWith(
+				`Failed to emit "${event}" to "${context.host.hostname}:${context.host.port}"`,
+			),
+		);
 	});
 });
