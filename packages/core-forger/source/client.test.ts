@@ -87,7 +87,7 @@ describe<{
 		context.client.register(hosts);
 
 		host.socket = {};
-		await assert.resolves(() =>context.client.broadcastBlock(forgedBlockWithTransactions));
+		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 
 		expect(context.logger.error).toHaveBeenCalledWith(
 			`Broadcast block failed: Request to ${host.hostname}:${host.port}<p2p.blocks.postBlock> failed, because of 'this.host.socket.request is not a function'.`,
