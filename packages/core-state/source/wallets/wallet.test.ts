@@ -13,7 +13,7 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 
 	beforeAll(async () => {
 		setup = await setUp();
-	});	
+	});
 
 	beforeEach(() => {
 		attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
@@ -174,117 +174,135 @@ describe("Original", ({ it, beforeAll, beforeEach, assert, afterEach }) => {
 
 	beforeEach(() => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
+		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+			Container.Identifiers.EventDispatcherService,
+		);
 
 		wallet = new Wallet("Abcde", attributeMap, events);
 	});
 
 	afterEach(() => {
 		setup.spies.dispatchSyncSpy.resetHistory();
-	})
+	});
 
 	it("should emit on setPublicKey", async () => {
 		wallet.setPublicKey("dummyPublicKey");
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
 
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: "dummyPublicKey",
-			key: "publicKey",
-			previousValue: undefined,
-			value: "dummyPublicKey",
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: "dummyPublicKey",
+				key: "publicKey",
+				previousValue: undefined,
+				value: "dummyPublicKey",
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on setBalance", async () => {
 		wallet.setBalance(Utils.BigNumber.ONE);
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "balance",
-			previousValue: Utils.BigNumber.ZERO,
-			value: Utils.BigNumber.ONE,
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "balance",
+				previousValue: Utils.BigNumber.ZERO,
+				value: Utils.BigNumber.ONE,
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on increaseBalance", async () => {
 		wallet.increaseBalance(Utils.BigNumber.ONE);
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "balance",
-			previousValue: Utils.BigNumber.ZERO,
-			value: Utils.BigNumber.ONE,
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "balance",
+				previousValue: Utils.BigNumber.ZERO,
+				value: Utils.BigNumber.ONE,
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on decreaseBalance", async () => {
 		wallet.decreaseBalance(Utils.BigNumber.ONE);
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "balance",
-			previousValue: Utils.BigNumber.ZERO,
-			value: Utils.BigNumber.make("-1"),
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "balance",
+				previousValue: Utils.BigNumber.ZERO,
+				value: Utils.BigNumber.make("-1"),
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on setNonce", async () => {
 		wallet.setNonce(Utils.BigNumber.ONE);
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "nonce",
-			previousValue: Utils.BigNumber.ZERO,
-			value: Utils.BigNumber.ONE,
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "nonce",
+				previousValue: Utils.BigNumber.ZERO,
+				value: Utils.BigNumber.ONE,
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on increaseNonce", async () => {
 		wallet.increaseNonce();
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "nonce",
-			previousValue: Utils.BigNumber.ZERO,
-			value: Utils.BigNumber.ONE,
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "nonce",
+				previousValue: Utils.BigNumber.ZERO,
+				value: Utils.BigNumber.ONE,
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on decreaseNonce", async () => {
 		wallet.decreaseNonce();
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "nonce",
-			previousValue: Utils.BigNumber.ZERO,
-			value: Utils.BigNumber.make("-1"),
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "nonce",
+				previousValue: Utils.BigNumber.ZERO,
+				value: Utils.BigNumber.make("-1"),
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on setAttribute", async () => {
 		wallet.setAttribute("delegate.username", "dummy");
 
 		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "delegate.username",
-			value: "dummy",
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "delegate.username",
+				value: "dummy",
+				wallet,
+			}),
+		);
 	});
 
 	it("should emit on forgetAttribute", async () => {
@@ -292,12 +310,14 @@ describe("Original", ({ it, beforeAll, beforeEach, assert, afterEach }) => {
 		wallet.forgetAttribute("delegate.username");
 
 		assert.true(setup.spies.dispatchSyncSpy.calledTwice);
-		assert.true(setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-			publicKey: undefined,
-			key: "delegate.username",
-			previousValue: "dummy",
-			wallet,
-		}));
+		assert.true(
+			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+				publicKey: undefined,
+				key: "delegate.username",
+				previousValue: "dummy",
+				wallet,
+			}),
+		);
 	});
 
 	it("should clone", async () => {

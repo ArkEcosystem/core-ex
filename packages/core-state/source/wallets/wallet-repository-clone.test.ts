@@ -1,6 +1,13 @@
 import { Utils } from "@arkecosystem/crypto";
 import { Container, Contracts, Services } from "@arkecosystem/core-kernel";
-import { addressesIndexer, publicKeysIndexer, usernamesIndexer, Wallet, WalletRepository, WalletRepositoryClone } from "./";
+import {
+	addressesIndexer,
+	publicKeysIndexer,
+	usernamesIndexer,
+	Wallet,
+	WalletRepository,
+	WalletRepositoryClone,
+} from "./";
 import { walletFactory } from "./wallet-factory";
 import { Sandbox, describe } from "@arkecosystem/core-test-framework";
 
@@ -268,9 +275,7 @@ describe("findByPublicKey", ({ it, assert, beforeEach, skip, spy }) => {
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getPublicKey(), publicKey);
 		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
-		assert.true(
-			walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()),
-		);
+		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()));
 		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
 
 		assert.not.equal(wallet, blockchainWallet);
@@ -283,9 +288,7 @@ describe("findByPublicKey", ({ it, assert, beforeEach, skip, spy }) => {
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getPublicKey(), publicKey);
 		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
-		assert.true(
-			walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()),
-		);
+		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()));
 
 		assert.false(walletRepositoryBlockchain.hasByPublicKey(publicKey));
 		assert.false(walletRepositoryBlockchain.hasByAddress(wallet.getAddress()));
@@ -393,9 +396,7 @@ describe("findByIndex", ({ it, assert, beforeEach, spy }) => {
 		assert.equal(wallet, blockchainWallet);
 		assert.equal(wallet.getAttribute("delegate.username"), username);
 		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has(username));
-		assert.true(
-			walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()),
-		);
+		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()));
 		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
 	});
 
@@ -417,9 +418,7 @@ describe("findByIndex", ({ it, assert, beforeEach, spy }) => {
 
 		assert.equal(wallet, existingWallet);
 		spyOnCreateWallet.neverCalled();
-		assert.false(
-			walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, username),
-		);
+		assert.false(walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, username));
 	});
 
 	it("should throw error if does not exist in blockchain wallet repository", () => {
@@ -596,7 +595,7 @@ describe("hasByIndex", ({ it, assert, beforeEach }) => {
 		assert.true(walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, "genesis_1"));
 		assert.true(
 			// @ts-ignore
-			walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].has("genesis_1")
+			walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].has("genesis_1"),
 		);
 		assert.false(walletRepositoryClone.hasByIndex(Contracts.State.WalletIndexes.Usernames, "genesis_1"));
 	});
@@ -637,9 +636,7 @@ describe("getNonce", ({ it, assert, beforeEach }) => {
 		wallet.setNonce(Utils.BigNumber.make("10"));
 
 		assert.equal(walletRepositoryClone.getNonce(publicKey), Utils.BigNumber.make("10"));
-		assert.true(
-			walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey),
-		);
+		assert.true(walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
 		assert.false(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
 	});
 
@@ -651,9 +648,7 @@ describe("getNonce", ({ it, assert, beforeEach }) => {
 		wallet.setNonce(Utils.BigNumber.make("20"));
 
 		assert.equal(walletRepositoryClone.getNonce(publicKey), Utils.BigNumber.make("20"));
-		assert.true(
-			walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey),
-		);
+		assert.true(walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
 		assert.true(walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
 	});
 });
@@ -754,10 +749,7 @@ describe("allByIndex", ({ it, skip, assert, beforeEach }) => {
 		const wallet2 = walletRepositoryBlockchain.findByAddress("address_2");
 		walletRepositoryBlockchain.setOnIndex(Contracts.State.WalletIndexes.Usernames, "usernames_2", wallet2);
 
-		assert.equal(walletRepositoryClone.allByIndex(Contracts.State.WalletIndexes.Usernames), [
-			wallet1,
-			wallet2,
-		]);
+		assert.equal(walletRepositoryClone.allByIndex(Contracts.State.WalletIndexes.Usernames), [wallet1, wallet2]);
 	});
 });
 
