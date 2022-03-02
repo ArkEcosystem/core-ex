@@ -1,13 +1,13 @@
+/* eslint-disable */
 import { Application, Container } from "@arkecosystem/core-kernel";
-import { Codecs, NetworkStateStatus } from "@arkecosystem/core-p2p";
+import * as P2P from "@arkecosystem/core-p2p";
+import sinon from "sinon";
 
-import { Client } from "./client";
 import { describe } from "../../core-test-framework/source";
 import { forgedBlockWithTransactions } from "../test/create-block-with-transactions";
-import { nes } from "./nes";
-
 import { nesClient } from "../test/mocks/nes";
-import sinon from "sinon";
+import { Client } from "./client";
+import { nes } from "./nes";
 
 describe<{
 	app: Application;
@@ -23,8 +23,8 @@ describe<{
 
 	beforeEach((context) => {
 		context.logger = {
-			error: spyFn(),
 			debug: spyFn(),
+			error: spyFn(),
 		};
 
 		context.mockClient = stub(nes, "Client").callsFake((url) => nesClient as any);
@@ -39,9 +39,9 @@ describe<{
 		context.client.register(hosts);
 
 		const expectedUrl = `ws://${host.hostname}:${host.port}`;
-		const expectedOptions = { ws: { maxPayload: 20971520 } };
+		const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
-		context.nes.calledWith(expectedUrl, expectedOptions);
+		context.mockClient.calledWith(expectedUrl, expectedOptions);
 		assert.equal(context.client.hosts, [{ ...host, socket: expect.anything() }]);
 	});
 
@@ -49,7 +49,7 @@ describe<{
 		context.client.register(hostsIPv6);
 
 		const expectedUrl = `ws://[${hostIPv6.hostname}]:${hostIPv6.port}`;
-		const expectedOptions = { ws: { maxPayload: 20971520 } };
+		const expectedOptions = { ws: { maxPayload: 20_971_520 } };
 
 		context.mockClient.calledWith(expectedUrl, expectedOptions);
 		assert.equal(context.client.hosts, [{ ...hostIPv6, socket: expect.anything() }]);
@@ -103,7 +103,7 @@ describe<{
 		context.client.register([host]);
 
 		nesClient.request.returns({
-			payload: Codecs.postBlock.response.serialize({ status: true, height: 100 }),
+			payload: Codecs.postBlock.response.serialize({ height: 100, status: true }),
 		});
 
 		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
@@ -133,7 +133,7 @@ describe<{
 	});
 
 	it("selectHost should select the first open socket", async (context) => {
-		let hosts = [host, host, host, host, host, host, host, host, host, host];
+		const hosts = [host, host, host, host, host, host, host, host, host, host];
 		hosts[4].socket._isReady = () => true;
 
 		context.client.register(hosts);
@@ -142,16 +142,16 @@ describe<{
 	});
 
 	it("selectHost should log debug message when no sockets are open", async (context) => {
-		let hosts = [host, host, host, host, host, host, host, host, host, host];
-		hosts.forEach((host) => {
+		const hosts = [host, host, host, host, host, host, host, host, host, host];
+		for (const host of hosts) {
 			host.socket._isReady = () => false;
-		});
+		}
 
 		context.client.register(hosts);
 
 		await assert.rejects(
 			() => context.client.selectHost(),
-			`${hosts.map((host) => host.hostname).join()} didn't respond. Trying again later.`,
+			`${hosts.map((host) => host.hostname).join(',')} didn't respond. Trying again later.`,
 		);
 		assert.true(
 			context.logger.debug.calledWith(
@@ -251,8 +251,8 @@ describe<{
 				path: "p2p.internal.emitEvent",
 				payload: Buffer.from(
 					JSON.stringify({
-						event: "test-event",
 						body: data,
+						event: "test-event",
 					}),
 				),
 			}),

@@ -1,4 +1,3 @@
-import { nes } from "./nes";
 import { Interfaces } from "@arkecosystem/crypto";
 
 export interface RelayHost {
@@ -6,7 +5,7 @@ export interface RelayHost {
 
 	port: number;
 
-	socket?: nes.Client;
+	socket?: any;
 }
 
 export interface Delegate {
