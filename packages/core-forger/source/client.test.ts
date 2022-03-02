@@ -71,7 +71,7 @@ describe<{
 	it("broadcastBlock should log broadcast as debug message", async (context) => {
 		context.client.register(hosts);
 
-		await expect(context.client.broadcastBlock(forgedBlockWithTransactions)).toResolve();
+		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 		expect(context.logger.debug).toHaveBeenCalledWith(
 			`Broadcasting block ${forgedBlockWithTransactions.data.height.toLocaleString()} (${
 				forgedBlockWithTransactions.data.id
@@ -83,7 +83,7 @@ describe<{
 		context.client.register(hosts);
 
 		host.socket = {};
-		await expect(context.client.broadcastBlock(forgedBlockWithTransactions)).toResolve();
+		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 
 		expect(context.logger.error).toHaveBeenCalledWith(
 			`Broadcast block failed: Request to ${host.hostname}:${host.port}<p2p.blocks.postBlock> failed, because of 'this.host.socket.request is not a function'.`,
@@ -97,7 +97,7 @@ describe<{
 			payload: Codecs.postBlock.response.serialize({ status: true, height: 100 }),
 		});
 
-		await expect(context.client.broadcastBlock(forgedBlockWithTransactions)).toResolve();
+		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 
 		expect(nesClient.request).toHaveBeenCalledWith({
 			path: "p2p.blocks.postBlock",
@@ -112,7 +112,7 @@ describe<{
 
 		nesClient.request.mockRejectedValueOnce(new Error("oops"));
 
-		await expect(context.client.broadcastBlock(forgedBlockWithTransactions)).toResolve();
+		await assert.resolves(() => context.client.broadcastBlock(forgedBlockWithTransactions));
 		expect(context.logger.error).toHaveBeenCalledWith(
 			`Broadcast block failed: Request to ${host.hostname}:${host.port}<p2p.blocks.postBlock> failed, because of 'oops'.`,
 		);
@@ -182,7 +182,7 @@ describe<{
 		nesClient.request.mockRejectedValueOnce(new Error(errorMessage));
 		host.socket._isReady = () => true;
 		context.client.register([host]);
-		await expect(context.client.syncWithNetwork()).toResolve();
+		await assert.resolves(() => context.client.syncWithNetwork());
 		expect(context.logger.error).toHaveBeenCalledWith(
 			`Could not sync check: Request to 127.0.0.1:4000<p2p.internal.syncBlockchain> failed, because of '${errorMessage}'.`,
 		);
