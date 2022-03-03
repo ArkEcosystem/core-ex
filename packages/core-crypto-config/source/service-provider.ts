@@ -7,13 +7,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		// if (this.app.isBound(Identifiers.Crypto)) {
-		const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
+		if (this.app.isBound(Identifiers.Crypto)) {
+			const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
 
-		this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
+			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
-		this.app.bind<Contracts.Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
-		// }
+			this.app.bind<Contracts.Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
+		}
 	}
 
 	private fromConfigRepository(): Contracts.Crypto.NetworkConfig {
