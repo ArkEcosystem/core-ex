@@ -3,6 +3,10 @@ import assert from "uvu/assert";
 export class Fake<T> {
 	protected subject;
 
+	public called(): void {
+		assert.ok(this.subject.called);
+	}
+
 	public calledWith(...arguments_: any[]): void {
 		assert.ok(this.subject.calledWith(...arguments_));
 	}
@@ -17,10 +21,6 @@ export class Fake<T> {
 		}
 		
 		assert.ok(this.subject.getCall(index).calledWith(...arguments_));
-	}
-
-	public called(): void {
-		assert.ok(this.subject.called);
 	}
 
 	public calledOnce(): void {
