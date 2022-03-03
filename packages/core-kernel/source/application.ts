@@ -3,14 +3,13 @@ import { join } from "path";
 import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { existsSync, removeSync, writeFileSync } from "fs-extra";
 
-import { Bootstrappers } from "./bootstrap";
+import * as Bootstrappers from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
 import { KernelEvent } from "./enums";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
 import { JsonObject, KeyValuePair } from "./types";
-import { Constructor } from "./types/container";
 
 export class Application implements Contracts.Kernel.Application {
 	private booted = false;
@@ -232,13 +231,12 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	private async bootstrapWith(type: string): Promise<void> {
-		// @ts-ignore
-		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
 
-		for (const bootstrapper of bootstrappers) {
+		for (const bootstrapper of Object.values(Bootstrappers)) {
 			events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
 
+			// @ts-ignore
 			await this.resolve<Bootstrapper>(bootstrapper).bootstrap();
 
 			events.dispatch(KernelEvent.Bootstrapped, { bootstrapper: bootstrapper.name });

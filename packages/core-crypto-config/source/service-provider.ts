@@ -7,18 +7,18 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		if (this.app.isBound(Identifiers.Crypto)) {
+		// @TODO: this breaks during network config generation
+		// if (this.app.isBound(Identifiers.Crypto)) {
 			const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
 
 			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
 			this.app.bind<Contracts.Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
-		}
-	}
+		// }
+  	}
 
 	private fromConfigRepository(): Contracts.Crypto.NetworkConfig {
 		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
-
 		return {
 			// @ts-ignore
 			genesisBlock: configRepository.get<IBlockJson>("crypto.genesisBlock")!,
