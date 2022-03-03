@@ -238,11 +238,12 @@ describe<{
 
 		context.forgerService.register({ hosts: [mockHost] });
 
-		const timeoutSpy = spy(global, "setTimeout");
+		const clock = sinon.useFakeTimers(new Date());
+		const timeoutSpy = spy(clock, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.boot(context.delegates));
 		} finally {
-			timeoutSpy.restore();
+			clock.restore();
 		}
 
 		timeoutSpy.calledWith(
@@ -453,11 +454,12 @@ describe<{
 			lastBlock: { height: 100 },
 		});
 
-		const timeoutSpy = spy(global, "setTimeout");
+		const clock = sinon.useFakeTimers(new Date());
+		const timeoutSpy = spy(clock, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
-			timeoutSpy.restore();
+			clock.restore();
 		}
 
 		timeoutSpy.calledWith(sinon.match.func, 200);
@@ -754,11 +756,12 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		const timeoutSpy = spy(global, "setTimeout");
+		const clock = sinon.useFakeTimers(new Date());
+		const timeoutSpy = spy(clock, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
-			timeoutSpy.restore();
+			clock.restore();
 		}
 
 		timeoutSpy.calledWith(sinon.match.func, 2000);
@@ -811,16 +814,16 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		const timeoutSpy = spy(global, "setTimeout");
+		const clock = sinon.useFakeTimers(new Date());
+		const timeoutSpy = spy(clock, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
-			timeoutSpy.restore();
+			clock.restore();
 		}
+
 		timeoutSpy.calledWith(sinon.match.func, 2000);
-
 		spyForgeNewBlock.neverCalled();
-
 		assert.true(context.logger.warning.calledWith(`Request to ${mockEndpoint} failed, because of '${mockError}'.`));
 	});
 
@@ -869,11 +872,12 @@ describe<{
 
 		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		const timeoutSpy = spy(global, "setTimeout");
+		const clock = sinon.useFakeTimers(new Date());
+		const timeoutSpy = spy(clock, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
-			timeoutSpy.restore();
+			clock.restore();
 		}
 
 		timeoutSpy.calledWith(sinon.match.func, 2000);
@@ -914,11 +918,12 @@ describe<{
 
 		context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
 
-		const timeoutSpy = spy(global, "setTimeout");
+		const clock = sinon.useFakeTimers(new Date());
+		const timeoutSpy = spy(clock, "setTimeout");
 		try {
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
-			timeoutSpy.restore();
+			clock.restore();
 		}
 
 		timeoutSpy.calledWith(sinon.match.func, 2000);
