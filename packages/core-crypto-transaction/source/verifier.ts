@@ -1,6 +1,9 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
-import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "@arkecosystem/core-contracts";
+import {
+	DuplicateParticipantInMultiSignatureError,
+	InvalidMultiSignatureAssetError,
+} from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Verifier implements Crypto.ITransactionVerifier {
