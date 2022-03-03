@@ -1,14 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
+import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import semver from "semver";
 
-import {
-	DependencyVersionOutOfRange,
-	InvalidPluginConfiguration,
-	OptionalDependencyCannotBeFound,
-	RequiredDependencyCannotBeFound,
-	ServiceProviderCannotBeRegistered,
-} from "../../exceptions/plugins";
 import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../../providers";
 import { ValidationManager } from "../../services/validation";
 import { assert } from "../../utils";
@@ -19,10 +12,10 @@ import { Bootstrapper } from "../interfaces";
 @injectable()
 export class RegisterServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application)
-	private readonly app!: Kernel.Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.LogService)
-	private readonly logger!: Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
@@ -49,7 +42,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 				const isRequired: boolean = await serviceProvider.required();
 
 				if (isRequired) {
-					throw new ServiceProviderCannotBeRegistered(serviceProviderName, error.message);
+					throw new Exceptions.ServiceProviderCannotBeRegistered(serviceProviderName, error.message);
 				}
 
 				serviceProviders.fail(serviceProviderName);
@@ -63,11 +56,11 @@ export class RegisterServiceProviders implements Bootstrapper {
 		if (Object.keys(configSchema).length > 0) {
 			const config: PluginConfiguration = serviceProvider.config();
 
-			const validator: Kernel.Validator | undefined = this.app
+			const validator: Contracts.Kernel.Validator | undefined = this.app
 				.get<ValidationManager>(Identifiers.ValidationManager)
 				.driver();
 
-			assert.defined<Kernel.Validator>(validator);
+			assert.defined<Contracts.Kernel.Validator>(validator);
 
 			validator.validate(config.all(), configSchema);
 
@@ -76,7 +69,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 
 				assert.defined<string>(serviceProviderName);
 
-				throw new InvalidPluginConfiguration(serviceProviderName, validator.errors());
+				throw new Exceptions.InvalidPluginConfiguration(serviceProviderName, validator.errors());
 			}
 
 			serviceProvider.setConfig(config.merge(validator.valid() || {}));
@@ -100,7 +93,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 			if (!serviceProviders.has(name)) {
 				// The dependency is necessary for this package to function. We'll output an error and terminate the process.
 				if (isRequired) {
-					const error: RequiredDependencyCannotBeFound = new RequiredDependencyCannotBeFound(
+					const error = new Exceptions.RequiredDependencyCannotBeFound(
 						serviceProviderName,
 						name,
 					);
@@ -109,7 +102,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 				}
 
 				// The dependency is optional for this package to function. We'll only output a warning.
-				const error: OptionalDependencyCannotBeFound = new OptionalDependencyCannotBeFound(
+				const error = new Exceptions.OptionalDependencyCannotBeFound(
 					serviceProviderName,
 					name,
 				);
@@ -127,7 +120,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 				assert.defined<string>(version);
 
 				if (!semver.satisfies(version, constraint)) {
-					const error: DependencyVersionOutOfRange = new DependencyVersionOutOfRange(
+					const error = new Exceptions.DependencyVersionOutOfRange(
 						name,
 						constraint,
 						version,
