@@ -19,7 +19,7 @@ export class Fake<T> {
 		if (this.subject.callCount <= index) {
 			throw new Error(`Failed to get arguments for call#${index}`);
 		}
-		
+
 		assert.ok(this.subject.getCall(index).calledWith(...arguments_));
 	}
 
