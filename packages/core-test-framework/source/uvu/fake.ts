@@ -11,6 +11,10 @@ export class Fake<T> {
 		assert.not.ok(this.subject.calledWith(...arguments_));
 	}
 
+	public called(): void {
+		assert.ok(this.subject.called);
+	}
+
 	public calledOnce(): void {
 		this.calledTimes(1);
 	}
