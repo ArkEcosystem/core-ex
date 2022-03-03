@@ -127,7 +127,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			return;
 		}
 
-		this.configRepository.set("crypto.json", this.loadFromLocation(["crypto.json"]));
+		this.configRepository.set("crypto", this.loadFromLocation(["crypto.json"]));
 	}
 
 	private loadFromLocation(files: string[]): KeyValuePair {

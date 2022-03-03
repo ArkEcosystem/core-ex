@@ -19,6 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	private fromConfigRepository(): Contracts.Crypto.NetworkConfig {
 		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
+
 		return {
 			// @ts-ignore
 			genesisBlock: configRepository.get<IBlockJson>("crypto.genesisBlock")!,
