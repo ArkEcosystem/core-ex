@@ -11,6 +11,14 @@ export class Fake<T> {
 		assert.not.ok(this.subject.calledWith(...arguments_));
 	}
 
+	public calledNthWith(index: number, ...arguments_: any[]): void {
+		if (this.subject.callCount <= index) {
+			throw new Error(`Failed to get arguments for call#${index}`);
+		}
+		
+		assert.ok(this.subject.getCall(index).calledWith(...arguments_));
+	}
+
 	public called(): void {
 		assert.ok(this.subject.called);
 	}
