@@ -17,6 +17,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	private fromConfigRepository(): Crypto.NetworkConfig {
+		console.log(this.app.isBound(Identifiers.ConfigRepository));
+
 		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
 
 		return {

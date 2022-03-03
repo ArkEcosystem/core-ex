@@ -1,20 +1,19 @@
+import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 import { existsSync, removeSync, writeFileSync } from "fs-extra";
 import { join } from "path";
 
-import * as Bootstrappers from "./bootstrap";
+import { Bootstrappers } from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
 import { KernelEvent } from "./enums";
 import { DirectoryCannotBeFound } from "./exceptions/filesystem";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
-// import { ShutdownSignal } from "./enums/process";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
 import { JsonObject, KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
-import { Identifiers, Kernel } from "@arkecosystem/core-contracts";
 
 export class Application implements Kernel.Application {
-	private booted: boolean = false;
+	private booted = false;
 
 	public constructor(public readonly container: Kernel.Container.Container) {
 		// todo: enable this after solving the event emitter limit issues
@@ -153,7 +152,7 @@ export class Application implements Kernel.Application {
 	}
 
 	public enableMaintenance(): void {
-		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: +new Date() }));
+		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
 
 		this.get<Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
 
@@ -223,7 +222,7 @@ export class Application implements Kernel.Application {
 	}
 
 	private async bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers[type]);
+		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers);
 		const events: Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
 
 		for (const bootstrapper of bootstrappers) {
