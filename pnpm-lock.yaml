@@ -343,10 +343,10 @@ importers:
       tmp: 0.2.1
       uvu: 0.5.3
 
-  packages/core-cli/_migrate_these_tests/services/plugins/@namespace/package2:
+  packages/core-cli/test/plugins/@namespace/package2:
     specifiers: {}
 
-  packages/core-cli/_migrate_these_tests/services/plugins/package1:
+  packages/core-cli/test/plugins/package1:
     specifiers: {}
 
   packages/core-container:
@@ -1201,12 +1201,16 @@ importers:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-state': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      import-fresh: 3.3.0
       joi: 17.4.2
       node-forge: 1.2.1
+      sinon: ^12.0.1
+      uvu: ^0.5.3
       wif: 2.0.6
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
@@ -1217,8 +1221,12 @@ importers:
       node-forge: 1.2.1
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-state': link:../core-state
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      import-fresh: 3.3.0
+      sinon: 12.0.1
+      uvu: 0.5.3
 
   packages/core-kernel:
     specifiers:
@@ -4277,7 +4285,6 @@ packages:
     resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-    dev: false
 
   /@sinonjs/fake-timers/9.1.0:
     resolution: {integrity: sha512-M8vapsv9qQupMdzrVzkn5rb9jG7aUTEPAZdMtME2PuBaefksFZVE2C1g4LBRTkF/k3nRDNbDc5tp5NFC1PEYxA==}
@@ -13167,7 +13174,6 @@ packages:
       diff: 5.0.0
       nise: 5.1.1
       supports-color: 7.2.0
-    dev: false
 
   /sinon/13.0.1:
     resolution: {integrity: sha512-8yx2wIvkBjIq/MGY1D9h1LMraYW+z1X0mb648KZnKSdvLasvDu7maa0dFaNYdTDczFgbjNw2tOmWdTk9saVfwQ==}
