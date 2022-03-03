@@ -1,9 +1,9 @@
 {
-    "address": "ark1gdpgusp48cdzxp8wx8g5vrfpvmvwzsqvpcgzcnyf5vzvya33zl7qg4mx8u",
-    "keys": {
-        "compressed": true,
-        "privateKey": "8ae1a6f53b6d8903955b1adfb9cecefb496d2f1d12fe13473bc51e6ab74b63fc",
-        "publicKey": "43428e40353e1a2304ee31d1460d2166d8e1400c0e102c4c89a304c2763117fc"
-    },
-    "passphrase": "unable noodle script knock december grain type title into object carbon soccer hundred put spin record man tone derive remind make spare language when"
+	"address": "ark1gdpgusp48cdzxp8wx8g5vrfpvmvwzsqvpcgzcnyf5vzvya33zl7qg4mx8u",
+	"keys": {
+		"compressed": true,
+		"privateKey": "8ae1a6f53b6d8903955b1adfb9cecefb496d2f1d12fe13473bc51e6ab74b63fc",
+		"publicKey": "43428e40353e1a2304ee31d1460d2166d8e1400c0e102c4c89a304c2763117fc"
+	},
+	"passphrase": "unable noodle script knock december grain type title into object carbon soccer hundred put spin record man tone derive remind make spare language when"
 }

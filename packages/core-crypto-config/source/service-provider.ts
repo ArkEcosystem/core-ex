@@ -9,13 +9,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		// @TODO: this breaks during network config generation
 		// if (this.app.isBound(Identifiers.Crypto)) {
-			const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
+		const config: Contracts.Crypto.NetworkConfig = this.fromConfigRepository();
 
-			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
+		this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
-			this.app.bind<Contracts.Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
+		this.app.bind<Contracts.Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
 		// }
-  	}
+	}
 
 	private fromConfigRepository(): Contracts.Crypto.NetworkConfig {
 		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
