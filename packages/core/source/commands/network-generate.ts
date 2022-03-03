@@ -428,8 +428,8 @@ export class Command extends Commands.Command {
 				{
 					task: async () => {
 						if (!flags.overwriteConfig && existsSync(coreConfigDestination)) {
-								throw new Error(`${coreConfigDestination} already exists.`);
-							}
+							throw new Error(`${coreConfigDestination} already exists.`);
+						}
 
 						ensureDirSync(coreConfigDestination);
 					},
@@ -465,13 +465,17 @@ export class Command extends Commands.Command {
 						// Genesis Block
 						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, validators, flags);
 
-						writeJSONSync(resolve(coreConfigDestination, "crypto.json"), {
-							genesisBlock,
-							milestones,
-							network: this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
-						}, {
-							spaces: 4,
-						});
+						writeJSONSync(
+							resolve(coreConfigDestination, "crypto.json"),
+							{
+								genesisBlock,
+								milestones,
+								network: this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
+							},
+							{
+								spaces: 4,
+							},
+						);
 					},
 					title: "Generate crypto network configuration.",
 				},
