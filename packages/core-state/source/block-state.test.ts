@@ -60,9 +60,9 @@ const beforeEachCallback = (spy: (owner?: object, method?: string) => Spy) => {
 		spyApplyBlockToForger = spy(blockState as any, "applyBlockToForger");
 		spyApplyVoteBalances = spy(blockState as any, "applyVoteBalances");
 		spyRevertBlockFromForger = spy(blockState as any, "revertBlockFromForger");
-	
+
 		forgingWallet = walletRepo.findByPublicKey(blocks[0].data.generatorPublicKey);
-	
+
 		forgingWallet.setAttribute("delegate", {
 			username: "test",
 			forgedFees: Utils.BigNumber.ZERO,
@@ -70,7 +70,7 @@ const beforeEachCallback = (spy: (owner?: object, method?: string) => Spy) => {
 			producedBlocks: 0,
 			lastBlock: undefined,
 		});
-	
+
 		votingWallet = factory
 			.get("Wallet")
 			.withOptions({
@@ -78,7 +78,7 @@ const beforeEachCallback = (spy: (owner?: object, method?: string) => Spy) => {
 				nonce: 0,
 			})
 			.make();
-	
+
 		sendingWallet = factory
 			.get("Wallet")
 			.withOptions({
@@ -86,7 +86,7 @@ const beforeEachCallback = (spy: (owner?: object, method?: string) => Spy) => {
 				nonce: 0,
 			})
 			.make();
-	
+
 		recipientWallet = factory
 			.get("Wallet")
 			.withOptions({
@@ -94,7 +94,7 @@ const beforeEachCallback = (spy: (owner?: object, method?: string) => Spy) => {
 				nonce: 0,
 			})
 			.make();
-	
+
 		recipientsDelegate = factory
 			.get("Wallet")
 			.withOptions({
@@ -102,7 +102,7 @@ const beforeEachCallback = (spy: (owner?: object, method?: string) => Spy) => {
 				nonce: 0,
 			})
 			.make();
-	
+
 		recipientsDelegate.setAttribute("delegate", {
 			username: "test2",
 			forgedFees: Utils.BigNumber.ZERO,
@@ -111,14 +111,14 @@ const beforeEachCallback = (spy: (owner?: object, method?: string) => Spy) => {
 			lastBlock: undefined,
 		});
 		recipientsDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
-	
+
 		walletRepo.index([votingWallet, forgingWallet, sendingWallet, recipientWallet, recipientsDelegate]);
-	
+
 		addTransactionsToBlock(
 			makeVoteTransactions(3, [`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`]),
 			blocks[0],
 		);
-	}
+	};
 };
 
 const afterEachCallback = () => {
@@ -138,7 +138,7 @@ describe("BlockState", ({ it, assert, beforeEach, beforeAll, afterEach, stub, sp
 		await blockState.applyBlock(blocks[1]);
 
 		for (let i = 0; i < blocks[1].transactions.length; i++) {
-			spyApplyTransaction.calledWith(blocks[0].transactions[i])
+			spyApplyTransaction.calledWith(blocks[0].transactions[i]);
 		}
 
 		spyApplyTransaction.restore();
@@ -158,14 +158,14 @@ describe("BlockState", ({ it, assert, beforeEach, beforeAll, afterEach, stub, sp
 
 		blocks[0].data.height = 1;
 		await blockState.applyBlock(blocks[0]);
-		
+
 		spyInitGenesisForgerWallet.calledWith(blocks[0].data.generatorPublicKey);
 	});
 
 	it("should create forger wallet if it doesn't exist genesis block", async () => {
 		spyApplyBlockToForger.restore();
 		stub(blockState, "applyBlockToForger").callsFake(() => {});
-		
+
 		const spyCreateWallet = spy(walletRepo, "createWallet");
 		blocks[0].data.height = 1;
 		blocks[0].data.generatorPublicKey = "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
@@ -575,45 +575,40 @@ describe("apply and revert transactions", ({ it, each, assert, beforeEach, befor
 		.sign("delegatePassphrase")
 		.build();
 
-	for (const transaction of [
-		transfer,
-		delegateReg,
-		vote,
-		delegateRes,
-	]) {
+	for (const transaction of [transfer, delegateReg, vote, delegateRes]) {
 		it("should call the transaction handler apply the transaction to the sender & recipient", async () => {
 			// console.log(dataset)
 			await blockState.applyTransaction(transaction as ITransaction);
-	
+
 			applySpy.calledWith(transaction);
 		});
-	
+
 		it("should call be able to revert the transaction", async () => {
 			await blockState.revertTransaction(transaction as ITransaction);
-	
+
 			revertSpy.calledWith(transaction);
 		});
-	
+
 		it("not fail to apply transaction if the recipient doesn't exist", async () => {
 			// @ts-ignore
 			transaction.data.recipientId = "don'tExist";
-	
+
 			forgetWallet(recipientWallet);
-	
+
 			await assert.resolves(() => blockState.applyTransaction(transaction as ITransaction));
 		});
-	
+
 		it("not fail to revert transaction if the recipient doesn't exist", async () => {
 			// @ts-ignore
 			transaction.data.recipientId = "don'tExist";
-	
+
 			forgetWallet(recipientWallet);
-	
+
 			await assert.resolves(() => blockState.revertTransaction(transaction as ITransaction));
 		});
 	}
 
-	describe("vote", ({ it, assert, beforeEach, beforeAll, afterEach, }) => {
+	describe("vote", ({ it, assert, beforeEach, beforeAll, afterEach }) => {
 		beforeEach(beforeEachCallback(spy));
 		beforeAll(beforeAllCallback);
 		afterEach(afterEachCallback);
@@ -636,7 +631,15 @@ describe("apply and revert transactions", ({ it, each, assert, beforeEach, befor
 	});
 });
 
-describe("when 1 transaction fails while reverting it", ({ it, assert, beforeEach, beforeAll, afterEach, spy, stub }) => {
+describe("when 1 transaction fails while reverting it", ({
+	it,
+	assert,
+	beforeEach,
+	beforeAll,
+	afterEach,
+	spy,
+	stub,
+}) => {
 	beforeEach(beforeEachCallback(spy));
 	beforeAll(beforeAllCallback);
 	afterEach(afterEachCallback);
@@ -676,7 +679,15 @@ describe("when 1 transaction fails while reverting it", ({ it, assert, beforeEac
 	});
 });
 
-describe("when 1 transaction fails while applying it", ({ it, assert, beforeEach, beforeAll, afterEach, spy, stub }) => {
+describe("when 1 transaction fails while applying it", ({
+	it,
+	assert,
+	beforeEach,
+	beforeAll,
+	afterEach,
+	spy,
+	stub,
+}) => {
 	beforeEach(beforeEachCallback(spy));
 	beforeAll(beforeAllCallback);
 	afterEach(afterEachCallback);
@@ -689,7 +700,7 @@ describe("when 1 transaction fails while applying it", ({ it, assert, beforeEach
 				throw new Error("Fake error");
 			}
 		});
-		
+
 		const lastBlock = stub(stateStore, "getLastBlock").returnValue(blocks[1]);
 
 		assert.length(blocks[0].transactions, 3);
@@ -702,7 +713,7 @@ describe("when 1 transaction fails while applying it", ({ it, assert, beforeEach
 			const i = blocks[0].transactions.slice(0, 1).indexOf(transaction);
 			const total = blocks[0].transactions.slice(0, 1).length;
 
-			revert.calledNthWith(total - i,blocks[0].transactions[i]);
+			revert.calledNthWith(total - i, blocks[0].transactions[i]);
 		}
 
 		apply.restore();
@@ -714,7 +725,7 @@ describe("when 1 transaction fails while applying it", ({ it, assert, beforeEach
 		const apply = stub(blockState, "applyTransaction").callsFake(() => {
 			throw new Error("Fake error");
 		});
-		
+
 		await assert.rejects(() => blockState.applyBlock(blocks[0]));
 
 		apply.restore();
