@@ -166,7 +166,12 @@ describe<{
 		context.forgerService.register({ hosts: [mockHost] });
 		context.client.getRound.returns({ delegates: context.delegates });
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+		} finally {
+			clock.restore();
+		}
 
 		assert.equal((context.forgerService as any).delegates, context.delegates);
 
@@ -185,7 +190,12 @@ describe<{
 		context.client.getRound.returns({ delegates: context.delegates });
 		(context.forgerService as any).initialized = true;
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+		} finally {
+			clock.restore();
+		}
 		assert.true(context.logger.info.neverCalledWith(`Forger Manager started.`));
 	});
 
@@ -193,7 +203,12 @@ describe<{
 		context.forgerService.register({ hosts: [mockHost] });
 		context.client.getRound.returns({ delegates: context.delegates });
 
-		await assert.resolves(() => context.forgerService.boot([]));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot([]));
+		} finally {
+			clock.restore();
+		}
 
 		assert.true(context.logger.info.calledOnceWith(`Forger Manager started.`));
 	});
@@ -215,7 +230,13 @@ describe<{
 			.join(", ")}`;
 
 		context.forgerService.register({ hosts: [mockHost] });
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+		} finally {
+			clock.restore();
+		}
 
 		assert.true(context.logger.info.calledWith(expectedInactiveDelegatesMessage));
 	});
@@ -224,7 +245,12 @@ describe<{
 		context.client.getRound.rejects(() => new Error("oops"));
 		context.forgerService.register({ hosts: [mockHost] });
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+		} finally {
+			clock.restore();
+		}
 
 		assert.true(context.logger.warning.calledWith(`Waiting for a responsive host`));
 	});
@@ -322,7 +348,13 @@ describe<{
 	it("isForgingAllowed should log double forge warning for any overheight block headers", async (context) => {
 		context.client.getRound.returns({ delegates: context.delegates });
 		context.forgerService.register({ hosts: [mockHost] });
-		await context.forgerService.boot(context.delegates);
+
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		const overHeightBlockHeaders: Array<{
 			[id: string]: any;
@@ -360,7 +392,13 @@ describe<{
 		});
 
 		context.forgerService.register({ hosts: [mockHost] });
-		await context.forgerService.boot(context.delegates);
+
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		(context.mockNetworkState.getQuorum = () => 0.6),
 			assert.false(
@@ -381,7 +419,13 @@ describe<{
 		});
 
 		context.forgerService.register({ hosts: [mockHost] });
-		await context.forgerService.boot(context.delegates);
+
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		assert.true(
 			// @ts-ignore
@@ -400,7 +444,13 @@ describe<{
 		});
 
 		context.forgerService.register({ hosts: [mockHost] });
-		await context.forgerService.boot(context.delegates);
+
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		const overHeightBlockHeaders: Array<{
 			[id: string]: any;
@@ -444,7 +494,7 @@ describe<{
 			timestamp: Crypto.Slots.getTime() - 7,
 			lastBlock: { height: 100 },
 		});
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+
 		// expect(context.logger.info).not.toHaveBeenCalledWith();
 		assert.false(context.logger.info.calledWith(`Forger Manager started.`));
 
@@ -457,6 +507,8 @@ describe<{
 		const clock = sinon.useFakeTimers(new Date());
 		const timeoutSpy = spy(clock, "setTimeout");
 		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
 			clock.restore();
@@ -490,13 +542,19 @@ describe<{
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
-		await assert.resolves(() =>
-			context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 2)),
-		);
-		assert.true(context.logger.info.neverCalledWith(`Forger Manager started.`));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() =>
+				context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 2)),
+			);
 
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
-		await assert.resolves(() => context.forgerService.checkSlot());
+			assert.true(context.logger.info.neverCalledWith(`Forger Manager started.`));
+
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			clock.restore();
+		}
 
 		assert.true(context.client.syncWithNetwork.calledOnce);
 
@@ -530,13 +588,18 @@ describe<{
 		context.forgerService.register({ hosts: [mockHost] });
 		(context.forgerService as any).initialized = true;
 
-		await assert.resolves(() =>
-			context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 3)),
-		);
-		assert.false(context.logger.info.calledWith(`Forger Manager started.`));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() =>
+				context.forgerService.boot(context.delegates.slice(0, context.delegates.length - 3)),
+			);
+			assert.false(context.logger.info.calledWith(`Forger Manager started.`));
 
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
-		await assert.resolves(() => context.forgerService.checkSlot());
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			clock.restore();
+		}
 
 		assert.true(context.client.syncWithNetwork.notCalled);
 
@@ -590,11 +653,16 @@ describe<{
 
 		context.client.getNetworkState.returns(context.mockNetworkState);
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		await assert.resolves(() => context.forgerService.checkSlot());
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			clock.restore();
+		}
 
 		spyForgeNewBlock.calledWith(
 			context.delegates[context.delegates.length - 2],
@@ -647,11 +715,16 @@ describe<{
 
 		context.client.getNetworkState.returns(context.mockNetworkState);
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		await context.forgerService.checkSlot();
+			await context.forgerService.checkSlot();
+		} finally {
+			clock.restore();
+		}
 
 		spyForgeNewBlock.calledWith(
 			context.delegates[context.delegates.length - 2],
@@ -704,11 +777,16 @@ describe<{
 
 		context.client.getNetworkState.returns(context.mockNetworkState);
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
 
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
 
-		await assert.resolves(() => context.forgerService.checkSlot());
+			await assert.resolves(() => context.forgerService.checkSlot());
+		} finally {
+			clock.restore();
+		}
 
 		spyForgeNewBlock.neverCalled();
 	});
@@ -752,13 +830,13 @@ describe<{
 
 		context.client.getNetworkState.rejects(new HostNoResponseError(`blockchain isn't ready`));
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
-
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
-
 		const clock = sinon.useFakeTimers(new Date());
 		const timeoutSpy = spy(clock, "setTimeout");
 		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
 			clock.restore();
@@ -810,13 +888,13 @@ describe<{
 		const mockError = `custom error`;
 		context.client.getNetworkState.rejects(new RelayCommunicationError(mockEndpoint, mockError));
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
-
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
-
 		const clock = sinon.useFakeTimers(new Date());
 		const timeoutSpy = spy(clock, "setTimeout");
 		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
 			clock.restore();
@@ -867,14 +945,13 @@ describe<{
 
 		const mockError = `custom error`;
 		context.client.getNetworkState.rejects(new Error(mockError));
-
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
-
-		context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
-
 		const clock = sinon.useFakeTimers(new Date());
 		const timeoutSpy = spy(clock, "setTimeout");
 		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+
+			context.client.getRound.returns(round.data as Contracts.P2P.CurrentRound);
+
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
 			clock.restore();
@@ -914,13 +991,13 @@ describe<{
 
 		const spyForgeNewBlock = spy(context.forgerService, "forgeNewBlock");
 
-		await assert.resolves(() => context.forgerService.boot(context.delegates));
-
-		context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
-
 		const clock = sinon.useFakeTimers(new Date());
 		const timeoutSpy = spy(clock, "setTimeout");
 		try {
+			await assert.resolves(() => context.forgerService.boot(context.delegates));
+
+			context.client.getRound.returns(round as Contracts.P2P.CurrentRound);
+
 			await assert.resolves(() => context.forgerService.checkSlot());
 		} finally {
 			clock.restore();
@@ -948,7 +1025,12 @@ describe<{
 
 		context.client.getTransactions.returns(context.mockTransaction);
 
-		await context.forgerService.boot(context.delegates);
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		const address = `Delegate-Wallet-${2}`;
 
@@ -982,7 +1064,12 @@ describe<{
 
 		context.client.getTransactions.returns(context.mockTransaction);
 
-		await context.forgerService.boot(context.delegates);
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		const address = `Delegate-Wallet-${2}`;
 
@@ -1019,7 +1106,12 @@ describe<{
 
 		context.client.getTransactions.returns(context.mockTransaction);
 
-		await context.forgerService.boot(context.delegates);
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		const address = `Delegate-Wallet-${2}`;
 
@@ -1066,7 +1158,12 @@ describe<{
 
 		context.mockNetworkState.lastBlockId = "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538";
 
-		await context.forgerService.boot(context.delegates);
+		const clock = sinon.useFakeTimers(new Date());
+		try {
+			await context.forgerService.boot(context.delegates);
+		} finally {
+			clock.restore();
+		}
 
 		const address = `Delegate-Wallet-${2}`;
 
