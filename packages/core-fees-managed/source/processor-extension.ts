@@ -1,10 +1,10 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Crypto, Identifiers, TransactionPool } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class ProcessorExtension extends Contracts.TransactionPool.ProcessorExtension {
+export class ProcessorExtension extends TransactionPool.ProcessorExtension {
 	@inject(Identifiers.Fee.Matcher)
-	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
+	private readonly feeMatcher!: TransactionPool.FeeMatcher;
 
 	public async throwIfCannotBroadcast(transaction: Crypto.ITransaction): Promise<void> {
 		await this.feeMatcher.throwIfCannotBroadcast(transaction);
