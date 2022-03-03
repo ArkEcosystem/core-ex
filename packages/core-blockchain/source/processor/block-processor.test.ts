@@ -28,9 +28,7 @@ describe<{
 	nonceOutOfOrderHandler: any;
 	unchainedHandler: any;
 	verificationFailedHandler: any;
-
 }>("BlockProcessor", ({ assert, beforeEach, it, spyFn, stubFn }) => {
-
 	const logService = { warning: spyFn(), info: spyFn(), error: spyFn(), debug: spyFn() };
 	const blockchain = { getLastBlock: stubFn() };
 	const transactionRepository = { getForgedTransactionsIds: stubFn() };
@@ -108,7 +106,6 @@ describe<{
 		context.sandbox.app
 			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
 			.bind("getActiveDelegates", new Actions.GetActiveDelegatesAction(context.sandbox.app));
-
 
 		context.baseBlock = {
 			data: {
