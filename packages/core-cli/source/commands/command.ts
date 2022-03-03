@@ -103,7 +103,6 @@ export abstract class Command {
 
 			await this.execute();
 		} catch (error) {
-			console.log(error);
 			this.components.fatal(error.message);
 		}
 	}
