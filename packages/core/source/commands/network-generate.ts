@@ -460,19 +460,21 @@ export class Command extends Commands.Command {
 							spaces: 4,
 						});
 
-						this.app.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
-							// @ts-ignore
-							genesisBlock: {},
-							milestones,
-							// @ts-ignore
-							network: {
+						this.app
+							.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+							.setConfig({
 								// @ts-ignore
-								address: {
-									base58: 12,
-									bech32m: "ark",
+								genesisBlock: {},
+								milestones,
+								// @ts-ignore
+								network: {
+									// @ts-ignore
+									address: {
+										base58: 12,
+										bech32m: "ark",
+									},
 								},
-							},
-						});
+							});
 
 						// Genesis Block
 						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, validators, flags);

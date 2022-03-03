@@ -1,4 +1,4 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
@@ -75,7 +75,10 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeForgedTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.ITransaction[]> {
+	public async removeForgedTransaction(
+		senderPublicKey: string,
+		id: string,
+	): Promise<Contracts.Crypto.ITransaction[]> {
 		const senderMempool = this.senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];

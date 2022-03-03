@@ -242,7 +242,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			const ourBlocksPrint = ourBlocks.map((b) => `{ height=${b.height}, id=${b.id} }`).join(", ");
 			// eslint-disable-next-line unicorn/prefer-at
-			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[ourBlocks.length - 1].height.toLocaleString()}]`;
+			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[
+				ourBlocks.length - 1
+			].height.toLocaleString()}]`;
 
 			const msRemaining = this.throwIfPastDeadline(deadline);
 

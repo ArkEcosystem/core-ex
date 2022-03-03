@@ -141,7 +141,10 @@ export class ForgerService {
 
 			return this.checkLater(this.getRoundRemainingSlotTime(this.round));
 		} catch (error) {
-			if (error instanceof Exceptions.HostNoResponseError || error instanceof Exceptions.RelayCommunicationError) {
+			if (
+				error instanceof Exceptions.HostNoResponseError ||
+				error instanceof Exceptions.RelayCommunicationError
+			) {
 				if (error.message.includes("blockchain isn't ready") || error.message.includes("App is not ready")) {
 					if (this.logAppReady) {
 						this.logger.info("Waiting for relay to become ready.");

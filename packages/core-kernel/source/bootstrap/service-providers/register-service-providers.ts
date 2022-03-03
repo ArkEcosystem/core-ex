@@ -93,19 +93,13 @@ export class RegisterServiceProviders implements Bootstrapper {
 			if (!serviceProviders.has(name)) {
 				// The dependency is necessary for this package to function. We'll output an error and terminate the process.
 				if (isRequired) {
-					const error = new Exceptions.RequiredDependencyCannotBeFound(
-						serviceProviderName,
-						name,
-					);
+					const error = new Exceptions.RequiredDependencyCannotBeFound(serviceProviderName, name);
 
 					await this.app.terminate(error.message, error);
 				}
 
 				// The dependency is optional for this package to function. We'll only output a warning.
-				const error = new Exceptions.OptionalDependencyCannotBeFound(
-					serviceProviderName,
-					name,
-				);
+				const error = new Exceptions.OptionalDependencyCannotBeFound(serviceProviderName, name);
 
 				this.logger.warning(error.message);
 
@@ -120,11 +114,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 				assert.defined<string>(version);
 
 				if (!semver.satisfies(version, constraint)) {
-					const error = new Exceptions.DependencyVersionOutOfRange(
-						name,
-						constraint,
-						version,
-					);
+					const error = new Exceptions.DependencyVersionOutOfRange(name, constraint, version);
 
 					if (isRequired) {
 						await this.app.terminate(error.message, error);

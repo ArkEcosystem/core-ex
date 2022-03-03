@@ -87,7 +87,10 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 		return this.signatureFactory.verify(hash, Buffer.from(signature, "hex"), Buffer.from(senderPublicKey, "hex"));
 	}
 
-	public verifySchema(data: Contracts.Crypto.ITransactionData, strict: boolean): Contracts.Crypto.ISchemaValidationResult {
+	public verifySchema(
+		data: Contracts.Crypto.ITransactionData,
+		strict: boolean,
+	): Contracts.Crypto.ISchemaValidationResult {
 		const transactionType = this.transactionTypeFactory.get(data.type, data.typeGroup, data.version);
 
 		if (!transactionType) {

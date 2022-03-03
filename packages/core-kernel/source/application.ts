@@ -157,7 +157,10 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
 
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch("kernel.maintenance", true);
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+			"kernel.maintenance",
+			true,
+		);
 	}
 
 	public disableMaintenance(): void {
@@ -165,7 +168,10 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
 
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch("kernel.maintenance", false);
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+			"kernel.maintenance",
+			false,
+		);
 	}
 
 	public isDownForMaintenance(): boolean {
@@ -186,11 +192,15 @@ export class Application implements Contracts.Kernel.Application {
 		await this.disposeServiceProviders();
 	}
 
-	public bind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): Contracts.Kernel.Container.BindingToSyntax<T> {
+	public bind<T>(
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+	): Contracts.Kernel.Container.BindingToSyntax<T> {
 		return this.container.bind(serviceIdentifier);
 	}
 
-	public rebind<T>(serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>): Contracts.Kernel.Container.BindingToSyntax<T> {
+	public rebind<T>(
+		serviceIdentifier: Contracts.Kernel.Container.ServiceIdentifier<T>,
+	): Contracts.Kernel.Container.BindingToSyntax<T> {
 		if (this.container.isBound(serviceIdentifier)) {
 			this.container.unbind(serviceIdentifier);
 		}

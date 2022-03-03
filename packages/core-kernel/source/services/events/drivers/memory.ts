@@ -28,8 +28,13 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		return this.forget.bind(this, event, listener);
 	}
 
-	public listenMany(events: Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>): Map<Contracts.Kernel.EventName, () => void> {
-		const listeners: Map<Contracts.Kernel.EventName, () => void> = new Map<Contracts.Kernel.EventName, () => void>();
+	public listenMany(
+		events: Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>,
+	): Map<Contracts.Kernel.EventName, () => void> {
+		const listeners: Map<Contracts.Kernel.EventName, () => void> = new Map<
+			Contracts.Kernel.EventName,
+			() => void
+		>();
 
 		for (const [event, listener] of events) {
 			listeners.set(event, this.listen(event, listener));
@@ -52,7 +57,9 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		return this.listeners.delete(event);
 	}
 
-	public forgetMany(events: Contracts.Kernel.EventName[] | Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>): void {
+	public forgetMany(
+		events: Contracts.Kernel.EventName[] | Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>,
+	): void {
 		for (const event of events) {
 			Array.isArray(event) ? this.forget(event[0], event[1]) : this.forget(event);
 		}

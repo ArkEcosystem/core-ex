@@ -95,8 +95,10 @@ export class Query implements Contracts.TransactionPool.Query {
 	public getFromLowestPriority(): QueryIterable {
 		const iterable = {
 			[Symbol.iterator]: () => {
-				const comparator: Comparator<Contracts.Crypto.ITransaction> = (a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
-					a.data.fee.comparedTo(b.data.fee);
+				const comparator: Comparator<Contracts.Crypto.ITransaction> = (
+					a: Contracts.Crypto.ITransaction,
+					b: Contracts.Crypto.ITransaction,
+				) => a.data.fee.comparedTo(b.data.fee);
 
 				const iterators: Iterator<Contracts.Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
 					.map((p) => p.getFromLatest())
@@ -112,8 +114,10 @@ export class Query implements Contracts.TransactionPool.Query {
 	public getFromHighestPriority(): QueryIterable {
 		const iterable = {
 			[Symbol.iterator]: () => {
-				const comparator: Comparator<Contracts.Crypto.ITransaction> = (a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
-					b.data.fee.comparedTo(a.data.fee);
+				const comparator: Comparator<Contracts.Crypto.ITransaction> = (
+					a: Contracts.Crypto.ITransaction,
+					b: Contracts.Crypto.ITransaction,
+				) => b.data.fee.comparedTo(a.data.fee);
 
 				const iterators: Iterator<Contracts.Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
 					.map((p) => p.getFromEarliest())

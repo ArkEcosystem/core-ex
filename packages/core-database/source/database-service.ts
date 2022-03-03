@@ -1,4 +1,4 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums } from "@arkecosystem/core-kernel";
 import { Connection } from "typeorm";
@@ -67,7 +67,9 @@ export class DatabaseService {
 
 	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
 		// TODO: caching the last 1000 blocks, in combination with `saveBlock` could help to optimise
-		const block: Contracts.Crypto.IBlockData = (await this.blockRepository.findOne(id)) as unknown as Contracts.Crypto.IBlockData;
+		const block: Contracts.Crypto.IBlockData = (await this.blockRepository.findOne(
+			id,
+		)) as unknown as Contracts.Crypto.IBlockData;
 
 		if (!block) {
 			return undefined;

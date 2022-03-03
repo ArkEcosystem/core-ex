@@ -85,7 +85,11 @@ export class BlockRepository extends AbstractRepository<Block> {
 			this.rawToEntity(
 				block,
 				// @ts-ignore
-				async (entity: Block & { transactions: Contracts.Crypto.ITransactionData[] }, _, value: Buffer[] | undefined) => {
+				async (
+					entity: Block & { transactions: Contracts.Crypto.ITransactionData[] },
+					_,
+					value: Buffer[] | undefined,
+				) => {
 					if (value && value.length > 0) {
 						entity.transactions = [];
 
@@ -299,7 +303,10 @@ export class BlockRepository extends AbstractRepository<Block> {
 		});
 	}
 
-	private async findByHeightRangeWithTransactionsRaw(start: number, end: number): Promise<Contracts.Crypto.IBlockData[]> {
+	private async findByHeightRangeWithTransactionsRaw(
+		start: number,
+		end: number,
+	): Promise<Contracts.Crypto.IBlockData[]> {
 		const [query, parameters] = this.manager.connection.driver.escapeQueryWithParameters(
 			`
                 SELECT *,

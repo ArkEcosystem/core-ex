@@ -23,7 +23,10 @@ export const isNewRound = (height: number, configuration: Contracts.Crypto.IConf
 	return height === 1 || (height - milestone.height) % milestone.activeValidators === 0;
 };
 
-export const calculateRound = (height: number, configuration: Contracts.Crypto.IConfiguration): Contracts.Shared.RoundInfo => {
+export const calculateRound = (
+	height: number,
+	configuration: Contracts.Crypto.IConfiguration,
+): Contracts.Shared.RoundInfo => {
 	const result: Contracts.Shared.RoundInfo = {
 		maxValidators: 0,
 		nextRound: 0,

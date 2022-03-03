@@ -16,5 +16,8 @@ export interface Validator {
 
 	address: string;
 
-	forge(transactions: Contracts.Crypto.ITransactionData[], options: Record<string, any>): Promise<Contracts.Crypto.IBlock>;
+	forge(
+		transactions: Contracts.Crypto.ITransactionData[],
+		options: Record<string, any>,
+	): Promise<Contracts.Crypto.IBlock>;
 }

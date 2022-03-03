@@ -102,7 +102,11 @@ export class Client {
 
 	public async emitEvent(
 		event: string,
-		body: { error: string } | { activeValidators: string[] } | Contracts.Crypto.IBlockData | Contracts.Crypto.ITransactionData,
+		body:
+			| { error: string }
+			| { activeValidators: string[] }
+			| Contracts.Crypto.IBlockData
+			| Contracts.Crypto.ITransactionData,
 	): Promise<void> {
 		// NOTE: Events need to be emitted to the localhost. If you need to trigger
 		// actions on a remote host based on events you should be using webhooks
@@ -162,7 +166,10 @@ export class Client {
 
 			return codec.response.deserialize(response.payload);
 		} catch (error) {
-			throw new Exceptions.RelayCommunicationError(`${this.host.hostname}:${this.host.port}<${event}>`, error.message);
+			throw new Exceptions.RelayCommunicationError(
+				`${this.host.hostname}:${this.host.port}<${event}>`,
+				error.message,
+			);
 		}
 	}
 

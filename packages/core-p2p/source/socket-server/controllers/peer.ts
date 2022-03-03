@@ -1,5 +1,5 @@
 import { inject } from "@arkecosystem/core-container";
-import { Contracts, Identifiers , Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import Hapi from "@hapi/hapi";

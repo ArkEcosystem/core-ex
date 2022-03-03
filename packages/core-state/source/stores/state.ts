@@ -180,7 +180,10 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setLastBlock(block: Contracts.Crypto.IBlock): void {
 		// Only keep blocks which are below the new block height (i.e. rollback)
-		if (this.lastBlocks.last() && this.lastBlocks.last<Contracts.Crypto.IBlock>().data.height !== block.data.height - 1) {
+		if (
+			this.lastBlocks.last() &&
+			this.lastBlocks.last<Contracts.Crypto.IBlock>().data.height !== block.data.height - 1
+		) {
 			assert(block.data.height - 1 <= this.lastBlocks.last<Contracts.Crypto.IBlock>().data.height);
 			this.lastBlocks = this.lastBlocks.filter((b) => b.data.height < block.data.height);
 		}
@@ -331,7 +334,10 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	// Map Block instances to block data.
-	private mapToBlockData(blocks: Seq<number, Contracts.Crypto.IBlock>, headersOnly?: boolean): Seq<number, Contracts.Crypto.IBlockData> {
+	private mapToBlockData(
+		blocks: Seq<number, Contracts.Crypto.IBlock>,
+		headersOnly?: boolean,
+	): Seq<number, Contracts.Crypto.IBlockData> {
 		return blocks.map((block) => ({
 			...block.data,
 			transactions: headersOnly ? undefined : block.transactions.map((tx) => tx.data),

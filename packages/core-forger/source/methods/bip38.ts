@@ -1,4 +1,4 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import bip38 from "bip38";
@@ -49,7 +49,10 @@ export class BIP38 extends Method implements Validator {
 		return this;
 	}
 
-	public async forge(transactions: Contracts.Crypto.ITransactionData[], options: Record<string, any>): Promise<Contracts.Crypto.IBlock> {
+	public async forge(
+		transactions: Contracts.Crypto.ITransactionData[],
+		options: Record<string, any>,
+	): Promise<Contracts.Crypto.IBlock> {
 		await this.decryptKeysWithOtp();
 
 		AppUtils.assert.defined<Contracts.Crypto.IKeyPair>(this.keys);

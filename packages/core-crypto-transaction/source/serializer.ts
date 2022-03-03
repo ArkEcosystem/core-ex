@@ -23,7 +23,10 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		throw new Exceptions.TransactionVersionError(version);
 	}
 
-	public async serialize(transaction: Contracts.Crypto.ITransaction, options: Contracts.Crypto.ISerializeOptions = {}): Promise<Buffer> {
+	public async serialize(
+		transaction: Contracts.Crypto.ITransaction,
+		options: Contracts.Crypto.ISerializeOptions = {},
+	): Promise<Buffer> {
 		const buff: ByteBuffer = new ByteBuffer(
 			Buffer.alloc(this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192),
 		);

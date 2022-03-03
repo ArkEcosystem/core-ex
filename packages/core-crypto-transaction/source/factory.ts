@@ -43,7 +43,9 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 	 */
 	public async fromBytesUnsafe(buff: Buffer, id?: string): Promise<Contracts.Crypto.ITransaction> {
 		try {
-			const options: Contracts.Crypto.IDeserializeOptions | Contracts.Crypto.ISerializeOptions = { acceptLegacyVersion: true };
+			const options: Contracts.Crypto.IDeserializeOptions | Contracts.Crypto.ISerializeOptions = {
+				acceptLegacyVersion: true,
+			};
 			const transaction: Contracts.Crypto.ITransaction = await this.deserializer.deserialize(buff, options);
 			transaction.data.id = id || (await this.utils.getId(transaction.data, options));
 			transaction.isVerified = true;

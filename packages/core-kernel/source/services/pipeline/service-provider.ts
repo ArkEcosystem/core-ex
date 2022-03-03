@@ -1,5 +1,5 @@
 import { interfaces } from "@arkecosystem/core-container";
-import { Contracts,Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { MemoryPipeline } from "./drivers/memory";

@@ -1,4 +1,4 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Repositories } from "@arkecosystem/core-database";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
@@ -170,7 +170,10 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	protected verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
+	protected verifyTransactionNonceApply(
+		wallet: Contracts.State.Wallet,
+		transaction: Contracts.Crypto.ITransaction,
+	): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
@@ -178,7 +181,10 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	protected verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
+	protected verifyTransactionNonceRevert(
+		wallet: Contracts.State.Wallet,
+		transaction: Contracts.Crypto.ITransaction,
+	): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().isEqualTo(nonce)) {

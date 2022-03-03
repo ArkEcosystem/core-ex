@@ -292,7 +292,8 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 					newLastBlock = this.stateStore.getGenesisBlock();
 				} else {
 					// eslint-disable-next-line unicorn/prefer-at
-					const temporaryNewLastBlockData: Contracts.Crypto.IBlockData = blocksToRemove[blocksToRemove.length - 1];
+					const temporaryNewLastBlockData: Contracts.Crypto.IBlockData =
+						blocksToRemove[blocksToRemove.length - 1];
 
 					Utils.assert.defined<Contracts.Crypto.IBlockData>(temporaryNewLastBlockData);
 

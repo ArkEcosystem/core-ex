@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers , Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 @injectable()
@@ -110,7 +110,9 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.warning(`${transaction} failed to enter pool: ${error.message}`);
 				this.events.dispatch(Enums.TransactionEvent.RejectedByPool, transaction.data);
 
-				throw error instanceof Exceptions.PoolError ? error : new Exceptions.PoolError(error.message, "ERR_OTHER");
+				throw error instanceof Exceptions.PoolError
+					? error
+					: new Exceptions.PoolError(error.message, "ERR_OTHER");
 			}
 		});
 	}

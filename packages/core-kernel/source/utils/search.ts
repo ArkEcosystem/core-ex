@@ -1,6 +1,8 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 
-export const optimizeExpression = <TEntity>(expression: Contracts.Search.Expression<TEntity>): Contracts.Search.Expression<TEntity> => {
+export const optimizeExpression = <TEntity>(
+	expression: Contracts.Search.Expression<TEntity>,
+): Contracts.Search.Expression<TEntity> => {
 	switch (expression.op) {
 		case "and": {
 			const optimized = expression.expressions.map(optimizeExpression);

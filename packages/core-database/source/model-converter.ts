@@ -1,4 +1,4 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
@@ -42,7 +42,9 @@ export class ModelConverter implements Contracts.Database.ModelConverter {
 		);
 	}
 
-	public async getTransactionData(models: Contracts.Database.TransactionModel[]): Promise<Contracts.Crypto.ITransactionData[]> {
+	public async getTransactionData(
+		models: Contracts.Database.TransactionModel[],
+	): Promise<Contracts.Crypto.ITransactionData[]> {
 		for (let index = 0; index < models.length; index++) {
 			const model = models[index];
 			const { data } = await this.transactionFactory.fromBytesUnsafe(model.serialized, model.id);

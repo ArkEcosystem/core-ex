@@ -64,7 +64,9 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 		throw new Exceptions.DeactivatedTransactionHandlerError(internalType);
 	}
 
-	public async getActivatedHandlerForData(transactionData: Contracts.Crypto.ITransactionData): Promise<TransactionHandler> {
+	public async getActivatedHandlerForData(
+		transactionData: Contracts.Crypto.ITransactionData,
+	): Promise<TransactionHandler> {
 		const internalType = Contracts.Transactions.InternalTransactionType.from(
 			transactionData.type,
 			transactionData.typeGroup,

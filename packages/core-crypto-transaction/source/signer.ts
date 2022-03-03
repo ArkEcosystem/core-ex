@@ -30,7 +30,11 @@ export class Signer {
 		return signature;
 	}
 
-	public async multiSign(transaction: Contracts.Crypto.ITransactionData, keys: Contracts.Crypto.IKeyPair, index = -1): Promise<string> {
+	public async multiSign(
+		transaction: Contracts.Crypto.ITransactionData,
+		keys: Contracts.Crypto.IKeyPair,
+		index = -1,
+	): Promise<string> {
 		if (!transaction.signatures) {
 			transaction.signatures = [];
 		}

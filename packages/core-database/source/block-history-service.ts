@@ -22,13 +22,17 @@ export class BlockHistoryService implements Contracts.Shared.BlockHistoryService
 	@inject(Identifiers.DatabaseModelConverter)
 	private readonly modelConverter!: Contracts.Database.ModelConverter;
 
-	public async findOneByCriteria(criteria: Contracts.Shared.OrBlockCriteria): Promise<Contracts.Crypto.IBlockData | undefined> {
+	public async findOneByCriteria(
+		criteria: Contracts.Shared.OrBlockCriteria,
+	): Promise<Contracts.Crypto.IBlockData | undefined> {
 		const data = await this.findManyByCriteria(criteria);
 		assert(data.length <= 1);
 		return data[0];
 	}
 
-	public async findManyByCriteria(criteria: Contracts.Shared.OrBlockCriteria): Promise<Contracts.Crypto.IBlockData[]> {
+	public async findManyByCriteria(
+		criteria: Contracts.Shared.OrBlockCriteria,
+	): Promise<Contracts.Crypto.IBlockData[]> {
 		const expression = await this.blockFilter.getExpression(criteria);
 		const sorting: Contracts.Search.Sorting = [{ direction: "asc", property: "height" }];
 		const models = await this.blockRepository.findManyByExpression(expression, sorting);

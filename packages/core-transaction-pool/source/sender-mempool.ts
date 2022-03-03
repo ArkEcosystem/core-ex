@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Identifiers , Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 @injectable()
@@ -45,7 +45,10 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 				if (this.transactions.length >= maxTransactionsPerSender) {
 					const allowedSenders: string[] = this.configuration.getOptional<string[]>("allowedSenders", []);
 					if (!allowedSenders.includes(transaction.data.senderPublicKey)) {
-						throw new Exceptions.SenderExceededMaximumTransactionCountError(transaction, maxTransactionsPerSender);
+						throw new Exceptions.SenderExceededMaximumTransactionCountError(
+							transaction,
+							maxTransactionsPerSender,
+						);
 					}
 				}
 

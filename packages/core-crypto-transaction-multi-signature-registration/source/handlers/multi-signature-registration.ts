@@ -124,7 +124,10 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			.has();
 
 		if (hasAddress) {
-			throw new Exceptions.PoolError(`MultiSignatureRegistration for address ${address} already in the pool`, "ERR_PENDING");
+			throw new Exceptions.PoolError(
+				`MultiSignatureRegistration for address ${address} already in the pool`,
+				"ERR_PENDING",
+			);
 		}
 	}
 

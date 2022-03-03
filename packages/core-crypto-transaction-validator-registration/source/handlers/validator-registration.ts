@@ -158,7 +158,10 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			.has();
 
 		if (hasUsername) {
-			throw new Exceptions.PoolError(`Validator registration for "${username}" already in the pool`, "ERR_PENDING");
+			throw new Exceptions.PoolError(
+				`Validator registration for "${username}" already in the pool`,
+				"ERR_PENDING",
+			);
 		}
 	}
 

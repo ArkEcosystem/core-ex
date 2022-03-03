@@ -29,7 +29,10 @@ export class BIP39 extends Method implements Validator {
 		return this;
 	}
 
-	public async forge(transactions: Contracts.Crypto.ITransactionData[], options: Record<string, any>): Promise<Contracts.Crypto.IBlock> {
+	public async forge(
+		transactions: Contracts.Crypto.ITransactionData[],
+		options: Record<string, any>,
+	): Promise<Contracts.Crypto.IBlock> {
 		return this.createBlock(this.keys, transactions, options);
 	}
 }

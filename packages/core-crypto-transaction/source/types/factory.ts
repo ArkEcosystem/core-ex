@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts,Exceptions,Identifiers  } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Transaction } from "./transaction";
 
@@ -19,14 +19,20 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 	}
 
 	public create(data: Contracts.Crypto.ITransactionData): Contracts.Crypto.ITransaction {
-		const instance: Contracts.Crypto.ITransaction = this.app.resolve(this.get(data.type, data.typeGroup, data.version));
+		const instance: Contracts.Crypto.ITransaction = this.app.resolve(
+			this.get(data.type, data.typeGroup, data.version),
+		);
 		instance.data = data;
 		instance.data.version = data.version || 1;
 
 		return instance;
 	}
 
-	public get(type: number, typeGroup?: number, version?: number): Contracts.Crypto.TransactionConstructor | undefined {
+	public get(
+		type: number,
+		typeGroup?: number,
+		version?: number,
+	): Contracts.Crypto.TransactionConstructor | undefined {
 		const internalType: Contracts.Transactions.InternalTransactionType =
 			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 

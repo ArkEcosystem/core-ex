@@ -16,11 +16,17 @@ export class Utils implements Contracts.Crypto.ITransactionUtils {
 		return this.serializer.serialize(this.transactionTypeFactory.create(data));
 	}
 
-	public async toHash(transaction: Contracts.Crypto.ITransactionData, options?: Contracts.Crypto.ISerializeOptions): Promise<Buffer> {
+	public async toHash(
+		transaction: Contracts.Crypto.ITransactionData,
+		options?: Contracts.Crypto.ISerializeOptions,
+	): Promise<Buffer> {
 		return this.hashFactory.sha256(await this.serializer.getBytes(transaction, options));
 	}
 
-	public async getId(transaction: Contracts.Crypto.ITransactionData, options: Contracts.Crypto.ISerializeOptions = {}): Promise<string> {
+	public async getId(
+		transaction: Contracts.Crypto.ITransactionData,
+		options: Contracts.Crypto.ISerializeOptions = {},
+	): Promise<string> {
 		return (await this.toHash(transaction, options)).toString("hex");
 	}
 }

@@ -45,15 +45,24 @@ export class StandardCriteriaService {
 
 		if (typeof value === "boolean") {
 			// narrowing `value` to `boolean` doesn't narrow `criteriaItem` to `StandardCriteriaOfItem<boolean>` :-(
-			return this.testBooleanValueCriteriaItem(value, criteriaItem as Contracts.Search.StandardCriteriaOfItem<boolean>);
+			return this.testBooleanValueCriteriaItem(
+				value,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<boolean>,
+			);
 		}
 
 		if (typeof value === "string") {
-			return this.testStringValueCriteriaItem(value, criteriaItem as Contracts.Search.StandardCriteriaOfItem<string>);
+			return this.testStringValueCriteriaItem(
+				value,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<string>,
+			);
 		}
 
 		if (typeof value === "number") {
-			return this.testNumberValueCriteriaItem(value, criteriaItem as Contracts.Search.StandardCriteriaOfItem<number>);
+			return this.testNumberValueCriteriaItem(
+				value,
+				criteriaItem as Contracts.Search.StandardCriteriaOfItem<number>,
+			);
 		}
 
 		if (typeof value === "bigint" || value instanceof BigNumber) {
@@ -111,7 +120,10 @@ export class StandardCriteriaService {
 		}
 	}
 
-	private testStringValueCriteriaItem(value: string, criteriaItem: Contracts.Search.StandardCriteriaOfItem<string>): boolean {
+	private testStringValueCriteriaItem(
+		value: string,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<string>,
+	): boolean {
 		if (typeof criteriaItem !== "string") {
 			throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 		}
@@ -133,7 +145,10 @@ export class StandardCriteriaService {
 		return true;
 	}
 
-	private testNumberValueCriteriaItem(value: number, criteriaItem: Contracts.Search.StandardCriteriaOfItem<number>): boolean {
+	private testNumberValueCriteriaItem(
+		value: number,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<number>,
+	): boolean {
 		if (typeof criteriaItem === "string" || typeof criteriaItem === "number") {
 			if (isNaN(Number(criteriaItem))) {
 				throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
@@ -226,7 +241,10 @@ export class StandardCriteriaService {
 		throw new Exceptions.InvalidCriteria(value, criteriaItem, []);
 	}
 
-	private testObjectValueCriteriaItem(value: object, criteriaItem: Contracts.Search.StandardCriteriaOfItem<object>): boolean {
+	private testObjectValueCriteriaItem(
+		value: object,
+		criteriaItem: Contracts.Search.StandardCriteriaOfItem<object>,
+	): boolean {
 		const criteriaKeys = Object.keys(criteriaItem);
 
 		if (criteriaKeys.length === 1 && criteriaKeys[0] === "*") {

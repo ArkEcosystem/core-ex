@@ -7,7 +7,9 @@ export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		return () => {};
 	}
 
-	public listenMany(events: Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>): Map<Contracts.Kernel.EventName, () => void> {
+	public listenMany(
+		events: Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>,
+	): Map<Contracts.Kernel.EventName, () => void> {
 		const map: Map<Contracts.Kernel.EventName, () => void> = new Map<Contracts.Kernel.EventName, () => void>();
 		for (const [name] of events) {
 			map.set(name, () => {});
@@ -21,7 +23,9 @@ export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
 
 	public forget(event: Contracts.Kernel.EventName, listener?: Contracts.Kernel.EventListener): void {}
 
-	public forgetMany(events: Contracts.Kernel.EventName[] | Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>): void {
+	public forgetMany(
+		events: Contracts.Kernel.EventName[] | Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>,
+	): void {
 		//
 	}
 

@@ -34,7 +34,11 @@ export class DatabaseInterceptor {
 
 	// ! three methods below (getBlocks, getBlocksForDownload, getBlocksByHeight) can be merged into one
 
-	public async getBlocks(offset: number, limit: number, headersOnly?: boolean): Promise<Contracts.Crypto.IBlockData[]> {
+	public async getBlocks(
+		offset: number,
+		limit: number,
+		headersOnly?: boolean,
+	): Promise<Contracts.Crypto.IBlockData[]> {
 		// The functions below return matches in the range [start, end], including both ends.
 		const start: number = offset;
 		const end: number = offset + limit - 1;

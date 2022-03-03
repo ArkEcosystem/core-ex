@@ -1,5 +1,5 @@
 import { inject, injectable, multiInject, optional } from "@arkecosystem/core-container";
-import { Contracts, Identifiers , Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -101,7 +101,9 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		}
 	}
 
-	private async getTransactionFromData(transactionData: Contracts.Crypto.ITransactionData): Promise<Contracts.Crypto.ITransaction> {
+	private async getTransactionFromData(
+		transactionData: Contracts.Crypto.ITransactionData,
+	): Promise<Contracts.Crypto.ITransaction> {
 		try {
 			return this.transactionFactory.fromData(transactionData);
 		} catch (error) {
