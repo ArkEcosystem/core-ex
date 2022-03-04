@@ -317,7 +317,7 @@ describe<{
 		broadcastBlockSpy.calledOnce();
 	});
 
-	it.only("should skip broadcasting if state is downloadFinished", async (context) => {
+	it("should skip broadcasting if state is downloadFinished", async (context) => {
 		stub(stateMachine, "getState").returnValue("downloadFinished");
 
 		const getTimeStampForBlock = (height: number) => {
