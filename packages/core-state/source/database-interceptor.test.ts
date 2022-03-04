@@ -1,5 +1,5 @@
 import { DatabaseInterceptor } from "./";
-import { Application, Container} from "@arkecosystem/core-kernel";
+import { Application, Container } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test-framework";
 import { setUp } from "../test/setup";
 import { StateStore } from "./stores";
@@ -15,17 +15,17 @@ describe("DatabaseInterceptor.getBlock", ({ it, assert, stub, spy, beforeAll }) 
 		app = initialEnv.sandbox.app;
 		app.bind(Container.Identifiers.DatabaseService).toConstantValue(DatabaseService);
 		app.bind(Container.Identifiers.DatabaseInterceptor).toConstantValue(DatabaseInterceptor);
-		
+
 		stateStore = initialEnv.stateStore;
 	});
 
 	it("should return block from state store", async () => {
 		const databaseInterceptor: DatabaseInterceptor = app.resolve(Container.Identifiers.DatabaseInterceptor);
-		
+
 		const block = { data: { id: "block_id", height: 100, transactions: [] } };
-		
+
 		const stateStoreStub = stub(stateStore, "getLastBlocks").returnValue([block]);
-		
+
 		assert.equal(await databaseInterceptor.getBlock("block_id"), block);
 
 		stateStoreStub.restore();
@@ -39,7 +39,7 @@ describe("DatabaseInterceptor.getBlock", ({ it, assert, stub, spy, beforeAll }) 
 
 	// 	const stateStoreStub = stub(stateStore, "getLastBlocks").returnValue([]);
 	// 	const databaseServiceStub = stub(databaseService, "getBlock").returnValue(block);
-		
+
 	// 	assert.equal(await databaseInterceptor.getBlock("block_id"), block);
 
 	// 	stateStoreStub.restore();
