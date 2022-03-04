@@ -439,7 +439,10 @@ describe<{
 		spyDispatch.calledWith("NEWBLOCK");
 
 		expect(context.eventDispatcherService.dispatch).toBeCalledTimes(1);
-		expect(context.eventDispatcherService.dispatch).toHaveBeenLastCalledWith(Enums.BlockEvent.Received, context.blockData);
+		expect(context.eventDispatcherService.dispatch).toHaveBeenLastCalledWith(
+			Enums.BlockEvent.Received,
+			context.blockData,
+		);
 
 		expect(spyEnqueue).toBeCalledTimes(1);
 		expect(spyEnqueue).toHaveBeenLastCalledWith([context.blockData]);
