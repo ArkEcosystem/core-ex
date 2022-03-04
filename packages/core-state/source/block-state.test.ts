@@ -577,7 +577,6 @@ describe("apply and revert transactions", ({ it, each, assert, beforeEach, befor
 
 	for (const transaction of [transfer, delegateReg, vote, delegateRes]) {
 		it("should call the transaction handler apply the transaction to the sender & recipient", async () => {
-			// console.log(dataset)
 			await blockState.applyTransaction(transaction as ITransaction);
 
 			applySpy.calledWith(transaction);
