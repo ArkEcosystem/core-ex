@@ -141,7 +141,6 @@ describe("DatabaseInteractions", ({ it, assert, spy, stub }) => {
 			process.env.CORE_RESET_DATABASE = "1";
 			const genesisBlock = {};
 
-
 			const setSpy = spy(stateStore, "setGenesisBlock");
 			const stateStoreStub = stub(stateStore, "getGenesisBlock").returnValue(genesisBlock);
 
@@ -168,7 +167,7 @@ describe("DatabaseInteractions", ({ it, assert, spy, stub }) => {
 		const appSpy = spy(app, "terminate");
 
 		await databaseInteraction.initialize();
-		
+
 		appSpy.called();
 
 		stateStoreStub.restore();
