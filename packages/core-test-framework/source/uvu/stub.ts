@@ -33,6 +33,12 @@ export class Stub extends Fake<SinonStub> {
 		return this;
 	}
 
+	public rejectedValue(value: unknown): Stub {
+		this.subject.rejects(value);
+
+		return this;
+	}
+
 	public callsFake(value: (...arguments_: any[]) => any): Stub {
 		this.subject.callsFake(value);
 
