@@ -1,4 +1,4 @@
-import { Utils } from "@packages/crypto";
+import { Utils } from "@arkecosystem/crypto";
 
 export const block1 = {
 	data: {
