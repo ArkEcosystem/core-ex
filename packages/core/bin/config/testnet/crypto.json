@@ -957,9 +957,7 @@
 				"recipientId": "ark10x708d52ex5ljm966vfgwq92fsnztmpzgl8v7g95t4za38w0gcus4leufg",
 				"senderPublicKey": "79bcf3b68ac9a9f96cbad3128700aa4c2625ec2247cecf20b45d45d89dcf4639",
 				"asset": {
-					"votes": [
-						"+79bcf3b68ac9a9f96cbad3128700aa4c2625ec2247cecf20b45d45d89dcf4639"
-					]
+					"votes": ["+79bcf3b68ac9a9f96cbad3128700aa4c2625ec2247cecf20b45d45d89dcf4639"]
 				},
 				"network": 30,
 				"signature": "1947acaf304ab24b06f70a356a5992dc5eb05522be094cf9b197bf4ca40b8639eea997f732a7d4ad0917555c1202c4d0637b128ff64d17eeabedbef5cc66d8a3",
@@ -976,9 +974,7 @@
 				"recipientId": "ark1dvtqu7u7uwykhemkhgmxp9grd2qpycj249ama0vp60v52hwmc4qsvalteh",
 				"senderPublicKey": "6b160e7b9ee3896be776ba366095036a8012624aa97bbebd81d3d9455ddbc541",
 				"asset": {
-					"votes": [
-						"+6b160e7b9ee3896be776ba366095036a8012624aa97bbebd81d3d9455ddbc541"
-					]
+					"votes": ["+6b160e7b9ee3896be776ba366095036a8012624aa97bbebd81d3d9455ddbc541"]
 				},
 				"network": 30,
 				"signature": "955fca8985815b4b993098c47b19948132a385a0e21e7e5b87aaa837ea4fde9d6a57f42f4f8847a9f02d96fdcc9f83b96f0ffd496cacd640d541165a85ce2baf",
@@ -995,9 +991,7 @@
 				"recipientId": "ark1r5czk7ghc4nspfrgu4lrmj8r68quqsr2n8pjfs4hx7yvv79mznesqzhg6u",
 				"senderPublicKey": "1d302b7917c56700a468e57e3dc8e3d1c1c0406a99c324c2b73788c678bb14f3",
 				"asset": {
-					"votes": [
-						"+1d302b7917c56700a468e57e3dc8e3d1c1c0406a99c324c2b73788c678bb14f3"
-					]
+					"votes": ["+1d302b7917c56700a468e57e3dc8e3d1c1c0406a99c324c2b73788c678bb14f3"]
 				},
 				"network": 30,
 				"signature": "51756e794cefc220b006d6bafd16c0e169d3813fee9121208eb553cb77b20cc2eb719801ade63be3debff9af9eb7210dec2119eda75e2febad2ee2bb2a1e9cef",
@@ -1014,9 +1008,7 @@
 				"recipientId": "ark10ghu9htrgvern8n8mjewuhuvq63r9jm7vwnz3fmht3smlqh2u52qpm38c0",
 				"senderPublicKey": "7a2fc2dd634332399e67dcb2ee5f8c06a232cb7e63a628a7775c61bf82eae514",
 				"asset": {
-					"votes": [
-						"+7a2fc2dd634332399e67dcb2ee5f8c06a232cb7e63a628a7775c61bf82eae514"
-					]
+					"votes": ["+7a2fc2dd634332399e67dcb2ee5f8c06a232cb7e63a628a7775c61bf82eae514"]
 				},
 				"network": 30,
 				"signature": "919fa9c7d8e2bb37620ffd041e23237744755d09cf9e9ee5f954d1b9aacafc5ac6f53d53b83fea8efa5a5c31b842a822c2b42359dfac0ba642b3c0b66266d08f",
@@ -1033,9 +1025,7 @@
 				"recipientId": "ark1h0ulrg40kudsp00t04tp4kjp74ry5qw8gx65mnmzm80hmk06hyuq4wjyq2",
 				"senderPublicKey": "bbf9f1a2afb71b00bdeb7d561ada41f5464a01c741b54dcf62d9df7dd9fab938",
 				"asset": {
-					"votes": [
-						"+bbf9f1a2afb71b00bdeb7d561ada41f5464a01c741b54dcf62d9df7dd9fab938"
-					]
+					"votes": ["+bbf9f1a2afb71b00bdeb7d561ada41f5464a01c741b54dcf62d9df7dd9fab938"]
 				},
 				"network": 30,
 				"signature": "362ae4a1064f2275eca4fb359d81bc1ecd62606716b2537bc04e8d15d1ebd13ade457fe1ecdabecaca9160265424d49177a4e76d68a771a0ee9055be493d6698",
@@ -1052,9 +1042,7 @@
 				"recipientId": "ark1gtq95m4437tym9t8lw07zts8ylkdsw3w6znr34vr5pgt6tf3hdnq4u0yuq",
 				"senderPublicKey": "42c05a6eb58f964d9567fb9fe12e0727ecd83a2ed0a638d583a050bd2d31bb66",
 				"asset": {
-					"votes": [
-						"+42c05a6eb58f964d9567fb9fe12e0727ecd83a2ed0a638d583a050bd2d31bb66"
-					]
+					"votes": ["+42c05a6eb58f964d9567fb9fe12e0727ecd83a2ed0a638d583a050bd2d31bb66"]
 				},
 				"network": 30,
 				"signature": "7ed5191452e77c6064014031bd32e098871285a7f59aa2434d6e16756ebb7309d35505fe23e7603792500984f4fe4479ad9079b37b622efa1573240c126e8e84",
@@ -1071,9 +1059,7 @@
 				"recipientId": "ark14z7jcql7xwhjw74nuk3nez0gjnse0daapkxd3lc0q6wlg9zn2phs9wjmcg",
 				"senderPublicKey": "a8bd2c03fe33af277ab3e5a33c89e894e197b7bd0d8cd8ff0f069df41453506f",
 				"asset": {
-					"votes": [
-						"+a8bd2c03fe33af277ab3e5a33c89e894e197b7bd0d8cd8ff0f069df41453506f"
-					]
+					"votes": ["+a8bd2c03fe33af277ab3e5a33c89e894e197b7bd0d8cd8ff0f069df41453506f"]
 				},
 				"network": 30,
 				"signature": "73eae2e1588d64a7e4eda4b074ca9669c4232f1d49c2204af49f64ec15987d73a264f7f37cae7f51495925a2f2d953d9c8f7cb21d787e1c5f63f58fe64aee400",
@@ -1090,9 +1076,7 @@
 				"recipientId": "ark1k84r85ytl5hq6khdjadhyrrkfandjgypg8gup24q3e8mpwaekghsuzn465",
 				"senderPublicKey": "b1ea33d08bfd2e0d5aed975b720c764f66d9208141d1c0aaa08e4fb0bbb9b22f",
 				"asset": {
-					"votes": [
-						"+b1ea33d08bfd2e0d5aed975b720c764f66d9208141d1c0aaa08e4fb0bbb9b22f"
-					]
+					"votes": ["+b1ea33d08bfd2e0d5aed975b720c764f66d9208141d1c0aaa08e4fb0bbb9b22f"]
 				},
 				"network": 30,
 				"signature": "b3a660c278ad39ef5d4074db2d616e20ded8b5f033466a6e525a4cd4918e74824d0e692a6491e0288fd1a81b84930d043cb736a98ad6f5a6fc77b18532350eb5",
@@ -1109,9 +1093,7 @@
 				"recipientId": "ark1nhlkvxyqaegxjmhk44450zf72p6srcjxrlgyjkekk47sxtwdet2scye8kl",
 				"senderPublicKey": "9dff661880ee50696ef6ad6b47893e507501e2461fd0495b36b57d032dcdcad5",
 				"asset": {
-					"votes": [
-						"+9dff661880ee50696ef6ad6b47893e507501e2461fd0495b36b57d032dcdcad5"
-					]
+					"votes": ["+9dff661880ee50696ef6ad6b47893e507501e2461fd0495b36b57d032dcdcad5"]
 				},
 				"network": 30,
 				"signature": "ec79e2e4520f0c9f0f9780c0bb6460fef4c9b345c4cdb16536a7db1b073e61c2ba9d330fc21afb6aa2ea6a5a04d17f7effb24a204be34431643c5c46e06dba11",
@@ -1128,9 +1110,7 @@
 				"recipientId": "ark1v7x4dhv3xl3eum5cp46wpmk5v5r2gp3jkdetn970yxva6rnqfd4sge87uz",
 				"senderPublicKey": "678d56dd9137e39e6e980d74e0eed46506a40632b372b997cf2199dd0e604b6b",
 				"asset": {
-					"votes": [
-						"+678d56dd9137e39e6e980d74e0eed46506a40632b372b997cf2199dd0e604b6b"
-					]
+					"votes": ["+678d56dd9137e39e6e980d74e0eed46506a40632b372b997cf2199dd0e604b6b"]
 				},
 				"network": 30,
 				"signature": "62ada6593edb29ad50b84616a369f1d159da2b5a2e1905494dfa8d1ca0003b3e20e1b6aa43f56be9344175c18cee7aa9ed6ea4f3b7b3b2696ca501d6224a65f1",
@@ -1147,9 +1127,7 @@
 				"recipientId": "ark1fnhx0cn3pdf057a3fngucrjdvwk76zt852h0rpvdugwpxhvu307qwmv3kf",
 				"senderPublicKey": "4cee67e2710b52fa7bb14cd1cc0e4d63aded0967a2aef1858de21c135d9c8bfc",
 				"asset": {
-					"votes": [
-						"+4cee67e2710b52fa7bb14cd1cc0e4d63aded0967a2aef1858de21c135d9c8bfc"
-					]
+					"votes": ["+4cee67e2710b52fa7bb14cd1cc0e4d63aded0967a2aef1858de21c135d9c8bfc"]
 				},
 				"network": 30,
 				"signature": "b72e9d293b5ed491af8015ed7b469735694dcd6d81171d9c2a072f59c27bf4d215510eeef35748090dfa40c734cf39243577897ee4925a8a714351a6a42687ba",
@@ -1166,9 +1144,7 @@
 				"recipientId": "ark1ah2tg99qjh0cs62pj7lukp2yp4lceljx04ducnrz7u594ypq4l6snjxtee",
 				"senderPublicKey": "edd4b414a095df88694197bfcb05440d7f8cfe467d5bcc4c62f7285a9020aff5",
 				"asset": {
-					"votes": [
-						"+edd4b414a095df88694197bfcb05440d7f8cfe467d5bcc4c62f7285a9020aff5"
-					]
+					"votes": ["+edd4b414a095df88694197bfcb05440d7f8cfe467d5bcc4c62f7285a9020aff5"]
 				},
 				"network": 30,
 				"signature": "1eab3c25e666239ba1ee7f1e8bd58642111aec184eda385821d44b175d03cce91cec7af4af4cffd1bdf869d3fd4e61ee4cbbacde11a1bcf1e469479d0d7a01dd",
@@ -1185,9 +1161,7 @@
 				"recipientId": "ark1qc5rvw49ty9pywcu45zvem3rey706jat5g5zty6zmrq8qj02z8nqqnvjaq",
 				"senderPublicKey": "0628363aa5590a123b1cad04ccee23c93cfd4baba228259342d8c07049ea11e6",
 				"asset": {
-					"votes": [
-						"+0628363aa5590a123b1cad04ccee23c93cfd4baba228259342d8c07049ea11e6"
-					]
+					"votes": ["+0628363aa5590a123b1cad04ccee23c93cfd4baba228259342d8c07049ea11e6"]
 				},
 				"network": 30,
 				"signature": "0aeddd8a861f6dfceb2c8054692285674e4248c4c7c5bcf1e90cd77fe374ab9ce45e923b2024b24115755d776ddffa9aefba2614acd9d57f570ba60d698d7ffb",
@@ -1204,9 +1178,7 @@
 				"recipientId": "ark1xu45208mvjk9mnht7zf8hc9fk744u97psv4ut3x9ktrh2ln4smpsspe7ff",
 				"senderPublicKey": "372b453cfb64ac5dceebf0927be0a9b7ab5e17c1832bc5c4c5b2c7757e7586c3",
 				"asset": {
-					"votes": [
-						"+372b453cfb64ac5dceebf0927be0a9b7ab5e17c1832bc5c4c5b2c7757e7586c3"
-					]
+					"votes": ["+372b453cfb64ac5dceebf0927be0a9b7ab5e17c1832bc5c4c5b2c7757e7586c3"]
 				},
 				"network": 30,
 				"signature": "2cabd8bb866e83a834e41f388a230f1fb756108a40fb9101e4a57dd97d64b1ef2a3e417ecf4db49b57996061a438c73822c62b740ca1173c4f4417894dc7dfda",
@@ -1223,9 +1195,7 @@
 				"recipientId": "ark1tsrn5fxhx4y3zqrjaf825yrnmk5w0hxrx4zlfyngn2ruxzxvvmjs0tjgzq",
 				"senderPublicKey": "5c073a24d73549110072ea4eaa1073dda8e7dcc33545f492689a87c308cc66e5",
 				"asset": {
-					"votes": [
-						"+5c073a24d73549110072ea4eaa1073dda8e7dcc33545f492689a87c308cc66e5"
-					]
+					"votes": ["+5c073a24d73549110072ea4eaa1073dda8e7dcc33545f492689a87c308cc66e5"]
 				},
 				"network": 30,
 				"signature": "d7112480b87a128df9267db3faea1941628bb0d09d375da679f22091e09bfd8c41abef6d46640c712d184d1355e71b3007c95b6847dd62c1bbb06e3e48577a54",
@@ -1242,9 +1212,7 @@
 				"recipientId": "ark1srkrqzfj8qu25d6cegs9mqzv8tstqlhdrn4zygjczhvrrmc9dx0qtfsk8z",
 				"senderPublicKey": "80ec3009323838aa3758ca205d804c3ae0b07eed1cea22225815d831ef05699e",
 				"asset": {
-					"votes": [
-						"+80ec3009323838aa3758ca205d804c3ae0b07eed1cea22225815d831ef05699e"
-					]
+					"votes": ["+80ec3009323838aa3758ca205d804c3ae0b07eed1cea22225815d831ef05699e"]
 				},
 				"network": 30,
 				"signature": "643deed900e502e113378303cf54c48c0b59f8b05d0f14dd9f2059de917ee521289809f6b9d9619651145d025a1d492b001c87db0170af8f8574e895be1663b4",
@@ -1261,9 +1229,7 @@
 				"recipientId": "ark1wnpe9npvdghvuuqndw6ukygfdwq62ywcefy5whcesejcje3npp4qlh6zy0",
 				"senderPublicKey": "74c392cc2c6a2ece70136bb5cb11096b81a511d8ca49475f198665896633086a",
 				"asset": {
-					"votes": [
-						"+74c392cc2c6a2ece70136bb5cb11096b81a511d8ca49475f198665896633086a"
-					]
+					"votes": ["+74c392cc2c6a2ece70136bb5cb11096b81a511d8ca49475f198665896633086a"]
 				},
 				"network": 30,
 				"signature": "502c342fbe8f64ff3fcdde174c7dcf562078ad9e48651810b8e8f5e1e4abf9242d0c70d0be9bc21a0ac2a755cc595c0d71e6267a8acddc429403a221a6594355",
@@ -1280,9 +1246,7 @@
 				"recipientId": "ark1kkmhux2k78lr8mxml4pj3s6zg7a32620jye6quzyfysze73p9j0sj3t8e2",
 				"senderPublicKey": "b5b77e1956f1fe33ecdbfd4328c34247bb15694f9133a0704449202cfa212c9f",
 				"asset": {
-					"votes": [
-						"+b5b77e1956f1fe33ecdbfd4328c34247bb15694f9133a0704449202cfa212c9f"
-					]
+					"votes": ["+b5b77e1956f1fe33ecdbfd4328c34247bb15694f9133a0704449202cfa212c9f"]
 				},
 				"network": 30,
 				"signature": "2b6ad1efb49427104abfe6f8f785ff6b5c4c7878f228d2490d7b00f69c907405d53f02adab0cf68e42399dc8ec81bf4a4ba60e3c9d5ff593fcad8c1178ea0b83",
@@ -1299,9 +1263,7 @@
 				"recipientId": "ark1egguj976llyju7f8ez67jm8gyh73sfzr0skp34jssvjfu8lxlx0qwhl8sr",
 				"senderPublicKey": "ca11c917daffc92e7927c8b5e96ce825fd1824437c2c18d65083249e1fe6f99e",
 				"asset": {
-					"votes": [
-						"+ca11c917daffc92e7927c8b5e96ce825fd1824437c2c18d65083249e1fe6f99e"
-					]
+					"votes": ["+ca11c917daffc92e7927c8b5e96ce825fd1824437c2c18d65083249e1fe6f99e"]
 				},
 				"network": 30,
 				"signature": "2f49812a4ab95d0c1f4df96c8e4ce9f4fab1d52600a874913441814c1dc7444c71a0a6b72fc80d30457a9f5322ff428fb734ee37c95ab67d89b5b99ccd8e2255",
@@ -1318,9 +1280,7 @@
 				"recipientId": "ark180lkejrrr36za38ce538d70r8echaq2c3cd6salqqq97j334hufs8uf64d",
 				"senderPublicKey": "3bff6cc8631c742ec4f8cd2276f9e33e717e81588e1ba877e0000be94635bf13",
 				"asset": {
-					"votes": [
-						"+3bff6cc8631c742ec4f8cd2276f9e33e717e81588e1ba877e0000be94635bf13"
-					]
+					"votes": ["+3bff6cc8631c742ec4f8cd2276f9e33e717e81588e1ba877e0000be94635bf13"]
 				},
 				"network": 30,
 				"signature": "8a23c94b65890b1232fbf9839bc2469c688107416b3ed93a90bda26e5a764f67f77dcae36b501cf88ecaaf0b991a4450f04c2c8b028e41b344b17b06ed090a89",
@@ -1337,9 +1297,7 @@
 				"recipientId": "ark13c4w42rgwx6smk52qeyfmcqfxl9q0vfk0krhxdvaetdwlkk0m77q9uzxnh",
 				"senderPublicKey": "8e2aeaa86871b50dda8a06489de00937ca07b1367d8773359dcadaefdacfdfbc",
 				"asset": {
-					"votes": [
-						"+8e2aeaa86871b50dda8a06489de00937ca07b1367d8773359dcadaefdacfdfbc"
-					]
+					"votes": ["+8e2aeaa86871b50dda8a06489de00937ca07b1367d8773359dcadaefdacfdfbc"]
 				},
 				"network": 30,
 				"signature": "c3d69a2cb7919658c22c84f00f33e51580b3df2e3910c5e7758e53fec3cd4f8a3e9c981e7855a81ed90e327f7bd8f7e06549165e38a172c301b0dfce071514a7",
@@ -1356,9 +1314,7 @@
 				"recipientId": "ark1s57d5zzavrvvr02qe8rvrwx63h8fqshm4838m6nc3nn5vkng2ksq3h8qxs",
 				"senderPublicKey": "853cda085d60d8c1bd40c9c6c1b8da8dce9042fba9e27dea788ce7465a6855a0",
 				"asset": {
-					"votes": [
-						"+853cda085d60d8c1bd40c9c6c1b8da8dce9042fba9e27dea788ce7465a6855a0"
-					]
+					"votes": ["+853cda085d60d8c1bd40c9c6c1b8da8dce9042fba9e27dea788ce7465a6855a0"]
 				},
 				"network": 30,
 				"signature": "babdf10ada8239aa2e9459b72d1314c927af606419253042bb384ee893d1a9ead5fddead3ccb323fd59384d23e0e4f354ce9d87f76f2aae11735f33ac3df1608",
@@ -1375,9 +1331,7 @@
 				"recipientId": "ark1zfwnx7srkv27pxewhld0npyghng3eeuu9kw8qazaa4g9y2rlatcq3wr442",
 				"senderPublicKey": "125d337a03b315e09b2ebfdaf98488bcd11ce79c2d9c70745ded5052287feaf0",
 				"asset": {
-					"votes": [
-						"+125d337a03b315e09b2ebfdaf98488bcd11ce79c2d9c70745ded5052287feaf0"
-					]
+					"votes": ["+125d337a03b315e09b2ebfdaf98488bcd11ce79c2d9c70745ded5052287feaf0"]
 				},
 				"network": 30,
 				"signature": "59149fc8bf9aa734c4932dbbb9f37fe794db7f88e24795eed601bda6cad4af4c866805ad479859168b72ab7379e293bf84408b3de9747bd11e40fc69859d2fcf",
@@ -1394,9 +1348,7 @@
 				"recipientId": "ark1ul9dkfwa88j8jcm3as7hv8hajn5fuka7z7z5rnycajd3scv6se3qzlmjx5",
 				"senderPublicKey": "e7cadb25dd39e4796371ec3d761efd94e89e5bbe178541cc98ec9b18619a8662",
 				"asset": {
-					"votes": [
-						"+e7cadb25dd39e4796371ec3d761efd94e89e5bbe178541cc98ec9b18619a8662"
-					]
+					"votes": ["+e7cadb25dd39e4796371ec3d761efd94e89e5bbe178541cc98ec9b18619a8662"]
 				},
 				"network": 30,
 				"signature": "53adb86ba6abd43a225f7cd3086eea9d9dc90420acc7da926ea252e79d5988770c45a2f49373200dd72552194c45fb26f2f6f4c18241f4b1c844bb65d14751ee",
@@ -1413,9 +1365,7 @@
 				"recipientId": "ark1v3hd2v2zj69lnjjapclw84e49hc9fgwyc5hlhjepev630hguh3nsa6st4u",
 				"senderPublicKey": "646ed53142968bf9ca5d0e3ee3d7352df054a1c4c52ffbcb21cb3517dd1cbc67",
 				"asset": {
-					"votes": [
-						"+646ed53142968bf9ca5d0e3ee3d7352df054a1c4c52ffbcb21cb3517dd1cbc67"
-					]
+					"votes": ["+646ed53142968bf9ca5d0e3ee3d7352df054a1c4c52ffbcb21cb3517dd1cbc67"]
 				},
 				"network": 30,
 				"signature": "81d17d4ca66cbf9559ebe91b1b52521f8213e717fce9d6c6c621b3eecb5fb981e31162a623da8fbdf99ef0ee265050ff1e25d3b755f1b07ee922416687898977",
@@ -1432,9 +1382,7 @@
 				"recipientId": "ark1lsunvdahqug5z3ejwpaca5wq6ffcms37h3sj7vekqdv49dzaxwwqcgc2ul",
 				"senderPublicKey": "fc393637b70711414732707b8ed1c0d2538dc23ebc612f3336035952b45d339c",
 				"asset": {
-					"votes": [
-						"+fc393637b70711414732707b8ed1c0d2538dc23ebc612f3336035952b45d339c"
-					]
+					"votes": ["+fc393637b70711414732707b8ed1c0d2538dc23ebc612f3336035952b45d339c"]
 				},
 				"network": 30,
 				"signature": "396a15b860c917cb7e08c45e6a9a18f4791d3f2d56ff05ce9fafdda3cde4f7126e3b6a9d4c8d1726c04194dbf166d429f96d996e80d886463788d70c1bae4644",
@@ -1451,9 +1399,7 @@
 				"recipientId": "ark1mn6xs26nptkynff828ersqqansz99mdzw4p6smcnqn3vm8q99e4qx2zh6v",
 				"senderPublicKey": "dcf4682b530aec49a52751f238001d9c0452eda27543a86f1304e2cd9c052e6a",
 				"asset": {
-					"votes": [
-						"+dcf4682b530aec49a52751f238001d9c0452eda27543a86f1304e2cd9c052e6a"
-					]
+					"votes": ["+dcf4682b530aec49a52751f238001d9c0452eda27543a86f1304e2cd9c052e6a"]
 				},
 				"network": 30,
 				"signature": "cb6454ad31600d588baba6b029a814285fabbd057d4dd23e31ebc416e81401ff6315e989d48871ec7e4a021bceb68bede77ab569c7b768c92460703fbb1bd296",
@@ -1470,9 +1416,7 @@
 				"recipientId": "ark1qulyssxw7ckd5xjr40z0mfyahjuhl0stpjy0lwhjgua07p7xdqfq8nyer2",
 				"senderPublicKey": "073e4840cef62cda1a43abc4fda49dbcb97fbe0b0c88ffbaf2473aff07c66812",
 				"asset": {
-					"votes": [
-						"+073e4840cef62cda1a43abc4fda49dbcb97fbe0b0c88ffbaf2473aff07c66812"
-					]
+					"votes": ["+073e4840cef62cda1a43abc4fda49dbcb97fbe0b0c88ffbaf2473aff07c66812"]
 				},
 				"network": 30,
 				"signature": "9778d9d4364601a28bf3e1f50b87e2fa137f7319ccefa70fd3b293ebaa7057e8271872aa34619e6a79e64594c197bf2fe66666f266b563f4d797aa5b3778ee82",
@@ -1489,9 +1433,7 @@
 				"recipientId": "ark1tpvkhkp5al9dwsl8cry8awkz5dvdk28pct9pzf4xgmvuv3jkqw7qv52zfq",
 				"senderPublicKey": "58596bd834efcad743e7c0c87ebac2a358db28e1c2ca1126a646d9c6465603bc",
 				"asset": {
-					"votes": [
-						"+58596bd834efcad743e7c0c87ebac2a358db28e1c2ca1126a646d9c6465603bc"
-					]
+					"votes": ["+58596bd834efcad743e7c0c87ebac2a358db28e1c2ca1126a646d9c6465603bc"]
 				},
 				"network": 30,
 				"signature": "bee88a60560816cf136886bb200e3854cd171916da8fde169c0aead93b185c858eb9700650fd57569d3e66816a0d1b2b37bb9a76e105514fae4175d84fd23bd1",
@@ -1508,9 +1450,7 @@
 				"recipientId": "ark1q29t8npjfzelgmfkdmkvmenvnz9cmw2e4rgdztjvu6rzhf5cylcsddq43q",
 				"senderPublicKey": "028ab3cc3248b3f46d366eeccde66c988b8db959a8d0d12e4ce6862ba69827f1",
 				"asset": {
-					"votes": [
-						"+028ab3cc3248b3f46d366eeccde66c988b8db959a8d0d12e4ce6862ba69827f1"
-					]
+					"votes": ["+028ab3cc3248b3f46d366eeccde66c988b8db959a8d0d12e4ce6862ba69827f1"]
 				},
 				"network": 30,
 				"signature": "964ca0e802591e7b5074ca28a6b635c3f1ba0c650d112d7fb4356646559f5455cca7613f569d4b05b09ce1ec1fe42a6e6be0a72a6265321f2a25b71a57b3df95",
@@ -1527,9 +1467,7 @@
 				"recipientId": "ark1asxxhw84kpqg833qrpr8h0ge3wfcpa44lrgptnlyn3mu75l0gw8q3vtkrk",
 				"senderPublicKey": "ec0c6bb8f5b04083c62018467bbd198b9380f6b5f8d015cfe49c77cf53ef438e",
 				"asset": {
-					"votes": [
-						"+ec0c6bb8f5b04083c62018467bbd198b9380f6b5f8d015cfe49c77cf53ef438e"
-					]
+					"votes": ["+ec0c6bb8f5b04083c62018467bbd198b9380f6b5f8d015cfe49c77cf53ef438e"]
 				},
 				"network": 30,
 				"signature": "96e753ca4f7578232b24eeb1239ce94ad4ce8a9fc0b41b03d9d58154f13917a00731e46ec6ec81ef87e9ae5a92e81988b290ecd68b146c094ea020026697845b",
@@ -1546,9 +1484,7 @@
 				"recipientId": "ark136ww8pace5spt2j7d5xcc5p3gk3hzdwna8cnlstms6lp9zp8gzmqxds0ak",
 				"senderPublicKey": "8e9ce387b8cd2015aa5e6d0d8c503145a37135d3e9f13fc17b86be12882740b6",
 				"asset": {
-					"votes": [
-						"+8e9ce387b8cd2015aa5e6d0d8c503145a37135d3e9f13fc17b86be12882740b6"
-					]
+					"votes": ["+8e9ce387b8cd2015aa5e6d0d8c503145a37135d3e9f13fc17b86be12882740b6"]
 				},
 				"network": 30,
 				"signature": "6a8399c8368222dcab7eea03c4fa631a7dede594c884491f18271ef6b11eca737503c1abb61bfd8764a66e518bd03e314d60c58c1761d05785a7c3d927e405af",
@@ -1565,9 +1501,7 @@
 				"recipientId": "ark1k8kz0wsgd20ql2rh8h6ypalz66lgf6aq4m7xarc7je8hgmxzc4dsg5zxa6",
 				"senderPublicKey": "b1ec27ba086a9e0fa8773df440f7e2d6be84eba0aefc6e8f1e964f746cc2c55b",
 				"asset": {
-					"votes": [
-						"+b1ec27ba086a9e0fa8773df440f7e2d6be84eba0aefc6e8f1e964f746cc2c55b"
-					]
+					"votes": ["+b1ec27ba086a9e0fa8773df440f7e2d6be84eba0aefc6e8f1e964f746cc2c55b"]
 				},
 				"network": 30,
 				"signature": "65d91cdc592874d42ecc70dce0989c98181241ce6f999b3db745552b5f9e0fa6afc3eadb58228cffef5b14fa5091c78410e97ccbe9445552d14016e6af3c182a",
@@ -1584,9 +1518,7 @@
 				"recipientId": "ark19mkjq9mzxfr02mxg0whg6dlm2rdy3xqjf63k58deulwpcklxr0dqpxyvq7",
 				"senderPublicKey": "2eed2017623246f56cc87bae8d37fb50da4898124ea36a1db9e7dc1c5be61bda",
 				"asset": {
-					"votes": [
-						"+2eed2017623246f56cc87bae8d37fb50da4898124ea36a1db9e7dc1c5be61bda"
-					]
+					"votes": ["+2eed2017623246f56cc87bae8d37fb50da4898124ea36a1db9e7dc1c5be61bda"]
 				},
 				"network": 30,
 				"signature": "5783e2499bf54998c96c33ebed0c8ea328eddfd5e7f8d98f1c4418f707f2bb880ec35803e1c4deac4c0d6b288dd9ac5b8abe355867d22d1334a9c0b2afca7766",
@@ -1603,9 +1535,7 @@
 				"recipientId": "ark1cala9n6spppw8g20y5ejq59c2q2s7at5dlann7aqapv8jgadp4xq5lszes",
 				"senderPublicKey": "c77fd2cf500842e3a14f25332050b850150f75746ffb39fba0e8587923ad0d4c",
 				"asset": {
-					"votes": [
-						"+c77fd2cf500842e3a14f25332050b850150f75746ffb39fba0e8587923ad0d4c"
-					]
+					"votes": ["+c77fd2cf500842e3a14f25332050b850150f75746ffb39fba0e8587923ad0d4c"]
 				},
 				"network": 30,
 				"signature": "24a7d0d7e330b1f171b72699fea6a0809bca5170feb2e89501c974b9b7a78f9541498297ec712d2b5a8c74cb2423216637e0bdbe24aa2a050708ff6fc0bc8b5e",
@@ -1622,9 +1552,7 @@
 				"recipientId": "ark1zce0wgysfmulkuvzwn2csgd48jezam2h3f2hkp6h3ryclqx5nh2qkxfvx7",
 				"senderPublicKey": "1632f720904ef9fb718274d58821b53cb22eed578a557b075788c98f80d49dd4",
 				"asset": {
-					"votes": [
-						"+1632f720904ef9fb718274d58821b53cb22eed578a557b075788c98f80d49dd4"
-					]
+					"votes": ["+1632f720904ef9fb718274d58821b53cb22eed578a557b075788c98f80d49dd4"]
 				},
 				"network": 30,
 				"signature": "3341385b0bc0c009a6c96f755ec9dc96cd20dbe634684f5e462c0753e97eeb6f02892f9c0f0d33fdd282cdf83b673a024fa1beccbe3843ae12f5086136c9807d",
@@ -1641,9 +1569,7 @@
 				"recipientId": "ark1ap28tv4h6f3lugjdnajlggn42ev2krryqq8n6qgtcjv3d00sc0eq8ps8ef",
 				"senderPublicKey": "e85475b2b7d263fe224d9f65f422755658ab0c64000f3d010bc49916bdf0c3f2",
 				"asset": {
-					"votes": [
-						"+e85475b2b7d263fe224d9f65f422755658ab0c64000f3d010bc49916bdf0c3f2"
-					]
+					"votes": ["+e85475b2b7d263fe224d9f65f422755658ab0c64000f3d010bc49916bdf0c3f2"]
 				},
 				"network": 30,
 				"signature": "069b3f6b14bcc38d203a51637c5891d4689d42bb9fab8bdcd46600198c4647ceefa45c21df724f765940f1646b5638ff8f07290ad1f37a92a7f220225865c2a1",
@@ -1660,9 +1586,7 @@
 				"recipientId": "ark1sllcvu2fnac9qz90c3nwr0z03vdptllqyxl5nd3vxx7ushwrkzwq58jmqt",
 				"senderPublicKey": "87ff8671499f705008afc466e1bc4f8b1a15ffe021bf49b62c31bdc85dc3b09c",
 				"asset": {
-					"votes": [
-						"+87ff8671499f705008afc466e1bc4f8b1a15ffe021bf49b62c31bdc85dc3b09c"
-					]
+					"votes": ["+87ff8671499f705008afc466e1bc4f8b1a15ffe021bf49b62c31bdc85dc3b09c"]
 				},
 				"network": 30,
 				"signature": "0bd918664a9572cd7ef8b8c996f4c6c8c4852b8d7788891455e3db00f2e69443b3740ee98c7cc1fd98f52bba4b76068b02b58d85db5ffe53d116de47b3594d3b",
@@ -1679,9 +1603,7 @@
 				"recipientId": "ark13rnfeled5l72pperv82levvevh0dlz6e2vrjvwhujrshe7ur4nusq7vser",
 				"senderPublicKey": "88e69cff2da7fca0872361d5fcb19965dedf8b595307263afc90e17cfb83acf9",
 				"asset": {
-					"votes": [
-						"+88e69cff2da7fca0872361d5fcb19965dedf8b595307263afc90e17cfb83acf9"
-					]
+					"votes": ["+88e69cff2da7fca0872361d5fcb19965dedf8b595307263afc90e17cfb83acf9"]
 				},
 				"network": 30,
 				"signature": "301db37e4e74b1eabf4d8028d8fe9a404fa03cf6a56955cb5c1e54b949ae04f4ea2479d4d2fed1e0aeb409523bfc31d5ccd415fd03874077b9d848e970835244",
@@ -1698,9 +1620,7 @@
 				"recipientId": "ark13cd9qa9ayqjuggc8z07y4zgf3ae5cyf6nxxetzmfjjkfksz3xpcqpg7hyp",
 				"senderPublicKey": "8e1a5074bd2025c4230713fc4a89098f734c113a998d958b6994ac9b40513070",
 				"asset": {
-					"votes": [
-						"+8e1a5074bd2025c4230713fc4a89098f734c113a998d958b6994ac9b40513070"
-					]
+					"votes": ["+8e1a5074bd2025c4230713fc4a89098f734c113a998d958b6994ac9b40513070"]
 				},
 				"network": 30,
 				"signature": "b6fdb9d6deff17871191fbba8658490ef4213b119476a32828d27ffd3706968361ca0009e17bc6ba81e60a96e5945182bef3dd4d2fa358e857482296d5f7911b",
@@ -1717,9 +1637,7 @@
 				"recipientId": "ark148luwz0ydxkyk49uw3sxqxqdkz2aqclz80znwlpeyh7tvzly50pq0lh87k",
 				"senderPublicKey": "a9ffc709e469ac4b54bc746060180db095d063e23bc5377c3925fcb60be4a3c2",
 				"asset": {
-					"votes": [
-						"+a9ffc709e469ac4b54bc746060180db095d063e23bc5377c3925fcb60be4a3c2"
-					]
+					"votes": ["+a9ffc709e469ac4b54bc746060180db095d063e23bc5377c3925fcb60be4a3c2"]
 				},
 				"network": 30,
 				"signature": "0dffc954a535ae9248c56aaf3a297804930d738ac147b371ffc2464fcc5c54582593edc004de5f635e9e69fd61d4ae59e223e427c88a1c90bc25e296901dad00",
@@ -1736,9 +1654,7 @@
 				"recipientId": "ark18fwfrqmtgnxuxwh8yc34ma48m9zxzsrstqxyyplu69xg60064swqve7upd",
 				"senderPublicKey": "3a5c91836b44cdc33ae726235df6a7d944614070580c4207fcd14c8d3dfaac1c",
 				"asset": {
-					"votes": [
-						"+3a5c91836b44cdc33ae726235df6a7d944614070580c4207fcd14c8d3dfaac1c"
-					]
+					"votes": ["+3a5c91836b44cdc33ae726235df6a7d944614070580c4207fcd14c8d3dfaac1c"]
 				},
 				"network": 30,
 				"signature": "d95cf41873f3b101eed331bc7d05057351dec232ba85d67b8f2249ab6b64267d852d1ff797c862cb166ee3d8013832d5cb7fa858c1afdef12bb526433768feef",
@@ -1755,9 +1671,7 @@
 				"recipientId": "ark1ldjpu9k3zgkraqqf2eqswmz5xzjrjeaq95jl5sy0rxcx30dde02s3er72h",
 				"senderPublicKey": "fb641e16d1122c3e80095641076c5430a43967a02d25fa408f19b068bdadcbd5",
 				"asset": {
-					"votes": [
-						"+fb641e16d1122c3e80095641076c5430a43967a02d25fa408f19b068bdadcbd5"
-					]
+					"votes": ["+fb641e16d1122c3e80095641076c5430a43967a02d25fa408f19b068bdadcbd5"]
 				},
 				"network": 30,
 				"signature": "2a016ff90ff172a48c96d93a4c8f6b13d6bc6944448eeb6f78b90f94c6b4755e717c3d7eba7db03c0ebfe140cd915442f7613fef06f9df7bf3ed05a596f38dfe",
@@ -1774,9 +1688,7 @@
 				"recipientId": "ark10lfegznm6mlqvfkwqsh6l0rkn2xwu4up934343243aegtpzuq5qskcn96t",
 				"senderPublicKey": "7fd3940a7bd6fe0626ce042fafbc769a8cee57812c6b1ac5558f7285845c0501",
 				"asset": {
-					"votes": [
-						"+7fd3940a7bd6fe0626ce042fafbc769a8cee57812c6b1ac5558f7285845c0501"
-					]
+					"votes": ["+7fd3940a7bd6fe0626ce042fafbc769a8cee57812c6b1ac5558f7285845c0501"]
 				},
 				"network": 30,
 				"signature": "f697ea1459b0b440314ff8352f346847727e565d3486d2980b117dfbadeac103c108c933cfae45f4e97676f58d813f860a1e79848203d96118b52cf279c95aee",
@@ -1793,9 +1705,7 @@
 				"recipientId": "ark1nf0cehrjvan8nwvgcvv65k3vd5hs7zg7pl6l0290qk3h0yjf36esu0amym",
 				"senderPublicKey": "9a5f8cdc72676679b988c319aa5a2c6d2f0f091e0ff5f7a8af05a37792498eb3",
 				"asset": {
-					"votes": [
-						"+9a5f8cdc72676679b988c319aa5a2c6d2f0f091e0ff5f7a8af05a37792498eb3"
-					]
+					"votes": ["+9a5f8cdc72676679b988c319aa5a2c6d2f0f091e0ff5f7a8af05a37792498eb3"]
 				},
 				"network": 30,
 				"signature": "2ec1aad34955239757eb58d0349688e9438e8e5980f58caa2f085357cc54bc3a2c60c4b6b37459782db0f96a0d4f2c3ecbcb437022cfcdc99c33489cb55dc70c",
@@ -1812,9 +1722,7 @@
 				"recipientId": "ark1eat4eppvns9q9pyxteuhg2mq4y4h55459f0ah0fxyhzmjlppwcesz38sgv",
 				"senderPublicKey": "cf575c842c9c0a0284865e79742b60a92b7a52b42a5fdbbd2625c5b97c217633",
 				"asset": {
-					"votes": [
-						"+cf575c842c9c0a0284865e79742b60a92b7a52b42a5fdbbd2625c5b97c217633"
-					]
+					"votes": ["+cf575c842c9c0a0284865e79742b60a92b7a52b42a5fdbbd2625c5b97c217633"]
 				},
 				"network": 30,
 				"signature": "52e2f47390c0ecc4b3a75111ee7d295f84c9d0f8bc6a8b8c8e9d15ddbbaf58e30436838270fc9ca51cd8adaa98279438c9ec4da84d8dcb1d6e008e1a9b601c3d",
@@ -1831,9 +1739,7 @@
 				"recipientId": "ark12r82m0kpugeatztudf3qd9uwhp9yr58dxn4dfnqfgn8pjjxqrj2q3fp0rf",
 				"senderPublicKey": "50ceadbec1e233d5897c6a6206978eb84a41d0ed34ead4cc0944ce1948c01c94",
 				"asset": {
-					"votes": [
-						"+50ceadbec1e233d5897c6a6206978eb84a41d0ed34ead4cc0944ce1948c01c94"
-					]
+					"votes": ["+50ceadbec1e233d5897c6a6206978eb84a41d0ed34ead4cc0944ce1948c01c94"]
 				},
 				"network": 30,
 				"signature": "f1caad87019849d14fcd27085fcf0faa6ce1b13b5a9fa8ff1c67bc4a8a6003dc23c5cd8b5ce82524ab1ae6fd983d865d1ca4caf1429c962c9b56dda69df9b85f",
@@ -1850,9 +1756,7 @@
 				"recipientId": "ark1f0jcy2eaxy66v837h0yhn3xzql4f3guv49v8yrl5srgdjm8drcfqjdhnyf",
 				"senderPublicKey": "4be5822b3d3135a61e3ebbc979c4c207ea98a38ca958720ff480d0d96ced1e12",
 				"asset": {
-					"votes": [
-						"+4be5822b3d3135a61e3ebbc979c4c207ea98a38ca958720ff480d0d96ced1e12"
-					]
+					"votes": ["+4be5822b3d3135a61e3ebbc979c4c207ea98a38ca958720ff480d0d96ced1e12"]
 				},
 				"network": 30,
 				"signature": "2946b12fb9c1b1447b61bd42fbb9a8ae1bfbcd4d585d10ad22289b679650f4df3913cb1f3f6499a141b2089f0e7a8c202ad80a8096040d5e3369853b339f1e91",
@@ -1869,9 +1773,7 @@
 				"recipientId": "ark1n6v0mg0efzax9tvugcpe4z8ujpsxfj9j0v9wsgm8fdmu6ymvth7qwatu9v",
 				"senderPublicKey": "9e98fda1f948ba62ad9c46039a88fc906064c8b27b0ae823674b77cd136c5dfc",
 				"asset": {
-					"votes": [
-						"+9e98fda1f948ba62ad9c46039a88fc906064c8b27b0ae823674b77cd136c5dfc"
-					]
+					"votes": ["+9e98fda1f948ba62ad9c46039a88fc906064c8b27b0ae823674b77cd136c5dfc"]
 				},
 				"network": 30,
 				"signature": "7e3743a36de96c2e1e0de88e04ded45a8ae131a42b60f45c594ae8b5520fac1b0d93d56e4a785b4ef734ad16f912b774c780980564f4dae1719d3644d44c1cbd",
@@ -1888,9 +1790,7 @@
 				"recipientId": "ark1w4z5nwegvvvge7ur66lajf676u2yzrxq40t0chgxnt2qgrrr05ysyhvls4",
 				"senderPublicKey": "754549bb2863188cfb83d6bfd9275ed714410cc0abd6fc5d069ad4040c637d09",
 				"asset": {
-					"votes": [
-						"+754549bb2863188cfb83d6bfd9275ed714410cc0abd6fc5d069ad4040c637d09"
-					]
+					"votes": ["+754549bb2863188cfb83d6bfd9275ed714410cc0abd6fc5d069ad4040c637d09"]
 				},
 				"network": 30,
 				"signature": "fea4c620e6a290a49d82c2daef670c991809a3e750d7c25f088bd63ab3578e7f4cbfaca9cd1dd68741d654ee7be1478cf6f37ebd2462986042c0d1c146504b9a",
@@ -1907,9 +1807,7 @@
 				"recipientId": "ark1vtuk9xptwd7evfz9klah0yjmf29q723epc5nguplc89j8aew8myq8ag9gw",
 				"senderPublicKey": "62f962982b737d962445b7fb77925b4a8a0f2a390e2934703fc1cb23f72e3ec8",
 				"asset": {
-					"votes": [
-						"+62f962982b737d962445b7fb77925b4a8a0f2a390e2934703fc1cb23f72e3ec8"
-					]
+					"votes": ["+62f962982b737d962445b7fb77925b4a8a0f2a390e2934703fc1cb23f72e3ec8"]
 				},
 				"network": 30,
 				"signature": "8e71c99bfb744873df355e3a5bfe7e8be1ae91af237672f2ef6b630cf5b9bde82aa02bdd76878ac2a2da287c5ac8c0dd5972c5f3b0a965fa45f626bd533eefcf",
