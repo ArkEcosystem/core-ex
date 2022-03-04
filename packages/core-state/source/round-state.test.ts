@@ -97,7 +97,7 @@ const generateDelegates = (count: number): any[] => {
 				return "public_key_" + i;
 			},
 			username: "username_" + i,
-			getAttribute: key => {
+			getAttribute: (key) => {
 				return key === "delegate.username" ? "username_" + i : i;
 			},
 			setAttribute: () => undefined,
@@ -186,7 +186,7 @@ describe("getActiveDelegates", ({ it, assert, beforeEach, spy, stub, stubFn }) =
 		const newDelegateWallet = {
 			setAttribute: setAttributeStub,
 			clone: cloneStub,
-			setPublicKey: () => {}
+			setPublicKey: () => {},
 		};
 		const walletRepoStub1 = stub(walletRepository, "createWallet").returnValue(newDelegateWallet);
 
@@ -207,11 +207,13 @@ describe("getActiveDelegates", ({ it, assert, beforeEach, spy, stub, stubFn }) =
 		walletRepoStub2.calledWith(delegatePublicKey);
 		walletRepoStub1.calledWith(Identities.Address.fromPublicKey(delegatePublicKey));
 		assert.true(oldDelegateWallet.getAttribute.calledWith("delegate.username"));
-		assert.true(newDelegateWallet.setAttribute.calledWith("delegate", {
-			voteBalance: delegateVoteBalance,
-			username: delegateUsername,
-			round: 34510,
-		}));
+		assert.true(
+			newDelegateWallet.setAttribute.calledWith("delegate", {
+				voteBalance: delegateVoteBalance,
+				username: delegateUsername,
+				round: 34510,
+			}),
+		);
 		assert.true(cloneStub.called);
 		spyOnShuffleDelegates.called();
 	});
@@ -401,7 +403,7 @@ describe("detectMissedRound", ({ it, assert, beforeEach, spy, stub }) => {
 		roundState.forgingDelegates = delegates;
 		blocksInCurrentRound = generateBlocks(3);
 
-		walletRepository.findByPublicKey = publicKey => {
+		walletRepository.findByPublicKey = (publicKey) => {
 			return delegates.find((delegate) => delegate.getPublicKey() === publicKey);
 		};
 	});
@@ -447,8 +449,8 @@ describe("applyRound", ({ it, assert, beforeEach, spy, stub, stubFn }) => {
 		const dposStateSetSpy = spy(dposState, "setDelegatesRound");
 
 		const forgingDelegate = {
-			getAttribute: () => undefined, 
-			getPublicKey: () => undefined
+			getAttribute: () => undefined,
+			getPublicKey: () => undefined,
 		};
 
 		const forgingDelegateRound = 1;
@@ -507,9 +509,9 @@ describe("applyRound", ({ it, assert, beforeEach, spy, stub, stubFn }) => {
 
 		const forgingDelegate = {
 			getAttribute: getAttributeStub,
-			getPublicKey: () => undefined
+			getPublicKey: () => undefined,
 		};
-		
+
 		// @ts-ignore
 		roundState.forgingDelegates = [forgingDelegate] as any;
 
@@ -561,7 +563,7 @@ describe("applyRound", ({ it, assert, beforeEach, spy, stub, stubFn }) => {
 
 describe("applyBlock", ({ it, assert, beforeEach, spy, stub }) => {
 	beforeEach(beforeEachCallback);
-	
+
 	let delegates: any[];
 
 	beforeEach(() => {
