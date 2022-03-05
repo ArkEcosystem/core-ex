@@ -83,6 +83,12 @@
 				"package": "@arkecosystem/core-blockchain"
 			},
 			{
+				"package": "@arkecosystem/core-networking-dns"
+			},
+			{
+				"package": "@arkecosystem/core-networking-ntp"
+			},
+			{
 				"package": "@arkecosystem/core-webhooks"
 			},
 			{
