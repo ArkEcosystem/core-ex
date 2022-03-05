@@ -9,7 +9,7 @@ import { SocketErrors } from "./enums";
 import { PeerVerifier } from "./peer-verifier";
 import { RateLimiter } from "./rate-limiter";
 import { replySchemas } from "./schemas";
-import { getCodec } from "./socket-server/utils/get-codec";
+// import { getCodec } from "./socket-server/utils/get-codec";
 import { buildRateLimiter, isValidVersion } from "./utils";
 
 // todo: review the implementation
@@ -281,7 +281,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	) {
 		await this.throttle(peer, event);
 
-		const codec = getCodec(this.app, event);
+		// const codec = getCodec(this.app, event);
+		const codec: any = undefined;
 
 		let response;
 		let parsedResponsePayload;

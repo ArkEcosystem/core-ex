@@ -80,6 +80,9 @@
 				"package": "@arkecosystem/core-transaction-pool-api"
 			},
 			{
+				"package": "@arkecosystem/core-p2p"
+			},
+			{
 				"package": "@arkecosystem/core-p2p-libp2p"
 			},
 			{

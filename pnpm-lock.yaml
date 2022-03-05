@@ -156,6 +156,7 @@ importers:
       '@arkecosystem/core-forger': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-logger-pino': workspace:*
+      '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-p2p-libp2p': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -209,6 +210,7 @@ importers:
       '@arkecosystem/core-forger': link:../core-forger
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
+      '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-p2p-libp2p': link:../core-p2p-libp2p
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
