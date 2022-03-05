@@ -49,20 +49,6 @@ interface Flag {
 	default?: any;
 }
 
-interface DynamicFees {
-	enabled?: boolean;
-	minFeePool?: number;
-	minFeeBroadcast?: number;
-	addonBytes: {
-		transfer?: number;
-		validatorRegistration?: number;
-		vote?: number;
-		multiSignature?: number;
-		multiPayment?: number;
-		validatorResignation?: number;
-	};
-}
-
 interface Options {
 	network: string;
 	premine: string;
@@ -638,18 +624,6 @@ export class Command extends Commands.Command {
 	}
 
 	private generateApp(options: Options): any {
-		const dynamicFees: DynamicFees = {
-			addonBytes: {},
-			enabled: undefined,
-			minFeeBroadcast: undefined,
-			minFeePool: undefined,
-		};
-
-		if (Object.keys(dynamicFees.addonBytes).length === 0) {
-			// @ts-ignore
-			delete dynamicFees.addonBytes;
-		}
-
 		return readJSONSync(resolve(__dirname, "../../bin/config/testnet/app.json"));
 	}
 

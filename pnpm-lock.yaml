@@ -156,7 +156,6 @@ importers:
       '@arkecosystem/core-forger': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-logger-pino': workspace:*
-      '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/core-transaction-pool': workspace:*
@@ -209,7 +208,6 @@ importers:
       '@arkecosystem/core-forger': link:../core-forger
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
-      '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
@@ -4481,7 +4479,7 @@ packages:
   /@types/ip/1.1.0:
     resolution: {integrity: sha512-dwNe8gOoF70VdL6WJBwVHtQmAX4RMd62M+mAB9HQFjG1/qiCLM/meRy95Pd14FYBbEDwCq7jgJs89cHpLBu4HQ==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 17.0.18
     dev: true
 
   /@types/is-ci/2.0.0:

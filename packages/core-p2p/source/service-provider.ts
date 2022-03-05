@@ -1,5 +1,5 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { Providers, Services, Types, Utils } from "@arkecosystem/core-kernel";
+import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { ValidateAndAcceptPeerAction } from "./actions";
@@ -11,7 +11,6 @@ import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
-import { Server } from "./socket-server/server";
 import { TransactionBroadcaster } from "./transaction-broadcaster";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -29,16 +28,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async boot(): Promise<void> {
 		this.app.get<EventListener>(Identifiers.PeerEventListener).initialize();
-
-		await this.buildServer();
-
-		return this.app.get<Server>(Identifiers.P2PServer).boot();
-	}
-
-	public async dispose(): Promise<void> {
-		if (!process.env.DISABLE_P2P_SERVER) {
-			this.app.get<Server>(Identifiers.P2PServer).dispose();
-		}
 	}
 
 	public async required(): Promise<boolean> {
@@ -101,16 +90,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerEventListener).to(EventListener).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerTransactionBroadcaster).to(TransactionBroadcaster);
-
-		this.app.bind<Server>(Identifiers.P2PServer).to(Server).inSingletonScope();
-	}
-
-	private async buildServer(): Promise<void> {
-		const server: Server = this.app.get<Server>(Identifiers.P2PServer);
-		const serverConfig = this.config().get<Types.JsonObject>("server");
-		Utils.assert.defined<Types.JsonObject>(serverConfig);
-
-		await server.initialize("P2P Server", serverConfig);
 	}
 
 	private registerActions(): void {
