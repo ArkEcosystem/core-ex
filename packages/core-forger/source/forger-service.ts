@@ -185,6 +185,8 @@ export class ForgerService {
 			});
 		}, {});
 
+		this.app.rebind(Identifiers.Forger.Usernames).toConstantValue(this.usernames);
+
 		if (!this.initialized) {
 			this.#printLoadedValidators();
 

@@ -4,6 +4,9 @@ import { Enums, Services, Types, Utils as AppUtils } from "@arkecosystem/core-ke
 
 @injectable()
 export class ForgeNewBlockAction extends Services.Triggers.Action {
+	@inject(Identifiers.Application)
+	private readonly app: Contracts.Kernel.Application;
+
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
@@ -53,7 +56,7 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 
 		const minimumMs = 2000;
 		const timeLeftInMs: number = this.#getRoundRemainingSlotTime(round);
-		const prettyName = `${this.usernames[validator.publicKey]} (${validator.publicKey})`;
+		const prettyName = `${this.app.get<object>(Identifiers.Forger.Usernames)[validator.publicKey]} (${validator.publicKey})`;
 
 		if (timeLeftInMs >= minimumMs) {
 			this.logger.info(`Forged new block ${block.data.id} by validator ${prettyName}`);
@@ -72,6 +75,14 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 		} else {
 			this.logger.warning(`Failed to forge new block by validator ${prettyName}, because already in next slot.`);
 		}
+	}
+
+	// @TODO: duplicate from forger-service.ts
+	#getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
+		const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
+		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
+
+		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
