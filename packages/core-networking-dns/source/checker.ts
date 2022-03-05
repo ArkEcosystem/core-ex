@@ -18,7 +18,7 @@ export class Checker {
 
 		for (const host of Utils.shuffle(this.configuration.get<string[]>("hosts"))) {
 			try {
-				await lookupService(host, 53)
+				await lookupService(host, 53);
 			} catch (error) {
 				this.logger.error(error.message);
 			}
