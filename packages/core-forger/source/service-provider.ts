@@ -11,7 +11,7 @@ import { ValidatorTracker } from "./validator-tracker";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.ForgerService).to(ForgerService).inSingletonScope();
+		this.app.bind(Identifiers.Forger.Service).to(ForgerService).inSingletonScope();
 		this.app.bind(DELEGATE_FACTORY).to(ValidatorFactory).inSingletonScope();
 
 		this.registerActions();
@@ -20,13 +20,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		const validators: Validator[] = await this.makeValidators();
 
-		await this.app.get<ForgerService>(Identifiers.ForgerService).boot(validators);
+		await this.app.get<ForgerService>(Identifiers.Forger.Service).boot(validators);
 
 		this.startTracker(validators);
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<ForgerService>(Identifiers.ForgerService).dispose();
+		await this.app.get<ForgerService>(Identifiers.Forger.Service).dispose();
 	}
 
 	public async bootWhen(): Promise<boolean> {
@@ -50,7 +50,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	private registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("forgeNewBlock", new ForgeNewBlockAction());
+			.bind("forgeNewBlock", this.app.resolve(ForgeNewBlockAction));
 
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)

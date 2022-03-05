@@ -14,9 +14,6 @@ export class ForgerService {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@inject(Identifiers.TransactionPoolCollator)
-	private readonly collator!: Contracts.TransactionPool.Collator;
-
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -32,20 +29,11 @@ export class ForgerService {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.TransactionPoolService)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots!: any;
-
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer: Contracts.Crypto.IBlockSerializer;
-
-	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
 
 	private validators: Validator[] = [];
 
@@ -54,8 +42,6 @@ export class ForgerService {
 	private isStopped = false;
 
 	private round: Contracts.P2P.CurrentRound | undefined;
-
-	private lastForgedBlock: Contracts.Crypto.IBlock | undefined;
 
 	private initialized = false;
 
@@ -66,11 +52,11 @@ export class ForgerService {
 	}
 
 	public getRemainingSlotTime(): number | undefined {
-		return this.round ? this.#getRoundRemainingSlotTime(this.round) : undefined;
-	}
+		if (this.round) {
+			return this.#getRoundRemainingSlotTime(this.round);
+		}
 
-	public getLastForgedBlock(): Contracts.Crypto.IBlock | undefined {
-		return this.lastForgedBlock;
+		return undefined;
 	}
 
 	public async boot(validators: Validator[]): Promise<void> {
@@ -176,78 +162,12 @@ export class ForgerService {
 					);
 				}
 
-				this.events.dispatch(Enums.ForgerEvent.Failed, { error: error.message });
+				await this.events.dispatch(Enums.ForgerEvent.Failed, { error: error.message });
 			}
 
 			// no idea when this will be ok, so waiting 2s before checking again
 			return this.#checkLater(2000);
 		}
-	}
-
-	public async forgeNewBlock(
-		validator: Validator,
-		round: Contracts.P2P.CurrentRound,
-		networkState: Contracts.P2P.NetworkState,
-	): Promise<void> {
-		AppUtils.assert.defined<number>(networkState.getNodeHeight());
-		this.configuration.setHeight(networkState.getNodeHeight()!);
-
-		const transactions: Contracts.Crypto.ITransactionData[] = await this.#getTransactionsForForging();
-
-		const block: Contracts.Crypto.IBlock | undefined = await validator.forge(transactions, {
-			previousBlock: {
-				height: networkState.getNodeHeight(),
-				id: networkState.getLastBlockId(),
-			},
-			reward: round.reward,
-			timestamp: round.timestamp,
-		});
-
-		AppUtils.assert.defined<Contracts.Crypto.IBlock>(block);
-		AppUtils.assert.defined<string>(validator.publicKey);
-
-		const minimumMs = 2000;
-		const timeLeftInMs: number = this.#getRoundRemainingSlotTime(round);
-		const prettyName = `${this.usernames[validator.publicKey]} (${validator.publicKey})`;
-
-		if (timeLeftInMs >= minimumMs) {
-			this.logger.info(`Forged new block ${block.data.id} by validator ${prettyName}`);
-
-			await this.#broadcastBlock(block);
-
-			this.lastForgedBlock = block;
-			this.events.dispatch(Enums.BlockEvent.Forged, block.data);
-
-			for (const transaction of transactions) {
-				this.events.dispatch(Enums.TransactionEvent.Forged, transaction);
-			}
-		} else if (timeLeftInMs > 0) {
-			this.logger.warning(
-				`Failed to forge new block by validator ${prettyName}, because there were ${timeLeftInMs}ms left in the current slot (less than ${minimumMs}ms).`,
-			);
-		} else {
-			this.logger.warning(`Failed to forge new block by validator ${prettyName}, because already in next slot.`);
-		}
-	}
-
-	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
-		const transactions: Contracts.Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
-
-		if (AppUtils.isEmpty(transactions)) {
-			this.logger.error("Could not get unconfirmed transactions from transaction pool.");
-			return [];
-		}
-
-		this.logger.debug(
-			`Received ${AppUtils.pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${AppUtils.pluralize(
-					"transaction",
-					this.transactionPool.getPoolSize(),
-					true,
-				)} total`,
-		);
-
-		return transactions.map((transaction: Contracts.Crypto.ITransaction) => transaction.data);
 	}
 
 	#isActiveValidator(publicKey: string): Validator | undefined {
@@ -268,8 +188,7 @@ export class ForgerService {
 		if (!this.initialized) {
 			this.#printLoadedValidators();
 
-			// @ts-ignore
-			this.events.dispatch(Enums.ForgerEvent.Started, {
+			await this.events.dispatch(Enums.ForgerEvent.Started, {
 				activeValidators: this.validators.map((validator) => validator.publicKey),
 			});
 
@@ -322,17 +241,6 @@ export class ForgerService {
 		const blocktime = this.configuration.getMilestone(round.lastBlock.height).blocktime;
 
 		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
-	}
-
-	async #broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-		const { data } = await this.deserializer.deserialize(
-			await this.serializer.serializeWithTransactions({
-				...block.data,
-				transactions: block.transactions.map((tx) => tx.data),
-			}),
-		);
-
-		await this.blockchain.handleIncomingBlock(data, true);
 	}
 
 	async #getRound(): Promise<Contracts.P2P.CurrentRound> {
