@@ -56,7 +56,9 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 
 		const minimumMs = 2000;
 		const timeLeftInMs: number = this.#getRoundRemainingSlotTime(round);
-		const prettyName = `${this.app.get<object>(Identifiers.Forger.Usernames)[validator.publicKey]} (${validator.publicKey})`;
+		const prettyName = `${this.app.get<object>(Identifiers.Forger.Usernames)[validator.publicKey]} (${
+			validator.publicKey
+		})`;
 
 		if (timeLeftInMs >= minimumMs) {
 			this.logger.info(`Forged new block ${block.data.id} by validator ${prettyName}`);
