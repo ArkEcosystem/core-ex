@@ -168,9 +168,7 @@ export class ForgerService {
 	}
 
 	async #loadRound(): Promise<void> {
-		this.round = await this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.call("getCurrentRound");
+		this.round = await this.app.get<Services.Triggers.Triggers>(Identifiers.TriggerService).call("getCurrentRound");
 
 		this.usernames = this.round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
