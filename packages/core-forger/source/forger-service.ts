@@ -1,6 +1,6 @@
-import { inject,injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Services, Utils as AppUtils , Utils } from "@arkecosystem/core-kernel";
+import { Enums, Services, Utils as AppUtils, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 import { Validator } from "./interfaces";
@@ -240,7 +240,11 @@ export class ForgerService {
 
 		this.logger.debug(
 			`Received ${AppUtils.pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${AppUtils.pluralize("transaction", this.transactionPool.getPoolSize(), true)} total`,
+				`from the pool containing ${AppUtils.pluralize(
+					"transaction",
+					this.transactionPool.getPoolSize(),
+					true,
+				)} total`,
 		);
 
 		return transactions.map((transaction: Contracts.Crypto.ITransaction) => transaction.data);
@@ -321,14 +325,14 @@ export class ForgerService {
 	}
 
 	async #broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
-        const { data } = await this.deserializer.deserialize(
-            await this.serializer.serializeWithTransactions({
-                ...block.data,
-                transactions: block.transactions.map((tx) => tx.data),
-            }),
-        );
+		const { data } = await this.deserializer.deserialize(
+			await this.serializer.serializeWithTransactions({
+				...block.data,
+				transactions: block.transactions.map((tx) => tx.data),
+			}),
+		);
 
-        await this.blockchain.handleIncomingBlock(data, true);
+		await this.blockchain.handleIncomingBlock(data, true);
 	}
 
 	async #getRound(): Promise<Contracts.P2P.CurrentRound> {

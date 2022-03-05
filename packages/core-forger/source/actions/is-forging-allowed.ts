@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Services, Types, Utils as AppUtils  } from "@arkecosystem/core-kernel";
+import { Services, Types, Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { NetworkStateStatus } from "@arkecosystem/core-p2p";
 
 import { Validator } from "../interfaces";
