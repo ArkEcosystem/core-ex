@@ -1,16 +1,16 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils } from "@arkecosystem/core-kernel";
+import { Contracts } from "@arkecosystem/core-contracts";
+// import { Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
-import { injectable, inject } from "@arkecosystem/core-container";
-
-import { Client } from "./hapi-nes";
+import { injectable } from "@arkecosystem/core-container";
 
 const TEN_SECONDS_IN_MILLISECONDS = 10_000;
 
+type Client = any;
+
 @injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
-	@inject(Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	// @inject(Identifiers.LogService)
+	// private readonly logger!: Contracts.Kernel.Logger;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
 	private readonly errors: Map<string, string> = new Map<string, string>();
@@ -97,19 +97,20 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	}
 
 	private async create(peer: Contracts.P2P.Peer): Promise<Client> {
-		const connection = new Client(`ws://${Utils.IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
-			timeout: 10_000,
-		});
-		this.connections.set(peer.ip, connection);
-		this.lastConnectionCreate.set(peer.ip, Date.now());
+		return {} as Client;
+		// const connection = new Client(`ws://${Utils.IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
+		// 	timeout: 10_000,
+		// });
+		// this.connections.set(peer.ip, connection);
+		// this.lastConnectionCreate.set(peer.ip, Date.now());
 
-		connection.onError = (error) => {
-			this.logger.debug(`Socket error (peer ${Utils.IpAddress.normalizeAddress(peer.ip)}) : ${error.message}`);
-			this.disconnect(peer);
-		};
+		// connection.onError = (error) => {
+		// 	this.logger.debug(`Socket error (peer ${Utils.IpAddress.normalizeAddress(peer.ip)}) : ${error.message}`);
+		// 	this.disconnect(peer);
+		// };
 
-		await connection.connect({ retries: 1, timeout: 5000 });
+		// await connection.connect({ retries: 1, timeout: 5000 });
 
-		return connection;
+		// return connection;
 	}
 }
