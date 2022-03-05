@@ -1,22 +1,29 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Utils } from "@arkecosystem/core-kernel";
 import dns from "dns";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Utils } from "@arkecosystem/core-kernel";
 import util from "util";
 
-export const checkDNS = async (app: Contracts.Kernel.Application, hosts: string[]) => {
-	hosts = Utils.shuffle(hosts);
+@injectable()
+export class Checker {
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-networking-ntp")
+	private readonly configuration!: Providers.PluginConfiguration;
 
-	const lookupService = util.promisify(dns.lookupService);
+	@inject(Identifiers.LogService)
+	private readonly logger!: Contracts.Kernel.Logger;
 
-	for (let index = hosts.length - 1; index >= 0; index--) {
-		try {
-			await lookupService(hosts[index], 53);
+	public async execute(): Promise<void> {
+		const lookupService = util.promisify(dns.lookupService);
 
-			return Promise.resolve(hosts[index]);
-		} catch (error) {
-			app.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.message);
+		for (const host of Utils.shuffle(this.configuration.get<string[]>("hosts"))) {
+			try {
+				await lookupService(host, 53)
+			} catch (error) {
+				this.logger.error(error.message);
+			}
 		}
-	}
 
-	return Promise.reject(new Error("Please check your network connectivity, couldn't connect to any host."));
-};
+		throw new Error("Please check your DNS connectivity, couldn't connect to any host.");
+	}
+}
