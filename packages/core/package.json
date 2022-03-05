@@ -48,6 +48,8 @@
 		"@arkecosystem/core-forger": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-logger-pino": "workspace:*",
+		"@arkecosystem/core-networking-ntp": "workspace:*",
+		"@arkecosystem/core-networking-dns": "workspace:*",
 		"@arkecosystem/core-serializer": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",
