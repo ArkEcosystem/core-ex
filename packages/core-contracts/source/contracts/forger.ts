@@ -7,8 +7,5 @@ export interface Validator {
 
 	address: string;
 
-	forge(
-		transactions: ITransactionData[],
-		options: Record<string, any>,
-	): Promise<IBlock>;
+	forge(transactions: ITransactionData[], options: Record<string, any>): Promise<IBlock>;
 }

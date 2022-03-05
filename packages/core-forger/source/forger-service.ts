@@ -111,7 +111,9 @@ export class ForgerService {
 
 			AppUtils.assert.defined<string>(this.round.currentForger.publicKey);
 
-			const validator: Contracts.Forger.Validator | undefined = this.#isActiveValidator(this.round.currentForger.publicKey);
+			const validator: Contracts.Forger.Validator | undefined = this.#isActiveValidator(
+				this.round.currentForger.publicKey,
+			);
 
 			if (!validator) {
 				AppUtils.assert.defined<string>(this.round.nextForger.publicKey);
