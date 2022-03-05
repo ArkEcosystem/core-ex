@@ -1,13 +1,11 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
+import { Providers, Services } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
 import { ForgeNewBlockAction, IsForgingAllowedAction } from "./actions";
 import { DELEGATE_FACTORY } from "./bindings";
 import { ForgerService } from "./forger-service";
-import { Validator } from "./interfaces";
 import { ValidatorFactory } from "./validator-factory";
-import { ValidatorTracker } from "./validator-tracker";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -18,11 +16,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		const validators: Validator[] = await this.makeValidators();
+		const validators: Contracts.Forger.Validator[] = await this.makeValidators();
+
+		this.app.bind(Identifiers.Forger.Validators).toConstantValue(validators);
 
 		await this.app.get<ForgerService>(Identifiers.Forger.Service).boot(validators);
-
-		this.startTracker(validators);
 	}
 
 	public async dispose(): Promise<void> {
@@ -43,7 +41,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return Joi.object({
 			bip38: Joi.string(),
 			password: Joi.string(),
-			tracker: Joi.bool().required(),
 		}).unknown(true);
 	}
 
@@ -57,23 +54,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind("isForgingAllowed", this.app.resolve(IsForgingAllowedAction));
 	}
 
-	private startTracker(validators: Validator[]): void {
-		if (!Array.isArray(validators) || validators.length === 0) {
-			return;
-		}
-
-		if (this.config().get("tracker") === true) {
-			this.app
-				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)
-				.listen(
-					Enums.BlockEvent.Applied,
-					this.app.resolve<ValidatorTracker>(ValidatorTracker).initialize(validators),
-				);
-		}
-	}
-
-	private async makeValidators(): Promise<Validator[]> {
-		const validators: Set<Validator> = new Set<Validator>();
+	private async makeValidators(): Promise<Contracts.Forger.Validator[]> {
+		const validators: Set<Contracts.Forger.Validator> = new Set<Contracts.Forger.Validator>();
 
 		for (const secret of this.app.config("validators.secrets")) {
 			validators.add(await this.app.get<ValidatorFactory>(DELEGATE_FACTORY).fromBIP39(secret));

@@ -2,8 +2,6 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Services, Types, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
-import { Validator } from "../interfaces";
-
 @injectable()
 export class ForgeNewBlockAction extends Services.Triggers.Action {
 	@inject(Identifiers.BlockchainService)
@@ -31,7 +29,7 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 	private readonly deserializer: Contracts.Crypto.IBlockDeserializer;
 
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {
-		const validator: Validator = arguments_.validator;
+		const validator: Contracts.Forger.Validator = arguments_.validator;
 		const round: Contracts.P2P.CurrentRound = arguments_.round;
 		const networkState: Contracts.P2P.NetworkState = arguments_.networkState;
 
