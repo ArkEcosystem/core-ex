@@ -5,11 +5,11 @@ import fastify, { FastifyInstance, FastifyRequest } from "fastify";
 import { v4 } from "uuid";
 
 import { ResponseHandler } from "./contracts";
-import { GetCommonBlocksHandler } from "./controllers/common-blocks";
-import { GetBlocksHandler } from "./controllers/get-blocks";
-import { GetPeerStatusHandler } from "./controllers/peer-status";
-import { PostBlockHandler } from "./controllers/post-block";
-import { PostTransactionsHandler } from "./controllers/post-transactions";
+import { GetCommonBlocksHandler } from "./handlers/common-blocks";
+import { GetBlocksHandler } from "./handlers/get-blocks";
+import { GetPeerStatusHandler } from "./handlers/peer-status";
+import { PostBlockHandler } from "./handlers/post-block";
+import { PostTransactionsHandler } from "./handlers/post-transactions";
 
 @injectable()
 export class Server {
@@ -17,7 +17,7 @@ export class Server {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-p2p-fastify")
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.LogService)
@@ -64,7 +64,7 @@ export class Server {
 	public async boot(): Promise<void> {
 		try {
 			// @ts-ignore
-			this.#address = await this.server.listen(this.configuration.get("port"), this.configuration.get("host"));
+			this.#address = await this.server.listen(this.configuration.get("server.port"), this.configuration.get("server.hostname"));
 
 			this.logger.info(`P2P server listening on ${this.#address}`);
 		} catch (error) {

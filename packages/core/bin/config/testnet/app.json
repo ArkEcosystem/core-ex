@@ -83,9 +83,6 @@
 		},
 		{
 			"package": "@arkecosystem/core-blockchain"
-		},
-		{
-			"package": "@arkecosystem/core-p2p-fastify"
 		}
 	]
 }

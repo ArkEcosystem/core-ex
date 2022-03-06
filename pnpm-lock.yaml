@@ -159,7 +159,6 @@ importers:
       '@arkecosystem/core-networking-dns': workspace:*
       '@arkecosystem/core-networking-ntp': workspace:*
       '@arkecosystem/core-p2p': workspace:*
-      '@arkecosystem/core-p2p-fastify': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/core-transaction-pool': workspace:*
@@ -215,7 +214,6 @@ importers:
       '@arkecosystem/core-networking-dns': link:../core-networking-dns
       '@arkecosystem/core-networking-ntp': link:../core-networking-ntp
       '@arkecosystem/core-p2p': link:../core-p2p
-      '@arkecosystem/core-p2p-fastify': link:../core-p2p-fastify
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/core-transaction-pool': link:../core-transaction-pool
@@ -1495,6 +1493,13 @@ importers:
       '@types/semver': 6.2.3
       dayjs: 1.10.7
       delay: 4.4.1
+      fastify: ^3.27.2
+      fastify-accepts-serializer: ^3.2.0
+      fastify-compress: ^4.0.1
+      fastify-helmet: ^7.0.1
+      fastify-rate-limit: ^5.7.2
+      fastify-response-validation: ^0.2.0
+      fastify-sensible: ^3.1.2
       ip: 1.1.5
       ipaddr.js: 2.0.1
       joi: 17.4.2
@@ -1520,6 +1525,13 @@ importers:
       '@hapi/teamwork': 5.1.0
       dayjs: 1.10.7
       delay: 4.4.1
+      fastify: 3.27.2
+      fastify-accepts-serializer: 3.2.0
+      fastify-compress: 4.0.1
+      fastify-helmet: 7.0.1
+      fastify-rate-limit: 5.7.2
+      fastify-response-validation: 0.2.0
+      fastify-sensible: 3.1.2
       ip: 1.1.5
       ipaddr.js: 2.0.1
       joi: 17.4.2
@@ -1531,73 +1543,6 @@ importers:
       ws: 7.5.5
     devDependencies:
       '@types/better-sqlite3': 5.4.3
-      '@types/fs-extra': 8.1.2
-      '@types/hapi__sntp': 3.1.2
-      '@types/ip': 1.1.0
-      '@types/semver': 6.2.3
-
-  packages/core-p2p-fastify:
-    specifiers:
-      '@arkecosystem/core-container': workspace:*
-      '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-crypto-validation': workspace:*
-      '@arkecosystem/core-database': workspace:*
-      '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-state': workspace:*
-      '@arkecosystem/utils': workspace:*
-      '@hapi/bounce': 2.0.0
-      '@hapi/hoek': 9.2.0
-      '@hapi/sntp': 4.0.0
-      '@hapi/teamwork': 5.1.0
-      '@types/fs-extra': 8.1.2
-      '@types/hapi__sntp': 3.1.2
-      '@types/ip': 1.1.0
-      '@types/semver': 6.2.3
-      dayjs: 1.10.7
-      delay: 4.4.1
-      fastify: ^3.27.2
-      fastify-accepts-serializer: ^3.2.0
-      fastify-compress: ^4.0.1
-      fastify-helmet: ^7.0.1
-      fastify-rate-limit: ^5.7.2
-      fastify-response-validation: ^0.2.0
-      fastify-sensible: ^3.1.2
-      ip: 1.1.5
-      ipaddr.js: 2.0.1
-      joi: 17.4.2
-      multiaddr: ^10.0.1
-      pluralize: 8.0.0
-      pretty-ms: 7.0.1
-      semver: 6.3.0
-    dependencies:
-      '@arkecosystem/core-container': link:../core-container
-      '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
-      '@arkecosystem/core-database': link:../core-database
-      '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-state': link:../core-state
-      '@arkecosystem/utils': link:../utils
-      '@hapi/bounce': 2.0.0
-      '@hapi/hoek': 9.2.0
-      '@hapi/sntp': 4.0.0
-      '@hapi/teamwork': 5.1.0
-      dayjs: 1.10.7
-      delay: 4.4.1
-      fastify: 3.27.2
-      fastify-accepts-serializer: 3.2.0
-      fastify-compress: 4.0.1
-      fastify-helmet: 7.0.1
-      fastify-rate-limit: 5.7.2
-      fastify-response-validation: 0.2.0
-      fastify-sensible: 3.1.2
-      ip: 1.1.5
-      ipaddr.js: 2.0.1
-      joi: 17.4.2
-      multiaddr: 10.0.1
-      pluralize: 8.0.0
-      pretty-ms: 7.0.1
-      semver: 6.3.0
-    devDependencies:
       '@types/fs-extra': 8.1.2
       '@types/hapi__sntp': 3.1.2
       '@types/ip': 1.1.0
@@ -7277,17 +7222,6 @@ packages:
       path-type: 4.0.0
     dev: true
 
-  /dns-over-http-resolver/1.2.3:
-    resolution: {integrity: sha512-miDiVSI6KSNbi4SVifzO/reD8rMnxgrlnkrlkugOLQpWQTe2qMdHsZp5DmfKjxNE+/T3VAAYLQUZMv9SMr6+AA==}
-    dependencies:
-      debug: 4.3.3
-      native-fetch: 3.0.0
-      receptacle: 1.3.2
-    transitivePeerDependencies:
-      - node-fetch
-      - supports-color
-    dev: false
-
   /doctrine/2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
@@ -7482,10 +7416,6 @@ packages:
   /err-code/2.0.3:
     resolution: {integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==}
     dev: true
-
-  /err-code/3.0.1:
-    resolution: {integrity: sha512-GiaH0KJUewYok+eeY05IIgjtAe4Yltygk9Wqp1V5yVWLdhf0hYZchRjNIT9bb0mSwRcIusT3cx7PJUf3zEIfUA==}
-    dev: false
 
   /errlop/2.2.0:
     resolution: {integrity: sha512-e64Qj9+4aZzjzzFpZC7p5kmm/ccCrbLhAJplhsDXQFs87XTsXwOpH4s1Io2s90Tau/8r2j9f4l/thhDevRjzxw==}
@@ -9766,13 +9696,6 @@ packages:
     resolution: {integrity: sha512-2HvIEKRoqS62guEC+qBjpvRubdX910WCMuJTZ+I9yvqKU2/12eSL549HMwtabb4oupdj2sMP50k+XJfB/8JE6w==}
     engines: {node: '>=8'}
 
-  /is-ip/3.1.0:
-    resolution: {integrity: sha512-35vd5necO7IitFPjd/YBeqwWnyDWbuLH9ZXQdMfDA8TEo7pv5X8yfrvVO3xbJbLUlERCMvf6X0hTUamQxCYJ9Q==}
-    engines: {node: '>=8'}
-    dependencies:
-      ip-regex: 4.3.0
-    dev: false
-
   /is-lambda/1.0.1:
     resolution: {integrity: sha1-PZh3iZ5qU+/AFgUEzeFfgubwYdU=}
     dev: true
@@ -11528,24 +11451,6 @@ packages:
   /ms/2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  /multiaddr/10.0.1:
-    resolution: {integrity: sha512-G5upNcGzEGuTHkzxezPrrD6CaIHR9uo+7MwqhNVcXTs33IInon4y7nMiGxl2CY5hG7chvYQUQhz5V52/Qe3cbg==}
-    dependencies:
-      dns-over-http-resolver: 1.2.3
-      err-code: 3.0.1
-      is-ip: 3.1.0
-      multiformats: 9.6.4
-      uint8arrays: 3.0.0
-      varint: 6.0.0
-    transitivePeerDependencies:
-      - node-fetch
-      - supports-color
-    dev: false
-
-  /multiformats/9.6.4:
-    resolution: {integrity: sha512-fCCB6XMrr6CqJiHNjfFNGT0v//dxOBMrOMqUIzpPc/mmITweLEyhvMpY9bF+jZ9z3vaMAau5E8B68DW77QMXkg==}
-    dev: false
-
   /multimap/1.1.0:
     resolution: {integrity: sha512-0ZIR9PasPxGXmRsEF8jsDzndzHDj7tIav+JUmvIFB/WHswliFnquxECT/De7GR4yg99ky/NlRKJT82G1y271bw==}
     dev: true
@@ -11600,12 +11505,6 @@ packages:
 
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
-    dev: false
-
-  /native-fetch/3.0.0:
-    resolution: {integrity: sha512-G3Z7vx0IFb/FQ4JxvtqGABsOTIqRWvgQz6e+erkB+JJD6LrszQtMozEHI4EkmgZQvnGHrpLVzUWk7t4sJCIkVw==}
-    peerDependencies:
-      node-fetch: '*'
     dev: false
 
   /natural-compare/1.4.0:
@@ -13102,12 +13001,6 @@ packages:
     dependencies:
       picomatch: 2.3.1
     dev: true
-
-  /receptacle/1.3.2:
-    resolution: {integrity: sha512-HrsFvqZZheusncQRiEE7GatOAETrARKV/lnfYicIm8lbvp/JQOdADOfhjBd2DajvoszEyxSM6RlAAIZgEoeu/A==}
-    dependencies:
-      ms: 2.1.3
-    dev: false
 
   /redent/3.0.0:
     resolution: {integrity: sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==}
@@ -14690,12 +14583,6 @@ packages:
     dev: true
     optional: true
 
-  /uint8arrays/3.0.0:
-    resolution: {integrity: sha512-HRCx0q6O9Bfbp+HHSfQQKD7wU70+lydKVt4EghkdOvlK/NlrF90z+eXV34mUd48rNvVJXwkrMSPpCATkct8fJA==}
-    dependencies:
-      multiformats: 9.6.4
-    dev: false
-
   /ultra-runner/3.10.5:
     resolution: {integrity: sha512-0U2OPII7sbvtbu9rhDlUUkP4Au/DPz2Tzbnawd/XwDuUruDqd+t/Bmel3cLJxl3yMLHf0OY0TMcIx9zzxdlAZw==}
     engines: {node: '>=10.0.0'}
@@ -14916,10 +14803,6 @@ packages:
     dependencies:
       builtins: 1.0.3
     dev: true
-
-  /varint/6.0.0:
-    resolution: {integrity: sha512-cXEIW6cfr15lFv563k4GuVuW/fiwjknytD37jIOLSdSWuOI6WnO/oKwmP2FQTU2l01LP8/M5TSAJpzUaGe3uWg==}
-    dev: false
 
   /vary/1.1.2:
     resolution: {integrity: sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=}

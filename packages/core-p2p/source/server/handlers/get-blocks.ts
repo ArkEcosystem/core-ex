@@ -4,7 +4,7 @@ import { DatabaseService } from "@arkecosystem/core-database";
 import { pluralize } from "@arkecosystem/utils";
 import { FastifyRequest } from "fastify";
 
-import { constants } from "../constants";
+import { constants } from "../../constants";
 import { mapAddr } from "../utils";
 
 @injectable()

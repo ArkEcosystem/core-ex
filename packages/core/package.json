@@ -51,7 +51,6 @@
 		"@arkecosystem/core-networking-dns": "workspace:*",
 		"@arkecosystem/core-networking-ntp": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
-		"@arkecosystem/core-p2p-fastify": "workspace:*",
 		"@arkecosystem/core-serializer": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
 		"@arkecosystem/core-transaction-pool": "workspace:*",

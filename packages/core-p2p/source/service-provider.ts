@@ -11,15 +11,24 @@ import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
+import { ResponseHandler } from "./server/contracts";
+import { GetCommonBlocksHandler } from "./server/handlers/common-blocks";
+import { GetBlocksHandler } from "./server/handlers/get-blocks";
+import { GetPeerStatusHandler } from "./server/handlers/peer-status";
+import { PostBlockHandler } from "./server/handlers/post-block";
+import { PostTransactionsHandler } from "./server/handlers/post-transactions";
+import { Server } from "./server/server";
 import { TransactionBroadcaster } from "./transaction-broadcaster";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.registerFactories();
+		this.#registerFactories();
 
-		this.registerServices();
+		this.#registerServices();
 
-		this.registerActions();
+		this.#registerActions();
+
+		await this.#registerServer();
 	}
 
 	public async bootWhen(): Promise<boolean> {
@@ -28,6 +37,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async boot(): Promise<void> {
 		this.app.get<EventListener>(Identifiers.PeerEventListener).initialize();
+
+		await this.app.get<Server>(Identifiers.P2PServer).boot();
+	}
+
+	public async dispose(): Promise<void> {
+		await this.app.get<Server>(Identifiers.P2PServer).dispose();
 	}
 
 	public async required(): Promise<boolean> {
@@ -64,13 +79,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	private registerFactories(): void {
+	#registerFactories(): void {
 		this.app
 			.bind(Identifiers.PeerFactory)
 			.toFactory<Peer>(() => (ip: string) => new Peer(ip, Number(this.config().get<number>("server.port"))!));
 	}
 
-	private registerServices(): void {
+	#registerServices(): void {
 		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
@@ -88,9 +103,21 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.PeerTransactionBroadcaster).to(TransactionBroadcaster);
 	}
 
-	private registerActions(): void {
+	#registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
+	}
+
+	async #registerServer(): Promise<void> {
+		this.app.bind(ResponseHandler.GetBlocks).to(GetBlocksHandler).inSingletonScope();
+		this.app.bind(ResponseHandler.GetCommonBlocks).to(GetCommonBlocksHandler).inSingletonScope();
+		this.app.bind(ResponseHandler.GetPeerStatus).to(GetPeerStatusHandler).inSingletonScope();
+		this.app.bind(ResponseHandler.PostBlock).to(PostBlockHandler).inSingletonScope();
+		this.app.bind(ResponseHandler.PostTransactions).to(PostTransactionsHandler).inSingletonScope();
+
+		this.app.bind(Identifiers.P2PServer).to(Server).inSingletonScope();
+
+		await this.app.get<Server>(Identifiers.P2PServer).register();
 	}
 }

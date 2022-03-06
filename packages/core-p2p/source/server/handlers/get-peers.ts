@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 import { FastifyRequest } from "fastify";
 
-import { constants } from "../constants";
+import { constants } from "../../constants";
 
 @injectable()
 export class GetPeersController {
