@@ -9,6 +9,7 @@ import { GetCommonBlocksHandler } from "./controllers/common-blocks";
 import { GetBlocksHandler } from "./controllers/get-blocks";
 import { GetPeerStatusHandler } from "./controllers/peer-status";
 import { PostBlockHandler } from "./controllers/post-block";
+import { PostTransactionsHandler } from "./controllers/post-transactions";
 
 @injectable()
 export class Server {
@@ -33,6 +34,9 @@ export class Server {
 
 	@inject(ResponseHandler.PostBlock)
 	private readonly postBlockHandler!: PostBlockHandler;
+
+	@inject(ResponseHandler.PostTransactions)
+	private readonly postTransactionsHandler!: PostTransactionsHandler;
 
 	private server: FastifyInstance;
 
@@ -175,6 +179,28 @@ export class Server {
 				},
 			},
 			async (request: FastifyRequest) => this.getPeerStatusHandler.handle(request),
+		);
+
+		this.server.post(
+			"/transactions",
+			{
+				schema: {
+					body: {
+						properties: {
+							// @TODO: better schema
+							transactions: { type: "object" },
+						},
+						type: "object",
+					},
+					headers: {
+						properties: {
+							version: { type: "string" },
+						},
+						type: "object",
+					},
+				},
+			},
+			async (request: FastifyRequest) => this.postTransactionsHandler.handle(request),
 		);
 	}
 }

@@ -3,4 +3,5 @@ export const ResponseHandler = {
 	GetCommonBlocks: "Handlers<GetCommonBlocks>",
 	GetPeerStatus: "Handlers<GetPeerStatus>",
 	PostBlock: "Handlers<PostBlock>",
+	PostTransactions: "Handlers<PostTransactions>",
 };
