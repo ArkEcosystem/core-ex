@@ -7,7 +7,7 @@ import util from "util";
 @injectable()
 export class Checker {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "core-networking-ntp")
+	@tagged("plugin", "core-networking-dns")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.LogService)
@@ -19,6 +19,8 @@ export class Checker {
 		for (const host of Utils.shuffle(this.configuration.get<string[]>("hosts"))) {
 			try {
 				await lookupService(host, 53);
+
+				return;
 			} catch (error) {
 				this.logger.error(error.message);
 			}
