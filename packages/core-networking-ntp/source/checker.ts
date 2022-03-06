@@ -21,6 +21,8 @@ export class Checker {
 					host,
 					timeout,
 				});
+
+				return;
 			} catch (error) {
 				this.logger.error(`Host ${host} responded with: ${error.message}`);
 			}

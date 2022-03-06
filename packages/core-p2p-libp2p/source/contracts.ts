@@ -1,11 +1,17 @@
-import { Contracts } from "@arkecosystem/core-contracts";
+export const PubSubHandler = {
+	GetBlocks: "libp2p.pubsub<GetBlocks>",
+	GetCommonBlocks: "libp2p.pubsub<GetCommonBlocks>",
+	GetPeerStatus: "libp2p.pubsub<GetPeerStatus>",
+	PostBlock: "libp2p.pubsub<PostBlock>",
+	PostTransactions: "libp2p.pubsub<PostTransactions>",
+};
 
-export type PeerFactory = (ip: string) => Contracts.P2P.Peer;
-
-export interface PeerService {
-	connector: Contracts.P2P.PeerConnector;
-	repository: Contracts.P2P.PeerRepository;
-	communicator: Contracts.P2P.PeerCommunicator;
-	processor: Contracts.P2P.PeerProcessor;
-	networkMonitor: Contracts.P2P.NetworkMonitor;
+export interface IMessage {
+	receivedFrom: string;
+	data: Uint8Array;
+	topicIDs: string[];
+	from: string;
+	seqno: Buffer;
+	signature: Buffer;
+	key: Buffer;
 }

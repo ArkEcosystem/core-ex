@@ -1562,6 +1562,7 @@ importers:
       joi: 17.4.2
       libp2p: ^0.36.2
       libp2p-bootstrap: ^0.14.0
+      libp2p-gossipsub: ^0.13.0
       libp2p-mplex: ^1.0.0
       libp2p-tcp: ^0.17.2
       multiaddr: ^10.0.1
@@ -1589,6 +1590,7 @@ importers:
       joi: 17.4.2
       libp2p: 0.36.2
       libp2p-bootstrap: 0.14.0
+      libp2p-gossipsub: 0.13.0
       libp2p-mplex: 1.0.0
       libp2p-tcp: 0.17.2
       multiaddr: 10.0.1
@@ -4800,6 +4802,12 @@ packages:
       moment: 2.29.1
     dev: true
 
+  /@types/debug/4.1.7:
+    resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
+    dependencies:
+      '@types/ms': 0.7.31
+    dev: false
+
   /@types/depcheck/0.9.1:
     resolution: {integrity: sha512-SwY4f69J/zCOXBQRwpr5I9P3ENFnVzvMo1YiaMMzjAG1z/Kx3ouAULgVddEibKoGpY0lLy6KmdeT/3BWqpfbxg==}
     deprecated: This is a stub types definition. depcheck provides its own type definitions, so you do not need this installed.
@@ -4959,6 +4967,10 @@ packages:
   /@types/minimist/1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
     dev: true
+
+  /@types/ms/0.7.31:
+    resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
+    dev: false
 
   /@types/node-forge/0.10.4:
     resolution: {integrity: sha512-RpP7JCxlPA32n8FE0kjOpCsCrsX6VjiD0fjOCo4NwIn8IdcicHi4B2e+votWuOpOmwzUjMwRLqVIF95epGd5nA==}
@@ -7317,6 +7329,11 @@ packages:
 
   /delegates/1.0.0:
     resolution: {integrity: sha1-hMbhWbgZBP3KWaDvRM2HDTElD5o=}
+
+  /denque/1.5.1:
+    resolution: {integrity: sha512-XwE+iZ4D6ZUB7mfYRMb5wByE8L74HCn30FBN7sWnXksWc1LO1bPDl67pBR9o/kC4z/xSNAwkMYcGgqDV3BE3Hw==}
+    engines: {node: '>=0.10'}
+    dev: false
 
   /depcheck/1.4.2:
     resolution: {integrity: sha512-oYaBLRbF5NMkYxc5rltnqtuPAn25Lx5xPBIJXy5oUVBgrEDDtotCoYUfFH8lvcmSWzgk1Ts9H+f4Rk0oWL51LQ==}
@@ -11332,6 +11349,23 @@ packages:
       node-forge: 1.2.1
       protobufjs: 6.11.2
       uint8arrays: 3.0.0
+    dev: false
+
+  /libp2p-gossipsub/0.13.0:
+    resolution: {integrity: sha512-xy2jRZGmJpjy++Di6f1admtjve8Fx0z5l8NISTQS282egwbRMmTPE6/UeYktb6hNGAgtSTIwXdHjXmMOiTarFA==}
+    dependencies:
+      '@types/debug': 4.1.7
+      debug: 4.3.3
+      denque: 1.5.1
+      err-code: 3.0.1
+      it-pipe: 1.1.0
+      libp2p-interfaces: 4.0.6
+      peer-id: 0.16.0
+      protobufjs: 6.11.2
+      uint8arrays: 3.0.0
+    transitivePeerDependencies:
+      - node-fetch
+      - supports-color
     dev: false
 
   /libp2p-interfaces/4.0.6:
