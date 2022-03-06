@@ -63,7 +63,11 @@ export class PostBlockHandler {
 
 			const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
 
-			const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.height, this.configuration);
+			const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
+				this.app,
+				block.height,
+				this.configuration,
+			);
 
 			if (!Utils.isBlockChained(lastDownloadedBlock, block, blockTimeLookup, this.slots)) {
 				return { height: this.blockchain.getLastHeight(), status: false };

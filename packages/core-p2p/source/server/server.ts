@@ -64,7 +64,10 @@ export class Server {
 	public async boot(): Promise<void> {
 		try {
 			// @ts-ignore
-			this.#address = await this.server.listen(this.configuration.get("server.port"), this.configuration.get("server.hostname"));
+			this.#address = await this.server.listen(
+				this.configuration.get("server.port"),
+				this.configuration.get("server.hostname"),
+			);
 
 			this.logger.info(`P2P server listening on ${this.#address}`);
 		} catch (error) {

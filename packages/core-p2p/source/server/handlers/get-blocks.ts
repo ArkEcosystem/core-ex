@@ -18,7 +18,9 @@ export class GetBlocksHandler {
 	@inject(Identifiers.LogService)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(request: FastifyRequest): Promise<Contracts.Crypto.IBlockData[] | Contracts.Shared.DownloadBlock[]> {
+	public async handle(
+		request: FastifyRequest,
+	): Promise<Contracts.Crypto.IBlockData[] | Contracts.Shared.DownloadBlock[]> {
 		const requestBlockHeight: number = +(request.query as any).lastBlockHeight + 1;
 		const requestBlockLimit: number = +(request.query as any).blockLimit || 400;
 		const requestHeadersOnly = !!(request.query as any).headersOnly;
@@ -57,5 +59,4 @@ export class GetBlocksHandler {
 
 		return blocksToReturn;
 	}
-
 }
