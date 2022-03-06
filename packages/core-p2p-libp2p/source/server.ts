@@ -1,3 +1,4 @@
+import { TextEncoder } from "util";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 // import { Providers, Types } from "@arkecosystem/core-kernel";
@@ -7,7 +8,6 @@ import Bootstrap from "libp2p-bootstrap";
 import Gossipsub from "libp2p-gossipsub";
 // import MPLEX from 'libp2p-mplex';
 import TCP from "libp2p-tcp";
-import { TextEncoder } from "util";
 
 import { IMessage, PubSubHandler } from "./contracts";
 import { GetCommonBlocksHandler } from "./controllers/common-blocks";
@@ -92,9 +92,9 @@ export class Server {
 				PubSubHandler.GetBlocks,
 				new TextEncoder().encode(
 					JSON.stringify({
-						lastBlockHeight: 1,
 						blockLimit: 500,
 						headersOnly: false,
+						lastBlockHeight: 1,
 					}),
 				),
 			);
@@ -153,7 +153,5 @@ export class Server {
 		this.server.pubsub.subscribe(PubSubHandler.GetPeerStatus);
 		this.server.pubsub.subscribe(PubSubHandler.PostBlock);
 		this.server.pubsub.subscribe(PubSubHandler.PostTransactions);
-
-		// this.server.dia
 	}
 }
