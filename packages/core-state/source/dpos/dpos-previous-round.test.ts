@@ -14,20 +14,20 @@ import { StateStore } from "../stores";
 import { BlockState } from "../block-state";
 
 describe<{
-	app: Application,
-	dposState: DposState,
-	dposPreviousRoundStateProv: DposPreviousRoundStateProvider,
-	walletRepo: WalletRepository,
-	factory: Factories.FactoryBuilder,
-	blockState: BlockState,
-	stateStore: StateStore,
-	round: RoundInfo,
-	blocks: Interfaces.IBlock[],
+	app: Application;
+	dposState: DposState;
+	dposPreviousRoundStateProv: DposPreviousRoundStateProvider;
+	walletRepo: WalletRepository;
+	factory: Factories.FactoryBuilder;
+	blockState: BlockState;
+	stateStore: StateStore;
+	round: RoundInfo;
+	blocks: Interfaces.IBlock[];
 }>("dposPreviousRound", ({ it, beforeAll, beforeEach, assert, spy, stub }) => {
 	beforeAll(async (context) => {
 		const env = await setUp();
-	
-		context.app = env.sandbox.app;	
+
+		context.app = env.sandbox.app;
 		context.dposState = env.dPosState;
 		context.dposPreviousRoundStateProv = env.dposPreviousRound;
 		context.walletRepo = env.walletRepo;
@@ -38,19 +38,19 @@ describe<{
 
 	beforeEach(async (context) => {
 		context.walletRepo.reset();
-	
+
 		context.round = Utils.roundCalculator.calculateRound(1);
-	
+
 		buildDelegateAndVoteWallets(5, context.walletRepo);
-	
+
 		context.dposState.buildVoteBalances();
 		context.dposState.buildDelegateRanking();
 		context.round.maxDelegates = 5;
 		context.dposState.setDelegatesRound(context.round);
-	
+
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
 	});
-	
+
 	it("should get all delegates", async (context) => {
 		const previousRound = await context.dposPreviousRoundStateProv([], context.round);
 
