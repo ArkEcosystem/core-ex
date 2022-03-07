@@ -47,7 +47,7 @@ export class DatabaseInteraction {
 
 	public async initialize(): Promise<void> {
 		try {
-			this.events.dispatch(Enums.StateEvent.Starting);
+			await this.events.dispatch(Enums.StateEvent.Starting);
 
 			const genesisBlockJson = this.configuration.get("genesisBlock");
 			const genesisBlock = await this.blockFactory.fromJson(genesisBlockJson);
@@ -61,7 +61,8 @@ export class DatabaseInteraction {
 			await this.initializeLastBlock();
 		} catch (error) {
 			this.logger.error(error.stack);
-			this.app.terminate("Failed to initialize database service.", error);
+
+			await this.app.terminate("Failed to initialize database service.", error);
 		}
 	}
 
@@ -106,11 +107,6 @@ export class DatabaseInteraction {
 	}
 
 	private async initializeLastBlock(): Promise<void> {
-		// ? attempt to remove potentially corrupt blocks from database
-
-		let lastBlock: Contracts.Crypto.IBlock | undefined;
-		let tries = 5; // ! actually 6, but only 5 will be removed
-
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
 		let lastHeight = 1;
@@ -121,26 +117,7 @@ export class DatabaseInteraction {
 
 		this.configuration.setHeight(lastHeight);
 
-		const getLastBlock = async (): Promise<Contracts.Crypto.IBlock | undefined> => {
-			try {
-				return await this.databaseService.getLastBlock();
-			} catch (error) {
-				this.logger.error(error.message);
-
-				if (tries > 0) {
-					const block: Contracts.Crypto.IBlock = await this.databaseService.findLatestBlock();
-					await this.databaseService.deleteBlocks([block.data]);
-					tries--;
-				} else {
-					this.app.terminate("Unable to deserialize last block from database.", error);
-					throw new Error("Terminated (unreachable)");
-				}
-
-				return getLastBlock();
-			}
-		};
-
-		lastBlock = await getLastBlock();
+		let lastBlock: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
 
 		if (!lastBlock) {
 			this.logger.warning("No block found in database");

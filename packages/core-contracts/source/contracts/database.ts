@@ -38,8 +38,6 @@ export interface IDatabaseService {
 	// @TODO
 	getLastBlock(): Promise<IBlock | undefined>;
 
-	deleteBlocks(blocks: IBlockData[]): Promise<void>;
-
 	findBlockByIds(id: string[]): Promise<IBlockData[]>;
 
 	getValidatorsForgedBlocks(): Promise<IBlockData[]>;
@@ -49,6 +47,4 @@ export interface IDatabaseService {
 	verifyBlockchain(): Promise<boolean>;
 
 	getForgedTransactionsIds(ids: string[]): Promise<string[]>;
-
-	deleteTopBlocks(count: number): Promise<void>;
 }
