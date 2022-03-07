@@ -156,6 +156,7 @@ importers:
       '@arkecosystem/core-forger': workspace:*
       '@arkecosystem/core-forger-tracker': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-lmdb': workspace:*
       '@arkecosystem/core-logger-pino': workspace:*
       '@arkecosystem/core-networking-dns': workspace:*
       '@arkecosystem/core-networking-ntp': workspace:*
@@ -212,6 +213,7 @@ importers:
       '@arkecosystem/core-forger': link:../core-forger
       '@arkecosystem/core-forger-tracker': link:../core-forger-tracker
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-lmdb': link:../core-lmdb
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
       '@arkecosystem/core-networking-dns': link:../core-networking-dns
       '@arkecosystem/core-networking-ntp': link:../core-networking-ntp
@@ -1304,6 +1306,18 @@ importers:
       libp2p-mplex: 1.0.0
       libp2p-tcp: 0.17.2
       libp2p-websockets: 0.16.2
+
+  packages/core-lmdb:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      lmdb: ^2.2.4
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-kernel': link:../core-kernel
+      lmdb: 2.2.4
 
   packages/core-logger-pino:
     specifiers:

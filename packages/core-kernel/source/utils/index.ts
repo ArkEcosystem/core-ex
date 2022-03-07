@@ -3,7 +3,6 @@ import { calculateTransactionExpiration } from "./expiration-calculator";
 import { getBlockTimeLookup } from "./get-blocktime-lookup";
 import { calculateRound, isNewRound } from "./round-calculator";
 import { calculate } from "./supply-calculator";
-import { calculateApproval, calculateForgedTotal } from "./validator-calculator";
 export * from "./assert";
 export * from "./expiration-calculator";
 export * as IpAddress from "./ip-address";
@@ -12,7 +11,6 @@ export * from "./ipc-subprocess";
 export * from "./lock";
 export * from "@arkecosystem/utils";
 
-export const validatorCalculator = { calculateApproval, calculateForgedTotal };
 export const expirationCalculator = { calculateTransactionExpiration };
 export const roundCalculator = { calculateRound, isNewRound };
 export const supplyCalculator = { calculate };

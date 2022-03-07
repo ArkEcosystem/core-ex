@@ -26,8 +26,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
-	#lastBlock: Contracts.Crypto.IBlock | undefined;
-
 	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
 		return this.blockFactory.fromBytes(this.blockStorage.get(id));
 	}
@@ -70,7 +68,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		);
 	}
 
-	public async findLatestBlock(): Promise<Contracts.Crypto.IBlock | undefined> {
+	public async getLastBlock(): Promise<Contracts.Crypto.IBlock | undefined> {
 		try {
 			return this.blockFactory.fromBytes(
 				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
@@ -109,13 +107,14 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 					await this.transactionStorage.put(transaction.data.id, transaction.serialized);
 				}
 			});
-
-			this.#lastBlock = block;
 		}
 	}
 
-	public async findBlocksByIds(ids: any[]): Promise<Contracts.Crypto.IBlock[]> {
-		return this.#map(ids, (id: string) => this.blockFactory.fromBytes(this.blockStorage.get(id)));
+	public async findBlocksByIds(ids: any[]): Promise<Contracts.Crypto.IBlockData[]> {
+		return this.#map(
+			ids,
+			async (id: string) => (await this.blockFactory.fromBytes(this.blockStorage.get(id))).data,
+		);
 	}
 
 	public async getRound(round: number): Promise<Contracts.Database.IRound[]> {
@@ -151,50 +150,82 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		}
 	}
 
-	public async getLastBlock(): Promise<Contracts.Crypto.IBlock | undefined> {
-		// @TODO: this is set when blocks are stored but we need to check if this is ok
-		return this.#lastBlock;
-	}
-
-	public async findBlockByIds(ids: string[]): Promise<Contracts.Crypto.IBlockData[]> {
-		return this.#map<Contracts.Crypto.IBlockData>(
-			ids,
-			async (id: string) => (await this.blockFactory.fromBytes(this.blockStorageById.get(id))).data,
-		);
-	}
-
-	public async getValidatorsForgedBlocks(): Promise<Contracts.Crypto.IBlockData[]> {
-		// return this.createQueryBuilder()
-		// 	.select([])
-		// 	.addSelect("generator_public_key", "generatorPublicKey")
-		// 	.addSelect("SUM(total_fee)", "totalFees")
-		// 	.addSelect("SUM(reward)", "totalRewards")
-		// 	.addSelect("COUNT(total_amount)", "totalProduced")
-		// 	.groupBy("generator_public_key")
-		// 	.getRawMany();
-
-		return [];
-	}
-
-	public async getLastForgedBlocks(): Promise<Contracts.Crypto.IBlockData[]> {
-		// return this.query(`SELECT id,
-		//                 height,
-		//                 generator_public_key AS "generatorPublicKey",
-		//                 TIMESTAMP
-		//         FROM blocks
-		//         WHERE height IN (
-		//         SELECT MAX(height) AS last_block_height
-		//         FROM blocks
-		//         GROUP BY generator_public_key
-		//         )
-		//         ORDER BY TIMESTAMP DESC
-		// `);
-
-		return [];
-	}
-
 	public async verifyBlockchain(): Promise<boolean> {
 		return true;
+
+		// const errors: string[] = [];
+
+		// const block: Contracts.Crypto.IBlock = await this.getLastBlock();
+
+		// // Last block is available
+		// if (!block) {
+		// 	errors.push("Last block is not available");
+		// }
+
+		// const blockStats: {
+		// 	numberOfTransactions: number;
+		// 	totalFee: string;
+		// 	totalAmount: string;
+		// 	count: number;
+		// } = await this.blockRepository.getStatistics();
+
+		// // return this.createQueryBuilder()
+		// // 	.select([])
+		// // 	.addSelect("COALESCE(SUM(number_of_transactions), 0)", "numberOfTransactions")
+		// // 	.addSelect("COALESCE(SUM(total_fee), 0)", "totalFee")
+		// // 	.addSelect("COALESCE(SUM(total_amount), 0)", "totalAmount")
+		// // 	.addSelect("COUNT(DISTINCT(height))", "count")
+		// // 	.getRawOne();
+
+		// const transactionStats: {
+		// 	count: number;
+		// 	totalFee: string;
+		// 	totalAmount: string;
+		// } = await this.transactionRepository.getStatistics();
+
+		// // return this.createQueryBuilder()
+		// // 	.select([])
+		// // 	.addSelect("COUNT(DISTINCT(id))", "count")
+		// // 	.addSelect("COALESCE(SUM(fee), 0)", "totalFee")
+		// // 	.addSelect("COALESCE(SUM(amount), 0)", "totalAmount")
+		// // 	.getRawOne();
+
+		// // Last block height equals the number of stored blocks
+		// if (block.data.height !== +blockStats.count) {
+		// 	errors.push(
+		// 		`Last block height: ${block.data.height.toLocaleString()}, number of stored blocks: ${blockStats.count}`,
+		// 	);
+		// }
+
+		// // Number of stored transactions equals the sum of block.numberOfTransactions in the database
+		// if (blockStats.numberOfTransactions !== transactionStats.count) {
+		// 	errors.push(
+		// 		`Number of transactions: ${transactionStats.count}, number of transactions included in blocks: ${blockStats.numberOfTransactions}`,
+		// 	);
+		// }
+
+		// // Sum of all tx fees equals the sum of block.totalFee
+		// if (blockStats.totalFee !== transactionStats.totalFee) {
+		// 	errors.push(
+		// 		`Total transaction fees: ${transactionStats.totalFee}, total of block.totalFee : ${blockStats.totalFee}`,
+		// 	);
+		// }
+
+		// // Sum of all tx amount equals the sum of block.totalAmount
+		// if (blockStats.totalAmount !== transactionStats.totalAmount) {
+		// 	errors.push(
+		// 		`Total transaction amounts: ${transactionStats.totalAmount}, total of block.totalAmount : ${blockStats.totalAmount}`,
+		// 	);
+		// }
+
+		// const hasErrors: boolean = errors.length > 0;
+
+		// if (hasErrors) {
+		// 	this.logger.error("FATAL: The database is corrupted");
+		// 	this.logger.error(JSON.stringify(errors, undefined, 4));
+		// }
+
+		// return !hasErrors;
 	}
 
 	public async getForgedTransactionsIds(ids: string[]): Promise<string[]> {

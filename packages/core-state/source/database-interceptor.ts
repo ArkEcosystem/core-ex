@@ -23,9 +23,7 @@ export class DatabaseInterceptor {
 		let commonBlocks: Contracts.Crypto.IBlockData[] = this.stateStore.getCommonBlocks(ids);
 
 		if (commonBlocks.length < ids.length) {
-			// ! do not query blocks that were found
-			// ! why method is called commonBlocks, but is just findByIds?
-			commonBlocks = (await this.databaseService.findBlockByIds(ids)) as unknown as Contracts.Crypto.IBlockData[];
+			return this.databaseService.findBlocksByIds(ids);
 		}
 
 		return commonBlocks;

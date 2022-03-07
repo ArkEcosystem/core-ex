@@ -21,13 +21,13 @@ export interface IDatabaseService {
 
 	findBlockByHeights(heights: number[]): Promise<IBlock[]>;
 
-	findLatestBlock(): Promise<IBlock | undefined>;
+	getLastBlock(): Promise<IBlock | undefined>;
 
 	getTransaction(id: string): Promise<ITransaction | undefined>;
 
 	saveBlocks(blocks: IBlock[]): Promise<void>;
 
-	findBlocksByIds(ids: any[]): Promise<IBlock[]>;
+	findBlocksByIds(ids: string[]): Promise<IBlockData[]>;
 
 	getRound(round: number): Promise<IRound[]>;
 
@@ -35,16 +35,7 @@ export interface IDatabaseService {
 
 	deleteRound(round: number): Promise<void>;
 
-	// @TODO
-	getLastBlock(): Promise<IBlock | undefined>;
-
-	findBlockByIds(id: string[]): Promise<IBlockData[]>;
-
-	getValidatorsForgedBlocks(): Promise<IBlockData[]>;
-
-	getLastForgedBlocks(): Promise<IBlockData[]>;
+	getForgedTransactionsIds(ids: string[]): Promise<string[]>;
 
 	verifyBlockchain(): Promise<boolean>;
-
-	getForgedTransactionsIds(ids: string[]): Promise<string[]>;
 }

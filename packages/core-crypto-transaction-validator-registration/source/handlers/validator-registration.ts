@@ -14,27 +14,12 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.Database.Service)
-	private readonly databaseService!: Contracts.Database.IDatabaseService;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
 
 	public walletAttributes(): ReadonlyArray<string> {
-		return [
-			"validator.approval", // Used by the API
-			"validator.forgedFees", // Used by the API
-			"validator.forgedRewards", // Used by the API
-			"validator.forgedTotal", // Used by the API
-			"validator.lastBlock",
-			"validator.producedBlocks", // Used by the API
-			"validator.rank",
-			"validator.round",
-			"validator.username",
-			"validator.voteBalance",
-			"validator",
-		];
+		return ["validator.rank", "validator.round", "validator.username", "validator.voteBalance", "validator"];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
@@ -49,46 +34,12 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 
 			wallet.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
-				forgedFees: BigNumber.ZERO,
-				forgedRewards: BigNumber.ZERO,
-				producedBlocks: 0,
 				rank: undefined,
 				username: transaction.asset.validator.username,
 				voteBalance: BigNumber.ZERO,
 			});
 
 			this.walletRepository.index(wallet);
-		}
-
-		const forgedBlocks = await this.databaseService.getValidatorsForgedBlocks();
-		const lastForgedBlocks = await this.databaseService.getLastForgedBlocks();
-		for (const block of forgedBlocks) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				block.generatorPublicKey,
-			);
-
-			// Genesis wallet is empty
-			if (!wallet.hasAttribute("validator")) {
-				continue;
-			}
-
-			const validator: Contracts.State.WalletValidatorAttributes = wallet.getAttribute("validator");
-			validator.forgedFees = validator.forgedFees.plus(block.totalFee);
-			validator.forgedRewards = validator.forgedRewards.plus(block.totalAmount);
-			validator.producedBlocks++;
-		}
-
-		for (const block of lastForgedBlocks) {
-			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				block.generatorPublicKey,
-			);
-
-			// Genesis wallet is empty
-			if (!wallet.hasAttribute("validator")) {
-				continue;
-			}
-
-			wallet.setAttribute("validator.lastBlock", block);
 		}
 	}
 
@@ -172,9 +123,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 
 		sender.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
-			forgedFees: BigNumber.ZERO,
-			forgedRewards: BigNumber.ZERO,
-			producedBlocks: 0,
 			round: 0,
 			username: transaction.data.asset.validator.username,
 			voteBalance: BigNumber.ZERO,
