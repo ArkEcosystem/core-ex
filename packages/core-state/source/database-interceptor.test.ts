@@ -24,7 +24,7 @@ describe<{
 			saveBlocks: () => undefined,
 			deleteBlocks: () => undefined,
 		};
-		
+
 		context.stateStore = {
 			setGenesisBlock: () => undefined,
 			getGenesisBlock: () => undefined,
@@ -122,7 +122,7 @@ describe<{
 		const databaseServiceStub = stub(databaseService, "getBlock").returnValue(block);
 
 		assert.equal(await databaseInterceptor.getBlock("block_id"), block);
-		
+
 		stateStoreStub.restore();
 		databaseServiceStub.restore();
 	});

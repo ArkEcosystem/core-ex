@@ -48,7 +48,7 @@ describe<{
 			findByBlockIds: () => undefined,
 			getStatistics: () => undefined,
 		};
-		
+
 		context.stateStore = {
 			setGenesisBlock: () => undefined,
 			getGenesisBlock: () => undefined,
@@ -58,16 +58,16 @@ describe<{
 			getCommonBlocks: () => undefined,
 			getLastBlockIds: () => undefined,
 		};
-		
+
 		context.handlerRegistry = {
 			getActivatedHandlerForData: () => undefined,
 		};
-		
+
 		context.blockState = {
 			applyBlock: () => undefined,
 			revertBlock: () => undefined,
 		};
-		
+
 		context.events = {
 			call: () => undefined,
 			dispatch: () => undefined,
@@ -80,12 +80,14 @@ describe<{
 			restore: () => undefined,
 			detectMissedBlocks: () => undefined,
 		};
-		
+
 		const container = new Container.Container();
 		container.bind(Container.Identifiers.Application).toConstantValue(context.app);
 		container.bind(Container.Identifiers.DatabaseConnection).toConstantValue(context.connection);
 		container.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);
-		container.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue(context.transactionRepository);
+		container
+			.bind(Container.Identifiers.DatabaseTransactionRepository)
+			.toConstantValue(context.transactionRepository);
 		container.bind(Container.Identifiers.DatabaseRoundRepository).toConstantValue({
 			getRound: () => undefined,
 			save: () => undefined,

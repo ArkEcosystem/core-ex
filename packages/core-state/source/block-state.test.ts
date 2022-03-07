@@ -51,7 +51,7 @@ describe<{
 		context.additionalBeforeEach = () => {
 			context.sendersDelegate = context.forgingWallet;
 			context.sendersDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
-	
+
 			const sendingWallet: Wallet = context.factory
 				.get("Wallet")
 				.withOptions({
@@ -59,9 +59,9 @@ describe<{
 					nonce: 0,
 				})
 				.make();
-	
+
 			context.amount = Utils.BigNumber.make(2345);
-	
+
 			context.multiPaymentTransaction = context.factory
 				.get("MultiPayment")
 				.withOptions({
@@ -70,7 +70,7 @@ describe<{
 					recipientId: context.recipientWallet.getAddress(),
 				})
 				.make();
-	
+
 			context.multiPaymentTransaction.data.asset.payments = [
 				{
 					amount: [context.amount],
@@ -84,10 +84,15 @@ describe<{
 			// TODO: Why do these need to be set manually here?
 			context.multiPaymentTransaction.typeGroup = context.multiPaymentTransaction.data.typeGroup;
 			context.multiPaymentTransaction.type = context.multiPaymentTransaction.data.type;
-	
+
 			sendingWallet.setAttribute("vote", context.sendersDelegate.getPublicKey());
 			context.recipientWallet.setAttribute("vote", context.recipientsDelegate.getPublicKey());
-			context.walletRepo.index([context.sendersDelegate, context.recipientsDelegate, sendingWallet, context.recipientWallet]);
+			context.walletRepo.index([
+				context.sendersDelegate,
+				context.recipientsDelegate,
+				sendingWallet,
+				context.recipientWallet,
+			]);
 		};
 
 		context.generateTransactions = () => {
@@ -147,14 +152,14 @@ describe<{
 			return {
 				sender,
 				recipientWallet,
-				transactions: [transfer, delegateReg, vote, delegateRes]
+				transactions: [transfer, delegateReg, vote, delegateRes],
 			};
 		};
 
 		context.forgetWallet = (wallet: Wallet) => {
 			for (const indexName of context.walletRepo.getIndexNames()) {
 				const index = context.walletRepo.getIndex(indexName);
-		
+
 				index.forgetWallet(wallet);
 			}
 		};
@@ -221,7 +226,13 @@ describe<{
 		});
 		context.recipientsDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
 
-		context.walletRepo.index([context.votingWallet, context.forgingWallet, context.sendingWallet, context.recipientWallet, context.recipientsDelegate]);
+		context.walletRepo.index([
+			context.votingWallet,
+			context.forgingWallet,
+			context.sendingWallet,
+			context.recipientWallet,
+			context.recipientsDelegate,
+		]);
 
 		addTransactionsToBlock(
 			makeVoteTransactions(3, [`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`]),
@@ -286,7 +297,8 @@ describe<{
 		const spyCreateWallet = spy(context.walletRepo, "createWallet");
 
 		context.blocks[0].data.height = 1;
-		context.blocks[0].data.generatorPublicKey = "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
+		context.blocks[0].data.generatorPublicKey =
+			"03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
 
 		await assert.resolves(() => context.blockState.applyBlock(context.blocks[0]));
 
@@ -363,12 +375,18 @@ describe<{
 		const amount: Utils.BigNumber = Utils.BigNumber.make(2345);
 		context.sendingWallet.setBalance(amount);
 
-		const recipientsDelegateBefore: Utils.BigNumber = context.recipientsDelegate.getAttribute("delegate.voteBalance");
+		const recipientsDelegateBefore: Utils.BigNumber =
+			context.recipientsDelegate.getAttribute("delegate.voteBalance");
 
 		context.sendingWallet.setAttribute("vote", sendersDelegate.getPublicKey());
 		context.recipientWallet.setAttribute("vote", context.recipientsDelegate.getPublicKey());
 
-		context.walletRepo.index([sendersDelegate, context.recipientsDelegate, context.sendingWallet, context.recipientWallet]);
+		context.walletRepo.index([
+			sendersDelegate,
+			context.recipientsDelegate,
+			context.sendingWallet,
+			context.recipientWallet,
+		]);
 
 		const transferTransaction = context.factory
 			.get("Transfer")
@@ -384,7 +402,10 @@ describe<{
 		// @ts-ignore
 		await context.blockState.applyTransaction(transferTransaction);
 
-		assert.equal(context.recipientsDelegate.getAttribute("delegate.voteBalance"), recipientsDelegateBefore.plus(amount));
+		assert.equal(
+			context.recipientsDelegate.getAttribute("delegate.voteBalance"),
+			recipientsDelegateBefore.plus(amount),
+		);
 		assert.equal(sendersDelegate.getAttribute("delegate.voteBalance"), senderDelegateBefore.minus(total));
 	});
 
@@ -426,7 +447,10 @@ describe<{
 		// @ts-ignore
 		await context.blockState.revertTransaction(transferTransaction);
 
-		assert.equal(context.recipientsDelegate.getAttribute("delegate.voteBalance"), recipientDelegateBefore.minus(amount));
+		assert.equal(
+			context.recipientsDelegate.getAttribute("delegate.voteBalance"),
+			recipientDelegateBefore.minus(amount),
+		);
 		assert.equal(sendersDelegate.getAttribute("delegate.voteBalance"), senderDelegateBefore.plus(total));
 	});
 
@@ -653,7 +677,7 @@ describe<{
 
 		for (const transaction of transactions.transactions) {
 			await context.blockState.applyTransaction(transaction as ITransaction);
-	
+
 			context.applySpy.calledWith(transaction);
 		}
 	});
@@ -687,9 +711,9 @@ describe<{
 		for (const transaction of transactions.transactions) {
 			// @ts-ignore
 			transaction.data.recipientId = "don'tExist";
-	
+
 			context.forgetWallet(transactions.recipientWallet);
-	
+
 			await assert.resolves(() => context.blockState.revertTransaction(transaction as ITransaction));
 		}
 	});

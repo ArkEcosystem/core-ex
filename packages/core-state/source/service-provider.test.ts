@@ -149,10 +149,7 @@ describe<{
 		defaults.storage.maxLastTransactionIds = 0;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
 
-		assert.equal(
-			result.error!.message,
-			'"storage.maxLastTransactionIds" must be greater than or equal to 1',
-		);
+		assert.equal(result.error!.message, '"storage.maxLastTransactionIds" must be greater than or equal to 1');
 
 		delete defaults.storage.maxLastTransactionIds;
 		result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
