@@ -2,6 +2,7 @@ import { DatabaseService } from "@arkecosystem/core-database";
 import { Container, Enums } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "./database-interactions";
 import { describe } from "@arkecosystem/core-test-framework";
+import { Blocks } from "@arkecosystem/crypto";
 
 describe<{
 	app: any;
@@ -14,7 +15,7 @@ describe<{
 	stateStore: any;
 	roundState: any;
 	transactionRepository: any;
-}>("DatabaseInteractions", ({ it, beforeAll, spy, stub }) => {
+}>("DatabaseInteractions", ({ it, assert, beforeAll, spy, stub, spyFn }) => {
 	beforeAll((context) => {
 		context.app = {
 			get: () => undefined,
@@ -146,24 +147,28 @@ describe<{
 	it("should reset database when CORE_RESET_DATABASE variable is set", async (context) => {
 		const genesisBlock = {};
 
+		const databaseState = process.env.CORE_RESET_DATABASE;
+
 		const setSpy = spy(context.stateStore, "setGenesisBlock");
 		const stateStoreStub = stub(context.stateStore, "getGenesisBlock").returnValue(genesisBlock);
 
+		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake(block => block);
+
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
+
+		process.env.CORE_RESET_DATABASE = "1";
+
 		try {
-			const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
-
-			process.env.CORE_RESET_DATABASE = "1";
-
 			await databaseInteraction.initialize();
-			// expect(databaseInteraction.reset).toBeCalled();
+
 			stateStoreStub.called();
-			// expect(databaseInteraction.saveBlocks).toBeCalledWith([genesisBlock]);
 			setSpy.called();
 		} finally {
-			delete process.env.CORE_RESET_DATABASE;
+			process.env.CORE_RESET_DATABASE = databaseState;
 
 			stateStoreStub.restore();
 			setSpy.restore();
+			spyOnFromData.restore();
 		}
 	});
 
@@ -184,7 +189,7 @@ describe<{
 		appSpy.restore();
 	});
 
-	it("should terminate if unable to deserialize last 5 blocks", async (context) => {
+	it.skip("should terminate if unable to deserialize last 5 blocks", async (context) => {
 		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		const block101data = { id: "block101", height: 101 };
@@ -296,7 +301,7 @@ describe<{
 
 		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
-		const spied = spy();
+		const spied = spyFn();
 
 		const handler = { emitEvents: spied };
 
@@ -310,7 +315,7 @@ describe<{
 
 		blockStateStub.calledWith(block);
 		roundStateStub.calledWith(block);
-		spied.calledWith(transaction, context.events);
+		assert.true(spied.calledWith(transaction, context.events));
 		eventsStub.calledWith(Enums.TransactionEvent.Applied, transaction.data);
 		eventsStub.calledWith(Enums.BlockEvent.Applied, block.data);
 
@@ -318,7 +323,6 @@ describe<{
 		blockStateStub.restore();
 		roundStateStub.restore();
 		roundStateStub2.restore();
-		spied.restore();
 		handlerStub.restore();
 	});
 
