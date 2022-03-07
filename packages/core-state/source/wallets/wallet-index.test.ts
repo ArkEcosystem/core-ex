@@ -11,13 +11,13 @@ describe<{
 }>("WalletIndex", ({ it, beforeAll, beforeEach, assert }) => {
 	beforeAll(async (context) => {
 		const env = await setUp();
-	
+
 		context.factory = env.factory.get("Wallet");
 	});
 
 	beforeEach((context) => {
 		context.wallet = context.factory.make<Wallets.Wallet>();
-	
+
 		context.walletIndex = new WalletIndex((index, wallet) => {
 			index.set(wallet.getAddress(), wallet);
 		}, true);

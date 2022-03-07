@@ -174,9 +174,7 @@ describe<{
 
 	beforeEach((context) => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
-		);
+		const events = context.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
 
 		context.wallet = new Wallet("Abcde", attributeMap, events);
 	});
@@ -343,9 +341,7 @@ describe<{
 
 	beforeEach((context) => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Container.Identifiers.EventDispatcherService,
-		);
+		const events = context.app.get<Contracts.Kernel.EventDispatcher>(Container.Identifiers.EventDispatcherService);
 
 		const wallet = new Wallet("Abcde", attributeMap, events);
 

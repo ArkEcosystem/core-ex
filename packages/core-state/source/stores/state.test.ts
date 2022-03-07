@@ -16,7 +16,7 @@ describe<{
 }>("StateStore", ({ it, beforeEach, afterEach, assert, spy }) => {
 	beforeEach(async (context) => {
 		const env = await setUp();
-	
+
 		context.factory = env.factory;
 		context.logger = env.spies.logger.info;
 		context.dispatchSpy = env.spies.dispatchSpy;
@@ -480,7 +480,9 @@ describe<{
 
 		context.stateStorage.pushPingBlock(context.blocks[5].data);
 		assert.true(
-			context.logger.calledWith(`Previous block ${context.blocks[3].data.height.toLocaleString()} pinged blockchain 1 times`),
+			context.logger.calledWith(
+				`Previous block ${context.blocks[3].data.height.toLocaleString()} pinged blockchain 1 times`,
+			),
 		);
 
 		const blockPing = context.stateStorage.getBlockPing()!;
@@ -500,7 +502,9 @@ describe<{
 
 		context.stateStorage.pushPingBlock(context.blocks[5].data, true);
 		assert.true(
-			context.logger.calledWith(`Previous block ${context.blocks[3].data.height.toLocaleString()} pinged blockchain 0 times`),
+			context.logger.calledWith(
+				`Previous block ${context.blocks[3].data.height.toLocaleString()} pinged blockchain 0 times`,
+			),
 		);
 
 		const blockPing = context.stateStorage.getBlockPing()!;

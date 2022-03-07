@@ -3,7 +3,7 @@ import { describe, Factories } from "@arkecosystem/core-test-framework";
 import { Interfaces } from "@arkecosystem/crypto";
 
 describe<{
-	factory: Factories.FactoryBuilder
+	factory: Factories.FactoryBuilder;
 }>("TransactionStore", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.factory = new Factories.FactoryBuilder();

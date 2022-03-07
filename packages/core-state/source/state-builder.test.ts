@@ -191,7 +191,9 @@ describe<{
 		await context.stateBuilder.run();
 
 		assert.true(
-			context.loggerWarningSpy.calledWith("Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'"),
+			context.loggerWarningSpy.calledWith(
+				"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'",
+			),
 		);
 		assert.false(context.dispatchSpy.called);
 	});
@@ -254,7 +256,9 @@ describe<{
 		await context.stateBuilder.run();
 
 		assert.true(
-			context.loggerWarningSpy.calledWith("Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'"),
+			context.loggerWarningSpy.calledWith(
+				"Wallet ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp has a negative balance of '-90000'",
+			),
 		);
 		assert.false(context.dispatchSpy.called);
 	});

@@ -10,7 +10,7 @@ describe<{
 }>("Wallet Repository", ({ it, assert, afterEach, beforeAll }) => {
 	beforeAll(async (context) => {
 		const env = await setUp();
-	
+
 		// TODO: why does this have to be rebound here?
 		env.sandbox.app.rebind(Container.Identifiers.WalletRepository).to(WalletRepository);
 
