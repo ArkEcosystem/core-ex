@@ -5,256 +5,211 @@ import { Utils } from "@arkecosystem/crypto";
 import { setUp } from "../../test/setup";
 import { describe } from "@arkecosystem/core-test-framework";
 
-let walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
-let walletRepo: WalletRepository;
+describe<{
+	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
+	walletRepo: WalletRepository;
+}>("Wallet Repository Copy On Write", ({ it, assert, afterEach, beforeAll, spy }) => {
+	beforeAll(async (context) => {
+		const env = await setUp();
 
-const beforeAllCallback = async () => {
-	const initialEnv = await setUp();
-	walletRepoCopyOnWrite = initialEnv.walletRepoCopyOnWrite;
-	walletRepo = initialEnv.walletRepo;
-};
+		context.walletRepoCopyOnWrite = env.walletRepoCopyOnWrite;
+		context.walletRepo = env.walletRepo;
+	});
 
-const beforeEachCallback = () => {
-	walletRepoCopyOnWrite.reset();
-	walletRepo.reset();
-};
+	afterEach((context) => {
+		context.walletRepoCopyOnWrite.reset();
+		context.walletRepo.reset();
+	});
 
-describe("Wallet Repository Copy On Write", ({ it, assert, beforeEach, beforeAll, skip, spy }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should create a wallet", () => {
-		const wallet = walletRepoCopyOnWrite.createWallet("abcd");
+	it("should create a wallet", (context) => {
+		const wallet = context.walletRepoCopyOnWrite.createWallet("abcd");
 		assert.equal(wallet.getAddress(), "abcd");
 		assert.instance(wallet, Wallet);
 	});
 
-	it("should be able to look up indexers", () => {
+	it("should be able to look up indexers", (context) => {
 		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
-		assert.equal(walletRepoCopyOnWrite.getIndexNames(), expected);
-		assert.equal(walletRepoCopyOnWrite.getIndex("addresses").indexer, addressesIndexer);
-		assert.equal(walletRepoCopyOnWrite.getIndex("publicKeys").indexer, publicKeysIndexer);
-		assert.equal(walletRepoCopyOnWrite.getIndex("usernames").indexer, usernamesIndexer);
-		assert.equal(walletRepoCopyOnWrite.getIndex("resignations").indexer, resignationsIndexer);
+		assert.equal(context.walletRepoCopyOnWrite.getIndexNames(), expected);
+		assert.equal(context.walletRepoCopyOnWrite.getIndex("addresses").indexer, addressesIndexer);
+		assert.equal(context.walletRepoCopyOnWrite.getIndex("publicKeys").indexer, publicKeysIndexer);
+		assert.equal(context.walletRepoCopyOnWrite.getIndex("usernames").indexer, usernamesIndexer);
+		assert.equal(context.walletRepoCopyOnWrite.getIndex("resignations").indexer, resignationsIndexer);
 	});
 
-	it("should find wallets by address", () => {
-		const spyFindByAddress = spy(walletRepo, "findByAddress");
-		const clonedWallet = walletRepoCopyOnWrite.findByAddress("notexisting");
+	it("should find wallets by address", (context) => {
+		const spyFindByAddress = spy(context.walletRepo, "findByAddress");
+		const clonedWallet = context.walletRepoCopyOnWrite.findByAddress("notexisting");
 
 		spyFindByAddress.calledWith("notexisting");
 
-		const originalWallet = walletRepo.findByAddress(clonedWallet.getAddress());
+		const originalWallet = context.walletRepo.findByAddress(clonedWallet.getAddress());
 
 		assert.not.equal(originalWallet, clonedWallet);
+
+		spyFindByAddress.restore();
 	});
 
-	it("should get all by username", () => {
-		const wallet1 = walletRepoCopyOnWrite.createWallet("abcd");
-		const wallet2 = walletRepoCopyOnWrite.createWallet("efg");
-		const wallet3 = walletRepoCopyOnWrite.createWallet("hij");
+	it("should get all by username", (context) => {
+		const wallet1 = context.walletRepoCopyOnWrite.createWallet("abcd");
+		const wallet2 = context.walletRepoCopyOnWrite.createWallet("efg");
+		const wallet3 = context.walletRepoCopyOnWrite.createWallet("hij");
 
 		wallet1.setAttribute("delegate.username", "username1");
 		wallet2.setAttribute("delegate.username", "username2");
 		wallet3.setAttribute("delegate.username", "username3");
 
 		const allWallets = [wallet1, wallet2, wallet3];
-		walletRepo.index(allWallets);
+		context.walletRepo.index(allWallets);
 
-		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet1.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet2.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet1.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet2.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
 
-		const wallet4 = walletRepoCopyOnWrite.createWallet("klm");
+		const wallet4 = context.walletRepoCopyOnWrite.createWallet("klm");
 		wallet4.setAttribute("delegate.username", "username4");
 
-		walletRepo.index(wallet4);
+		context.walletRepo.index(wallet4);
 		allWallets.push(wallet4);
 
-		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet1.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet2.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
-		assert.true(walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet4.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet1.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet2.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet4.getAddress()));
 	});
 
 	// TODO: test behaves differently to WalletRepository due to inheritance
-	skip("findByPublicKey should index wallet", () => {
+	it.skip("findByPublicKey should index wallet", (context) => {
 		const address = "ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp";
-		const wallet = walletRepoCopyOnWrite.createWallet(address);
+		const wallet = context.walletRepoCopyOnWrite.createWallet(address);
 		const publicKey = "03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece";
 		wallet.setPublicKey(publicKey);
 
-		assert.not.equal(walletRepoCopyOnWrite.findByAddress(address), wallet);
-		walletRepoCopyOnWrite.getIndex("publicKeys").set(publicKey, wallet);
-		assert.defined(walletRepoCopyOnWrite.findByPublicKey(publicKey).getPublicKey());
-		assert.equal(walletRepoCopyOnWrite.findByPublicKey(publicKey), wallet);
+		assert.not.equal(context.walletRepoCopyOnWrite.findByAddress(address), wallet);
+		context.walletRepoCopyOnWrite.getIndex("publicKeys").set(publicKey, wallet);
+		assert.defined(context.walletRepoCopyOnWrite.findByPublicKey(publicKey).getPublicKey());
+		assert.equal(context.walletRepoCopyOnWrite.findByPublicKey(publicKey), wallet);
 
-		assert.defined(walletRepoCopyOnWrite.findByAddress(address).getPublicKey());
-		assert.equal(walletRepoCopyOnWrite.findByAddress(address), wallet);
+		assert.defined(context.walletRepoCopyOnWrite.findByAddress(address).getPublicKey());
+		assert.equal(context.walletRepoCopyOnWrite.findByAddress(address), wallet);
 	});
 
 	// TODO: test behaves differently to WalletRepository due to inheritance
-	skip("should not retrieve wallets indexed in original repo, until they are indexed", () => {
+	it.skip("should not retrieve wallets indexed in original repo, until they are indexed", (context) => {
 		const address = "abcd";
 
-		const wallet = walletRepoCopyOnWrite.createWallet(address);
-		walletRepoCopyOnWrite.index(wallet);
+		const wallet = context.walletRepoCopyOnWrite.createWallet(address);
+		context.walletRepoCopyOnWrite.index(wallet);
 
-		assert.false(walletRepoCopyOnWrite.has(address));
-		assert.false(walletRepoCopyOnWrite.hasByAddress(address));
-		assert.false(walletRepoCopyOnWrite.hasByIndex("addresses", address));
+		assert.false(context.walletRepoCopyOnWrite.has(address));
+		assert.false(context.walletRepoCopyOnWrite.hasByAddress(address));
+		assert.false(context.walletRepoCopyOnWrite.hasByIndex("addresses", address));
 
-		assert.equal(walletRepoCopyOnWrite.allByAddress(), [wallet]);
+		assert.equal(context.walletRepoCopyOnWrite.allByAddress(), [wallet]);
 
-		walletRepo.index(wallet);
+		context.walletRepo.index(wallet);
 
-		assert.true(walletRepoCopyOnWrite.has(address));
-		assert.true(walletRepoCopyOnWrite.hasByAddress(address));
-		assert.true(walletRepoCopyOnWrite.hasByIndex("addresses", address));
-		assert.equal(walletRepoCopyOnWrite.allByAddress(), [wallet]);
+		assert.true(context.walletRepoCopyOnWrite.has(address));
+		assert.true(context.walletRepoCopyOnWrite.hasByAddress(address));
+		assert.true(context.walletRepoCopyOnWrite.hasByIndex("addresses", address));
+		assert.equal(context.walletRepoCopyOnWrite.allByAddress(), [wallet]);
 
 		// TODO: similarly, this behaviour is odd - as the code hasn't been overwritten in the extended class
-		assert.true(walletRepoCopyOnWrite.has(address));
+		assert.true(context.walletRepoCopyOnWrite.has(address));
 	});
 
 	// TODO: test behaves differently to WalletRepository due to i
-	skip("should create a wallet if one is not found during address lookup", () => {
-		assert.not.throws(() => walletRepoCopyOnWrite.findByAddress("hello"));
-		assert.instance(walletRepoCopyOnWrite.findByAddress("iDontExist"), Wallet);
-		assert.false(walletRepoCopyOnWrite.has("hello"));
-		assert.false(walletRepoCopyOnWrite.hasByAddress("iDontExist"));
+	it.skip("should create a wallet if one is not found during address lookup", (context) => {
+		assert.not.throws(() => context.walletRepoCopyOnWrite.findByAddress("hello"));
+		assert.instance(context.walletRepoCopyOnWrite.findByAddress("iDontExist"), Wallet);
+		assert.false(context.walletRepoCopyOnWrite.has("hello"));
+		assert.false(context.walletRepoCopyOnWrite.hasByAddress("iDontExist"));
 
-		assert.not.throws(() => walletRepoCopyOnWrite.findByIndex("addresses", "iAlsoDontExist"));
+		assert.not.throws(() => context.walletRepoCopyOnWrite.findByIndex("addresses", "iAlsoDontExist"));
 	});
-});
-
-describe("index", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
 
 	// TODO: test behaves differently to WalletRepository due to inheritance
-	it.skip("should not affect the original", () => {
-		const wallet = walletRepo.createWallet("abcdef");
-		walletRepo.index(wallet);
+	it.skip("index - should not affect the original", (context) => {
+		const wallet = context.walletRepo.createWallet("abcdef");
+		context.walletRepo.index(wallet);
 
-		walletRepoCopyOnWrite.index(wallet);
+		context.walletRepoCopyOnWrite.index(wallet);
 
 		assert.not.equal(
-			walletRepo.findByAddress(wallet.getAddress()),
-			walletRepoCopyOnWrite.findByAddress(wallet.getAddress()),
+			context.walletRepo.findByAddress(wallet.getAddress()),
+			context.walletRepoCopyOnWrite.findByAddress(wallet.getAddress()),
 		);
 	});
-});
 
-describe("findByAddress", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
+	it("findByAddress - should return a copy", (context) => {
+		const wallet = context.walletRepo.createWallet("abcdef");
+		context.walletRepo.index(wallet);
 
-	it("should return a copy", () => {
-		const wallet = walletRepo.createWallet("abcdef");
-		walletRepo.index(wallet);
-
-		const tempWallet = walletRepoCopyOnWrite.findByAddress(wallet.getAddress());
+		const tempWallet = context.walletRepoCopyOnWrite.findByAddress(wallet.getAddress());
 		tempWallet.setBalance(Utils.BigNumber.ONE);
 
 		assert.not.equal(wallet.getBalance(), tempWallet.getBalance());
 	});
-});
 
-describe("findByPublicKey", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should return a copy", () => {
-		const wallet = walletRepo.createWallet("ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp");
+	it("findByPublicKey - should return a copy", (context) => {
+		const wallet = context.walletRepo.createWallet("ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp");
 		wallet.setPublicKey("03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece");
 		wallet.setBalance(Utils.BigNumber.SATOSHI);
-		walletRepo.index(wallet);
+		context.walletRepo.index(wallet);
 
-		const tempWallet = walletRepoCopyOnWrite.findByPublicKey(wallet.getPublicKey()!);
+		const tempWallet = context.walletRepoCopyOnWrite.findByPublicKey(wallet.getPublicKey()!);
 		tempWallet.setBalance(Utils.BigNumber.ZERO);
 
 		assert.equal(wallet.getBalance(), Utils.BigNumber.SATOSHI);
 		assert.equal(tempWallet.getBalance(), Utils.BigNumber.ZERO);
 	});
-});
 
-describe("findByUsername", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should return a copy", () => {
-		const wallet = walletRepo.createWallet("abcdef");
+	it("findByUsername - should return a copy", (context) => {
+		const wallet = context.walletRepo.createWallet("abcdef");
 		wallet.setAttribute("delegate", { username: "test" });
-		walletRepo.index(wallet);
+		context.walletRepo.index(wallet);
 
-		const tempWallet = walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("delegate.username"));
+		const tempWallet = context.walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("delegate.username"));
 		tempWallet.setBalance(Utils.BigNumber.ONE);
 
 		assert.not.equal(wallet.getBalance(), tempWallet.getBalance());
 	});
-});
 
-describe("hasByAddress", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
+	it("hasByAddress - should be ok", (context) => {
+		const wallet = context.walletRepo.createWallet("abcdef");
+		context.walletRepo.index(wallet);
 
-	it("should be ok", () => {
-		const wallet = walletRepo.createWallet("abcdef");
-		walletRepo.index(wallet);
-
-		assert.true(walletRepoCopyOnWrite.hasByAddress(wallet.getAddress()));
+		assert.true(context.walletRepoCopyOnWrite.hasByAddress(wallet.getAddress()));
 	});
-});
 
-describe("hasByPublicKey", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should be ok", () => {
-		const wallet = walletRepo.createWallet("ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp");
+	it("hasByPublicKey - should be ok", (context) => {
+		const wallet = context.walletRepo.createWallet("ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp");
 		wallet.setPublicKey("03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece");
-		walletRepo.index(wallet);
+		context.walletRepo.index(wallet);
 
-		assert.true(walletRepoCopyOnWrite.hasByPublicKey(wallet.getPublicKey()!));
+		assert.true(context.walletRepoCopyOnWrite.hasByPublicKey(wallet.getPublicKey()!));
 	});
-});
 
-describe("hasByUsername", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should be ok", () => {
-		const wallet = walletRepo.createWallet("abcdef");
+	it("hasByUsername - should be ok", (context) => {
+		const wallet = context.walletRepo.createWallet("abcdef");
 		wallet.setAttribute("delegate", { username: "test" });
-		walletRepo.index(wallet);
+		context.walletRepo.index(wallet);
 
-		assert.true(walletRepoCopyOnWrite.hasByUsername(wallet.getAttribute("delegate.username")));
+		assert.true(context.walletRepoCopyOnWrite.hasByUsername(wallet.getAttribute("delegate.username")));
 	});
-});
 
-describe("hasByIndex", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should be ok", () => {
-		const wallet = walletRepo.createWallet("abc");
+	it("hasByIndex - should be ok", (context) => {
+		const wallet = context.walletRepo.createWallet("abc");
 		wallet.setAttribute("delegate", { username: "test" });
-		walletRepo.index(wallet);
+		context.walletRepo.index(wallet);
 
-		assert.true(walletRepoCopyOnWrite.hasByIndex(Contracts.State.WalletIndexes.Usernames, "test"));
+		assert.true(context.walletRepoCopyOnWrite.hasByIndex(Contracts.State.WalletIndexes.Usernames, "test"));
 	});
-});
 
-describe("findByIndex", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should be ok", () => {
-		const wallet = walletRepo.createWallet("abc");
+	it("findByIndex - should be ok", (context) => {
+		const wallet = context.walletRepo.createWallet("abc");
 		wallet.setAttribute("delegate", { username: "test" });
-		walletRepo.index(wallet);
-		const clone = walletRepoCopyOnWrite.findByIndex(Contracts.State.WalletIndexes.Usernames, "test");
+		context.walletRepo.index(wallet);
+		const clone = context.walletRepoCopyOnWrite.findByIndex(Contracts.State.WalletIndexes.Usernames, "test");
 
 		assert.not.equal(clone, wallet);
 		assert.equal(clone.getAddress(), wallet.getAddress());
