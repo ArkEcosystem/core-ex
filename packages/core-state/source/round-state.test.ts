@@ -173,7 +173,7 @@ describe<{
 	});
 
 	it.skip("getActiveDelegates - should return shuffled round delegates", async (context) => {
-        const lastBlock = Blocks.BlockFactory.fromData(block1760000)
+		const lastBlock = Blocks.BlockFactory.fromData(block1760000);
 
 		const stateStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 

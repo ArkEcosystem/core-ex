@@ -152,7 +152,7 @@ describe<{
 		const setSpy = spy(context.stateStore, "setGenesisBlock");
 		const stateStoreStub = stub(context.stateStore, "getGenesisBlock").returnValue(genesisBlock);
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake(block => block);
+		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => block);
 
 		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
