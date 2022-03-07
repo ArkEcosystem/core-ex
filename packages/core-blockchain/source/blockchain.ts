@@ -1,6 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService, Repositories } from "@arkecosystem/core-database";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
 
@@ -24,11 +23,11 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly database!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly database: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.DatabaseBlockRepository)
-	private readonly blockRepository!: Repositories.BlockRepository;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
@@ -291,8 +290,8 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 				if (blocksToRemove[blocksToRemove.length - 1].height === 1) {
 					newLastBlock = this.stateStore.getGenesisBlock();
 				} else {
-					// eslint-disable-next-line unicorn/prefer-at
 					const temporaryNewLastBlockData: Contracts.Crypto.IBlockData =
+						// eslint-disable-next-line unicorn/prefer-at
 						blocksToRemove[blocksToRemove.length - 1];
 
 					Utils.assert.defined<Contracts.Crypto.IBlockData>(temporaryNewLastBlockData);
@@ -339,7 +338,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 
 			await __removeBlocks(nblocks);
 
-			await this.blockRepository.deleteBlocks(removedBlocks.reverse());
+			await this.databaseService.deleteBlocks(removedBlocks.reverse());
 			this.stateStore.setLastStoredBlockHeight(lastBlock.data.height - nblocks);
 
 			await this.transactionPool.readdTransactions(removedTransactions.reverse());
@@ -364,7 +363,7 @@ export class Blockchain implements Contracts.Blockchain.Blockchain {
 	public async removeTopBlocks(count: number): Promise<void> {
 		this.logger.info(`Removing top ${Utils.pluralize("block", count, true)}`);
 
-		await this.blockRepository.deleteTopBlocks(count);
+		await this.databaseService.deleteTopBlocks(count);
 	}
 
 	public resetLastDownloadedBlock(): void {

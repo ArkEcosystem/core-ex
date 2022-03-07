@@ -10,7 +10,6 @@ export * as IpAddress from "./ip-address";
 export * from "./ipc-handler";
 export * from "./ipc-subprocess";
 export * from "./lock";
-export * as Search from "./search";
 export * from "@arkecosystem/utils";
 
 export const validatorCalculator = { calculateApproval, calculateForgedTotal };

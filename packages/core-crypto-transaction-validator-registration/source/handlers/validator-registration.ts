@@ -14,8 +14,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionHistoryService)
-	private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -41,13 +41,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		return ValidatorRegistrationTransaction;
 	}
 
-	public async bootstrap(): Promise<void> {
-		const criteria = {
-			type: this.getConstructor().type,
-			typeGroup: this.getConstructor().typeGroup,
-		};
-
-		for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
+	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+		for (const transaction of this.allTransactions(transactions)) {
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 			AppUtils.assert.defined<string>(transaction.asset?.validator?.username);
 
@@ -65,8 +60,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			this.walletRepository.index(wallet);
 		}
 
-		const forgedBlocks = await this.blockRepository.getValidatorsForgedBlocks();
-		const lastForgedBlocks = await this.blockRepository.getLastForgedBlocks();
+		const forgedBlocks = await this.databaseService.getValidatorsForgedBlocks();
+		const lastForgedBlocks = await this.databaseService.getLastForgedBlocks();
 		for (const block of forgedBlocks) {
 			const wallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 				block.generatorPublicKey,
@@ -78,9 +73,9 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			}
 
 			const validator: Contracts.State.WalletValidatorAttributes = wallet.getAttribute("validator");
-			validator.forgedFees = validator.forgedFees.plus(block.totalFees);
-			validator.forgedRewards = validator.forgedRewards.plus(block.totalRewards);
-			validator.producedBlocks += +block.totalProduced;
+			validator.forgedFees = validator.forgedFees.plus(block.totalFee);
+			validator.forgedRewards = validator.forgedRewards.plus(block.totalAmount);
+			validator.producedBlocks++;
 		}
 
 		for (const block of lastForgedBlocks) {

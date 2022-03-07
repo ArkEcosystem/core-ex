@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService } from "@arkecosystem/core-database";
+
 import { Enums } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "./round-state";
@@ -10,8 +10,8 @@ export class DatabaseInteraction {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly databaseService!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.BlockState)
 	@tagged("state", "blockchain")
@@ -102,7 +102,6 @@ export class DatabaseInteraction {
 	}
 
 	private async reset(): Promise<void> {
-		await this.databaseService.reset();
 		await this.createGenesisBlock();
 	}
 
@@ -115,7 +114,7 @@ export class DatabaseInteraction {
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
 		let lastHeight = 1;
-		const latest: Contracts.Crypto.IBlockData | undefined = await this.databaseService.findLatestBlock();
+		const latest: Contracts.Crypto.IBlockData | undefined = (await this.databaseService.findLatestBlock()).data;
 		if (latest) {
 			lastHeight = latest.height;
 		}
@@ -129,8 +128,8 @@ export class DatabaseInteraction {
 				this.logger.error(error.message);
 
 				if (tries > 0) {
-					const block: Contracts.Crypto.IBlockData = (await this.databaseService.findLatestBlock())!;
-					await this.databaseService.deleteBlocks([block]);
+					const block: Contracts.Crypto.IBlock = await this.databaseService.findLatestBlock();
+					await this.databaseService.deleteBlocks([block.data]);
 					tries--;
 				} else {
 					this.app.terminate("Unable to deserialize last block from database.", error);

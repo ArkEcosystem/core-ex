@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { DatabaseService } from "@arkecosystem/core-database";
+
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
@@ -20,8 +20,8 @@ export class RollbackDatabase implements Action {
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@inject(Identifiers.DatabaseService)
-	private readonly databaseService!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
