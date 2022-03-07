@@ -104,20 +104,22 @@ describe<{
 			info: () => undefined,
 			debug: () => undefined,
 		};
-	
+
 		const sandbox = new Sandbox();
 
 		context.app = sandbox.app;
-	
+
 		sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(context.databaseService);
 		sandbox.app.bind(Container.Identifiers.DposState).toConstantValue(context.dposState);
-		sandbox.app.bind(Container.Identifiers.DposPreviousRoundStateProvider).toConstantValue(context.getDposPreviousRoundState);
+		sandbox.app
+			.bind(Container.Identifiers.DposPreviousRoundStateProvider)
+			.toConstantValue(context.getDposPreviousRoundState);
 		sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
 		sandbox.app.bind(Container.Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 		sandbox.app.bind(Container.Identifiers.TriggerService).toConstantValue(context.triggerService);
 		sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
 		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-	
+
 		context.roundState = sandbox.app.resolve<RoundState>(RoundState);
 	});
 
@@ -459,7 +461,9 @@ describe<{
 			getRoundDelegates: () => delegates,
 		});
 
-		const spyOnCalcPreviousActiveDelegates = stub(context.roundState, "calcPreviousActiveDelegates").returnValue(delegates);
+		const spyOnCalcPreviousActiveDelegates = stub(context.roundState, "calcPreviousActiveDelegates").returnValue(
+			delegates,
+		);
 
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, []);
@@ -473,7 +477,7 @@ describe<{
 		assert.equal(context.roundState.blocksInCurrentRound.length, 50);
 
 		spyOnFromData.restore();
-		databaseServiceSpy.restore()
+		databaseServiceSpy.restore();
 		stateStub1.restore();
 		stateStub2.restore();
 		spyOnCalcPreviousActiveDelegates.restore();
@@ -498,14 +502,16 @@ describe<{
 			getRoundDelegates: () => delegates,
 		});
 
-		const spyOnCalcPreviousActiveDelegates = stub(context.roundState, "calcPreviousActiveDelegates").returnValue(delegates);
+		const spyOnCalcPreviousActiveDelegates = stub(context.roundState, "calcPreviousActiveDelegates").returnValue(
+			delegates,
+		);
 
 		const databaseServiceSpy = stub(context.databaseService, "deleteRound").callsFake(() => {
 			throw new Error("Database error");
 		});
 
-        // @ts-ignore
-        context.roundState.blocksInCurrentRound = [];
+		// @ts-ignore
+		context.roundState.blocksInCurrentRound = [];
 
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, []);
@@ -546,7 +552,7 @@ describe<{
 		stateSpy.restore();
 	});
 
-    it("restore - should restore blocksInCurrentRound and forgingDelegates when last block in middle of round", async (context) => {
+	it("restore - should restore blocksInCurrentRound and forgingDelegates when last block in middle of round", async (context) => {
 		const delegates: any[] = generateDelegates(51);
 		const blocks: any[] = generateBlocks(3);
 
@@ -572,11 +578,11 @@ describe<{
 		// @ts-ignore
 		assert.equal(context.roundState.forgingDelegates, delegates);
 
-        getLastBlockStub.restore();
-        getLastBlocksByHeightHeight.restore();
-        databaseServiceSpy.restore();
-        triggerStub.restore();
-        spyOnFromData.restore();
+		getLastBlockStub.restore();
+		getLastBlocksByHeightHeight.restore();
+		databaseServiceSpy.restore();
+		triggerStub.restore();
+		spyOnFromData.restore();
 	});
 
 	it("restore - should restore blocksInCurrentRound and forgingDelegates when last block is lastBlock of round", async (context) => {
@@ -611,14 +617,14 @@ describe<{
 		// @ts-ignore
 		assert.equal(context.roundState.forgingDelegates, delegates);
 
-        eventSpy.restore();
-        stateStoreStub.restore();
-        stateStoreStub2.restore();
-        dposStub.restore();
-        triggerStub.restore();
-        spyOnFromData.restore();
-        dbDeleteSpy.restore();
-        dbSaveSpy.restore();
+		eventSpy.restore();
+		stateStoreStub.restore();
+		stateStoreStub2.restore();
+		dposStub.restore();
+		triggerStub.restore();
+		spyOnFromData.restore();
+		dbDeleteSpy.restore();
+		dbSaveSpy.restore();
 	});
 
 	it("restore - should throw if databaseService throws error", async (context) => {
@@ -644,15 +650,15 @@ describe<{
 
 		dbStub.calledWith(2);
 
-        stateStoreStub.restore();
-        stateStoreStub2.restore();
-        dposStub.restore();
-        triggerStub.restore();
-        spyOnFromData.restore();
-        dbStub.restore();
+		stateStoreStub.restore();
+		stateStoreStub2.restore();
+		dposStub.restore();
+		triggerStub.restore();
+		spyOnFromData.restore();
+		dbStub.restore();
 	});
 
-    it("calcPreviousActiveDelegates - should return previous active delegates && set ranks", async (context) => {
+	it("calcPreviousActiveDelegates - should return previous active delegates && set ranks", async (context) => {
 		const delegates = generateDelegates(51);
 		const blocks = generateBlocks(51);
 
@@ -676,12 +682,12 @@ describe<{
 		setAttributeSpy.calledWith("delegate.rank", 1);
 		setAttributeSpy.calledOnce();
 
-        stubbedRoundState.restore();
-        setAttributeSpy.restore();
-        walletRepoStub.restore();
+		stubbedRoundState.restore();
+		setAttributeSpy.restore();
+		walletRepoStub.restore();
 	});
 
-    it("detectMissedBlocks - should not detect missed round when stateStore.lastBlock is genesis block", async (context) => {
+	it("detectMissedBlocks - should not detect missed round when stateStore.lastBlock is genesis block", async (context) => {
 		// @ts-ignore
 		context.roundState.forgingDelegates = generateDelegates(51);
 
@@ -692,10 +698,10 @@ describe<{
 		};
 
 		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue({
-            data: {
-                height: 1,
-            },
-        });
+			data: {
+				height: 1,
+			},
+		});
 		const loggerSpy = spy(context.logger, "debug");
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
@@ -704,9 +710,9 @@ describe<{
 		loggerSpy.neverCalled();
 		eventSpy.neverCalled();
 
-        stateStoreStub.restore();
-        loggerSpy.restore();
-        eventSpy.restore();
+		stateStoreStub.restore();
+		loggerSpy.restore();
+		eventSpy.restore();
 	});
 
 	it("detectMissedBlocks - should not detect missed block if slots are sequential", async (context) => {
@@ -735,13 +741,13 @@ describe<{
 		loggerSpy.neverCalled();
 		eventSpy.neverCalled();
 
-        stateStoreStub.restore();
-        loggerSpy.restore();
-        eventSpy.restore();
+		stateStoreStub.restore();
+		loggerSpy.restore();
+		eventSpy.restore();
 	});
 
 	it("detectMissedBlocks - should detect missed block if slots are not sequential", async (context) => {
-        const delegates = generateDelegates(51);
+		const delegates = generateDelegates(51);
 		// @ts-ignore
 		context.roundState.forgingDelegates = delegates;
 
@@ -770,15 +776,15 @@ describe<{
 			delegate: delegates[2],
 		});
 
-        stateStoreStub.restore();
-        loggerSpy.restore();
-        eventSpy.restore();
+		stateStoreStub.restore();
+		loggerSpy.restore();
+		eventSpy.restore();
 	});
 
 	it("detectMissedBlocks - should detect only one round if multiple rounds are missing", async (context) => {
 		// @ts-ignore
 		context.roundState.forgingDelegates = generateDelegates(51);
-        
+
 		const block1 = {
 			data: {
 				height: 2,
@@ -801,13 +807,13 @@ describe<{
 		loggerSpy.calledTimes(51);
 		eventSpy.calledTimes(51);
 
-        stateStoreStub.restore();
-        loggerSpy.restore();
-        eventSpy.restore();
+		stateStoreStub.restore();
+		loggerSpy.restore();
+		eventSpy.restore();
 	});
 
-    it("detectMissedRound - should not detect missed round if all delegates forged blocks", (context) => {
-        let delegates = generateDelegates(3);
+	it("detectMissedRound - should not detect missed round if all delegates forged blocks", (context) => {
+		let delegates = generateDelegates(3);
 		// @ts-ignore
 		context.roundState.forgingDelegates = delegates;
 		let blocksInCurrentRound = generateBlocks(3);
@@ -828,12 +834,12 @@ describe<{
 		loggerSpy.neverCalled();
 		eventSpy.neverCalled();
 
-        loggerSpy.restore();
-        eventSpy.restore();
+		loggerSpy.restore();
+		eventSpy.restore();
 	});
 
 	it("detectMissedRound - should detect missed round", (context) => {
-        let delegates = generateDelegates(3);
+		let delegates = generateDelegates(3);
 		// @ts-ignore
 		context.roundState.forgingDelegates = delegates;
 		let blocksInCurrentRound = generateBlocks(3);
@@ -841,7 +847,7 @@ describe<{
 		context.walletRepository.findByPublicKey = (publicKey) => {
 			return delegates.find((delegate) => delegate.getPublicKey() === publicKey);
 		};
-        
+
 		blocksInCurrentRound[2].data.generatorPublicKey = "public_key_1";
 
 		const loggerSpy = spy(context.logger, "debug");
@@ -850,18 +856,18 @@ describe<{
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = blocksInCurrentRound;
 
-        // @ts-ignore
+		// @ts-ignore
 		context.roundState.detectMissedRound();
 
 		loggerSpy.calledOnce();
 		eventSpy.calledWith(Enums.RoundEvent.Missed, { delegate: delegates[2] });
 
-        loggerSpy.restore();
-        eventSpy.restore();
+		loggerSpy.restore();
+		eventSpy.restore();
 	});
 
-    it("applyBlock - should push block to blocksInCurrentRound and skip applyRound when block is not last block in round", async (context) => {
-        let delegates = generateDelegates(51);
+	it("applyBlock - should push block to blocksInCurrentRound and skip applyRound when block is not last block in round", async (context) => {
+		let delegates = generateDelegates(51);
 		// @ts-ignore
 		context.roundState.forgingDelegates = delegates;
 
@@ -873,8 +879,8 @@ describe<{
 
 		const databaseServiceSpy = spy(context.databaseService, "saveRound");
 
-        // @ts-ignore
-        context.roundState.blocksInCurrentRound = [];
+		// @ts-ignore
+		context.roundState.blocksInCurrentRound = [];
 
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, []);
@@ -885,11 +891,11 @@ describe<{
 		assert.equal(context.roundState.blocksInCurrentRound, [block]);
 		databaseServiceSpy.neverCalled();
 
-        databaseServiceSpy.restore();
+		databaseServiceSpy.restore();
 	});
 
 	it("applyBlock - should push block to blocksInCurrentRound, applyRound, check missing round, calculate delegates, and clear blocksInCurrentRound when block is last in round", async (context) => {
-        let delegates = generateDelegates(51);
+		let delegates = generateDelegates(51);
 		// @ts-ignore
 		context.roundState.forgingDelegates = delegates;
 
@@ -928,20 +934,20 @@ describe<{
 
 		eventSpy.notCalledWith(Enums.RoundEvent.Missed);
 
-        databaseServiceSpy.restore();
-        eventSpy.restore();
-        dposGetStub.restore();
-        triggerStub.restore();
-        spyOnShuffleDelegates.restore();
-        spyOnDetectMissedRound.restore();
+		databaseServiceSpy.restore();
+		eventSpy.restore();
+		dposGetStub.restore();
+		triggerStub.restore();
+		spyOnShuffleDelegates.restore();
+		spyOnDetectMissedRound.restore();
 	});
 
 	// TODO: Check how we can restore
 	it("applyBlock - should throw error if databaseService.saveRound throws error", async (context) => {
-        let delegates = generateDelegates(51);
+		let delegates = generateDelegates(51);
 		// @ts-ignore
 		context.roundState.forgingDelegates = delegates;
-        
+
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = generateBlocks(50);
 
@@ -980,12 +986,12 @@ describe<{
 
 		eventSpy.notCalledWith(Enums.RoundEvent.Missed);
 
-        eventSpy.restore();
-        dposGetStub.restore();
-        triggerStub.restore();
-        spyOnShuffleDelegates.restore();
-        spyOnDetectMissedRound.restore();
-        databaseServiceSpy.restore();
+		eventSpy.restore();
+		dposGetStub.restore();
+		triggerStub.restore();
+		spyOnShuffleDelegates.restore();
+		spyOnDetectMissedRound.restore();
+		databaseServiceSpy.restore();
 	});
 
 	// TODO: Check genesisBlock if required
