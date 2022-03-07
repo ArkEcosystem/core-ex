@@ -675,7 +675,9 @@ describe<{
 			.returnValueNth(4, blocksToRemove[1]) // called in __removeBlocks
 			.returnValueNth(5, blocksToRemove[1]) // called in revertLastBlock
 			.returnValueNth(6, context.blockHeight1); // called in validation process
-		stub(context.databaseService, "getBlocks").returnValue(blocksToRemove.map((b) => ({ ...b.data, transactions: b.transactions })));
+		stub(context.databaseService, "getBlocks").returnValue(
+			blocksToRemove.map((b) => ({ ...b.data, transactions: b.transactions })),
+		);
 		stub(context.databaseService, "getLastBlock").returnValue(context.blockHeight1);
 
 		await blockchain.removeBlocks(2);
@@ -703,14 +705,13 @@ describe<{
 			.returnValueNth(2, context.blockHeight2) // called in __removeBlocks
 			.returnValueNth(3, context.blockHeight2) // called in revertLastBlock
 			.returnValueNth(4, { data: genesisBlock });
-		stub(context.databaseService, "getBlocks")
-			.returnValue([
-				genesisBlock,
-				{
-					...context.blockHeight2.data,
-					transactions: context.blockHeight2.transactions,
-				},
-			]);
+		stub(context.databaseService, "getBlocks").returnValue([
+			genesisBlock,
+			{
+				...context.blockHeight2.data,
+				transactions: context.blockHeight2.transactions,
+			},
+		]);
 		stub(context.databaseService, "getLastBlock").returnValue({ data: genesisBlock });
 
 		await blockchain.removeBlocks(context.blockHeight2.data.height + 10);
@@ -742,15 +743,21 @@ describe<{
 			.returnValueNth(5, blocksToRemove[1]) // called in revertLastBlock
 			.returnValueNth(6, context.blockHeight1) // called in validation process
 			.returnValueNth(7, context.blockHeight1); // called when logging the error
-		stub(context.databaseService, "getBlocks").returnValue(blocksToRemove.map((b) => ({ ...b.data, transactions: b.transactions })));
+		stub(context.databaseService, "getBlocks").returnValue(
+			blocksToRemove.map((b) => ({ ...b.data, transactions: b.transactions })),
+		);
 		stub(context.databaseService, "getLastBlock").returnValue(context.blockHeight3);
 
 		await blockchain.removeBlocks(2);
 
 		errorLogSpy.calledOnce();
-		errorLogSpy.calledWith(sinon.match(s => s.includes(
-			`Last stored block (${context.blockHeight3.data.id}) is not the same as last block from state store (${context.blockHeight1.data.id})`,
-		)));
+		errorLogSpy.calledWith(
+			sinon.match((s) =>
+				s.includes(
+					`Last stored block (${context.blockHeight3.data.id}) is not the same as last block from state store (${context.blockHeight1.data.id})`,
+				),
+			),
+		);
 		warningLogSpy.calledOnce();
 		exitSpy.calledOnce();
 	});
