@@ -13,7 +13,7 @@ describe<{
 	factory: Factories.FactoryBuilder;
 	logger: SinonSpy;
 	dispatchSpy: SinonSpy;
-}>("StateStore", ({ it, beforeEach, assert, spy }) => {
+}>("StateStore", ({ it, beforeEach, afterEach, assert, spy }) => {
 	beforeEach(async (context) => {
 		const env = await setUp();
 	
@@ -22,6 +22,11 @@ describe<{
 		context.dispatchSpy = env.spies.dispatchSpy;
 		context.stateStorage = env.sandbox.app.get(Container.Identifiers.StateStore);
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
+	});
+
+	afterEach((context) => {
+		context.logger.resetHistory();
+		context.dispatchSpy.resetHistory();
 	});
 
 	it("getBlockchain - should return initial state", (context) => {

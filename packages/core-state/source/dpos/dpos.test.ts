@@ -13,7 +13,7 @@ describe<{
 	walletRepo: WalletRepository;
 	logger: SinonSpy;
 	round: Contracts.Shared.RoundInfo;
-}>("dpos", ({ it, beforeAll, beforeEach, assert }) => {
+}>("dpos", ({ it, beforeAll, beforeEach, afterEach, assert }) => {
 	beforeAll(async (context) => {
 		const env = await setUp();
 
@@ -26,6 +26,10 @@ describe<{
 		context.walletRepo.reset();
 
 		buildDelegateAndVoteWallets(5, context.walletRepo);
+	});
+
+	afterEach((context) => {
+		context.logger.resetHistory();
 	});
 
 	it.skip("should update delegate votes of htlc locked balances", async (context) => {
