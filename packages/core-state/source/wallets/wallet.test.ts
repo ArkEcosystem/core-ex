@@ -1,34 +1,29 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
 import { Utils } from "@arkecosystem/crypto";
 import { Services } from "@arkecosystem/core-kernel";
 import { Wallet, WalletEvent } from "../wallets";
 import { getWalletAttributeSet } from "@arkecosystem/core-test-framework/source/internal/wallet-attributes";
-import { Setup, setUp } from "../../test/setup";
+import { setUp } from "../../test/setup";
 import { describe } from "@arkecosystem/core-test-framework";
+import { SinonSpy } from "sinon";
 
-let setup: Setup;
-
-describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
-	let attributeMap;
-
-	beforeAll(async () => {
-		setup = await setUp();
+describe<{
+	attributeMap: Services.Attributes.AttributeMap;
+}>("Models - Wallet", ({ it, assert, beforeEach }) => {
+	beforeEach((context) => {
+		context.attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
 	});
 
-	beforeEach(() => {
-		attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-	});
-
-	it("returns the address", () => {
+	it("returns the address", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getAddress(), address);
 	});
 
-	it("should set and get publicKey", () => {
+	it("should set and get publicKey", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.undefined(wallet.getPublicKey());
 
@@ -36,9 +31,9 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.equal(wallet.getPublicKey(), "publicKey");
 	});
 
-	it("should set and get balance", () => {
+	it("should set and get balance", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
 
@@ -46,9 +41,9 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.equal(wallet.getBalance(), Utils.BigNumber.ONE);
 	});
 
-	it("should set and get nonce", () => {
+	it("should set and get nonce", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
 
@@ -56,9 +51,9 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.equal(wallet.getNonce(), Utils.BigNumber.ONE);
 	});
 
-	it("should increase balance", () => {
+	it("should increase balance", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
 
@@ -66,18 +61,18 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.equal(wallet.getBalance(), Utils.BigNumber.ONE);
 	});
 
-	it("should decrease balance", () => {
+	it("should decrease balance", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getBalance(), Utils.BigNumber.ZERO);
 		assert.equal(wallet.decreaseBalance(Utils.BigNumber.ONE), wallet);
 		assert.equal(wallet.getBalance(), Utils.BigNumber.make("-1"));
 	});
 
-	it("should increase nonce", () => {
+	it("should increase nonce", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
 
@@ -86,9 +81,9 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.equal(wallet.getNonce(), Utils.BigNumber.ONE);
 	});
 
-	it("should decrease nonce", () => {
+	it("should decrease nonce", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.equal(wallet.getNonce(), Utils.BigNumber.ZERO);
 
@@ -96,7 +91,7 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.equal(wallet.getNonce(), Utils.BigNumber.make("-1"));
 	});
 
-	it("should get, set and forget custom attributes", () => {
+	it("should get, set and forget custom attributes", (context) => {
 		const customAttributeSet = getWalletAttributeSet();
 		customAttributeSet.set("customAttribute");
 		const custromAttributeMap = new Services.Attributes.AttributeMap(customAttributeSet);
@@ -119,9 +114,9 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.throws(() => wallet.getAttribute("customAttribute"));
 	});
 
-	it("should get all attributes", () => {
+	it("should get all attributes", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		wallet.setAttribute("delegate", {});
 		wallet.setAttribute("vote", {});
@@ -129,238 +124,255 @@ describe("Models - Wallet", ({ it, assert, beforeAll, beforeEach }) => {
 		assert.equal(wallet.getAttributes(), { delegate: {}, vote: {} });
 	});
 
-	it("should return whether wallet is delegate", () => {
+	it("should return whether wallet is delegate", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.false(wallet.isDelegate());
 		wallet.setAttribute("delegate", {});
 		assert.true(wallet.isDelegate());
 	});
 
-	it("should return whether wallet has voted", () => {
+	it("should return whether wallet has voted", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.false(wallet.hasVoted());
 		wallet.setAttribute("vote", {});
 		assert.true(wallet.hasVoted());
 	});
 
-	it("should return whether the wallet has multisignature", () => {
+	it("should return whether the wallet has multisignature", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.false(wallet.hasMultiSignature());
 		wallet.setAttribute("multiSignature", {});
 		assert.true(wallet.hasMultiSignature());
 	});
 
-	it("should be cloneable", () => {
+	it("should be cloneable", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, attributeMap);
+		const wallet = new Wallet(address, context.attributeMap);
 		wallet.setPublicKey("test");
 
 		assert.equal(wallet.clone(), wallet);
 	});
 });
 
-describe("Original", ({ it, beforeAll, beforeEach, assert, afterEach }) => {
-	let wallet: Wallet;
+describe<{
+	app: Application;
+	wallet: Wallet;
+	dispatchSyncSpy: SinonSpy;
+}>("Original", ({ it, beforeAll, beforeEach, assert, afterEach }) => {
+	beforeAll(async (context) => {
+		const env = await setUp();
 
-	beforeAll(async () => {
-		setup = await setUp();
+		context.app = env.sandbox.app;
+		context.dispatchSyncSpy = env.spies.dispatchSyncSpy;
 	});
 
-	beforeEach(() => {
+	beforeEach((context) => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+		const events = context.app.get<Contracts.Kernel.EventDispatcher>(
 			Container.Identifiers.EventDispatcherService,
 		);
 
-		wallet = new Wallet("Abcde", attributeMap, events);
+		context.wallet = new Wallet("Abcde", attributeMap, events);
 	});
 
-	afterEach(() => {
-		setup.spies.dispatchSyncSpy.resetHistory();
+	afterEach((context) => {
+		context.dispatchSyncSpy.resetHistory();
 	});
 
-	it("should emit on setPublicKey", async () => {
-		wallet.setPublicKey("dummyPublicKey");
+	it("should emit on setPublicKey", async (context) => {
+		context.wallet.setPublicKey("dummyPublicKey");
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: "dummyPublicKey",
 				key: "publicKey",
 				previousValue: undefined,
 				value: "dummyPublicKey",
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on setBalance", async () => {
-		wallet.setBalance(Utils.BigNumber.ONE);
+	it("should emit on setBalance", async (context) => {
+		context.wallet.setBalance(Utils.BigNumber.ONE);
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "balance",
 				previousValue: Utils.BigNumber.ZERO,
 				value: Utils.BigNumber.ONE,
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on increaseBalance", async () => {
-		wallet.increaseBalance(Utils.BigNumber.ONE);
+	it("should emit on increaseBalance", async (context) => {
+		context.wallet.increaseBalance(Utils.BigNumber.ONE);
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "balance",
 				previousValue: Utils.BigNumber.ZERO,
 				value: Utils.BigNumber.ONE,
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on decreaseBalance", async () => {
-		wallet.decreaseBalance(Utils.BigNumber.ONE);
+	it("should emit on decreaseBalance", async (context) => {
+		context.wallet.decreaseBalance(Utils.BigNumber.ONE);
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "balance",
 				previousValue: Utils.BigNumber.ZERO,
 				value: Utils.BigNumber.make("-1"),
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on setNonce", async () => {
-		wallet.setNonce(Utils.BigNumber.ONE);
+	it("should emit on setNonce", async (context) => {
+		context.wallet.setNonce(Utils.BigNumber.ONE);
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "nonce",
 				previousValue: Utils.BigNumber.ZERO,
 				value: Utils.BigNumber.ONE,
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on increaseNonce", async () => {
-		wallet.increaseNonce();
+	it("should emit on increaseNonce", async (context) => {
+		context.wallet.increaseNonce();
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "nonce",
 				previousValue: Utils.BigNumber.ZERO,
 				value: Utils.BigNumber.ONE,
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on decreaseNonce", async () => {
-		wallet.decreaseNonce();
+	it("should emit on decreaseNonce", async (context) => {
+		context.wallet.decreaseNonce();
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "nonce",
 				previousValue: Utils.BigNumber.ZERO,
 				value: Utils.BigNumber.make("-1"),
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on setAttribute", async () => {
-		wallet.setAttribute("delegate.username", "dummy");
+	it("should emit on setAttribute", async (context) => {
+		context.wallet.setAttribute("delegate.username", "dummy");
 
-		assert.true(setup.spies.dispatchSyncSpy.calledOnce);
+		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "delegate.username",
 				value: "dummy",
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should emit on forgetAttribute", async () => {
-		wallet.setAttribute("delegate.username", "dummy");
-		wallet.forgetAttribute("delegate.username");
+	it("should emit on forgetAttribute", async (context) => {
+		context.wallet.setAttribute("delegate.username", "dummy");
+		context.wallet.forgetAttribute("delegate.username");
 
-		assert.true(setup.spies.dispatchSyncSpy.calledTwice);
+		assert.true(context.dispatchSyncSpy.calledTwice);
 		assert.true(
-			setup.spies.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
+			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
 				publicKey: undefined,
 				key: "delegate.username",
 				previousValue: "dummy",
-				wallet,
+				wallet: context.wallet,
 			}),
 		);
 	});
 
-	it("should clone", async () => {
-		wallet.setAttribute("delegate.username", "dummy");
-		const clone = wallet.clone();
+	it("should clone", async (context) => {
+		context.wallet.setAttribute("delegate.username", "dummy");
+		const clone = context.wallet.clone();
 
 		assert.equal(clone.getAddress(), "Abcde");
 		assert.equal(clone.getAttribute("delegate.username"), "dummy");
 	});
 });
 
-describe("Clone", ({ it, beforeAll, beforeEach, assert }) => {
-	let clone;
+describe<{
+	app: Application;
+	clone: Contracts.State.Wallet;
+	dispatchSyncSpy: SinonSpy;
+}>("Clone", ({ it, beforeAll, beforeEach, afterEach, assert }) => {
+	beforeAll(async (context) => {
+		const env = await setUp();
 
-	beforeAll(async () => {
-		setup = await setUp();
+		context.app = env.sandbox.app;
+		context.dispatchSyncSpy = env.spies.dispatchSyncSpy;
 	});
 
-	beforeEach(() => {
+	beforeEach((context) => {
 		const attributeMap = new Services.Attributes.AttributeMap(getWalletAttributeSet());
-		const events = setup.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+		const events = context.app.get<Contracts.Kernel.EventDispatcher>(
 			Container.Identifiers.EventDispatcherService,
 		);
+
 		const wallet = new Wallet("Abcde", attributeMap, events);
-		clone = wallet.clone();
+
+		context.clone = wallet.clone();
 	});
 
-	it("should emit on property set", async () => {
-		clone.nonce = Utils.BigNumber.make("3");
-
-		assert.false(setup.spies.dispatchSyncSpy.called);
+	afterEach((context) => {
+		context.dispatchSyncSpy.resetHistory();
 	});
 
-	it("should emit on setAttribute", async () => {
-		clone.setAttribute("delegate.username", "dummy");
+	it("should emit on property set", async (context) => {
+		// @ts-ignore
+		context.clone.nonce = Utils.BigNumber.make("3");
 
-		assert.false(setup.spies.dispatchSyncSpy.called);
+		assert.false(context.dispatchSyncSpy.called);
 	});
 
-	it("should emit on forgetAttribute", async () => {
-		clone.setAttribute("delegate.username", "dummy");
-		clone.forgetAttribute("delegate.username");
+	it("should emit on setAttribute", async (context) => {
+		context.clone.setAttribute("delegate.username", "dummy");
 
-		assert.false(setup.spies.dispatchSyncSpy.called);
+		assert.false(context.dispatchSyncSpy.called);
+	});
+
+	it("should emit on forgetAttribute", async (context) => {
+		context.clone.setAttribute("delegate.username", "dummy");
+		context.clone.forgetAttribute("delegate.username");
+
+		assert.false(context.dispatchSyncSpy.called);
 	});
 });
