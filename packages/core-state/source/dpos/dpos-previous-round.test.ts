@@ -1,4 +1,4 @@
-import { Container, Utils } from "@arkecosystem/core-kernel";
+import { Application, Container, Utils } from "@arkecosystem/core-kernel";
 import { RoundInfo } from "@arkecosystem/core-kernel/source/contracts/shared";
 import { DposPreviousRoundStateProvider } from "@arkecosystem/core-kernel/source/contracts/state";
 import { DposState } from "./dpos";
@@ -9,71 +9,75 @@ import { makeChainedBlocks } from "../../test/make-chained-block";
 import { makeVoteTransactions } from "../../test/make-vote-transactions";
 import { addTransactionsToBlock } from "../../test/transactions";
 import { setUp } from "../../test/setup";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe, Factories } from "@arkecosystem/core-test-framework";
+import { StateStore } from "../stores";
+import { BlockState } from "../block-state";
 
-let dposState: DposState;
-let dposPreviousRoundStateProv: DposPreviousRoundStateProvider;
-let walletRepo: WalletRepository;
-let factory;
-let blockState;
-let stateStore;
-let initialEnv;
-let round: RoundInfo;
-let blocks: Interfaces.IBlock[];
-
-describe("dposPreviousRound", ({ it, beforeAll, beforeEach, assert, spy, stub }) => {
-	beforeAll(async () => {
-		initialEnv = await setUp();
-		dposState = initialEnv.dPosState;
-		dposPreviousRoundStateProv = initialEnv.dposPreviousRound;
-		walletRepo = initialEnv.walletRepo;
-		factory = initialEnv.factory;
-		blockState = initialEnv.blockState;
-		stateStore = initialEnv.stateStore;
+describe<{
+	app: Application,
+	dposState: DposState,
+	dposPreviousRoundStateProv: DposPreviousRoundStateProvider,
+	walletRepo: WalletRepository,
+	factory: Factories.FactoryBuilder,
+	blockState: BlockState,
+	stateStore: StateStore,
+	round: RoundInfo,
+	blocks: Interfaces.IBlock[],
+}>("dposPreviousRound", ({ it, beforeAll, beforeEach, assert, spy, stub }) => {
+	beforeAll(async (context) => {
+		const env = await setUp();
+	
+		context.app = env.sandbox.app;	
+		context.dposState = env.dPosState;
+		context.dposPreviousRoundStateProv = env.dposPreviousRound;
+		context.walletRepo = env.walletRepo;
+		context.factory = env.factory;
+		context.blockState = env.blockState;
+		context.stateStore = env.stateStore;
 	});
 
-	beforeEach(async () => {
-		walletRepo.reset();
+	beforeEach(async (context) => {
+		context.walletRepo.reset();
 	
-		round = Utils.roundCalculator.calculateRound(1);
+		context.round = Utils.roundCalculator.calculateRound(1);
 	
-		buildDelegateAndVoteWallets(5, walletRepo);
+		buildDelegateAndVoteWallets(5, context.walletRepo);
 	
-		dposState.buildVoteBalances();
-		dposState.buildDelegateRanking();
-		round.maxDelegates = 5;
-		dposState.setDelegatesRound(round);
+		context.dposState.buildVoteBalances();
+		context.dposState.buildDelegateRanking();
+		context.round.maxDelegates = 5;
+		context.dposState.setDelegatesRound(context.round);
 	
-		blocks = makeChainedBlocks(101, factory.get("Block"));
+		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
 	});
 	
-	it("should get all delegates", async () => {
-		const previousRound = await dposPreviousRoundStateProv([], round);
+	it("should get all delegates", async (context) => {
+		const previousRound = await context.dposPreviousRoundStateProv([], context.round);
 
-		assert.equal(previousRound.getAllDelegates(), walletRepo.allByUsername());
+		assert.equal(previousRound.getAllDelegates(), context.walletRepo.allByUsername());
 	});
 
-	it("should get round delegates", async () => {
-		const previousRound = await dposPreviousRoundStateProv([], round);
+	it("should get round delegates", async (context) => {
+		const previousRound = await context.dposPreviousRoundStateProv([], context.round);
 
-		assert.containValues(previousRound.getRoundDelegates(), walletRepo.allByUsername() as any);
+		assert.containValues(previousRound.getRoundDelegates(), context.walletRepo.allByUsername() as any);
 	});
 
-	it("should revert blocks", async () => {
-		const spyBuildDelegateRanking = spy(dposState, "buildDelegateRanking");
-		const spySetDelegatesRound = spy(dposState, "setDelegatesRound");
-		const spyRevertBlock = spy(blockState, "revertBlock");
-		const spyGetLastBlock = stub(stateStore, "getLastBlock").returnValue({
+	it("should revert blocks", async (context) => {
+		const spyBuildDelegateRanking = spy(context.dposState, "buildDelegateRanking");
+		const spySetDelegatesRound = spy(context.dposState, "setDelegatesRound");
+		const spyRevertBlock = spy(context.blockState, "revertBlock");
+		const spyGetLastBlock = stub(context.stateStore, "getLastBlock").returnValue({
 			data: {
 				height: 1,
 			},
 		});
 
-		initialEnv.sandbox.app.rebind(Container.Identifiers.DposState).toConstantValue(dposState);
-		initialEnv.sandbox.app.rebind(Container.Identifiers.BlockState).toConstantValue(blockState);
-		initialEnv.sandbox.app.rebind(Container.Identifiers.StateStore).toConstantValue(stateStore);
+		context.app.rebind(Container.Identifiers.DposState).toConstantValue(context.dposState);
+		context.app.rebind(Container.Identifiers.BlockState).toConstantValue(context.blockState);
+		context.app.rebind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
 
-		const generatorWallet = walletRepo.findByPublicKey(blocks[0].data.generatorPublicKey);
+		const generatorWallet = context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
 
 		generatorWallet.setAttribute("delegate", {
 			username: "test",
@@ -83,22 +87,22 @@ describe("dposPreviousRound", ({ it, beforeAll, beforeEach, assert, spy, stub })
 			lastBlock: undefined,
 		});
 
-		walletRepo.index(generatorWallet);
+		context.walletRepo.index(generatorWallet);
 
 		addTransactionsToBlock(
 			makeVoteTransactions(3, [`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`]),
-			blocks[0],
+			context.blocks[0],
 		);
-		blocks[0].data.height = 2;
+		context.blocks[0].data.height = 2;
 
-		await blockState.applyBlock(blocks[0]);
+		await context.blockState.applyBlock(context.blocks[0]);
 
-		await dposPreviousRoundStateProv([blocks[0]], round);
+		await context.dposPreviousRoundStateProv([context.blocks[0]], context.round);
 
 		spyGetLastBlock.calledOnce();
 		spyBuildDelegateRanking.calledOnce();
-		spySetDelegatesRound.calledWith(round);
-		spyRevertBlock.calledWith(blocks[0]);
+		spySetDelegatesRound.calledWith(context.round);
+		spyRevertBlock.calledWith(context.blocks[0]);
 
 		spyBuildDelegateRanking.restore();
 		spySetDelegatesRound.restore();
@@ -106,17 +110,17 @@ describe("dposPreviousRound", ({ it, beforeAll, beforeEach, assert, spy, stub })
 		spyGetLastBlock.restore();
 	});
 
-	it("should not revert the blocks when height is one", async () => {
-		const spyBuildDelegateRanking = spy(dposState, "buildDelegateRanking");
-		const spySetDelegatesRound = spy(dposState, "setDelegatesRound");
-		const spyRevertBlock = spy(blockState, "revertBlock");
+	it("should not revert the blocks when height is one", async (context) => {
+		const spyBuildDelegateRanking = spy(context.dposState, "buildDelegateRanking");
+		const spySetDelegatesRound = spy(context.dposState, "setDelegatesRound");
+		const spyRevertBlock = spy(context.blockState, "revertBlock");
 
-		initialEnv.sandbox.app.rebind(Container.Identifiers.DposState).toConstantValue(dposState);
-		initialEnv.sandbox.app.rebind(Container.Identifiers.BlockState).toConstantValue(blockState);
+		context.app.rebind(Container.Identifiers.DposState).toConstantValue(context.dposState);
+		context.app.rebind(Container.Identifiers.BlockState).toConstantValue(context.blockState);
 
-		blocks[0].data.height = 1;
+		context.blocks[0].data.height = 1;
 
-		await dposPreviousRoundStateProv([blocks[0]], round);
+		await context.dposPreviousRoundStateProv([context.blocks[0]], context.round);
 
 		spyBuildDelegateRanking.calledOnce();
 		spySetDelegatesRound.calledOnce();
