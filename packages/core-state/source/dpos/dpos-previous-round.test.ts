@@ -21,56 +21,43 @@ let initialEnv;
 let round: RoundInfo;
 let blocks: Interfaces.IBlock[];
 
-const beforeAllCallback = async () => {
-	initialEnv = await setUp();
-	dposState = initialEnv.dPosState;
-	dposPreviousRoundStateProv = initialEnv.dposPreviousRound;
-	walletRepo = initialEnv.walletRepo;
-	factory = initialEnv.factory;
-	blockState = initialEnv.blockState;
-	stateStore = initialEnv.stateStore;
-};
+describe("dposPreviousRound", ({ it, beforeAll, beforeEach, assert, spy, stub }) => {
+	beforeAll(async () => {
+		initialEnv = await setUp();
+		dposState = initialEnv.dPosState;
+		dposPreviousRoundStateProv = initialEnv.dposPreviousRound;
+		walletRepo = initialEnv.walletRepo;
+		factory = initialEnv.factory;
+		blockState = initialEnv.blockState;
+		stateStore = initialEnv.stateStore;
+	});
 
-const beforeEachCallback = async () => {
-	walletRepo.reset();
-
-	round = Utils.roundCalculator.calculateRound(1);
-
-	buildDelegateAndVoteWallets(5, walletRepo);
-
-	dposState.buildVoteBalances();
-	dposState.buildDelegateRanking();
-	round.maxDelegates = 5;
-	dposState.setDelegatesRound(round);
-
-	blocks = makeChainedBlocks(101, factory.get("Block"));
-};
-
-describe("dposPreviousRound.getAllDelegates", ({ it, beforeAll, beforeEach, assert }) => {
-	beforeAll(beforeAllCallback);
-	beforeEach(beforeEachCallback);
-
+	beforeEach(async () => {
+		walletRepo.reset();
+	
+		round = Utils.roundCalculator.calculateRound(1);
+	
+		buildDelegateAndVoteWallets(5, walletRepo);
+	
+		dposState.buildVoteBalances();
+		dposState.buildDelegateRanking();
+		round.maxDelegates = 5;
+		dposState.setDelegatesRound(round);
+	
+		blocks = makeChainedBlocks(101, factory.get("Block"));
+	});
+	
 	it("should get all delegates", async () => {
 		const previousRound = await dposPreviousRoundStateProv([], round);
 
 		assert.equal(previousRound.getAllDelegates(), walletRepo.allByUsername());
 	});
-});
-
-describe("dposPreviousRound.getRoundDelegates", ({ it, beforeAll, beforeEach, assert }) => {
-	beforeAll(beforeAllCallback);
-	beforeEach(beforeEachCallback);
 
 	it("should get round delegates", async () => {
 		const previousRound = await dposPreviousRoundStateProv([], round);
 
 		assert.containValues(previousRound.getRoundDelegates(), walletRepo.allByUsername() as any);
 	});
-});
-
-describe("dposPreviousRound.revert", ({ it, beforeAll, beforeEach, spy, stub }) => {
-	beforeAll(beforeAllCallback);
-	beforeEach(beforeEachCallback);
 
 	it("should revert blocks", async () => {
 		const spyBuildDelegateRanking = spy(dposState, "buildDelegateRanking");
@@ -112,6 +99,11 @@ describe("dposPreviousRound.revert", ({ it, beforeAll, beforeEach, spy, stub }) 
 		spyBuildDelegateRanking.calledOnce();
 		spySetDelegatesRound.calledWith(round);
 		spyRevertBlock.calledWith(blocks[0]);
+
+		spyBuildDelegateRanking.restore();
+		spySetDelegatesRound.restore();
+		spyRevertBlock.restore();
+		spyGetLastBlock.restore();
 	});
 
 	it("should not revert the blocks when height is one", async () => {
@@ -129,5 +121,9 @@ describe("dposPreviousRound.revert", ({ it, beforeAll, beforeEach, spy, stub }) 
 		spyBuildDelegateRanking.calledOnce();
 		spySetDelegatesRound.calledOnce();
 		spyRevertBlock.neverCalled();
+
+		spyBuildDelegateRanking.restore();
+		spySetDelegatesRound.restore();
+		spyRevertBlock.restore();
 	});
 });
