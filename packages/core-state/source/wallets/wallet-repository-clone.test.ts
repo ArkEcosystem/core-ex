@@ -14,8 +14,13 @@ import { Sandbox, describe } from "@arkecosystem/core-test-framework";
 describe<{
 	walletRepositoryBlockchain: WalletRepository;
 	walletRepositoryClone: WalletRepositoryClone;
+	publicKey: string;
+	username: string;
 }>("Wallet Repository Clone", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
+		context.publicKey = "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37";
+		context.username = "genesis_1";
+
 		const sandbox = new Sandbox();
 		const app = sandbox.app;
 	
@@ -235,18 +240,16 @@ describe<{
 		spyOnCreateWallet.restore();
 	});
 
-	const publicKey = "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37";
-
 	it.skip("findByPublicKey - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", (context) => {
-		const blockchainWallet = context.walletRepositoryBlockchain.findByPublicKey(publicKey);
-		assert.true(context.walletRepositoryBlockchain.hasByPublicKey(publicKey));
+		const blockchainWallet = context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
+		assert.true(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
 		context.walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.Usernames).set("key", blockchainWallet);
 
-		const wallet = context.walletRepositoryClone.findByPublicKey(publicKey);
+		const wallet = context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
 		assert.instance(wallet, Wallet);
-		assert.equal(wallet.getPublicKey(), publicKey);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
+		assert.equal(wallet.getPublicKey(), context.publicKey);
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey));
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()));
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
 
@@ -255,33 +258,33 @@ describe<{
 	});
 
 	it("findByPublicKey - should create and index new wallet if does not exist in blockchain wallet repository", (context) => {
-		const wallet = context.walletRepositoryClone.findByPublicKey(publicKey);
+		const wallet = context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
 		assert.instance(wallet, Wallet);
-		assert.equal(wallet.getPublicKey(), publicKey);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
+		assert.equal(wallet.getPublicKey(), context.publicKey);
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey));
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()));
 
-		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(publicKey));
+		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
 		assert.false(context.walletRepositoryBlockchain.hasByAddress(wallet.getAddress()));
 	});
 
 	it("findByPublicKey - should return existing wallet", (context) => {
 		const spyOnCreateWallet = spy(context.walletRepositoryClone, "createWallet");
 
-		const wallet = context.walletRepositoryClone.findByPublicKey(publicKey);
+		const wallet = context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
 		assert.instance(wallet, Wallet);
-		assert.equal(wallet.getPublicKey(), publicKey);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
+		assert.equal(wallet.getPublicKey(), context.publicKey);
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey));
 		spyOnCreateWallet.calledOnce();
 
 		spyOnCreateWallet.reset();
-		const existingWallet = context.walletRepositoryClone.findByPublicKey(publicKey);
+		const existingWallet = context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
 		assert.equal(wallet, existingWallet);
 		spyOnCreateWallet.neverCalled();
-		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(publicKey));
+		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
 
 		spyOnCreateWallet.restore();
 	});
@@ -341,23 +344,21 @@ describe<{
 		}, "Wallet address doesn't exist in indexes addresses");
 	});
 
-	const username = "genesis_1";
-
 	it("findByIndex - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", (context) => {
 		const blockchainWallet = context.walletRepositoryBlockchain.findByAddress("address");
-		blockchainWallet.setAttribute("delegate.username", username);
+		blockchainWallet.setAttribute("delegate.username", context.username);
 		context.walletRepositoryBlockchain.index(blockchainWallet);
 		context.walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.Usernames).set("key", blockchainWallet);
-		assert.true(context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, username));
+		assert.true(context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, context.username));
 
-		const wallet = context.walletRepositoryClone.findByIndex(Contracts.State.WalletIndexes.Usernames, username);
+		const wallet = context.walletRepositoryClone.findByIndex(Contracts.State.WalletIndexes.Usernames, context.username);
 
 		assert.not.equal(wallet, blockchainWallet);
 		blockchainWallet.setPublicKey(undefined);
 
 		assert.equal(wallet, blockchainWallet);
-		assert.equal(wallet.getAttribute("delegate.username"), username);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has(username));
+		assert.equal(wallet.getAttribute("delegate.username"), context.username);
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has(context.username));
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has(wallet.getAddress()));
 		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has("key"));
 	});
@@ -366,28 +367,28 @@ describe<{
 		const spyOnCreateWallet = spy(context.walletRepositoryClone, "createWallet");
 
 		const wallet = context.walletRepositoryClone.findByAddress("address");
-		wallet.setAttribute("delegate.username", username);
+		wallet.setAttribute("delegate.username", context.username);
 		context.walletRepositoryClone.index(wallet);
 
 		assert.instance(wallet, Wallet);
 		assert.equal(wallet.getAddress(), "address");
-		assert.equal(wallet.getAttribute("delegate.username"), username);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has(username));
+		assert.equal(wallet.getAttribute("delegate.username"), context.username);
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Usernames).has(context.username));
 		spyOnCreateWallet.calledOnce();
 
 		spyOnCreateWallet.reset();
-		const existingWallet = context.walletRepositoryClone.findByIndex(Contracts.State.WalletIndexes.Usernames, username);
+		const existingWallet = context.walletRepositoryClone.findByIndex(Contracts.State.WalletIndexes.Usernames, context.username);
 
 		assert.equal(wallet, existingWallet);
 		spyOnCreateWallet.neverCalled();
-		assert.false(context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, username));
+		assert.false(context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, context.username));
 
 		spyOnCreateWallet.restore();
 	});
 
 	it("findByIndex - should throw error if does not exist in blockchain wallet repository", (context) => {
 		assert.throws(() => {
-			context.walletRepositoryClone.findByIndex(Contracts.State.WalletIndexes.Usernames, username);
+			context.walletRepositoryClone.findByIndex(Contracts.State.WalletIndexes.Usernames, context.username);
 		}, "Wallet genesis_1 doesn't exist in index usernames");
 	});
 
@@ -430,22 +431,22 @@ describe<{
 	});
 
 	it("hasByPublicKey - should return true if wallet exist in blockchain wallet repository", (context) => {
-		context.walletRepositoryBlockchain.findByPublicKey(publicKey);
+		context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
 
-		assert.true(context.walletRepositoryBlockchain.hasByPublicKey(publicKey));
-		assert.true(context.walletRepositoryClone.hasByPublicKey(publicKey));
+		assert.true(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
+		assert.true(context.walletRepositoryClone.hasByPublicKey(context.publicKey));
 	});
 
 	it("hasByPublicKey - should return true if wallet exist in clone wallet repository", (context) => {
-		context.walletRepositoryClone.findByPublicKey(publicKey);
+		context.walletRepositoryClone.findByPublicKey(context.publicKey);
 
-		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(publicKey));
-		assert.true(context.walletRepositoryClone.hasByPublicKey(publicKey));
+		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
+		assert.true(context.walletRepositoryClone.hasByPublicKey(context.publicKey));
 	});
 
 	it("hasByPublicKey - should return false if wallet does not exist in clone wallet repository", (context) => {
-		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(publicKey));
-		assert.false(context.walletRepositoryClone.hasByPublicKey(publicKey));
+		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
+		assert.false(context.walletRepositoryClone.hasByPublicKey(context.publicKey));
 	});
 
 	it("hasByUsername - should return true if wallet exist in blockchain wallet repository", (context) => {
@@ -564,28 +565,28 @@ describe<{
 	});
 
 	it("getNonce - should return 0 if wallet does not exists", (context) => {
-		assert.equal(context.walletRepositoryClone.getNonce(publicKey), Utils.BigNumber.ZERO);
+		assert.equal(context.walletRepositoryClone.getNonce(context.publicKey), Utils.BigNumber.ZERO);
 	});
 
 	it("getNonce - should return nonce if wallet exists only in blockchain wallet repository", (context) => {
-		const wallet = context.walletRepositoryBlockchain.findByPublicKey(publicKey);
+		const wallet = context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
 		wallet.setNonce(Utils.BigNumber.make("10"));
 
-		assert.equal(context.walletRepositoryClone.getNonce(publicKey), Utils.BigNumber.make("10"));
-		assert.true(context.walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
-		assert.false(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
+		assert.equal(context.walletRepositoryClone.getNonce(context.publicKey), Utils.BigNumber.make("10"));
+		assert.true(context.walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey));
+		assert.false(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey));
 	});
 
 	it("getNonce - should return nonce if wallet exists on copy wallet repository", (context) => {
-		const blockchainWallet = context.walletRepositoryBlockchain.findByPublicKey(publicKey);
+		const blockchainWallet = context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
 		blockchainWallet.setNonce(Utils.BigNumber.make("10"));
 
-		const wallet = context.walletRepositoryClone.findByPublicKey(publicKey);
+		const wallet = context.walletRepositoryClone.findByPublicKey(context.publicKey);
 		wallet.setNonce(Utils.BigNumber.make("20"));
 
-		assert.equal(context.walletRepositoryClone.getNonce(publicKey), Utils.BigNumber.make("20"));
-		assert.true(context.walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey));
+		assert.equal(context.walletRepositoryClone.getNonce(context.publicKey), Utils.BigNumber.make("20"));
+		assert.true(context.walletRepositoryBlockchain.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey));
+		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(context.publicKey));
 	});
 
 	it("allByAddress - should return all wallets from clone and blockchain wallet repository by address", (context) => {
