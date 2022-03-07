@@ -3,129 +3,136 @@ import { Container, Enums } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "./database-interactions";
 import { describe } from "@arkecosystem/core-test-framework";
 
-const app = {
-	get: () => undefined,
-	terminate: () => undefined,
-};
-const connection = {
-	query: () => undefined,
-	close: () => undefined,
-};
-const blockRepository = {
-	findOne: () => undefined,
-	findByHeightRange: () => undefined,
-	findByHeightRangeWithTransactions: () => undefined,
-	findByHeightRangeWithTransactionsForDownload: () => undefined,
-	findByHeights: () => undefined,
-	findLatest: () => undefined,
-	findByIds: () => undefined,
-	findRecent: () => undefined,
-	findTop: () => undefined,
-	count: () => undefined,
-	getStatistics: () => undefined,
-	saveBlocks: () => undefined,
-	deleteBlocks: () => undefined,
-};
-const transactionRepository = {
-	find: () => undefined,
-	findOne: () => undefined,
-	findByBlockIds: () => undefined,
-	getStatistics: () => undefined,
-};
-const roundRepository = {
-	getRound: () => undefined,
-	save: () => undefined,
-	deleteFrom: () => undefined,
-};
+describe<{
+	app: any;
+	blockRepository: any;
+	blockState: any;
+	connection: any;
+	container: Container.Container;
+	events: any;
+	handlerRegistry: any;
+	stateStore: any;
+	roundState: any;
+	transactionRepository: any;
+}>("DatabaseInteractions", ({ it, beforeAll, spy, stub }) => {
+	beforeAll((context) => {
+		context.app = {
+			get: () => undefined,
+			terminate: () => undefined,
+		};
 
-const stateStore = {
-	setGenesisBlock: () => undefined,
-	getGenesisBlock: () => undefined,
-	setLastBlock: () => undefined,
-	getLastBlock: () => undefined,
-	getLastBlocksByHeight: () => undefined,
-	getCommonBlocks: () => undefined,
-	getLastBlockIds: () => undefined,
-};
+		context.connection = {
+			query: () => undefined,
+			close: () => undefined,
+		};
 
-const stateBlockStore = {
-	resize: () => undefined,
-};
+		context.blockRepository = {
+			findOne: () => undefined,
+			findByHeightRange: () => undefined,
+			findByHeightRangeWithTransactions: () => undefined,
+			findByHeightRangeWithTransactionsForDownload: () => undefined,
+			findByHeights: () => undefined,
+			findLatest: () => undefined,
+			findByIds: () => undefined,
+			findRecent: () => undefined,
+			findTop: () => undefined,
+			count: () => undefined,
+			getStatistics: () => undefined,
+			saveBlocks: () => undefined,
+			deleteBlocks: () => undefined,
+		};
 
-const stateTransactionStore = {
-	resize: () => undefined,
-};
+		context.transactionRepository = {
+			find: () => undefined,
+			findOne: () => undefined,
+			findByBlockIds: () => undefined,
+			getStatistics: () => undefined,
+		};
+		
+		context.stateStore = {
+			setGenesisBlock: () => undefined,
+			getGenesisBlock: () => undefined,
+			setLastBlock: () => undefined,
+			getLastBlock: () => undefined,
+			getLastBlocksByHeight: () => undefined,
+			getCommonBlocks: () => undefined,
+			getLastBlockIds: () => undefined,
+		};
+		
+		context.handlerRegistry = {
+			getActivatedHandlerForData: () => undefined,
+		};
+		
+		context.blockState = {
+			applyBlock: () => undefined,
+			revertBlock: () => undefined,
+		};
+		
+		context.events = {
+			call: () => undefined,
+			dispatch: () => undefined,
+		};
 
-const handlerRegistry = {
-	getActivatedHandlerForData: () => undefined,
-};
+		context.roundState = {
+			applyBlock: () => undefined,
+			revertBlock: () => undefined,
+			getActiveDelegates: () => undefined,
+			restore: () => undefined,
+			detectMissedBlocks: () => undefined,
+		};
+		
+		const container = new Container.Container();
+		container.bind(Container.Identifiers.Application).toConstantValue(context.app);
+		container.bind(Container.Identifiers.DatabaseConnection).toConstantValue(context.connection);
+		container.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(context.blockRepository);
+		container.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue(context.transactionRepository);
+		container.bind(Container.Identifiers.DatabaseRoundRepository).toConstantValue({
+			getRound: () => undefined,
+			save: () => undefined,
+			deleteFrom: () => undefined,
+		});
+		container.bind(Container.Identifiers.DatabaseService).to(DatabaseService);
+		container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
+		container.bind(Container.Identifiers.StateBlockStore).toConstantValue({
+			resize: () => undefined,
+		});
+		container.bind(Container.Identifiers.StateTransactionStore).toConstantValue({
+			resize: () => undefined,
+		});
+		container.bind(Container.Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
+		container.bind(Container.Identifiers.WalletRepository).toConstantValue({
+			createWallet: () => undefined,
+			findByPublicKey: () => undefined,
+			findByUsername: () => undefined,
+		});
+		container.bind(Container.Identifiers.BlockState).toConstantValue(context.blockState);
+		container.bind(Container.Identifiers.DposState).toConstantValue({
+			buildDelegateRanking: () => undefined,
+			setDelegatesRound: () => undefined,
+			getRoundDelegates: () => undefined,
+		});
+		container.bind(Container.Identifiers.DposPreviousRoundStateProvider).toConstantValue(() => undefined);
+		container.bind(Container.Identifiers.TriggerService).toConstantValue({
+			call: () => undefined,
+		});
+		container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.events);
 
-const walletRepository = {
-	createWallet: () => undefined,
-	findByPublicKey: () => undefined,
-	findByUsername: () => undefined,
-};
+		container.bind(Container.Identifiers.LogService).toConstantValue({
+			error: () => undefined,
+			warning: () => undefined,
+			info: () => undefined,
+			debug: () => undefined,
+		});
 
-const blockState = {
-	applyBlock: () => undefined,
-	revertBlock: () => undefined,
-};
+		container.bind(Container.Identifiers.RoundState).toConstantValue(context.roundState);
 
-const dposState = {
-	buildDelegateRanking: () => undefined,
-	setDelegatesRound: () => undefined,
-	getRoundDelegates: () => undefined,
-};
+		context.container = container;
+	});
 
-const getDposPreviousRoundState = () => undefined;
+	it("should dispatch starting event", async (context) => {
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
-const triggers = {
-	call: () => undefined,
-};
-
-const events = {
-	call: () => undefined,
-	dispatch: () => undefined,
-};
-const logger = {
-	error: () => undefined,
-	warning: () => undefined,
-	info: () => undefined,
-	debug: () => undefined,
-};
-const roundState = {
-	applyBlock: () => undefined,
-	revertBlock: () => undefined,
-	getActiveDelegates: () => undefined,
-	restore: () => undefined,
-	detectMissedBlocks: () => undefined,
-};
-
-const container = new Container.Container();
-container.bind(Container.Identifiers.Application).toConstantValue(app);
-container.bind(Container.Identifiers.DatabaseConnection).toConstantValue(connection);
-container.bind(Container.Identifiers.DatabaseBlockRepository).toConstantValue(blockRepository);
-container.bind(Container.Identifiers.DatabaseTransactionRepository).toConstantValue(transactionRepository);
-container.bind(Container.Identifiers.DatabaseRoundRepository).toConstantValue(roundRepository);
-container.bind(Container.Identifiers.DatabaseService).to(DatabaseService);
-container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-container.bind(Container.Identifiers.StateBlockStore).toConstantValue(stateBlockStore);
-container.bind(Container.Identifiers.StateTransactionStore).toConstantValue(stateTransactionStore);
-container.bind(Container.Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
-container.bind(Container.Identifiers.WalletRepository).toConstantValue(walletRepository);
-container.bind(Container.Identifiers.BlockState).toConstantValue(blockState);
-container.bind(Container.Identifiers.DposState).toConstantValue(dposState);
-container.bind(Container.Identifiers.DposPreviousRoundStateProvider).toConstantValue(getDposPreviousRoundState);
-container.bind(Container.Identifiers.TriggerService).toConstantValue(triggers);
-container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(events);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
-container.bind(Container.Identifiers.RoundState).toConstantValue(roundState);
-
-describe("DatabaseInteractions", ({ it, assert, spy, stub }) => {
-	it("should dispatch starting event", async () => {
-		const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
-
-		const eventsStub = spy(events, "dispatch");
+		const eventsStub = spy(context.events, "dispatch");
 
 		await databaseInteraction.initialize();
 
@@ -134,37 +141,38 @@ describe("DatabaseInteractions", ({ it, assert, spy, stub }) => {
 		eventsStub.restore();
 	});
 
-	it("should reset database when CORE_RESET_DATABASE variable is set", async () => {
+	it("should reset database when CORE_RESET_DATABASE variable is set", async (context) => {
+		const genesisBlock = {};
+
+		const setSpy = spy(context.stateStore, "setGenesisBlock");
+		const stateStoreStub = stub(context.stateStore, "getGenesisBlock").returnValue(genesisBlock);
+
 		try {
-			const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
+			const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 			process.env.CORE_RESET_DATABASE = "1";
-			const genesisBlock = {};
-
-			const setSpy = spy(stateStore, "setGenesisBlock");
-			const stateStoreStub = stub(stateStore, "getGenesisBlock").returnValue(genesisBlock);
 
 			await databaseInteraction.initialize();
 			// expect(databaseInteraction.reset).toBeCalled();
 			stateStoreStub.called();
 			// expect(databaseInteraction.saveBlocks).toBeCalledWith([genesisBlock]);
 			setSpy.called();
+		} finally {
+			delete process.env.CORE_RESET_DATABASE;
 
 			stateStoreStub.restore();
 			setSpy.restore();
-		} finally {
-			delete process.env.CORE_RESET_DATABASE;
 		}
 	});
 
-	it("should terminate app if exception was raised", async () => {
-		const stateStoreStub = stub(stateStore, "setGenesisBlock").callsFake(() => {
+	it("should terminate app if exception was raised", async (context) => {
+		const stateStoreStub = stub(context.stateStore, "setGenesisBlock").callsFake(() => {
 			throw new Error("Fail");
 		});
 
-		const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
-		const appSpy = spy(app, "terminate");
+		const appSpy = spy(context.app, "terminate");
 
 		await databaseInteraction.initialize();
 
@@ -174,8 +182,8 @@ describe("DatabaseInteractions", ({ it, assert, spy, stub }) => {
 		appSpy.restore();
 	});
 
-	it("should terminate if unable to deserialize last 5 blocks", async () => {
-		const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
+	it("should terminate if unable to deserialize last 5 blocks", async (context) => {
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		const block101data = { id: "block101", height: 101 };
 		const block102data = { id: "block102", height: 102 };
@@ -184,36 +192,36 @@ describe("DatabaseInteractions", ({ it, assert, spy, stub }) => {
 		const block105data = { id: "block105", height: 105 };
 		const block106data = { id: "block106", height: 105 };
 
-		const blockRepoLatestStub = stub(blockRepository, "findLatest");
-		const transRepoStub = stub(transactionRepository, "findByBlockIds");
-		const setBlockSpy = spy(stateStore, "setGenesisBlock");
-		const deleteBlockSpy = spy(blockRepository, "deleteBlocks");
-		const appSpy = spy(app, "terminate");
+		const blockRepoLatestStub = stub(context.blockRepository, "findLatest");
+		const transRepoStub = stub(context.transactionRepository, "findByBlockIds");
+		const setBlockSpy = spy(context.stateStore, "setGenesisBlock");
+		const deleteBlockSpy = spy(context.blockRepository, "deleteBlocks");
+		const appSpy = spy(context.app, "terminate");
 
-		blockRepoLatestStub.returnValueOnce(block106data);
+		blockRepoLatestStub.returnValueNth(0, block106data);
 
-		blockRepoLatestStub.returnValueOnce(block106data); // this.getLastBlock
-		transRepoStub.returnValueOnce([]); // this.getLastBlock
+		blockRepoLatestStub.returnValueNth(1, block106data); // this.getLastBlock
+		transRepoStub.returnValueNth(0, []); // this.getLastBlock
 
-		blockRepoLatestStub.returnValueOnce(block106data); // blockRepository.deleteBlocks
-		blockRepoLatestStub.returnValueOnce(block105data); // this.getLastBlock
-		transRepoStub.returnValueOnce([]); // this.getLastBlock
+		blockRepoLatestStub.returnValueNth(2, block106data); // blockRepository.deleteBlocks
+		blockRepoLatestStub.returnValueNth(3, block105data); // this.getLastBlock
+		transRepoStub.returnValueNth(1, []); // this.getLastBlock
 
-		blockRepoLatestStub.returnValueOnce(block105data); // blockRepository.deleteBlocks
-		blockRepoLatestStub.returnValueOnce(block104data); // this.getLastBlock
-		transRepoStub.returnValueOnce([]); // this.getLastBlock
+		blockRepoLatestStub.returnValueNth(4, block105data); // blockRepository.deleteBlocks
+		blockRepoLatestStub.returnValueNth(5, block104data); // this.getLastBlock
+		transRepoStub.returnValueNth(2, []); // this.getLastBlock
 
-		blockRepoLatestStub.returnValueOnce(block104data); // blockRepository.deleteBlocks
-		blockRepoLatestStub.returnValueOnce(block103data); // this.getLastBlock
-		transRepoStub.returnValueOnce([]); // this.getLastBlock
+		blockRepoLatestStub.returnValueNth(6, block104data); // blockRepository.deleteBlocks
+		blockRepoLatestStub.returnValueNth(7, block103data); // this.getLastBlock
+		transRepoStub.returnValueNth(3, []); // this.getLastBlock
 
-		blockRepoLatestStub.returnValueOnce(block103data); // blockRepository.deleteBlocks
-		blockRepoLatestStub.returnValueOnce(block102data); // this.getLastBlock
-		transRepoStub.returnValueOnce([]); // this.getLastBlock
+		blockRepoLatestStub.returnValueNth(8, block103data); // blockRepository.deleteBlocks
+		blockRepoLatestStub.returnValueNth(9, block102data); // this.getLastBlock
+		transRepoStub.returnValueNth(4, []); // this.getLastBlock
 
-		blockRepoLatestStub.returnValueOnce(block102data); // blockRepository.deleteBlocks
-		blockRepoLatestStub.returnValueOnce(block101data); // this.getLastBlock
-		transRepoStub.returnValueOnce([]); // this.getLastBlock
+		blockRepoLatestStub.returnValueNth(10, block102data); // blockRepository.deleteBlocks
+		blockRepoLatestStub.returnValueNth(11, block101data); // this.getLastBlock
+		transRepoStub.returnValueNth(5, []); // this.getLastBlock
 
 		await databaseInteraction.initialize();
 
@@ -239,14 +247,18 @@ describe("DatabaseInteractions", ({ it, assert, spy, stub }) => {
 		transRepoStub.calledWith([block101data.id]);
 
 		appSpy.called();
+
+		blockRepoLatestStub.restore();
+		transRepoStub.restore();
+		setBlockSpy.restore();
+		deleteBlockSpy.restore();
+		appSpy.restore();
 	});
-});
 
-describe("DatabaseInteraction.restoreCurrentRound", ({ it, assert, spy }) => {
-	it("should call roundState.restore", async () => {
-		const roundStateSpy = spy(roundState, "restore");
+	it("restoreCurrentRound - should call roundState.restore", async (context) => {
+		const roundStateSpy = spy(context.roundState, "restore");
 
-		const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		await databaseInteraction.restoreCurrentRound();
 
@@ -254,16 +266,14 @@ describe("DatabaseInteraction.restoreCurrentRound", ({ it, assert, spy }) => {
 
 		roundStateSpy.restore();
 	});
-});
 
-describe("DatabaseInteraction.reset", ({ it, assert, stub, spy }) => {
-	it("should reset database", async () => {
+	it("reset - should reset database", async (context) => {
 		const genesisBlock = {};
-		const connectionSpy = spy(connection, "query");
-		const stateStoreStub = stub(stateStore, "getGenesisBlock").returnValueOnce(genesisBlock);
-		const blockRepoSpy = spy(blockRepository, "saveBlocks");
+		const connectionSpy = spy(context.connection, "query");
+		const stateStoreStub = stub(context.stateStore, "getGenesisBlock").returnValueOnce(genesisBlock);
+		const blockRepoSpy = spy(context.blockRepository, "saveBlocks");
 
-		const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		// @ts-ignore
 		await databaseInteraction.reset();
@@ -275,22 +285,20 @@ describe("DatabaseInteraction.reset", ({ it, assert, stub, spy }) => {
 		stateStoreStub.restore();
 		blockRepoSpy.restore();
 	});
-});
 
-describe("DatabaseInteraction.applyBlock", ({ it, assert, spy, stub }) => {
-	it("should apply block, round, detect missing blocks, and fire events", async () => {
-		const eventsStub = spy(events, "dispatch");
-		const blockStateStub = spy(blockState, "applyBlock");
-		const roundStateStub = spy(roundState, "applyBlock");
-		const roundStateStub2 = spy(roundState, "detectMissedBlocks");
+	it("applyBlock - should apply block, round, detect missing blocks, and fire events", async (context) => {
+		const eventsStub = spy(context.events, "dispatch");
+		const blockStateStub = spy(context.blockState, "applyBlock");
+		const roundStateStub = spy(context.roundState, "applyBlock");
+		const roundStateStub2 = spy(context.roundState, "detectMissedBlocks");
 
-		const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		const spied = spy();
 
 		const handler = { emitEvents: spied };
 
-		const handlerStub = stub(handlerRegistry, "getActivatedHandlerForData").returnValueOnce(handler);
+		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").returnValueOnce(handler);
 
 		const transaction = { data: { id: "dummy_id" } };
 		const block = { data: { height: 54, timestamp: 35 }, transactions: [transaction] };
@@ -300,7 +308,7 @@ describe("DatabaseInteraction.applyBlock", ({ it, assert, spy, stub }) => {
 
 		blockStateStub.calledWith(block);
 		roundStateStub.calledWith(block);
-		spied.calledWith(transaction, events);
+		spied.calledWith(transaction, context.events);
 		eventsStub.calledWith(Enums.TransactionEvent.Applied, transaction.data);
 		eventsStub.calledWith(Enums.BlockEvent.Applied, block.data);
 
@@ -311,15 +319,13 @@ describe("DatabaseInteraction.applyBlock", ({ it, assert, spy, stub }) => {
 		spied.restore();
 		handlerStub.restore();
 	});
-});
 
-describe("DatabaseInteraction.revertBlock", ({ it, assert, stub, spy }) => {
-	it("should revert state, and fire events", async () => {
-		const eventsStub = spy(events, "dispatch");
-		const blockStateStub = spy(blockState, "revertBlock");
-		const roundStateStub = spy(roundState, "revertBlock");
+	it("revertBlock - should revert state, and fire events", async (context) => {
+		const eventsStub = spy(context.events, "dispatch");
+		const blockStateStub = spy(context.blockState, "revertBlock");
+		const roundStateStub = spy(context.roundState, "revertBlock");
 
-		const databaseInteraction: DatabaseInteraction = container.resolve(DatabaseInteraction);
+		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		const transaction1 = { data: {} };
 		const transaction2 = { data: {} };
