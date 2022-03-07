@@ -4,118 +4,99 @@ import { setUp } from "../../test/setup";
 import { describe } from "@arkecosystem/core-test-framework";
 import { Factory } from "@arkecosystem/core-test-framework/distribution/factories/factory";
 
-let factory: Factory;
+describe<{
+	factory: Factory;
+	wallet: Wallets.Wallet;
+	walletIndex: WalletIndex;
+}>("WalletIndex", ({ it, beforeAll, beforeEach, assert }) => {
+	beforeAll(async (context) => {
+		const env = await setUp();
+	
+		context.factory = env.factory.get("Wallet");
+	});
 
-let wallet: Wallets.Wallet;
-let walletIndex: WalletIndex;
+	beforeEach((context) => {
+		context.wallet = context.factory.make<Wallets.Wallet>();
+	
+		context.walletIndex = new WalletIndex((index, wallet) => {
+			index.set(wallet.getAddress(), wallet);
+		}, true);
+	});
 
-const beforeAllCallback = async () => {
-	const initialEnv = await setUp();
-
-	factory = initialEnv.factory.get("Wallet");
-};
-
-const beforeEachCallback = () => {
-	wallet = factory.make<Wallets.Wallet>();
-
-	walletIndex = new WalletIndex((index, wallet) => {
-		index.set(wallet.getAddress(), wallet);
-	}, true);
-};
-
-describe("WalletIndex", ({ it, beforeAll, beforeEach, assert }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should return entries", () => {
-		walletIndex.index(wallet);
-		const entries = walletIndex.entries();
+	it("should return entries", (context) => {
+		context.walletIndex.index(context.wallet);
+		const entries = context.walletIndex.entries();
 
 		assert.equal(entries.length, 1);
 		assert.equal(entries[0][0], entries[0][1].getAddress());
-		assert.equal(entries[0][0], wallet.getAddress());
+		assert.equal(entries[0][0], context.wallet.getAddress());
 	});
 
-	it("should return keys", () => {
-		walletIndex.index(wallet);
+	it("should return keys", (context) => {
+		context.walletIndex.index(context.wallet);
 
-		assert.true(walletIndex.keys().includes(wallet.getAddress()));
+		assert.true(context.walletIndex.keys().includes(context.wallet.getAddress()));
 	});
 
-	it("should return walletKeys", () => {
-		assert.equal(walletIndex.walletKeys(wallet), []);
+	it("should return walletKeys", (context) => {
+		assert.equal(context.walletIndex.walletKeys(context.wallet), []);
 
-		walletIndex.index(wallet);
+		context.walletIndex.index(context.wallet);
 
-		assert.equal(walletIndex.walletKeys(wallet), [wallet.getAddress()]);
-	});
-});
-
-describe("set", ({ it, beforeAll, beforeEach, assert }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should set and get addresses", () => {
-		assert.false(walletIndex.has(wallet.getAddress()));
-
-		walletIndex.index(wallet);
-		walletIndex.set(wallet.getAddress(), wallet);
-
-		assert.equal(walletIndex.get(wallet.getAddress()), wallet);
-		assert.true(walletIndex.has(wallet.getAddress()));
-
-		assert.true(walletIndex.values().includes(wallet));
-
-		walletIndex.clear();
-		assert.false(walletIndex.has(wallet.getAddress()));
+		assert.equal(context.walletIndex.walletKeys(context.wallet), [context.wallet.getAddress()]);
 	});
 
-	it("should override key with new wallet", () => {
-		const anotherWallet = factory.make<Wallets.Wallet>();
+	it("set - should set and get addresses", (context) => {
+		assert.false(context.walletIndex.has(context.wallet.getAddress()));
 
-		walletIndex.set("key1", wallet);
-		walletIndex.set("key1", anotherWallet);
+		context.walletIndex.index(context.wallet);
+		context.walletIndex.set(context.wallet.getAddress(), context.wallet);
 
-		assert.equal(walletIndex.get("key1"), anotherWallet);
+		assert.equal(context.walletIndex.get(context.wallet.getAddress()), context.wallet);
+		assert.true(context.walletIndex.has(context.wallet.getAddress()));
 
-		const entries = walletIndex.entries();
+		assert.true(context.walletIndex.values().includes(context.wallet));
+
+		context.walletIndex.clear();
+		assert.false(context.walletIndex.has(context.wallet.getAddress()));
+	});
+
+	it("set - should override key with new wallet", (context) => {
+		const anotherWallet = context.factory.make<Wallets.Wallet>();
+
+		context.walletIndex.set("key1", context.wallet);
+		context.walletIndex.set("key1", anotherWallet);
+
+		assert.equal(context.walletIndex.get("key1"), anotherWallet);
+
+		const entries = context.walletIndex.entries();
 
 		assert.equal(entries.length, 1);
 	});
-});
 
-describe("forget", ({ it, beforeAll, beforeEach, assert }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
+	it("forget - should index and forget wallets", (context) => {
+		assert.false(context.walletIndex.has(context.wallet.getAddress()));
 
-	it("should index and forget wallets", () => {
-		assert.false(walletIndex.has(wallet.getAddress()));
+		context.walletIndex.index(context.wallet);
+		assert.true(context.walletIndex.has(context.wallet.getAddress()));
 
-		walletIndex.index(wallet);
-		assert.true(walletIndex.has(wallet.getAddress()));
-
-		walletIndex.forget(wallet.getAddress());
-		assert.false(walletIndex.has(wallet.getAddress()));
+		context.walletIndex.forget(context.wallet.getAddress());
+		assert.false(context.walletIndex.has(context.wallet.getAddress()));
 	});
 
-	it("should not throw if key is not indexed", () => {
-		walletIndex.forget(wallet.getAddress());
-	});
-});
-
-describe("forgetWallet", ({ it, beforeAll, beforeEach, assert }) => {
-	beforeEach(beforeEachCallback);
-	beforeAll(beforeAllCallback);
-
-	it("should forget wallet", () => {
-		walletIndex.index(wallet);
-		assert.equal(walletIndex.get(wallet.getAddress()), wallet);
-
-		walletIndex.forgetWallet(wallet);
-		assert.undefined(walletIndex.get(wallet.getAddress()));
+	it("forget - should not throw if key is not indexed", (context) => {
+		context.walletIndex.forget(context.wallet.getAddress());
 	});
 
-	it("should not throw if wallet is not indexed", () => {
-		walletIndex.forgetWallet(wallet);
+	it("forgetWallet - should forget wallet", (context) => {
+		context.walletIndex.index(context.wallet);
+		assert.equal(context.walletIndex.get(context.wallet.getAddress()), context.wallet);
+
+		context.walletIndex.forgetWallet(context.wallet);
+		assert.undefined(context.walletIndex.get(context.wallet.getAddress()));
+	});
+
+	it("forgetWallet - should not throw if wallet is not indexed", (context) => {
+		context.walletIndex.forgetWallet(context.wallet);
 	});
 });
