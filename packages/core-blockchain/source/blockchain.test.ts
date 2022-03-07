@@ -29,7 +29,7 @@ describe<{
 	blockHeight1: any;
 	blockHeight2: any;
 	blockHeight3: any;
-}>("Blockchain", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
+}>("Blockchain", ({ assert, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
 		context.configuration = {
 			getOptional: (key, defaultValue) => defaultValue,
@@ -433,7 +433,7 @@ describe<{
 	it("handleIncomingBlock when state is started should dispatch 'NEWBLOCK', BlockEvent.Received and enqueue the block", async (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 		const dispatchSpy = spy(blockchain, "dispatch");
-		const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
+		const enqueueBlocksSpy = stub(blockchain, "enqueueBlocks").callsFake(() => undefined);
 
 		const eventDispatcherServiceDispatchSpy = spy(context.eventDispatcherService, "dispatch");
 		stub(Crypto.Slots, "getSlotNumber").returnValue(1);
@@ -467,7 +467,7 @@ describe<{
 
 	it("handleIncomingBlock when state is started should handle block from forger if in right slot", async (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
+		const enqueueBlocksSpy = stub(blockchain, "enqueueBlocks").callsFake(() => undefined);
 		const dispatchSpy = spy(blockchain, "dispatch");
 		stub(context.stateStore, "isStarted").returnValue(true);
 		stub(context.stateStore, "getLastBlock").returnValue({ data: context.blockData });
@@ -518,7 +518,7 @@ describe<{
 
 	it("handleIncomingBlock when state is started should handle block if not from forger if less than 2 seconds left in slot", async (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
-		const enqueueBlocksSpy = spy(blockchain, "enqueueBlocks");
+		const enqueueBlocksSpy = stub(blockchain, "enqueueBlocks").callsFake(() => undefined);
 		const dispatchSpy = spy(blockchain, "dispatch");
 
 		stub(context.stateStore, "isStarted").returnValue(true);
