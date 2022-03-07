@@ -256,6 +256,7 @@ importers:
       delay: 4.4.1
       import-fresh: 3.3.0
       joi: 17.4.2
+      sinon: ^12.0.1
       uvu: ^0.5.3
       xstate: 4.23.4
     dependencies:
@@ -270,6 +271,7 @@ importers:
       '@types/async': 3.2.7
       delay: 4.4.1
       import-fresh: 3.3.0
+      sinon: 12.0.1
       uvu: 0.5.3
 
   packages/core-cli:
