@@ -1,17 +1,18 @@
 import { TransactionStore } from "./transactions";
 import { describe, Factories } from "@arkecosystem/core-test-framework";
-import { ITransaction } from "@arkecosystem/crypto/source/interfaces";
+import { Interfaces } from "@arkecosystem/crypto";
 
-let factory: Factories.FactoryBuilder;
+describe<{
+	factory: Factories.FactoryBuilder
+}>("TransactionStore", ({ it, assert, beforeEach }) => {
+	beforeEach((context) => {
+		context.factory = new Factories.FactoryBuilder();
 
-describe("TransactionStore", ({ it, assert, beforeEach }) => {
-	beforeEach(() => {
-		factory = new Factories.FactoryBuilder();
-		Factories.Factories.registerTransactionFactory(factory);
+		Factories.Factories.registerTransactionFactory(context.factory);
 	});
 
-	it("should push and get a transaction", () => {
-		const transaction: ITransaction = factory.get("Transfer").make();
+	it("should push and get a transaction", (context) => {
+		const transaction: Interfaces.ITransaction = context.factory.get("Transfer").make();
 
 		// TODO: set id using factory
 		transaction.data.id = "1";
