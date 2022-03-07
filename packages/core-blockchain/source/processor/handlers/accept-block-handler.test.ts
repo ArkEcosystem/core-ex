@@ -72,11 +72,10 @@ describe<{
 		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.transactionPool);
 	});
 
-	it.only("execute should apply block to database, transaction pool, blockchain and state", async (context) => {
+	it("execute should apply block to database, transaction pool, blockchain and state", async (context) => {
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
 		stub(context.state, "isStarted").returnValue(true);
-		// stub(context.state, "getForkedBlock").returnValue(context.block);
 		const applyBlockSpy = spy(context.databaseInteractions, "applyBlock");
 		const resetWakeUpSpy = spy(context.blockchain, "resetWakeUp");
 		const removeForgedTransactionSpy = spy(context.transactionPool, "removeForgedTransaction");
@@ -95,70 +94,76 @@ describe<{
 	it("execute should clear forkedBlock if incoming block has same height", async (context) => {
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
-		context.state.getForkedBlock = jest.fn().mockReturnValue({ data: { height: context.block.data.height } });
+		stub(context.state, "getForkedBlock").returnValue({ data: { height: context.block.data.height } });
+		const clearForkedBlockSpy = spy(context.state, "clearForkedBlock");
+
 		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
 
 		assert.is(result, BlockProcessorResult.Accepted);
-
-		expect(context.state.clearForkedBlock).toHaveBeenCalled();
+		clearForkedBlockSpy.calledOnce();
 	});
 
 	it("execute should set state.lastDownloadedBlock if incoming block height is higher", async (context) => {
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
-		context.state.getLastDownloadedBlock = jest.fn().mockReturnValue({ height: context.block.data.height - 1 });
+		stub(context.state, "getLastDownloadedBlock").returnValue({ height: context.block.data.height - 1 });
+		const setLastDownloadedBlockSpy = spy(context.state, "setLastDownloadedBlock");
 		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
 
 		assert.is(result, BlockProcessorResult.Accepted);
 
-		expect(context.state.setLastDownloadedBlock).toHaveBeenCalledWith(context.block.data);
-		expect(context.state.setLastDownloadedBlock).toHaveBeenCalledTimes(1);
+		setLastDownloadedBlockSpy.calledOnce();
+		setLastDownloadedBlockSpy.calledWith(context.block.data);
 	});
 
 	it("revert should call revertBlockHandler when block is accepted, but execute throws", async (context) => {
-		context.revertBlockHandler.execute.mockReturnValue(BlockProcessorResult.Reverted);
-		context.application.resolve.mockReturnValue(context.revertBlockHandler);
-		context.state.getLastBlock.mockReturnValue({ data: { height: 5544 } });
+		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(BlockProcessorResult.Reverted);
+		stub(context.application, "resolve").returnValue(context.revertBlockHandler);
+		stub(context.state, "getLastBlock").returnValue({ data: { height: 5544 } });
+		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
 
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
-		context.databaseInteractions.applyBlock = jest.fn().mockRejectedValueOnce(new Error("oops"));
+		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
+
 		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
 
 		assert.is(result, BlockProcessorResult.Rejected);
-
-		expect(context.blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);
-		expect(context.revertBlockHandler.execute).toBeCalledTimes(1);
+		resetLastDownloadedBlockSpy.calledOnce();
+		revertBlockHandlerExecuteStub.calledOnce();
 	});
 
-	it("revert should call not revertBlockHandler when block not accepted and execute throws", async (context) => {
-		context.revertBlockHandler.execute.mockReturnValue(BlockProcessorResult.Reverted);
-		context.state.getLastBlock.mockReturnValue({ data: { height: 5543 } }); // Current block was not accpeted
+	it.only("revert should call not revertBlockHandler when block not accepted and execute throws", async (context) => {
+		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(BlockProcessorResult.Reverted);
+		stub(context.state, "getLastBlock").returnValue({ data: { height: 5543 } }); // Current block was not accpeted
 
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
-		context.databaseInteractions.applyBlock = jest.fn().mockRejectedValueOnce(new Error("oops"));
+		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
+		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
+
 		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
 
 		assert.is(result, BlockProcessorResult.Rejected);
-
-		expect(context.blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);
-		expect(context.revertBlockHandler.execute).not.toBeCalled();
+		resetLastDownloadedBlockSpy.calledOnce();
+		revertBlockHandlerExecuteStub.neverCalled();
 	});
 
 	it("revert should return Corrupted when reverting block fails", async (context) => {
-		context.revertBlockHandler.execute.mockReturnValue(BlockProcessorResult.Corrupted);
-		context.application.resolve.mockReturnValue(context.revertBlockHandler);
-		context.state.getLastBlock.mockReturnValue({ data: { height: 5544 } });
+		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(BlockProcessorResult.Corrupted);
+		stub(context.application, "resolve").returnValue(context.revertBlockHandler);
+		stub(context.state, "getLastBlock").returnValue({ data: { height: 5544 } });
 
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
 
-		context.databaseInteractions.applyBlock = jest.fn().mockRejectedValueOnce(new Error("oops"));
+		stub(context.databaseInteractions, "applyBlock").rejectedValue(new Error("oops"));
+		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
+
 		const result = await acceptBlockHandler.execute(context.block as Interfaces.IBlock);
 
 		assert.is(result, BlockProcessorResult.Corrupted);
 
-		expect(context.blockchain.resetLastDownloadedBlock).toBeCalledTimes(1);
-		expect(context.revertBlockHandler.execute).toBeCalledTimes(1);
+		resetLastDownloadedBlockSpy.calledOnce();
+		revertBlockHandlerExecuteStub.calledOnce();
 	});
 });
