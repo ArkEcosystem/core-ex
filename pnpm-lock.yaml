@@ -21,6 +21,7 @@ importers:
       babel-loader: 8.2.2
       c8: ~7.10.0
       capture-console: 1.0.1
+      chalk: 4.1.2
       cpy-cli: 3.1.1
       create-hash: 1.2.0
       cross-env: 7.0.3
@@ -82,6 +83,7 @@ importers:
       babel-loader: 8.2.2_@babel+core@7.15.5
       c8: 7.10.0
       capture-console: 1.0.1
+      chalk: 4.1.2
       cpy-cli: 3.1.1
       create-hash: 1.2.0
       cross-env: 7.0.3
@@ -299,6 +301,7 @@ importers:
       reflect-metadata: 0.1.13
       semver: 6.3.0
       tar: 6.1.11
+      tmp: 0.2.1
       type-fest: 0.21.3
       uvu: ^0.5.3
       yargs-parser: 20.2.9
@@ -337,12 +340,13 @@ importers:
       '@types/listr': 0.14.4
       '@types/semver': 6.2.3
       '@types/yargs-parser': 20.2.1
+      tmp: 0.2.1
       uvu: 0.5.3
 
-  packages/core-cli/_migrate_these_tests/services/plugins/@namespace/package2:
+  packages/core-cli/test/plugins/@namespace/package2:
     specifiers: {}
 
-  packages/core-cli/_migrate_these_tests/services/plugins/package1:
+  packages/core-cli/test/plugins/package1:
     specifiers: {}
 
   packages/core-container:
@@ -908,6 +912,7 @@ importers:
       '@arkecosystem/core-crypto-errors': workspace:*
       '@arkecosystem/core-crypto-networks': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
@@ -945,6 +950,7 @@ importers:
       '@arkecosystem/core-crypto-errors': link:../core-crypto-errors
       '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
       '@arkecosystem/core-crypto-time': link:../core-crypto-time
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/crypto-identities': 1.2.0
@@ -1157,16 +1163,54 @@ importers:
       import-fresh: 3.3.0
       uvu: 0.5.3
 
+  packages/core-fees:
+    specifiers:
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/crypto': workspace:*
+      '@arkecosystem/utils': workspace:*
+    dependencies:
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/crypto': link:../crypto
+      '@arkecosystem/utils': link:../utils
+
+  packages/core-fees-managed:
+    specifiers:
+      '@arkecosystem/core-fees': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-transactions': workspace:*
+      '@arkecosystem/crypto': workspace:*
+    dependencies:
+      '@arkecosystem/core-fees': link:../core-fees
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-transactions': link:../core-transactions
+      '@arkecosystem/crypto': link:../crypto
+
+  packages/core-fees-static:
+    specifiers:
+      '@arkecosystem/core-fees': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-transactions': workspace:*
+      '@arkecosystem/crypto': workspace:*
+    dependencies:
+      '@arkecosystem/core-fees': link:../core-fees
+      '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-transactions': link:../core-transactions
+      '@arkecosystem/crypto': link:../crypto
+
   packages/core-forger:
     specifiers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-state': workspace:*
       '@arkecosystem/core-transactions': workspace:*
       '@arkecosystem/crypto': workspace:*
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      import-fresh: 3.3.0
       joi: 17.4.2
       node-forge: 1.2.1
+      sinon: ^12.0.1
+      uvu: ^0.5.3
       wif: 2.0.6
     dependencies:
       '@arkecosystem/core-kernel': link:../core-kernel
@@ -1177,8 +1221,12 @@ importers:
       node-forge: 1.2.1
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-state': link:../core-state
       '@types/node-forge': 0.10.4
       '@types/wif': 2.0.2
+      import-fresh: 3.3.0
+      sinon: 12.0.1
+      uvu: 0.5.3
 
   packages/core-kernel:
     specifiers:
@@ -4231,13 +4279,11 @@ packages:
     resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-    dev: false
 
   /@sinonjs/fake-timers/9.1.0:
     resolution: {integrity: sha512-M8vapsv9qQupMdzrVzkn5rb9jG7aUTEPAZdMtME2PuBaefksFZVE2C1g4LBRTkF/k3nRDNbDc5tp5NFC1PEYxA==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-    dev: false
 
   /@sinonjs/samsam/5.3.1:
     resolution: {integrity: sha512-1Hc0b1TtyfBu8ixF/tpfSHTVWKwCBLY4QJbkgnE7HcwyvT2xArDxb4K7dMgqRm3szI+LJbzmW/s4xxEhv6hwDg==}
@@ -4253,7 +4299,6 @@ packages:
       '@sinonjs/commons': 1.8.3
       lodash.get: 4.4.2
       type-detect: 4.0.8
-    dev: false
 
   /@sinonjs/text-encoding/0.7.1:
     resolution: {integrity: sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==}
@@ -4397,7 +4442,7 @@ packages:
   /@types/fs-extra/8.1.2:
     resolution: {integrity: sha512-SvSrYXfWSc7R4eqnOzbQF4TZmfpNSM9FrSWLU3EUnWBuyZqNBOrv1B1JA3byUDPUl9z4Ab3jeZG2eDdySlgNMg==}
     dependencies:
-      '@types/node': 13.9.5
+      '@types/node': 17.0.18
     dev: true
 
   /@types/functional-red-black-tree/1.0.1:
@@ -11161,7 +11206,6 @@ packages:
       '@sinonjs/text-encoding': 0.7.1
       just-extend: 4.2.1
       path-to-regexp: 1.8.0
-    dev: false
 
   /no-case/3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
@@ -13124,7 +13168,6 @@ packages:
       diff: 5.0.0
       nise: 5.1.1
       supports-color: 7.2.0
-    dev: false
 
   /sinon/9.2.4:
     resolution: {integrity: sha512-zljcULZQsJxVra28qIAL6ow1Z9tpattkCTEJR4RBP3TGc00FcttsP5pK284Nas5WjMZU5Yzy3kAIp3B3KRf5Yg==}
