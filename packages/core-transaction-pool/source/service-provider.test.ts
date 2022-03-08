@@ -60,7 +60,7 @@ describe<{
 
 		await assert.resolves(() => promise);
 
-		promise.then(res => {
+		promise.then((res) => {
 			assert.true(res);
 		});
 	});
@@ -198,7 +198,7 @@ describe<{
 		assert.defined(result.error);
 		assert.equal(result.error!.message, '"maxTransactionsPerSender" must be a number');
 	});
-	
+
 	it("should parse process.env.CORE_TRANSACTION_POOL_MAX_PER_SENDER", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
