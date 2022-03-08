@@ -1,14 +1,14 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { StateStore } from "./";
 import { Factories } from "@arkecosystem/core-test-framework";
-import { IBlock, IBlockData, ITransactionData } from "@arkecosystem/crypto/distribution/interfaces";
+import { Interfaces } from "@arkecosystem/crypto";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { setUp } from "../../test/setup";
 import { SinonSpy } from "sinon";
 import { describe } from "@arkecosystem/core-test-framework";
 
 describe<{
-	blocks: IBlock[];
+	blocks: Interfaces.IBlock[];
 	stateStorage: StateStore;
 	factory: Factories.FactoryBuilder;
 	logger: SinonSpy;
@@ -208,7 +208,7 @@ describe<{
 			context.stateStorage.setLastBlock(context.blocks[i]);
 		}
 
-		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as IBlockData[];
+		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Interfaces.IBlockData[];
 		assert.length(lastBlocksData, 5);
 
 		for (let i = 0; i < 5; i++) {
@@ -224,7 +224,7 @@ describe<{
 			context.stateStorage.setLastBlock(context.blocks[i]);
 		}
 
-		const lastBlocksData = context.stateStorage.getLastBlocksData(true).toArray() as IBlockData[];
+		const lastBlocksData = context.stateStorage.getLastBlocksData(true).toArray() as Interfaces.IBlockData[];
 
 		assert.length(lastBlocksData, 5);
 	});
@@ -240,7 +240,7 @@ describe<{
 			context.stateStorage.setLastBlock(context.blocks[i]);
 		}
 
-		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as IBlockData[];
+		const lastBlocksData = context.stateStorage.getLastBlocksData().toArray() as Interfaces.IBlockData[];
 
 		assert.length(lastBlocksData, 5);
 	});
@@ -342,7 +342,7 @@ describe<{
 	});
 
 	it("cacheTransactions - should add transaction id", (context) => {
-		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as ITransactionData]), {
+		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Interfaces.ITransactionData]), {
 			added: [{ id: "1" }],
 			notAdded: [],
 		});
@@ -350,11 +350,11 @@ describe<{
 	});
 
 	it("cacheTransactions - should not add duplicate transaction ids", (context) => {
-		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as ITransactionData]), {
+		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Interfaces.ITransactionData]), {
 			added: [{ id: "1" }],
 			notAdded: [],
 		});
-		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as ITransactionData]), {
+		assert.equal(context.stateStorage.cacheTransactions([{ id: "1" } as Interfaces.ITransactionData]), {
 			added: [],
 			notAdded: [{ id: "1" }],
 		});

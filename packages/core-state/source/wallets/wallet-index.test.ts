@@ -1,22 +1,21 @@
 import { Wallets } from "../";
 import { WalletIndex } from "./";
 import { setUp } from "../../test/setup";
-import { describe } from "@arkecosystem/core-test-framework";
-import { Factory } from "@arkecosystem/core-test-framework/distribution/factories/factory";
+import { describe, Factories } from "@arkecosystem/core-test-framework";
 
 describe<{
-	factory: Factory;
+	factory: Factories.FactoryBuilder;
 	wallet: Wallets.Wallet;
 	walletIndex: WalletIndex;
 }>("WalletIndex", ({ it, beforeAll, beforeEach, assert }) => {
 	beforeAll(async (context) => {
 		const env = await setUp();
 
-		context.factory = env.factory.get("Wallet");
+		context.factory = env.factory;
 	});
 
 	beforeEach((context) => {
-		context.wallet = context.factory.make<Wallets.Wallet>();
+		context.wallet = context.factory.get("Wallet").make<Wallets.Wallet>();
 
 		context.walletIndex = new WalletIndex((index, wallet) => {
 			index.set(wallet.getAddress(), wallet);
@@ -62,7 +61,7 @@ describe<{
 	});
 
 	it("set - should override key with new wallet", (context) => {
-		const anotherWallet = context.factory.make<Wallets.Wallet>();
+		const anotherWallet = context.factory.get("Wallet").make<Wallets.Wallet>();
 
 		context.walletIndex.set("key1", context.wallet);
 		context.walletIndex.set("key1", anotherWallet);
