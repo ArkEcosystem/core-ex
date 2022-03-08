@@ -30,7 +30,7 @@ describe<{
 	verificationFailedHandler: any;
 }>("BlockProcessor", ({ assert, beforeEach, it, spyFn, stubFn }) => {
 	const logService = { warning: spyFn(), info: spyFn(), error: spyFn(), debug: spyFn() };
-	const blockchain = { getLastBlock: stubFn() };
+	const blockchain = { getLastBlock: stubFn(), resetLastDownloadedBlock: stubFn() };
 	const transactionRepository = { getForgedTransactionsIds: stubFn() };
 
 	const walletRepository = {
@@ -50,14 +50,18 @@ describe<{
 		restoreCurrentRound: spyFn(),
 		revertBlock: spyFn(),
 		deleteRound: spyFn(),
+		applyBlock: spyFn(),
 	};
 	const roundState = {
 		getActiveDelegates: stubFn().returns([]),
 	};
 	const stateStore = {
+		getForkedBlock: stubFn(),
 		getLastBlock: stubFn(),
 		getLastBlocks: stubFn(),
+		getLastDownloadedBlock: stubFn(),
 		getLastStoredBlockHeight: stubFn(),
+		isStarted: stubFn(),
 	};
 
 	const databaseInterceptor = {};
