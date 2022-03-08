@@ -4,7 +4,8 @@ import { Processor } from "./processor";
 import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import { describe } from "@arkecosystem/core-test-framework";
 
-const buildTransaction = (nonce: string): Interfaces.ITransaction => Transactions.BuilderFactory.transfer()
+const buildTransaction = (nonce: string): Interfaces.ITransaction =>
+	Transactions.BuilderFactory.transfer()
 		.version(2)
 		.amount("100")
 		.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
@@ -23,30 +24,33 @@ describe<{
 }>("Processor", ({ it, assert, beforeAll, beforeEach, stub, spy }) => {
 	beforeAll((context) => {
 		context.pool = {
-			addTransaction: () => undefined
+			addTransaction: () => undefined,
 		};
 
-		context.extensions = [
-			{ throwIfCannotBroadcast: () => undefined },
-			{ throwIfCannotBroadcast: () => undefined }
-		];
+		context.extensions = [{ throwIfCannotBroadcast: () => undefined }, { throwIfCannotBroadcast: () => undefined }];
 
 		context.transactionBroadcaster = {
 			broadcastTransactions: () => Promise.resolve(),
 		};
 
 		context.workerPool = {
-			getTransactionFromData: () => undefined
+			getTransactionFromData: () => undefined,
 		};
 
 		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[0]);
-		context.container.bind(Container.Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[1]);
+		context.container
+			.bind(Container.Identifiers.TransactionPoolProcessorExtension)
+			.toConstantValue(context.extensions[0]);
+		context.container
+			.bind(Container.Identifiers.TransactionPoolProcessorExtension)
+			.toConstantValue(context.extensions[1]);
 		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.pool);
-		context.container.bind(Container.Identifiers.PeerTransactionBroadcaster).toConstantValue(context.transactionBroadcaster);
+		context.container
+			.bind(Container.Identifiers.PeerTransactionBroadcaster)
+			.toConstantValue(context.transactionBroadcaster);
 		context.container.bind(Container.Identifiers.TransactionPoolWorkerPool).toConstantValue(context.workerPool);
 		context.container.bind(Container.Identifiers.LogService).toConstantValue({
-			error: () => undefined
+			error: () => undefined,
 		});
 
 		// Build transactions...
@@ -62,9 +66,7 @@ describe<{
 		const workerPoolStub = stub(context.workerPool, "getTransactionFromData");
 		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
-		workerPoolStub
-			.resolvedValueNth(0, context.transaction1)
-			.resolvedValueNth(1, context.transaction2);
+		workerPoolStub.resolvedValueNth(0, context.transaction1).resolvedValueNth(1, context.transaction2);
 
 		const spiedExtension0 = stub(context.extensions[0], "throwIfCannotBroadcast");
 
@@ -96,7 +98,10 @@ describe<{
 	it.skip("should wrap deserialize errors into BAD_DATA pool error", async (context) => {
 		const processor = context.container.resolve(Processor);
 
-		const workerPoolStub = stub(context.workerPool, "getTransactionFromData").rejectedValueNth(0, new Error("Version 1 not supported"));
+		const workerPoolStub = stub(context.workerPool, "getTransactionFromData").rejectedValueNth(
+			0,
+			new Error("Version 1 not supported"),
+		);
 
 		const result = await processor.process([context.transaction1.data]);
 
@@ -142,7 +147,7 @@ describe<{
 
 	it("should add broadcast eligible transaction", async (context) => {
 		const poolSpy = spy(context.pool, "addTransaction");
-		
+
 		const spiedExtension0 = stub(context.extensions[0], "throwIfCannotBroadcast");
 		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
@@ -151,7 +156,7 @@ describe<{
 			.callsFakeNth(1, async (transaction) => {
 				throw new TransactionFeeToLowError(transaction);
 			});
-		
+
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
 
 		const processor = context.container.resolve(Processor);
