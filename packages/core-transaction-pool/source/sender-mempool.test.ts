@@ -1,7 +1,7 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test-framework";
 import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
-import { SenderMempool } from "../../../packages/core-transaction-pool/source/sender-mempool";
+import { SenderMempool } from "./";
 
 const buildTransaction = (nonce: string): Interfaces.ITransaction => {
 	return Transactions.BuilderFactory.transfer()

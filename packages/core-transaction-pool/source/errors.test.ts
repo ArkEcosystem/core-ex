@@ -15,7 +15,7 @@ import {
 	TransactionFromWrongNetworkError,
 	TransactionHasExpiredError,
 	TransactionPoolFullError,
-} from "../../../packages/core-transaction-pool/source/errors";
+} from "./errors";
 
 // DLaFiYprzZU2DwV1KPYcDfPr2MJFLSznU7#1 918fa01e Transfer v2
 // console.log(String(transaction));

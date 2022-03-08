@@ -1,7 +1,7 @@
 import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
 import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
 import { describe } from "@arkecosystem/core-test-framework";
-import { SenderState } from "../../../packages/core-transaction-pool/source/sender-state";
+import { SenderState } from "./";
 
 describe<{
 	configuration: any;

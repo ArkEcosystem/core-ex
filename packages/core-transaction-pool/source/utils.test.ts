@@ -1,4 +1,4 @@
-import { IteratorMany } from "../../../packages/core-transaction-pool/source/utils";
+import { IteratorMany } from "./";
 import { describe } from "@arkecosystem/core-test-framework";
 
 describe("IteratorMany", ({ it, assert }) => {

@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Managers } from "@arkecosystem/crypto";
 import { describe } from "@arkecosystem/core-test-framework";
-import { Collator } from "../../../packages/core-transaction-pool/source/collator";
+import { Collator } from "./";
 
 describe<{
 	container: Container.Container;

@@ -1,6 +1,6 @@
 import { Container, Utils } from "@arkecosystem/core-kernel";
 import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
-import { ExpirationService } from "../../../packages/core-transaction-pool/source/expiration-service";
+import { ExpirationService } from "./";
 import { describe } from "@arkecosystem/core-test-framework";
 
 describe<{

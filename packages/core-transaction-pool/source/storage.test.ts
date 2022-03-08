@@ -2,7 +2,7 @@ import { Container } from "@arkecosystem/core-kernel";
 import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import fs from "fs-extra";
 import { describe } from "@arkecosystem/core-test-framework";
-import { Storage } from "../../../packages/core-transaction-pool/source/storage";
+import { Storage } from "./";
 import { Stub } from "@arkecosystem/core-test-framework/distribution/uvu/stub";
 
 const buildTransaction = (nonce: string): Interfaces.ITransaction => {

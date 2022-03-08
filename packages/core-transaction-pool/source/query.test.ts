@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Enums, Identities, Managers, Transactions } from "@arkecosystem/crypto";
 import { describe } from "@arkecosystem/core-test-framework";
-import { Query, QueryIterable } from "../../../packages/core-transaction-pool/source/query";
+import { Query, QueryIterable } from "./";
 
 describe<{
 	aip: Boolean;
