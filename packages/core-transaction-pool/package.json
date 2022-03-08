@@ -27,7 +27,7 @@
 		"@arkecosystem/core-test-framework": "workspace:*",
 		"@types/better-sqlite3": "5.4.3",
 		"@types/fs-extra": "8.1.2",
-		"core-test-framework:workspace:*,": "link:@arkecosystem/core-test-framework:workspace:*,",
+		"import-fresh": "3.3.0",
 		"sinon": "^13.0.1",
 		"uvu": "^0.5.3"
 	},
