@@ -2,7 +2,7 @@ import { Container } from "@arkecosystem/core-kernel";
 import { Interfaces } from "@arkecosystem/crypto";
 import { describe } from "../../../../core-test-framework";
 
-import { BlockProcessorResult } from "../block-processor";
+import { BlockProcessorResult } from "../contracts";
 import { AcceptBlockHandler } from "./accept-block-handler";
 
 describe<{
