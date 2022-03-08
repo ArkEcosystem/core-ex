@@ -3,13 +3,13 @@ import { Interfaces } from "@arkecosystem/crypto";
 import { describe } from "../../../../core-test-framework";
 
 import { BlockProcessorResult } from "../contracts";
-import { AlreadyForgedHandler } from "./already-forged-handler";
+import { IncompatibleTransactionsHandler } from "./incompatible-transactions-handler";
 
 describe<{
 	container: Container.Container;
 	blockchain: any;
 	application: any;
-}>("AlreadyForgedHandler", ({ assert, beforeEach, it, spy }) => {
+}>("IncompatibleTransactionsHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.blockchain = {
 			resetLastDownloadedBlock: () => undefined,
@@ -24,14 +24,16 @@ describe<{
 	});
 
 	it("should call blockchain.resetLastDownloadedBlock and return DiscardedButCanBeBroadcasted", async (context) => {
-		const alreadyForgedHandler = context.container.resolve<AlreadyForgedHandler>(AlreadyForgedHandler);
+		const incompatibleTransactionsHandler = context.container.resolve<IncompatibleTransactionsHandler>(
+			IncompatibleTransactionsHandler,
+		);
 
 		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
 
 		const block = {};
-		const result = await alreadyForgedHandler.execute(block as Interfaces.IBlock);
+		const result = await incompatibleTransactionsHandler.execute(block as Interfaces.IBlock);
 
-		assert.equal(result, BlockProcessorResult.DiscardedButCanBeBroadcasted);
+		assert.equal(result, BlockProcessorResult.Rejected);
 		resetLastDownloadedBlockSpy.calledOnce();
 	});
 });
