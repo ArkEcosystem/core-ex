@@ -55,14 +55,9 @@ const buildMultipaymentTransaction = (context) => {
 
 	sendingWallet.setAttribute("vote", sendersDelegate.getPublicKey());
 	context.recipientWallet.setAttribute("vote", context.recipientsDelegate.getPublicKey());
-	context.walletRepo.index([
-		sendersDelegate,
-		context.recipientsDelegate,
-		sendingWallet,
-		context.recipientWallet,
-	]);
+	context.walletRepo.index([sendersDelegate, context.recipientsDelegate, sendingWallet, context.recipientWallet]);
 
-	return { amount, multiPaymentTransaction, sendingWallet, sendersDelegate }
+	return { amount, multiPaymentTransaction, sendingWallet, sendersDelegate };
 };
 
 describe<{
@@ -608,7 +603,7 @@ describe<{
 	});
 
 	it("multipayment should fail if there are no assets", async (context) => {
-		const { sendingWallet, multiPaymentTransaction } = buildMultipaymentTransaction(context)
+		const { sendingWallet, multiPaymentTransaction } = buildMultipaymentTransaction(context);
 
 		sendingWallet.forgetAttribute("vote");
 		context.walletRepo.index([sendingWallet]);
@@ -619,7 +614,7 @@ describe<{
 	});
 
 	it("multipayment should fail if there are no assets and sending wallet has voted", async (context) => {
-		const { multiPaymentTransaction } = buildMultipaymentTransaction(context)
+		const { multiPaymentTransaction } = buildMultipaymentTransaction(context);
 
 		delete multiPaymentTransaction.data.asset;
 
@@ -627,7 +622,7 @@ describe<{
 	});
 
 	it("multipayment should be okay when recipient hasn't voted", async (context) => {
-		const { multiPaymentTransaction } = buildMultipaymentTransaction(context)
+		const { multiPaymentTransaction } = buildMultipaymentTransaction(context);
 
 		context.recipientWallet.forgetAttribute("vote");
 		context.walletRepo.index([context.recipientWallet]);
@@ -636,7 +631,7 @@ describe<{
 	});
 
 	it("multipayment should update delegates vote balance for multiPayments", async (context) => {
-		const { amount, multiPaymentTransaction, sendersDelegate } = buildMultipaymentTransaction(context)
+		const { amount, multiPaymentTransaction, sendersDelegate } = buildMultipaymentTransaction(context);
 
 		const senderDelegateBefore = sendersDelegate.getAttribute("delegate.voteBalance");
 		const recipientsDelegateBefore = context.recipientsDelegate.getAttribute("delegate.voteBalance");
