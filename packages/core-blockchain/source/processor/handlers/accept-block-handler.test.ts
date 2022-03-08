@@ -133,7 +133,7 @@ describe<{
 		revertBlockHandlerExecuteStub.calledOnce();
 	});
 
-	it.only("revert should call not revertBlockHandler when block not accepted and execute throws", async (context) => {
+	it("revert should call not revertBlockHandler when block not accepted and execute throws", async (context) => {
 		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(BlockProcessorResult.Reverted);
 		stub(context.state, "getLastBlock").returnValue({ data: { height: 5543 } }); // Current block was not accpeted
 
