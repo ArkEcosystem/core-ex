@@ -23,11 +23,15 @@ describe<{
 		context.logger = { warning: () => undefined, error: () => undefined };
 
 		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.TransactionValidatorFactory).toConstantValue(context.createTransactionValidator);
+		context.container
+			.bind(Container.Identifiers.TransactionValidatorFactory)
+			.toConstantValue(context.createTransactionValidator);
 		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
 		context.container.bind(Container.Identifiers.TransactionPoolService).toConstantValue(context.pool);
 		context.container.bind(Container.Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
-		context.container.bind(Container.Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
+		context.container
+			.bind(Container.Identifiers.TransactionPoolExpirationService)
+			.toConstantValue(context.expirationService);
 		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
 	});
 
@@ -80,7 +84,7 @@ describe<{
 
 		const milestone = { block: { idFullSha256: true, maxTransactions: 5, maxPayload: 141 + 10 + 4 + 10 + 4 } };
 		const lastBlock = { data: { height: 10 } };
-		
+
 		const milestoneStub = stub(Managers.configManager, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
 		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);

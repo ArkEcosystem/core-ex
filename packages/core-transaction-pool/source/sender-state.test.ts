@@ -30,11 +30,15 @@ describe<{
 		context.emitter = {
 			dispatch: () => undefined,
 		};
-		
+
 		context.container = new Container.Container();
 		context.container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(context.configuration);
-		context.container.bind(Container.Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
-		context.container.bind(Container.Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
+		context.container
+			.bind(Container.Identifiers.TransactionHandlerRegistry)
+			.toConstantValue(context.handlerRegistry);
+		context.container
+			.bind(Container.Identifiers.TransactionPoolExpirationService)
+			.toConstantValue(context.expirationService);
 		context.container.bind(Container.Identifiers.TriggerService).toConstantValue(context.triggers);
 		context.container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.emitter);
 
@@ -55,7 +59,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_TOO_LARGE");
 		});
@@ -71,7 +75,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_WRONG_NETWORK");
 		});
@@ -88,7 +92,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_FROM_FUTURE");
 		});
@@ -108,7 +112,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_EXPIRED");
 		});
@@ -132,7 +136,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_BAD_DATA");
 		});
@@ -165,7 +169,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_RETRY");
 		});
@@ -186,7 +190,7 @@ describe<{
 		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 		stub(context.expirationService, "isExpired").returnValueOnce(false);
 		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
-		
+
 		const triggerStub = stub(context.triggers, "call");
 		triggerStub.resolvedValueNth(0, true); // verifyTransaction
 		triggerStub.resolvedValueNth(1, undefined); // throwIfCannotEnterPool
@@ -196,7 +200,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_APPLY");
 		});

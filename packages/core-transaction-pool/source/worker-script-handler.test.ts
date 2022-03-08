@@ -30,7 +30,7 @@ describe("WorkerScriptHandler", ({ it, assert }) => {
 			.nonce("1")
 			.sign("sender's secret")
 			.build();
-		
+
 		const result = await workerScriptHandler.getTransactionFromData(transaction.data);
 
 		assert.equal(result, {

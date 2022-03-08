@@ -29,7 +29,7 @@ describe<{
 					throw new Error(`Test scenarios should not hit this line`);
 			}
 		};
-	
+
 		stub(Utils.forgingInfoCalculator, "getBlockTimeLookup").resolvedValue(getTimeStampForBlock);
 	});
 

@@ -12,7 +12,7 @@ const buildTransaction = (nonce: string): Interfaces.ITransaction => {
 		.fee("900")
 		.sign("sender's secret")
 		.build();
-}
+};
 
 describe<{
 	aip: Boolean;
@@ -25,26 +25,22 @@ describe<{
 		context.aip = Managers.configManager.getMilestone().aip11;
 
 		Managers.configManager.getMilestone().aip11 = true;
-		
+
 		context.configuration = {
 			getRequired: () => undefined,
-			getOptional: () => undefined
+			getOptional: () => undefined,
 		};
 
 		context.senderState = {
 			apply: () => undefined,
-			revert: () => undefined
+			revert: () => undefined,
 		};
 
 		context.container = new Container.Container();
 		context.container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 		context.container.bind(Container.Identifiers.TransactionPoolSenderState).toConstantValue(context.senderState);
 
-		context.transactions = [
-			buildTransaction("1"),
-			buildTransaction("2"),
-			buildTransaction("3"),
-		];
+		context.transactions = [buildTransaction("1"), buildTransaction("2"), buildTransaction("3")];
 	});
 
 	afterAll((context) => {
@@ -123,7 +119,7 @@ describe<{
 
 		await assert.rejects(() => promise);
 
-		promise.catch(err => {
+		promise.catch((err) => {
 			assert.instance(err, Contracts.TransactionPool.PoolError);
 			assert.equal(err.type, "ERR_EXCEEDS_MAX_COUNT");
 		});
@@ -131,7 +127,9 @@ describe<{
 
 	it("addTransaction - should apply transaction to sender state when sender exceeded maximum transaction count but is included in allowedSenders", async (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(0); // maxTransactionsPerSender
-		stub(context.configuration, "getOptional").returnValueOnce([Identities.PublicKey.fromPassphrase("sender's secret")]); // allowedSenders
+		stub(context.configuration, "getOptional").returnValueOnce([
+			Identities.PublicKey.fromPassphrase("sender's secret"),
+		]); // allowedSenders
 		const applySpy = spy(context.senderState, "apply");
 
 		const senderMempool = context.container.resolve(SenderMempool);

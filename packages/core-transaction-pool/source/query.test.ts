@@ -18,10 +18,10 @@ describe<{
 			hasSenderMempool: () => undefined,
 			getSenderMempool: () => undefined,
 		};
-		
+
 		context.container = new Container.Container();
 		context.container.bind(Container.Identifiers.TransactionPoolMempool).toConstantValue(context.mempool);
-		
+
 		context.aip = Managers.configManager.getMilestone().aip11;
 		Managers.configManager.getMilestone().aip11 = true;
 

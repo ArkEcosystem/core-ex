@@ -13,7 +13,9 @@ describe<{
 		context.logger = { debug: () => undefined };
 
 		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.TransactionPoolSenderMempoolFactory).toConstantValue(context.createSenderMempool);
+		context.container
+			.bind(Container.Identifiers.TransactionPoolSenderMempoolFactory)
+			.toConstantValue(context.createSenderMempool);
 		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
 	});
 
@@ -34,9 +36,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool1)
-			.onSecondCall().returns(senderMempool2);
+		context.createSenderMempool.onFirstCall().returns(senderMempool1).onSecondCall().returns(senderMempool2);
 
 		const transaction1 = {
 			id: "transaction1-id",
@@ -62,8 +62,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",
@@ -83,8 +82,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",
@@ -104,8 +102,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",
@@ -124,8 +121,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",
@@ -150,9 +146,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool1)
-			.onSecondCall().returns(senderMempool2);
+		context.createSenderMempool.onFirstCall().returns(senderMempool1).onSecondCall().returns(senderMempool2);
 
 		const transaction1 = {
 			id: "transaction1-id",
@@ -178,8 +172,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",
@@ -202,9 +195,8 @@ describe<{
 			addTransaction: stubFn().rejects(error),
 			isDisposable: stubFn().returns(true),
 		};
-		
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",
@@ -247,9 +239,8 @@ describe<{
 			removeTransaction: stubFn().returns([transaction]),
 			isDisposable: stubFn().returns(false),
 		};
-		
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const loggerSpy = spy(context.logger, "debug");
 
@@ -274,9 +265,8 @@ describe<{
 			removeTransaction: stubFn().rejects(error),
 			isDisposable: stubFn().onFirstCall().returns(false).onSecondCall().returns(true),
 		};
-		
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const loggerSpy = spy(context.logger, "debug");
 
@@ -313,9 +303,8 @@ describe<{
 			removeForgedTransaction: stubFn().returns([transaction]),
 			isDisposable: stubFn().returns(false),
 		};
-		
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const loggerSpy = spy(context.logger, "debug");
 
@@ -344,8 +333,7 @@ describe<{
 			isDisposable: stubFn().onFirstCall().returns(false).onSecondCall().returns(true),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const loggerSpy = spy(context.logger, "debug");
 
@@ -367,8 +355,7 @@ describe<{
 			isDisposable: stubFn().returns(false),
 		};
 
-		context.createSenderMempool
-			.onFirstCall().returns(senderMempool);
+		context.createSenderMempool.onFirstCall().returns(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",

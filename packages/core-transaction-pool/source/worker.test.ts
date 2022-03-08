@@ -11,7 +11,9 @@ describe<{
 		context.createWorkerSubprocess = stubFn();
 
 		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory).toConstantValue(context.createWorkerSubprocess);
+		context.container
+			.bind(Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory)
+			.toConstantValue(context.createWorkerSubprocess);
 	});
 
 	beforeEach((context) => {
@@ -28,7 +30,7 @@ describe<{
 		const queueSize = 5;
 
 		const ipcSubprocess = {
-			getQueueSize: stubFn().returns(queueSize)
+			getQueueSize: stubFn().returns(queueSize),
 		};
 
 		context.createWorkerSubprocess.onFirstCall().returns(ipcSubprocess);
@@ -51,15 +53,16 @@ describe<{
 
 		const ipcSubprocess = {
 			sendAction: spyFn(),
-			sendRequest: stubFn().onFirstCall().resolves({
-				id: transaction.id,
-				serialized: transaction.serialized.toString("hex"),
-				isVerified: true,
-			})
+			sendRequest: stubFn()
+				.onFirstCall()
+				.resolves({
+					id: transaction.id,
+					serialized: transaction.serialized.toString("hex"),
+					isVerified: true,
+				}),
 		};
 
-		context.createWorkerSubprocess
-			.onFirstCall().returns(ipcSubprocess);
+		context.createWorkerSubprocess.onFirstCall().returns(ipcSubprocess);
 
 		const worker = context.container.resolve(Worker);
 

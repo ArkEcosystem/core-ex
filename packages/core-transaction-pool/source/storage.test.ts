@@ -14,7 +14,7 @@ const buildTransaction = (nonce: string): Interfaces.ITransaction => {
 		.fee("900")
 		.sign("sender's secret")
 		.build();
-}
+};
 
 describe<{
 	aip: Boolean;
@@ -46,7 +46,7 @@ describe<{
 	});
 
 	it("boot - should instantiate BetterSqlite3 using configured filename", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -61,7 +61,7 @@ describe<{
 	});
 
 	it("dispose - should close database", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 		const database = storage["database"];
@@ -72,7 +72,7 @@ describe<{
 	});
 
 	it("hasTransaction - should find transaction that was added", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -92,7 +92,7 @@ describe<{
 	});
 
 	it("hasTransaction - should not find transaction that wasn't added", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -112,7 +112,7 @@ describe<{
 	});
 
 	it("getAllTransactions - should return all added transactions", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -142,7 +142,7 @@ describe<{
 	});
 
 	it("getOldTransactions - should return only old transactions", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -172,7 +172,7 @@ describe<{
 	});
 
 	it("getOldTransactions - should return all old transactions", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -202,7 +202,7 @@ describe<{
 	});
 
 	it("addTransaction - should add new transaction", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -222,7 +222,7 @@ describe<{
 	});
 
 	it("addTransaction - should throw when adding same transaction twice", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -248,7 +248,7 @@ describe<{
 	});
 
 	it("removeTransaction - should remove previously added transaction", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
@@ -270,7 +270,7 @@ describe<{
 	});
 
 	it("flush - should remove all previously added transactions", (context) => {
-		stub(context.configuration, "getRequired").returnValueOnce(":memory:") // storage
+		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.container.resolve(Storage);
 		storage.boot();
 
