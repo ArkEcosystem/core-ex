@@ -1,35 +1,33 @@
-import "jest-extended";
-
 import os from "os";
+import { describe } from "@arkecosystem/core-test-framework";
+import { isValidPeer } from "./is-valid-peer";
 
-import { isValidPeer } from "../../../../packages/crypto/source/utils/is-valid-peer";
-
-describe("isValidPeer", () => {
+describe("isValidPeer", ({ it, assert }) => {
 	it("should not be ok for 127.0.0.1", () => {
-		expect(isValidPeer({ ip: "127.0.0.1" })).toBeFalse();
+		assert.false(isValidPeer({ ip: "127.0.0.1" }));
 	});
 
 	it("should not be ok for ::ffff:127.0.0.1", () => {
 		const peer = { ip: "::ffff:127.0.0.1" };
-		expect(isValidPeer(peer)).toBeFalse();
+		assert.false(isValidPeer(peer));
 	});
 
 	it("should not be ok for 0.0.0.0", () => {
-		expect(isValidPeer({ ip: "0.0.0.0" })).toBeFalse();
+		assert.false(isValidPeer({ ip: "0.0.0.0" }));
 	});
 
 	it("should not be ok for ::1", () => {
 		const peer = { ip: "::1" };
-		expect(isValidPeer(peer)).toBeFalse();
+		assert.false(isValidPeer(peer));
 	});
 
 	it("should not be ok for 2130706433", () => {
 		const peer = { ip: "2130706433" };
-		expect(isValidPeer(peer)).toBeFalse();
+		assert.false(isValidPeer(peer));
 	});
 
 	it("should not be ok for garbage", () => {
-		expect(isValidPeer({ ip: "garbage" })).toBeFalse();
+		assert.false(isValidPeer({ ip: "garbage" }));
 	});
 
 	it("should not be ok for LAN addresses", () => {
@@ -42,14 +40,14 @@ describe("isValidPeer", () => {
 		}
 
 		for (const ipAddress of addresses) {
-			expect(isValidPeer({ ip: ipAddress })).toBeFalse();
+			assert.false(isValidPeer({ ip: ipAddress }));
 		}
 	});
 
 	it("should be ok", () => {
-		expect(isValidPeer({ ip: "192.168.178.0" })).toBeTrue();
-		expect(isValidPeer({ ip: "5.196.105.32" })).toBeTrue();
-		expect(isValidPeer({ ip: "5.196.105.32" })).toBeTrue();
-		expect(isValidPeer({ ip: "5.196.105.32" })).toBeTrue();
+		assert.true(isValidPeer({ ip: "192.168.178.0" }));
+		assert.true(isValidPeer({ ip: "5.196.105.32" }));
+		assert.true(isValidPeer({ ip: "5.196.105.32" }));
+		assert.true(isValidPeer({ ip: "5.196.105.32" }));
 	});
 });
