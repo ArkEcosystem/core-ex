@@ -117,7 +117,9 @@ describe<{
 	});
 
 	it("revert should call revertBlockHandler when block is accepted, but execute throws", async (context) => {
-		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(BlockProcessorResult.Reverted);
+		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
+			BlockProcessorResult.Reverted,
+		);
 		stub(context.application, "resolve").returnValue(context.revertBlockHandler);
 		stub(context.state, "getLastBlock").returnValue({ data: { height: 5544 } });
 		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
@@ -134,7 +136,9 @@ describe<{
 	});
 
 	it("revert should call not revertBlockHandler when block not accepted and execute throws", async (context) => {
-		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(BlockProcessorResult.Reverted);
+		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
+			BlockProcessorResult.Reverted,
+		);
 		stub(context.state, "getLastBlock").returnValue({ data: { height: 5543 } }); // Current block was not accpeted
 
 		const acceptBlockHandler = context.container.resolve<AcceptBlockHandler>(AcceptBlockHandler);
@@ -150,7 +154,9 @@ describe<{
 	});
 
 	it("revert should return Corrupted when reverting block fails", async (context) => {
-		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(BlockProcessorResult.Corrupted);
+		const revertBlockHandlerExecuteStub = stub(context.revertBlockHandler, "execute").returnValue(
+			BlockProcessorResult.Corrupted,
+		);
 		stub(context.application, "resolve").returnValue(context.revertBlockHandler);
 		stub(context.state, "getLastBlock").returnValue({ data: { height: 5544 } });
 
