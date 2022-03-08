@@ -1,6 +1,6 @@
-import { Application } from "@arkecosystem/core-kernel";
-import { Contracts } from "@arkecosystem/core-contracts";
 import { Container } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { Application } from "@arkecosystem/core-kernel";
 
 import { AnyObject } from "../contracts";
 
