@@ -24,8 +24,5 @@ export const Bootstrappers = {
 		LoadConfiguration,
 		LoadServiceProviders,
 	],
-	serviceProviders: [
-		RegisterServiceProviders,
-		BootServiceProviders,
-	],
+	serviceProviders: [RegisterServiceProviders, BootServiceProviders],
 };
