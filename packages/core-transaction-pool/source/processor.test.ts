@@ -14,6 +14,7 @@ const buildTransaction = (nonce: string): Interfaces.ITransaction =>
 		.build();
 
 describe<{
+	aip: Boolean;
 	container: Container.Container;
 	workerPool: any;
 	pool: any;
@@ -21,7 +22,7 @@ describe<{
 	transactionBroadcaster: any;
 	transaction1: Interfaces.ITransaction;
 	transaction2: Interfaces.ITransaction;
-}>("Processor", ({ it, assert, beforeAll, beforeEach, stub, spy }) => {
+}>("Processor", ({ it, assert, beforeAll, stub, spy, afterAll }) => {
 	beforeAll((context) => {
 		context.pool = {
 			addTransaction: () => undefined,
@@ -58,7 +59,12 @@ describe<{
 		context.transaction2 = buildTransaction("2");
 		context.transaction2.data.typeGroup = undefined;
 
+		context.aip = Managers.configManager.getMilestone().aip11;
 		Managers.configManager.getMilestone().aip11 = true;
+	});
+
+	afterAll((context) => {
+		Managers.configManager.getMilestone().aip11 = context.aip;
 	});
 
 	it("should parse transactions through factory pool", async (context) => {
