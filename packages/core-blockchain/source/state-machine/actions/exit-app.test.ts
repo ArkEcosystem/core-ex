@@ -1,12 +1,12 @@
-import {Container} from "@arkecosystem/core-kernel";
-import {describe} from "../../../../core-test-framework";
+import { Container } from "@arkecosystem/core-kernel";
+import { describe } from "../../../../core-test-framework";
 
-import {ExitApp} from "./exit-app";
+import { ExitApp } from "./exit-app";
 
 describe<{
 	container: Container.Container;
 	application;
-}>("ExitApp", ({beforeEach, it, spy}) => {
+}>("ExitApp", ({ beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.application = {
 			terminate: () => undefined,
