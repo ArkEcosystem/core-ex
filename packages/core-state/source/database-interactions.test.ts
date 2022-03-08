@@ -181,8 +181,8 @@ describe<{
 	});
 
 	it("should terminate if unable to deserialize last 5 blocks", async (context) => {
-		stub(Blocks.BlockFactory, "fromJson").callsFake(block => block);
-		
+		stub(Blocks.BlockFactory, "fromJson").callsFake((block) => block);
+
 		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		const block101data = { id: "block101", height: 101 };
