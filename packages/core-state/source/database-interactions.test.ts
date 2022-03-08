@@ -95,7 +95,6 @@ describe<{
 			deleteFrom: () => undefined,
 		});
 		container.bind(Container.Identifiers.DatabaseService).to(DatabaseService);
-		container.bind(Container.Identifiers.DatabaseInteraction).to(DatabaseInteraction);
 		container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
 		container.bind(Container.Identifiers.StateBlockStore).toConstantValue({
 			resize: () => undefined,
@@ -181,7 +180,9 @@ describe<{
 		appSpy.called();
 	});
 
-	it.skip("should terminate if unable to deserialize last 5 blocks", async (context) => {
+	it("should terminate if unable to deserialize last 5 blocks", async (context) => {
+		stub(Blocks.BlockFactory, "fromJson").callsFake(block => block);
+		
 		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
 		const block101data = { id: "block101", height: 101 };
@@ -228,22 +229,22 @@ describe<{
 
 		blockRepoLatestStub.calledTimes(12);
 
-		// transRepoStub.calledWith([block106data.id]);
+		transRepoStub.calledNthWith(0, [block106data.id]);
 
-		// deleteBlockSpy.calledWith([block106data]);
-		// transRepoStub.calledWith([block105data.id]);
+		deleteBlockSpy.calledNthWith(0, [block106data]);
+		transRepoStub.calledNthWith(1, [block105data.id]);
 
-		// deleteBlockSpy.calledWith([block105data]);
-		// transRepoStub.calledWith([block104data.id]);
+		deleteBlockSpy.calledNthWith(1, [block105data]);
+		transRepoStub.calledNthWith(2, [block104data.id]);
 
-		// deleteBlockSpy.calledWith([block104data]);
-		// transRepoStub.calledWith([block103data.id]);
+		deleteBlockSpy.calledNthWith(2, [block104data]);
+		transRepoStub.calledNthWith(3, [block103data.id]);
 
-		// deleteBlockSpy.calledWith([block103data]);
-		// transRepoStub.calledWith([block102data.id]);
+		deleteBlockSpy.calledNthWith(3, [block103data]);
+		transRepoStub.calledNthWith(4, [block102data.id]);
 
-		// deleteBlockSpy.calledWith([block102data]);
-		// transRepoStub.calledWith([block101data.id]);
+		deleteBlockSpy.calledNthWith(4, [block102data]);
+		transRepoStub.calledNthWith(5, [block101data.id]);
 
 		appSpy.called();
 	});
