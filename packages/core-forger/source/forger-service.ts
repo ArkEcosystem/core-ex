@@ -138,7 +138,7 @@ export class ForgerService {
 
 			return this.#checkLater(this.getRemainingSlotTime());
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 
 			if (
 				error instanceof Exceptions.HostNoResponseError ||
