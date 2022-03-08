@@ -21,10 +21,16 @@ describe("validator", ({ it, assert }) => {
 			id: "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
 		} as ITransactionData;
 
-		assert.equal(validator.validate("transferSigned", transaction).error, "data must have required property 'timestamp'");
+		assert.equal(
+			validator.validate("transferSigned", transaction).error,
+			"data must have required property 'timestamp'",
+		);
 
 		transaction.version = 1;
-		assert.equal(validator.validate("transferSigned", transaction).error, "data must have required property 'timestamp'");
+		assert.equal(
+			validator.validate("transferSigned", transaction).error,
+			"data must have required property 'timestamp'",
+		);
 
 		transaction.timestamp = 12222;
 		assert.undefined(validator.validate("transferSigned", transaction).error);
@@ -45,7 +51,10 @@ describe("validator", ({ it, assert }) => {
 
 		transaction.version = 2;
 
-		assert.equal(validator.validate("transferSigned", transaction).error, "data must have required property 'nonce'");
+		assert.equal(
+			validator.validate("transferSigned", transaction).error,
+			"data must have required property 'nonce'",
+		);
 
 		transaction.nonce = BigNumber.ZERO;
 		assert.undefined(validator.validate("transferSigned", transaction).error);
@@ -70,23 +79,16 @@ describe("validator", ({ it, assert }) => {
 
 	it("validate - publicKey - should be ok", () => {
 		assert.undefined(
-			validator.validate(
-				"publicKey",
-				"034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
-			).error,
+			validator.validate("publicKey", "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126").error,
 		);
 	});
 
 	it("validate - publicKey - should not be ok", () => {
 		assert.defined(
-			validator.validate(
-				"publicKey",
-				"Z34da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
-			).error,
+			validator.validate("publicKey", "Z34da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126").error,
 		);
 		assert.defined(
-			validator.validate("publicKey", "34da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126")
-				.error,
+			validator.validate("publicKey", "34da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126").error,
 		);
 		assert.defined(validator.validate("publicKey", "").error);
 		assert.defined(validator.validate("publicKey", 1234).error);
@@ -102,8 +104,7 @@ describe("validator", ({ it, assert }) => {
 		assert.defined(validator.validate("address", "€TRdbaUW3RQQSL5By4G43JVaeHiqfVp9oh").error);
 		assert.defined(validator.validate("address", "DTRdbaUW3RQQSL5By4G43JVaeHiqfVp9").error);
 		assert.defined(
-			validator.validate("address", "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126")
-				.error,
+			validator.validate("address", "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126").error,
 		);
 		assert.defined(validator.validate("address", "").error);
 		assert.defined(validator.validate("address", 1234).error);
@@ -152,31 +153,23 @@ describe("validator", ({ it, assert }) => {
 
 	it("validate - transactionId - should be ok", () => {
 		assert.undefined(
-			validator.validate(
-				"transactionId",
-				"943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
-			).error,
+			validator.validate("transactionId", "943c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4")
+				.error,
 		);
 	});
 
 	it("validate - transactionId - should not be ok", () => {
 		assert.defined(
-			validator.validate(
-				"transactionId",
-				"94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4",
-			).error,
+			validator.validate("transactionId", "94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4")
+				.error,
 		);
 		assert.defined(
-			validator.validate(
-				"transactionId",
-				"94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4111",
-			).error,
+			validator.validate("transactionId", "94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4111")
+				.error,
 		);
 		assert.defined(
-			validator.validate(
-				"transactionId",
-				"94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4@@@",
-			).error,
+			validator.validate("transactionId", "94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4@@@")
+				.error,
 		);
 		assert.defined(validator.validate("transactionId", 1).error);
 		assert.defined(validator.validate("transactionId", "").error);
@@ -186,26 +179,20 @@ describe("validator", ({ it, assert }) => {
 
 	it("validate - walletVote - should be ok", () => {
 		assert.undefined(
-			validator.validate(
-				"walletVote",
-				"+034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
-			).error,
+			validator.validate("walletVote", "+034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126")
+				.error,
 		);
 
 		assert.undefined(
-			validator.validate(
-				"walletVote",
-				"-034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
-			).error,
+			validator.validate("walletVote", "-034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126")
+				.error,
 		);
 	});
 
 	it("validate - walletVote - should not be ok", () => {
 		assert.defined(
-			validator.validate(
-				"walletVote",
-				"034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126",
-			).error,
+			validator.validate("walletVote", "034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126")
+				.error,
 		);
 		assert.defined(validator.validate("walletVote", "-^sd").error);
 		assert.defined(validator.validate("walletVote", 1234).error);

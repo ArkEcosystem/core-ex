@@ -216,7 +216,7 @@ describe<{
 		};
 
 		const validate = context.ajv.compile(schema);
-		
+
 		assert.true(validate({ amount: 0, id: "3e3817fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
 		assert.false(validate({ amount: 0, id: "affe17fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
 		assert.false(validate({ amount: 0 }));
