@@ -9,8 +9,6 @@ describe<{
 	application;
 }>("DownloadPaused", ({ beforeEach, it, spy }) => {
 	beforeEach((context) => {
-		context.container = new Container.Container();
-
 		context.logger = {
 			warning: () => undefined,
 			debug: () => undefined,
@@ -20,6 +18,8 @@ describe<{
 		context.application = {
 			resolve: () => undefined,
 		};
+
+		context.container = new Container.Container();
 		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
 		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
 	});
