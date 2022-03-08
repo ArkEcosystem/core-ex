@@ -29,6 +29,7 @@ describe<{
 	});
 
 	afterEach((context) => {
+		context.walletRepo.reset();
 		context.logger.resetHistory();
 	});
 

@@ -4,6 +4,8 @@ import { Blocks, Identities, Utils } from "@arkecosystem/crypto";
 import { Sandbox, describe } from "@arkecosystem/core-test-framework";
 import block1760000 from "../test/fixtures/block1760000";
 
+const dummyBlock = Blocks.BlockFactory.fromData(block1760000);
+
 const generateBlocks = (count: number): any[] => {
 	const blocks: any[] = [];
 
@@ -142,10 +144,6 @@ describe<{
 
 		stateStoreStub2.calledWith(1, 3);
 		spyOnFromData.calledTimes(3);
-
-		stateStoreStub.restore();
-		stateStoreStub2.restore();
-		spyOnFromData.restore();
 	});
 
 	it("getBlocksForRound - should return array of blocks when only last block is in stateStore", async (context) => {
@@ -165,15 +163,10 @@ describe<{
 		stateStoreStub2.calledWith(1, 3);
 		databaseServiceStub.calledWith(1, 2);
 		spyOnFromData.calledTimes(3);
-
-		stateStoreStub.restore();
-		stateStoreStub2.restore();
-		spyOnFromData.restore();
-		databaseServiceStub.restore();
 	});
 
-	it.skip("getActiveDelegates - should return shuffled round delegates", async (context) => {
-		const lastBlock = Blocks.BlockFactory.fromData(block1760000);
+	it("getActiveDelegates - should return shuffled round delegates", async (context) => {
+		const lastBlock = dummyBlock;
 
 		const stateStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 
@@ -219,12 +212,6 @@ describe<{
 		);
 		assert.true(cloneStub.called);
 		spyOnShuffleDelegates.called();
-
-		stateStub.restore();
-		dbStub.restore();
-		walletRepoStub1.restore();
-		walletRepoStub2.restore();
-		spyOnShuffleDelegates.restore();
 	});
 
 	it("getActiveDelegates - should return cached forgingDelegates when round is the same", async (context) => {
@@ -242,8 +229,6 @@ describe<{
 		getAttributeStub.calledWith("delegate.round");
 		// @ts-ignore
 		assert.equal(result, context.roundState.forgingDelegates);
-
-		getAttributeStub.restore();
 	});
 
 	it("setForgingDelegatesOfRound - should call getActiveDelegates and set forgingDelegatesOfRound", async (context) => {
@@ -338,13 +323,6 @@ describe<{
 		});
 		databaseServiceSpy.calledWith(dposStateRoundDelegates);
 		eventStub.calledWith("round.applied");
-
-		eventStub.restore();
-		databaseServiceSpy.restore();
-		dposStateBuildSpy.restore();
-		dposStateSetSpy.restore();
-		dposGetStub.restore();
-		walletRepoStub.restore();
 	});
 
 	it("applyRound - should build delegates, save round, dispatch events, and skip missing round checks when first round has genesis block only", async (context) => {
@@ -399,13 +377,6 @@ describe<{
 		});
 		databaseServiceSpy.calledWith(dposStateRoundDelegates);
 		eventStub.calledWith("round.applied");
-
-		eventStub.restore();
-		databaseServiceSpy.restore();
-		dposStateBuildSpy.restore();
-		dposStateSetSpy.restore();
-		dposGetStub.restore();
-		walletRepoStub.restore();
 	});
 
 	it("applyRound - should do nothing when next height is same round", async (context) => {
@@ -415,8 +386,6 @@ describe<{
 		await context.roundState.applyRound(50);
 
 		loggerSpy.neverCalled();
-
-		loggerSpy.restore();
 	});
 
 	it("revertBlock - should remove last block from blocksInCurrentRound when block is in the same round", async (context) => {
@@ -436,8 +405,6 @@ describe<{
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, []);
 		databaseServiceSpy.neverCalled();
-
-		databaseServiceSpy.restore();
 	});
 
 	it("revertBlock - should restore previous round, load previousRoundBlocks and delegates, remove last round from DB and remove last block from blocksInCurrentRound if block is last in round", async (context) => {
@@ -475,12 +442,6 @@ describe<{
 		databaseServiceSpy.calledWith(2);
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound.length, 50);
-
-		spyOnFromData.restore();
-		databaseServiceSpy.restore();
-		stateStub1.restore();
-		stateStub2.restore();
-		spyOnCalcPreviousActiveDelegates.restore();
 	});
 
 	it("revertBlock - should throw error if databaseService throws error", async (context) => {
@@ -524,12 +485,6 @@ describe<{
 
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound.length, 51);
-
-		spyOnFromData.restore();
-		stateStub1.restore();
-		stateStub2.restore();
-		spyOnCalcPreviousActiveDelegates.restore();
-		databaseServiceSpy.restore();
 	});
 
 	it("revertBlock - should throw error if last blocks is not equal to block", async (context) => {
@@ -547,9 +502,6 @@ describe<{
 		assert.equal(context.roundState.blocksInCurrentRound, [blocks[0]]);
 		dbSpy.neverCalled();
 		stateSpy.neverCalled();
-
-		dbSpy.restore();
-		stateSpy.restore();
 	});
 
 	it("restore - should restore blocksInCurrentRound and forgingDelegates when last block in middle of round", async (context) => {
@@ -577,12 +529,6 @@ describe<{
 		assert.equal(context.roundState.blocksInCurrentRound, blocks);
 		// @ts-ignore
 		assert.equal(context.roundState.forgingDelegates, delegates);
-
-		getLastBlockStub.restore();
-		getLastBlocksByHeightHeight.restore();
-		databaseServiceSpy.restore();
-		triggerStub.restore();
-		spyOnFromData.restore();
 	});
 
 	it("restore - should restore blocksInCurrentRound and forgingDelegates when last block is lastBlock of round", async (context) => {
@@ -616,15 +562,6 @@ describe<{
 		assert.equal(context.roundState.blocksInCurrentRound, []);
 		// @ts-ignore
 		assert.equal(context.roundState.forgingDelegates, delegates);
-
-		eventSpy.restore();
-		stateStoreStub.restore();
-		stateStoreStub2.restore();
-		dposStub.restore();
-		triggerStub.restore();
-		spyOnFromData.restore();
-		dbDeleteSpy.restore();
-		dbSaveSpy.restore();
 	});
 
 	it("restore - should throw if databaseService throws error", async (context) => {
@@ -649,13 +586,6 @@ describe<{
 		await assert.rejects(() => context.roundState.restore());
 
 		dbStub.calledWith(2);
-
-		stateStoreStub.restore();
-		stateStoreStub2.restore();
-		dposStub.restore();
-		triggerStub.restore();
-		spyOnFromData.restore();
-		dbStub.restore();
 	});
 
 	it("calcPreviousActiveDelegates - should return previous active delegates && set ranks", async (context) => {
@@ -681,10 +611,6 @@ describe<{
 		walletRepoStub.calledTimes(51);
 		setAttributeSpy.calledWith("delegate.rank", 1);
 		setAttributeSpy.calledOnce();
-
-		stubbedRoundState.restore();
-		setAttributeSpy.restore();
-		walletRepoStub.restore();
 	});
 
 	it("detectMissedBlocks - should not detect missed round when stateStore.lastBlock is genesis block", async (context) => {
@@ -709,10 +635,6 @@ describe<{
 
 		loggerSpy.neverCalled();
 		eventSpy.neverCalled();
-
-		stateStoreStub.restore();
-		loggerSpy.restore();
-		eventSpy.restore();
 	});
 
 	it("detectMissedBlocks - should not detect missed block if slots are sequential", async (context) => {
@@ -740,10 +662,6 @@ describe<{
 
 		loggerSpy.neverCalled();
 		eventSpy.neverCalled();
-
-		stateStoreStub.restore();
-		loggerSpy.restore();
-		eventSpy.restore();
 	});
 
 	it("detectMissedBlocks - should detect missed block if slots are not sequential", async (context) => {
@@ -775,10 +693,6 @@ describe<{
 		eventSpy.calledWith(Enums.ForgerEvent.Missing, {
 			delegate: delegates[2],
 		});
-
-		stateStoreStub.restore();
-		loggerSpy.restore();
-		eventSpy.restore();
 	});
 
 	it("detectMissedBlocks - should detect only one round if multiple rounds are missing", async (context) => {
@@ -806,10 +720,6 @@ describe<{
 
 		loggerSpy.calledTimes(51);
 		eventSpy.calledTimes(51);
-
-		stateStoreStub.restore();
-		loggerSpy.restore();
-		eventSpy.restore();
 	});
 
 	it("detectMissedRound - should not detect missed round if all delegates forged blocks", (context) => {
@@ -833,9 +743,6 @@ describe<{
 
 		loggerSpy.neverCalled();
 		eventSpy.neverCalled();
-
-		loggerSpy.restore();
-		eventSpy.restore();
 	});
 
 	it("detectMissedRound - should detect missed round", (context) => {
@@ -861,9 +768,6 @@ describe<{
 
 		loggerSpy.calledOnce();
 		eventSpy.calledWith(Enums.RoundEvent.Missed, { delegate: delegates[2] });
-
-		loggerSpy.restore();
-		eventSpy.restore();
 	});
 
 	it("applyBlock - should push block to blocksInCurrentRound and skip applyRound when block is not last block in round", async (context) => {
@@ -890,8 +794,6 @@ describe<{
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, [block]);
 		databaseServiceSpy.neverCalled();
-
-		databaseServiceSpy.restore();
 	});
 
 	it("applyBlock - should push block to blocksInCurrentRound, applyRound, check missing round, calculate delegates, and clear blocksInCurrentRound when block is last in round", async (context) => {
@@ -933,13 +835,6 @@ describe<{
 		spyOnDetectMissedRound.called();
 
 		eventSpy.notCalledWith(Enums.RoundEvent.Missed);
-
-		databaseServiceSpy.restore();
-		eventSpy.restore();
-		dposGetStub.restore();
-		triggerStub.restore();
-		spyOnShuffleDelegates.restore();
-		spyOnDetectMissedRound.restore();
 	});
 
 	// TODO: Check how we can restore
@@ -985,13 +880,6 @@ describe<{
 		spyOnDetectMissedRound.called();
 
 		eventSpy.notCalledWith(Enums.RoundEvent.Missed);
-
-		eventSpy.restore();
-		dposGetStub.restore();
-		triggerStub.restore();
-		spyOnShuffleDelegates.restore();
-		spyOnDetectMissedRound.restore();
-		databaseServiceSpy.restore();
 	});
 
 	// TODO: Check genesisBlock if required

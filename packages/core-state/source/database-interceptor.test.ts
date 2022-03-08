@@ -108,8 +108,6 @@ describe<{
 		const stateStoreStub = stub(context.stateStore, "getLastBlocks").returnValue([block]);
 
 		assert.equal(await databaseInterceptor.getBlock("block_id"), block);
-
-		stateStoreStub.restore();
 	});
 
 	it("getBlock - should return block from database", async (context) => {
@@ -122,9 +120,6 @@ describe<{
 		const databaseServiceStub = stub(databaseService, "getBlock").returnValue(block);
 
 		assert.equal(await databaseInterceptor.getBlock("block_id"), block);
-
-		stateStoreStub.restore();
-		databaseServiceStub.restore();
 	});
 
 	it("getCommonBlocks - should return blocks by ids", async (context) => {
@@ -142,9 +137,6 @@ describe<{
 		commonBlockStub.calledWith([block100.id, block101.id, block102.id]);
 		findByIdsStub.calledWith([block100.id, block101.id, block102.id]);
 		assert.equal(result, [block100, block101, block102]);
-
-		commonBlockStub.restore();
-		findByIdsStub.restore();
 	});
 
 	it("getBlocksByHeight - should return blocks with transactions when full blocks are requested", async (context) => {
@@ -171,7 +163,5 @@ describe<{
 		blockRepoStub.calledWith([101]);
 
 		assert.equal(result, [block100, block101, block102]);
-
-		getLastBlockStub.restore();
 	});
 });

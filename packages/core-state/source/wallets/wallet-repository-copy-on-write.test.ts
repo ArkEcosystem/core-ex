@@ -45,8 +45,6 @@ describe<{
 		const originalWallet = context.walletRepo.findByAddress(clonedWallet.getAddress());
 
 		assert.not.equal(originalWallet, clonedWallet);
-
-		spyFindByAddress.restore();
 	});
 
 	it("should get all by username", (context) => {

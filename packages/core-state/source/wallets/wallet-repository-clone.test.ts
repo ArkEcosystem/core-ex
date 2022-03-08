@@ -234,8 +234,6 @@ describe<{
 		assert.equal(wallet, existingWallet);
 		spyOnCreateWallet.neverCalled();
 		assert.false(context.walletRepositoryBlockchain.hasByAddress("address"));
-
-		spyOnCreateWallet.restore();
 	});
 
 	it.skip("findByPublicKey - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", (context) => {
@@ -295,8 +293,6 @@ describe<{
 		assert.equal(wallet, existingWallet);
 		spyOnCreateWallet.neverCalled();
 		assert.false(context.walletRepositoryBlockchain.hasByPublicKey(context.publicKey));
-
-		spyOnCreateWallet.restore();
 	});
 
 	it("findByUsername - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", (context) => {
@@ -410,8 +406,6 @@ describe<{
 		assert.false(
 			context.walletRepositoryBlockchain.hasByIndex(Contracts.State.WalletIndexes.Usernames, context.username),
 		);
-
-		spyOnCreateWallet.restore();
 	});
 
 	it("findByIndex - should throw error if does not exist in blockchain wallet repository", (context) => {

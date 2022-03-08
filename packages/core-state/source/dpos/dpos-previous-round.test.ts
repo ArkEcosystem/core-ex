@@ -23,7 +23,7 @@ describe<{
 	stateStore: StateStore;
 	round: RoundInfo;
 	blocks: Interfaces.IBlock[];
-}>("dposPreviousRound", ({ it, beforeAll, beforeEach, assert, spy, stub }) => {
+}>("dposPreviousRound", ({ it, beforeAll, beforeEach, afterEach, assert, spy, stub }) => {
 	beforeAll(async (context) => {
 		const env = await setUp();
 
@@ -49,6 +49,10 @@ describe<{
 		context.dposState.setDelegatesRound(context.round);
 
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
+	});
+
+	afterEach((context) => {
+		context.walletRepo.reset();
 	});
 
 	it("should get all delegates", async (context) => {
@@ -103,11 +107,6 @@ describe<{
 		spyBuildDelegateRanking.calledOnce();
 		spySetDelegatesRound.calledWith(context.round);
 		spyRevertBlock.calledWith(context.blocks[0]);
-
-		spyBuildDelegateRanking.restore();
-		spySetDelegatesRound.restore();
-		spyRevertBlock.restore();
-		spyGetLastBlock.restore();
 	});
 
 	it("should not revert the blocks when height is one", async (context) => {
@@ -125,9 +124,5 @@ describe<{
 		spyBuildDelegateRanking.calledOnce();
 		spySetDelegatesRound.calledOnce();
 		spyRevertBlock.neverCalled();
-
-		spyBuildDelegateRanking.restore();
-		spySetDelegatesRound.restore();
-		spyRevertBlock.restore();
 	});
 });

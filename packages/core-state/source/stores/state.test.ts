@@ -4,7 +4,7 @@ import { Factories } from "@arkecosystem/core-test-framework";
 import { IBlock, IBlockData, ITransactionData } from "@arkecosystem/crypto/distribution/interfaces";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { setUp } from "../../test/setup";
-import Sinon, { SinonSpy } from "sinon";
+import { SinonSpy } from "sinon";
 import { describe } from "@arkecosystem/core-test-framework";
 
 describe<{
@@ -13,7 +13,7 @@ describe<{
 	factory: Factories.FactoryBuilder;
 	logger: SinonSpy;
 	dispatchSpy: SinonSpy;
-}>("StateStore", ({ it, beforeEach, afterEach, assert, spy }) => {
+}>("StateStore", ({ it, beforeEach, afterEach, assert, spy, clock }) => {
 	beforeEach(async (context) => {
 		const env = await setUp();
 
@@ -415,7 +415,7 @@ describe<{
 	});
 
 	it("pingBlock - should return true if block pinged == current blockPing and should update stats", async (context) => {
-		const clock = Sinon.useFakeTimers();
+		const timer = clock();
 		const currentTime = new Date().getTime();
 
 		// @ts-ignore
@@ -426,7 +426,7 @@ describe<{
 			block: context.blocks[5].data,
 		};
 
-		clock.tick(100);
+		timer.tick(100);
 
 		assert.true(context.stateStorage.pingBlock(context.blocks[5].data));
 
@@ -435,8 +435,6 @@ describe<{
 		assert.equal(blockPing.block, context.blocks[5].data);
 		assert.true(blockPing.last > currentTime);
 		assert.equal(blockPing.first, currentTime);
-
-		clock.restore();
 	});
 
 	it("pingBlock - should return false if block pinged != current blockPing", (context) => {
@@ -518,73 +516,50 @@ describe<{
 	});
 
 	it("isWakeUpTimeoutSet - should return true if timer is set", async (context) => {
-		const clock = Sinon.useFakeTimers();
+		const timer = clock();
 
 		context.stateStorage.setWakeUpTimeout(() => {}, 100);
 
 		assert.true(context.stateStorage.isWakeUpTimeoutSet());
 
-		clock.tick(200);
+		timer.tick(200);
 
-		try {
-			assert.false(context.stateStorage.isWakeUpTimeoutSet());
-		} finally {
-			clock.restore();
-		}
+		assert.false(context.stateStorage.isWakeUpTimeoutSet());
 	});
 
 	it("setWakeUpTimeout - should call callback and clear timeout", async (context) => {
-		const clock = Sinon.useFakeTimers();
+		const timer = clock();
 
 		const spyFn = spy(() => {});
 		const spyOnClearWakeUpTimeout = spy(context.stateStorage, "clearWakeUpTimeout");
 
-		try {
-			context.stateStorage.setWakeUpTimeout(() => {}, 100);
+		context.stateStorage.setWakeUpTimeout(() => {}, 100);
 
-			clock.tick(200);
+		timer.tick(200);
 
-			spyFn.calledOnce();
-			spyOnClearWakeUpTimeout.calledOnce();
-		} finally {
-			clock.restore();
-
-			spyFn.restore();
-			spyOnClearWakeUpTimeout.restore();
-		}
+		spyFn.calledOnce();
+		spyOnClearWakeUpTimeout.calledOnce();
 	});
 
 	it("clearWakeUpTimeout - should clear wake up timers", (context) => {
-		const clock = Sinon.useFakeTimers();
-		const timeoutSpy = spy(clock, "clearTimeout");
+		const timer = clock();
+		const timeoutSpy = spy(timer, "clearTimeout");
 
 		// @ts-ignore
 		context.stateStorage.wakeUpTimeout = 1;
 
 		context.stateStorage.clearWakeUpTimeout();
 
-		try {
-			// @ts-ignore
-			assert.undefined(context.stateStorage.wakeUpTimeout);
-			timeoutSpy.calledOnce();
-		} finally {
-			clock.restore();
-
-			timeoutSpy.restore();
-		}
+		// @ts-ignore
+		assert.undefined(context.stateStorage.wakeUpTimeout);
+		timeoutSpy.calledOnce();
 	});
 
 	it("clearWakeUpTimeout - should do nothing if a timer is not set", (context) => {
-		const clock = Sinon.useFakeTimers();
-		const timeoutSpy = spy(clock, "clearTimeout");
+		const timer = clock();
+		const timeoutSpy = spy(timer, "clearTimeout");
 
-		try {
-			context.stateStorage.clearWakeUpTimeout();
-			timeoutSpy.neverCalled();
-		} finally {
-			clock.restore();
-
-			timeoutSpy.restore();
-		}
+		context.stateStorage.clearWakeUpTimeout();
+		timeoutSpy.neverCalled();
 	});
 });

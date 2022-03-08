@@ -9,8 +9,7 @@ import { addTransactionsToBlock } from "../test/transactions";
 import { setUp } from "../test/setup";
 import { describe, Factories } from "@arkecosystem/core-test-framework";
 import { SinonSpy } from "sinon";
-import { Spy } from "@arkecosystem/core-test-framework/distribution/uvu/spy";
-import { ITransaction } from "@arkecosystem/crypto/distribution/interfaces";
+import { Spy } from "@arkecosystem/core-test-framework/source/uvu/spy";
 
 describe<{
 	walletRepo: WalletRepository;
@@ -73,16 +72,20 @@ describe<{
 
 			context.multiPaymentTransaction.data.asset.payments = [
 				{
+					// @ts-ignore
 					amount: [context.amount],
 					recipientId: "D5T4Cjx7khYbwaaCLmi7j3cUdt4GVWqKkG",
 				},
 				{
+					// @ts-ignore
 					amount: [context.amount],
 					recipientId: "D5T4Cjx7khYbwaaCLmi7j3cUdt4GVWqKkG",
 				},
 			];
 			// TODO: Why do these need to be set manually here?
+			// @ts-ignore
 			context.multiPaymentTransaction.typeGroup = context.multiPaymentTransaction.data.typeGroup;
+			// @ts-ignore
 			context.multiPaymentTransaction.type = context.multiPaymentTransaction.data.type;
 
 			sendingWallet.setAttribute("vote", context.sendersDelegate.getPublicKey());
@@ -676,7 +679,7 @@ describe<{
 		const transactions = context.generateTransactions();
 
 		for (const transaction of transactions.transactions) {
-			await context.blockState.applyTransaction(transaction as ITransaction);
+			await context.blockState.applyTransaction(transaction as Interfaces.ITransaction);
 
 			context.applySpy.calledWith(transaction);
 		}
@@ -686,7 +689,7 @@ describe<{
 		const transactions = context.generateTransactions();
 
 		for (const transaction of transactions.transactions) {
-			await context.blockState.revertTransaction(transaction as ITransaction);
+			await context.blockState.revertTransaction(transaction as Interfaces.ITransaction);
 
 			context.revertSpy.calledWith(transaction);
 		}
@@ -701,7 +704,7 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.applyTransaction(transaction as ITransaction));
+			await assert.resolves(() => context.blockState.applyTransaction(transaction as Interfaces.ITransaction));
 		}
 	});
 
@@ -714,7 +717,7 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.revertTransaction(transaction as ITransaction));
+			await assert.resolves(() => context.blockState.revertTransaction(transaction as Interfaces.ITransaction));
 		}
 	});
 
