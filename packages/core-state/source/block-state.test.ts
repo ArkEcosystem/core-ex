@@ -11,6 +11,60 @@ import { describe, Factories } from "@arkecosystem/core-test-framework";
 import { SinonSpy } from "sinon";
 import { Spy } from "@arkecosystem/core-test-framework/source/uvu/spy";
 
+const buildMultipaymentTransaction = (context) => {
+	const sendersDelegate = context.forgingWallet.clone();
+	sendersDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
+
+	const sendingWallet: Wallet = context.factory
+		.get("Wallet")
+		.withOptions({
+			passphrase: "testPassphrase1",
+			nonce: 0,
+		})
+		.make();
+
+	const amount = Utils.BigNumber.make(2345);
+
+	const multiPaymentTransaction = context.factory
+		.get("MultiPayment")
+		.withOptions({
+			amount,
+			senderPublicKey: sendingWallet.getPublicKey(),
+			recipientId: context.recipientWallet.getAddress(),
+		})
+		.make();
+
+	// @ts-ignore
+	multiPaymentTransaction.data.asset.payments = [
+		{
+			// @ts-ignore
+			amount: [amount],
+			recipientId: context.recipientWallet.getAddress(),
+		},
+		{
+			// @ts-ignore
+			amount: [amount],
+			recipientId: context.recipientWallet.getAddress(),
+		},
+	];
+	// TODO: Why do these need to be set manually here?
+	// @ts-ignore
+	multiPaymentTransaction.typeGroup = multiPaymentTransaction.data.typeGroup;
+	// @ts-ignore
+	multiPaymentTransaction.type = multiPaymentTransaction.data.type;
+
+	sendingWallet.setAttribute("vote", sendersDelegate.getPublicKey());
+	context.recipientWallet.setAttribute("vote", context.recipientsDelegate.getPublicKey());
+	context.walletRepo.index([
+		sendersDelegate,
+		context.recipientsDelegate,
+		sendingWallet,
+		context.recipientWallet,
+	]);
+
+	return { amount, multiPaymentTransaction, sendingWallet, sendersDelegate }
+};
+
 describe<{
 	walletRepo: WalletRepository;
 	blockState: BlockState;
@@ -31,9 +85,6 @@ describe<{
 	recipientWallet: Contracts.State.Wallet;
 	recipientsDelegate: Contracts.State.Wallet;
 	additionalBeforeEach: Function;
-	multiPaymentTransaction: Interfaces.ITransaction;
-	sendersDelegate: Contracts.State.Wallet;
-	amount: Utils.BigNumber;
 	generateTransactions: Function;
 	forgetWallet: Function;
 }>("BlockState", ({ it, assert, beforeEach, beforeAll, afterEach, stub, spy }) => {
@@ -46,57 +97,6 @@ describe<{
 		context.factory = env.factory;
 		context.applySpy = env.spies.applySpy;
 		context.revertSpy = env.spies.revertSpy;
-
-		context.additionalBeforeEach = () => {
-			context.sendersDelegate = context.forgingWallet;
-			context.sendersDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
-
-			const sendingWallet: Wallet = context.factory
-				.get("Wallet")
-				.withOptions({
-					passphrase: "testPassphrase1",
-					nonce: 0,
-				})
-				.make();
-
-			context.amount = Utils.BigNumber.make(2345);
-
-			context.multiPaymentTransaction = context.factory
-				.get("MultiPayment")
-				.withOptions({
-					amount: context.amount,
-					senderPublicKey: sendingWallet.getPublicKey(),
-					recipientId: context.recipientWallet.getAddress(),
-				})
-				.make();
-
-			context.multiPaymentTransaction.data.asset.payments = [
-				{
-					// @ts-ignore
-					amount: [context.amount],
-					recipientId: "D5T4Cjx7khYbwaaCLmi7j3cUdt4GVWqKkG",
-				},
-				{
-					// @ts-ignore
-					amount: [context.amount],
-					recipientId: "D5T4Cjx7khYbwaaCLmi7j3cUdt4GVWqKkG",
-				},
-			];
-			// TODO: Why do these need to be set manually here?
-			// @ts-ignore
-			context.multiPaymentTransaction.typeGroup = context.multiPaymentTransaction.data.typeGroup;
-			// @ts-ignore
-			context.multiPaymentTransaction.type = context.multiPaymentTransaction.data.type;
-
-			sendingWallet.setAttribute("vote", context.sendersDelegate.getPublicKey());
-			context.recipientWallet.setAttribute("vote", context.recipientsDelegate.getPublicKey());
-			context.walletRepo.index([
-				context.sendersDelegate,
-				context.recipientsDelegate,
-				sendingWallet,
-				context.recipientWallet,
-			]);
-		};
 
 		context.generateTransactions = () => {
 			const sender: any = context.factory
@@ -246,57 +246,43 @@ describe<{
 	afterEach((context) => {
 		context.walletRepo.reset();
 
-		context.spyIncreaseWalletDelegateVoteBalance.restore();
-		context.spyDecreaseWalletDelegateVoteBalance.restore();
-		context.spyInitGenesisForgerWallet.restore();
-		context.spyApplyBlockToForger.restore();
-		context.spyApplyVoteBalances.restore();
-		context.spyRevertBlockFromForger.restore();
-
 		context.applySpy.resetHistory();
 		context.revertSpy.resetHistory();
 	});
 
 	it("should apply sequentially the transactions of the block", async (context) => {
 		const spyApplyTransaction = spy(context.blockState, "applyTransaction");
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(context.blocks[0]);
+		stub(context.stateStore, "getLastBlock").returnValue(context.blocks[0]);
 
 		await context.blockState.applyBlock(context.blocks[1]);
 
 		for (let i = 0; i < context.blocks[1].transactions.length; i++) {
 			spyApplyTransaction.calledWith(context.blocks[0].transactions[i]);
 		}
-
-		spyApplyTransaction.restore();
-		stateStoreStub.restore();
 	});
 
 	it("should call the handler for each transaction", async (context) => {
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(context.blocks[0]);
+		stub(context.stateStore, "getLastBlock").returnValue(context.blocks[0]);
 
 		await context.blockState.applyBlock(context.blocks[1]);
 
 		assert.equal(context.applySpy.callCount, context.blocks[1].transactions.length);
 		assert.false(context.revertSpy.called);
-
-		stateStoreStub.restore();
 	});
 
 	it("should init foring wallet on genesis block", async (context) => {
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(context.blocks[0]);
+		stub(context.stateStore, "getLastBlock").returnValue(context.blocks[0]);
 
 		context.blocks[0].data.height = 1;
 		await context.blockState.applyBlock(context.blocks[0]);
 
 		context.spyInitGenesisForgerWallet.calledWith(context.blocks[0].data.generatorPublicKey);
-
-		stateStoreStub.restore();
 	});
 
 	it("should create forger wallet if it doesn't exist genesis block", async (context) => {
 		context.spyApplyBlockToForger.restore();
 
-		const blockStateStub = stub(context.blockState, "applyBlockToForger").callsFake(() => {});
+		stub(context.blockState, "applyBlockToForger").callsFake(() => {});
 		const spyCreateWallet = spy(context.walletRepo, "createWallet");
 
 		context.blocks[0].data.height = 1;
@@ -307,9 +293,6 @@ describe<{
 
 		context.spyInitGenesisForgerWallet.calledWith(context.blocks[0].data.generatorPublicKey);
 		spyCreateWallet.calledTimes(4);
-
-		blockStateStub.restore();
-		spyCreateWallet.restore();
 	});
 
 	it("should apply the block data to the forger", async (context) => {
@@ -370,7 +353,7 @@ describe<{
 	});
 
 	it("should update sender's and recipient's delegate's vote balance when applying transaction", async (context) => {
-		const sendersDelegate = context.forgingWallet;
+		const sendersDelegate = context.forgingWallet.clone();
 		sendersDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
 
 		const senderDelegateBefore = sendersDelegate.getAttribute("delegate.voteBalance");
@@ -413,7 +396,7 @@ describe<{
 	});
 
 	it("should update sender's and recipient's delegate's vote balance when reverting transaction", async (context) => {
-		const sendersDelegate = context.forgingWallet;
+		const sendersDelegate = context.forgingWallet.clone();
 		sendersDelegate.setAttribute("delegate.voteBalance", Utils.BigNumber.ZERO);
 
 		const senderDelegateBefore = sendersDelegate.getAttribute("delegate.voteBalance");
@@ -625,54 +608,54 @@ describe<{
 	});
 
 	it("multipayment should fail if there are no assets", async (context) => {
-		context.additionalBeforeEach();
+		const { sendingWallet, multiPaymentTransaction } = buildMultipaymentTransaction(context)
 
-		context.sendingWallet.forgetAttribute("vote");
-		context.walletRepo.index([context.sendingWallet]);
+		sendingWallet.forgetAttribute("vote");
+		context.walletRepo.index([sendingWallet]);
 
-		delete context.multiPaymentTransaction.data.asset;
+		delete multiPaymentTransaction.data.asset;
 
-		await assert.rejects(() => context.blockState.applyTransaction(context.multiPaymentTransaction));
+		await assert.rejects(() => context.blockState.applyTransaction(multiPaymentTransaction));
 	});
 
 	it("multipayment should fail if there are no assets and sending wallet has voted", async (context) => {
-		context.additionalBeforeEach();
+		const { multiPaymentTransaction } = buildMultipaymentTransaction(context)
 
-		delete context.multiPaymentTransaction.data.asset;
+		delete multiPaymentTransaction.data.asset;
 
-		await assert.rejects(() => context.blockState.applyTransaction(context.multiPaymentTransaction));
+		await assert.rejects(() => context.blockState.applyTransaction(multiPaymentTransaction));
 	});
 
 	it("multipayment should be okay when recipient hasn't voted", async (context) => {
-		context.additionalBeforeEach();
+		const { multiPaymentTransaction } = buildMultipaymentTransaction(context)
 
 		context.recipientWallet.forgetAttribute("vote");
 		context.walletRepo.index([context.recipientWallet]);
 
-		await assert.resolves(() => context.blockState.applyTransaction(context.multiPaymentTransaction));
+		await assert.resolves(() => context.blockState.applyTransaction(multiPaymentTransaction));
 	});
 
-	it.skip("multipayment should update delegates vote balance for multiPayments", async (context) => {
-		context.additionalBeforeEach();
+	it("multipayment should update delegates vote balance for multiPayments", async (context) => {
+		const { amount, multiPaymentTransaction, sendersDelegate } = buildMultipaymentTransaction(context)
 
-		const senderDelegateBefore = context.sendersDelegate.getAttribute("delegate.voteBalance");
+		const senderDelegateBefore = sendersDelegate.getAttribute("delegate.voteBalance");
 		const recipientsDelegateBefore = context.recipientsDelegate.getAttribute("delegate.voteBalance");
 
-		await context.blockState.applyTransaction(context.multiPaymentTransaction);
+		await context.blockState.applyTransaction(multiPaymentTransaction);
 
 		assert.equal(
 			context.recipientsDelegate.getAttribute("delegate.voteBalance"),
-			recipientsDelegateBefore.plus(context.amount).times(2),
+			recipientsDelegateBefore.plus(amount).times(2),
 		);
 		assert.equal(
-			context.sendersDelegate.getAttribute("delegate.voteBalance"),
-			senderDelegateBefore.minus(context.amount.times(2).plus(context.multiPaymentTransaction.data.fee)),
+			sendersDelegate.getAttribute("delegate.voteBalance"),
+			senderDelegateBefore.minus(amount.times(2).plus(multiPaymentTransaction.data.fee)),
 		);
 
-		await context.blockState.revertTransaction(context.multiPaymentTransaction);
+		await context.blockState.revertTransaction(multiPaymentTransaction);
 
 		assert.equal(context.recipientsDelegate.getAttribute("delegate.voteBalance"), Utils.BigNumber.ZERO);
-		assert.equal(context.sendersDelegate.getAttribute("delegate.voteBalance"), Utils.BigNumber.ZERO);
+		assert.equal(sendersDelegate.getAttribute("delegate.voteBalance"), Utils.BigNumber.ZERO);
 	});
 
 	it("should call the transaction handler apply the transaction to the sender & recipient", async (context) => {
