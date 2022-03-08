@@ -19,88 +19,105 @@ describe<{
 	sandbox: Sandbox;
 	blockProcessor: BlockProcessor;
 	baseBlock: any;
+	chainedBlock: any;
 
-	acceptBlockHandler: any;
-	alreadyForgedHandler: any;
-	exceptionHandler: any;
-	incompatibleTransactionsHandler: any;
-	invalidGeneratorHandler: any;
-	nonceOutOfOrderHandler: any;
-	unchainedHandler: any;
-	verificationFailedHandler: any;
-}>("BlockProcessor", ({ assert, beforeEach, it, spyFn, stubFn }) => {
-	const logService = { warning: spyFn(), info: spyFn(), error: spyFn(), debug: spyFn() };
-	const blockchain = { getLastBlock: stubFn(), resetLastDownloadedBlock: stubFn() };
-	const transactionRepository = { getForgedTransactionsIds: stubFn() };
+	// handler spies
+	acceptBlockHandlerSpy: any;
+	alreadyForgedHandlerSpy: any;
+	exceptionHandlerSpy: any;
+	incompatibleTransactionsHandlerSpy: any;
+	invalidGeneratorHandlerSpy: any;
+	nonceOutOfOrderHandlerSpy: any;
+	unchainedHandlerSpy: any;
+	verificationFailedHandlerSpy: any;
 
-	const walletRepository = {
-		findByPublicKey: stubFn(),
-		getNonce: stubFn(),
-	};
-	const transactionHandlerRegistry = {
-		getActivatedHandlerForData: stubFn(),
-	};
-	const databaseService = {};
-	const databaseInteractions = {
-		walletRepository: {
-			getNonce: spyFn(),
-		},
-		getTopBlocks: spyFn(),
-		getLastBlock: spyFn(),
-		restoreCurrentRound: spyFn(),
-		revertBlock: spyFn(),
-		deleteRound: spyFn(),
-		applyBlock: spyFn(),
-	};
-	const roundState = {
-		getActiveDelegates: stubFn().returns([]),
-	};
-	const stateStore = {
-		getForkedBlock: stubFn(),
-		getLastBlock: stubFn(),
-		getLastBlocks: stubFn(),
-		getLastDownloadedBlock: stubFn(),
-		getLastStoredBlockHeight: stubFn(),
-		isStarted: stubFn(),
-	};
-
-	const databaseInterceptor = {};
-
+	blockchain: any;
+	databaseInteractions: any;
+	databaseInterceptor: any;
+	databaseService: any;
+	logService: any;
+	roundState: any;
+	stateStore: any;
+	transactionHandlerRegistry: any;
+	transactionRepository: any;
+	walletRepository: any;
+}>("BlockProcessor", ({ assert, beforeEach, it, spy, stub, stubFn }) => {
 	beforeEach((context) => {
+		context.acceptBlockHandlerSpy = spy(AcceptBlockHandler.prototype, "execute");
+		context.alreadyForgedHandlerSpy = spy(AlreadyForgedHandler.prototype, "execute");
+		context.exceptionHandlerSpy = spy(ExceptionHandler.prototype, "execute");
+		context.incompatibleTransactionsHandlerSpy = spy(IncompatibleTransactionsHandler.prototype, "execute");
+		context.invalidGeneratorHandlerSpy = spy(InvalidGeneratorHandler.prototype, "execute");
+		context.nonceOutOfOrderHandlerSpy = spy(NonceOutOfOrderHandler.prototype, "execute");
+		context.unchainedHandlerSpy = spy(UnchainedHandler.prototype, "execute");
+		context.verificationFailedHandlerSpy = spy(VerificationFailedHandler.prototype, "execute");
+
+		context.logService = {
+			warning: () => undefined,
+			info: () => undefined,
+			error: () => undefined,
+			debug: () => undefined,
+		};
+		context.blockchain = {
+			getLastBlock: () => undefined,
+			clearQueue: () => undefined,
+			resetLastDownloadedBlock: () => undefined,
+		};
+		context.transactionRepository = {
+			getForgedTransactionsIds: () => undefined,
+		};
+
+		context.walletRepository = {
+			findByPublicKey: () => undefined,
+			getNonce: () => undefined,
+		};
+		context.transactionHandlerRegistry = {
+			getActivatedHandlerForData: () => undefined,
+		};
+		context.databaseService = {};
+		context.databaseInteractions = {
+			walletRepository: context.walletRepository,
+			getTopBlocks: () => undefined,
+			getLastBlock: () => undefined,
+			restoreCurrentRound: () => undefined,
+			revertBlock: () => undefined,
+			deleteRound: () => undefined,
+			applyBlock: () => undefined,
+		};
+		context.roundState = {
+			getActiveDelegates: () => undefined,
+		};
+		context.stateStore = {
+			getForkedBlock: () => undefined,
+			getLastBlock: () => undefined,
+			getLastBlocks: () => undefined,
+			getLastDownloadedBlock: () => undefined,
+			getLastStoredBlockHeight: () => undefined,
+			isStarted: () => undefined,
+		};
+
+		context.databaseInterceptor = {};
+
 		context.sandbox = new Sandbox();
 
-		context.acceptBlockHandler = spyFn();
-		context.alreadyForgedHandler = spyFn();
-		context.exceptionHandler = spyFn();
-		context.incompatibleTransactionsHandler = spyFn();
-		context.invalidGeneratorHandler = spyFn();
-		context.nonceOutOfOrderHandler = spyFn();
-		context.unchainedHandler = spyFn();
-		context.verificationFailedHandler = spyFn();
-
-		context.sandbox.app.bind(AcceptBlockHandler).to(context.acceptBlockHandler as any);
-		context.sandbox.app.bind(AlreadyForgedHandler).to(context.alreadyForgedHandler as any);
-		context.sandbox.app.bind(ExceptionHandler).to(context.exceptionHandler as any);
-		context.sandbox.app.bind(IncompatibleTransactionsHandler).to(context.incompatibleTransactionsHandler as any);
-		context.sandbox.app.bind(InvalidGeneratorHandler).to(context.invalidGeneratorHandler as any);
-		context.sandbox.app.bind(NonceOutOfOrderHandler).to(context.nonceOutOfOrderHandler as any);
-		context.sandbox.app.bind(UnchainedHandler).to(context.unchainedHandler as any);
-		context.sandbox.app.bind(VerificationFailedHandler).to(context.verificationFailedHandler() as any);
-
-		context.sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(logService);
-		context.sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(blockchain);
+		context.sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(context.logService);
+		context.sandbox.app.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
 		context.sandbox.app
 			.bind(Container.Identifiers.DatabaseTransactionRepository)
-			.toConstantValue(transactionRepository);
-		context.sandbox.app.bind(Container.Identifiers.WalletRepository).toConstantValue(walletRepository);
-		context.sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(databaseService);
-		context.sandbox.app.bind(Container.Identifiers.DatabaseInteraction).toConstantValue(databaseInteractions);
-		context.sandbox.app.bind(Container.Identifiers.DatabaseInterceptor).toConstantValue(databaseInterceptor);
-		context.sandbox.app.bind(Container.Identifiers.RoundState).toConstantValue(roundState);
+			.toConstantValue(context.transactionRepository);
+		context.sandbox.app.bind(Container.Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+		context.sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(context.databaseService);
+		context.sandbox.app
+			.bind(Container.Identifiers.DatabaseInteraction)
+			.toConstantValue(context.databaseInteractions);
+		context.sandbox.app
+			.bind(Container.Identifiers.DatabaseInterceptor)
+			.toConstantValue(context.databaseInterceptor);
+		context.sandbox.app.bind(Container.Identifiers.RoundState).toConstantValue(context.roundState);
 		context.sandbox.app
 			.bind(Container.Identifiers.TransactionHandlerRegistry)
-			.toConstantValue(transactionHandlerRegistry);
-		context.sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
+			.toConstantValue(context.transactionHandlerRegistry);
+		context.sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
 		context.sandbox.app.bind(Container.Identifiers.TransactionPoolService).toConstantValue({});
 
 		context.sandbox.app
@@ -131,10 +148,37 @@ describe<{
 			},
 			serialized: "",
 			verification: { verified: true, errors: [], containsMultiSignatures: false },
-			getHeader: spyFn(),
-			verify: spyFn(),
-			verifySignature: spyFn(),
-			toJson: spyFn(),
+			getHeader: () => undefined,
+			verify: () => undefined,
+			verifySignature: () => undefined,
+			toJson: () => undefined,
+			transactions: [],
+		};
+
+		context.chainedBlock = {
+			data: {
+				id: "7242383292164246617",
+				version: 0,
+				timestamp: 46583338,
+				height: 3,
+				reward: Utils.BigNumber.make("0"),
+				previousBlock: "17882607875259085966",
+				numberOfTransactions: 0,
+				totalAmount: Utils.BigNumber.make("0"),
+				totalFee: Utils.BigNumber.make("0"),
+				payloadLength: 0,
+				payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+				generatorPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
+				blockSignature:
+					"304402204087bb1d2c82b9178b02b9b3f285de260cdf0778643064fe6c7aef27321d49520220594c57009c1fca543350126d277c6adeb674c00685a464c3e4bf0d634dc37e39",
+				createdAt: "2018-09-11T16:48:58.431Z",
+			},
+			serialized: "",
+			verification: { verified: true, errors: [], containsMultiSignatures: false },
+			getHeader: () => undefined,
+			verify: () => undefined,
+			verifySignature: () => undefined,
+			toJson: () => undefined,
 			transactions: [],
 		};
 
@@ -146,14 +190,14 @@ describe<{
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.verificationFailedHandler.execute.calledOnce);
+		context.verificationFailedHandlerSpy.calledOnce();
 	});
 
 	it("should execute VerificationFailedHandler when handler.verify() fails on one transaction (containsMultiSignatures)", async (context) => {
 		const block = {
 			...context.baseBlock,
 			verification: { verified: true, errors: [], containsMultiSignatures: true },
-			verify: stubFn().returns(true),
+			verify: () => true,
 			transactions: [
 				{
 					data: {
@@ -173,13 +217,16 @@ describe<{
 				} as Interfaces.ITransaction,
 			],
 		};
-		transactionHandlerRegistry.getActivatedHandlerForData.returns({
-			verify: stubFn().rejects(new Error("oops")),
+
+		stub(context.transactionHandlerRegistry, "getActivatedHandlerForData").returnValue({
+			verify: () => {
+				throw new Error("oops");
+			},
 		});
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.verificationFailedHandler.execute.calledOnce);
+		context.verificationFailedHandlerSpy.calledOnce();
 	});
 
 	it("should execute VerificationFailedHandler when block.verify() fails (containsMultiSignatures)", async (context) => {
@@ -191,7 +238,7 @@ describe<{
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.verificationFailedHandler.execute.calledOnce);
+		context.verificationFailedHandlerSpy.calledOnce();
 		assert.true(block.verify.calledOnce);
 	});
 
@@ -206,7 +253,7 @@ describe<{
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.incompatibleTransactionsHandler.execute.calledOnce);
+		context.incompatibleTransactionsHandlerSpy.calledOnce();
 	});
 
 	it("should execute NonceOutOfOrderHandler when block has out of order nonce", async (context) => {
@@ -226,11 +273,11 @@ describe<{
 			],
 		};
 
-		walletRepository.getNonce.returns(Utils.BigNumber.ONE);
+		stub(context.walletRepository, "getNonce").returnValue(Utils.BigNumber.ONE);
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.nonceOutOfOrderHandler.execute.calledOnce);
+		context.nonceOutOfOrderHandlerSpy.calledOnce();
 	});
 
 	it("should not execute NonceOutOfOrderHandler when block has v1 transactions and nonce out of order", async (context) => {
@@ -247,109 +294,80 @@ describe<{
 			],
 		};
 
-		walletRepository.getNonce = stubFn().returns(Utils.BigNumber.ONE);
-		roundState.getActiveDelegates = stubFn().returns([]);
-		blockchain.getLastBlock = stubFn().returns(context.baseBlock);
-		const generatorWallet = {
-			getAttribute: stubFn().returns("generatorusername"),
-		};
-		walletRepository.findByPublicKey = stubFn().returns(generatorWallet);
-		UnchainedHandler.prototype.initialize = stubFn().returns(new UnchainedHandler());
+		stub(context.walletRepository, "getNonce").returnValue(Utils.BigNumber.ONE);
+		stub(context.roundState, "getActiveDelegates").returnValue([]);
+		stub(context.blockchain, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.walletRepository, "findByPublicKey").returnValue({
+			getAttribute: () => "generatorusername",
+		});
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.nonceOutOfOrderHandler.execute.notCalled);
+		context.nonceOutOfOrderHandlerSpy.neverCalled();
 	});
 
 	it("should execute UnchainedHandler when block is not chained", async (context) => {
 		const block = {
 			...context.baseBlock,
 		};
-		blockchain.getLastBlock = stubFn().returns(context.baseBlock);
-		const generatorWallet = {
-			getAttribute: stubFn().returns("generatorusername"),
-		};
-		walletRepository.findByPublicKey = stubFn().returns(generatorWallet);
-		UnchainedHandler.prototype.initialize = stubFn().returns(new UnchainedHandler());
-		roundState.getActiveDelegates = stubFn().returns([]);
+		stub(context.roundState, "getActiveDelegates").returnValue([]);
+		stub(context.blockchain, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.walletRepository, "findByPublicKey").returnValue({
+			getAttribute: () => "generatorusername",
+		});
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.unchainedHandler.execute.calledOnce);
+		context.unchainedHandlerSpy.calledOnce();
 	});
-
-	const chainedBlock = {
-		data: {
-			id: "7242383292164246617",
-			version: 0,
-			timestamp: 46583338,
-			height: 3,
-			reward: Utils.BigNumber.make("0"),
-			previousBlock: "17882607875259085966",
-			numberOfTransactions: 0,
-			totalAmount: Utils.BigNumber.make("0"),
-			totalFee: Utils.BigNumber.make("0"),
-			payloadLength: 0,
-			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			generatorPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
-			blockSignature:
-				"304402204087bb1d2c82b9178b02b9b3f285de260cdf0778643064fe6c7aef27321d49520220594c57009c1fca543350126d277c6adeb674c00685a464c3e4bf0d634dc37e39",
-			createdAt: "2018-09-11T16:48:58.431Z",
-		},
-		serialized: "",
-		verification: { verified: true, errors: [], containsMultiSignatures: false },
-		getHeader: spyFn(),
-		verify: spyFn(),
-		verifySignature: spyFn(),
-		toJson: spyFn(),
-		transactions: [],
-	};
 
 	it("should execute InvalidGeneratorHandler when block has invalid generator", async (context) => {
 		const block = {
-			...chainedBlock,
+			...context.chainedBlock,
 		};
-		blockchain.getLastBlock.returns(context.baseBlock);
-		const generatorWallet = {
-			getAttribute: stubFn().returns("generatorusername"),
-		};
-		walletRepository.findByPublicKey.returns(generatorWallet);
-		const notBlockGenerator = {
-			getPublicKey: () => {
-				return "02ff171adaef486b7db9fc160b28433d20cf43163d56fd28fee72145f0d5219a4b";
-			},
-		};
+		stub(context.blockchain, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.walletRepository, "findByPublicKey").returnValue({
+			getAttribute: () => "generatorusername",
+		});
 
 		const activeDelegatesWithoutGenerator = [];
 		activeDelegatesWithoutGenerator.length = 51;
-		activeDelegatesWithoutGenerator.fill(notBlockGenerator, 0);
+		activeDelegatesWithoutGenerator.fill(
+			{
+				getPublicKey: () => {
+					return "02ff171adaef486b7db9fc160b28433d20cf43163d56fd28fee72145f0d5219a4b";
+				},
+			},
+			0,
+		);
 
-		roundState.getActiveDelegates.returns(activeDelegatesWithoutGenerator);
+		stub(context.roundState, "getActiveDelegates").returnValue(activeDelegatesWithoutGenerator);
 
 		await assert.resolves(() => context.blockProcessor.process(block));
 
-		assert.true(context.invalidGeneratorHandler.execute.calledOnce);
+		context.invalidGeneratorHandlerSpy.calledOnce();
 	});
 
 	it("should execute InvalidGeneratorHandler when generatorWallet.getAttribute() throws", async (context) => {
 		const block = {
-			...chainedBlock,
+			...context.chainedBlock,
 		};
-		blockchain.getLastBlock.returns(context.baseBlock);
-		const generatorWallet = {
-			getAttribute: stubFn().rejects(new Error("oops")),
-		};
-		walletRepository.findByPublicKey.returns(generatorWallet);
+
+		stub(context.blockchain, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.walletRepository, "findByPublicKey").returnValue({
+			getAttribute: () => {
+				throw new Error("oops");
+			},
+		});
 
 		const notBlockGenerator = {
 			publicKey: "02ff171adaef486b7db9fc160b28433d20cf43163d56fd28fee72145f0d5219a4b",
 		};
-
-		roundState.getActiveDelegates.returns([notBlockGenerator]);
+		stub(context.roundState, "getActiveDelegates").returnValue([notBlockGenerator]);
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.invalidGeneratorHandler.execute.calledOnce);
+		context.invalidGeneratorHandlerSpy.calledOnce();
 	});
 
 	it("should execute AlreadyForgedHandler when block has already forged transactions in database", async (context) => {
@@ -360,24 +378,23 @@ describe<{
 			nonce: Utils.BigNumber.make(2),
 		} as Interfaces.ITransactionData;
 		const block = {
-			...chainedBlock,
+			...context.chainedBlock,
 			transactions: [{ data: transactionData, id: transactionData.id } as Interfaces.ITransaction],
 		};
-		roundState.getActiveDelegates.returns([]);
-		blockchain.getLastBlock.returns(context.baseBlock);
-		transactionRepository.getForgedTransactionsIds.returns([transactionData.id]);
-		walletRepository.getNonce.returns(Utils.BigNumber.ONE);
-		const generatorWallet = {
-			getAttribute: stubFn().returns("generatorusername"),
-		};
-		walletRepository.findByPublicKey.returns(generatorWallet);
-		stateStore.getLastBlock.returns(context.baseBlock);
-		stateStore.getLastStoredBlockHeight.returns(context.baseBlock.data.height);
-		stateStore.getLastBlocks.returns([]);
+		stub(context.walletRepository, "getNonce").returnValue(Utils.BigNumber.ONE);
+		stub(context.roundState, "getActiveDelegates").returnValue([]);
+		stub(context.blockchain, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.walletRepository, "findByPublicKey").returnValue({
+			getAttribute: () => "generatorusername",
+		});
+		stub(context.transactionRepository, "getForgedTransactionsIds").returnValue([transactionData.id]);
+		stub(context.stateStore, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.stateStore, "getLastStoredBlockHeight").returnValue(context.baseBlock.data.height);
+		stub(context.stateStore, "getLastBlocks").returnValue([]);
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.alreadyForgedHandler.execute.calledOnce);
+		context.alreadyForgedHandlerSpy.calledOnce();
 	});
 
 	it("should execute AlreadyForgedHandler when block has already forged transactions in stateStore", async (context) => {
@@ -394,40 +411,41 @@ describe<{
 			nonce: Utils.BigNumber.make(3),
 		} as Interfaces.ITransactionData;
 		const block = {
-			...chainedBlock,
+			...context.chainedBlock,
 			transactions: [{ data: transactionData, id: transactionData.id } as Interfaces.ITransaction],
 		};
-		roundState.getActiveDelegates.returns([]);
-		blockchain.getLastBlock.returns(context.baseBlock);
-		transactionRepository.getForgedTransactionsIds.returns([]);
-		walletRepository.getNonce.returns(Utils.BigNumber.ONE);
-		const generatorWallet = {
-			getAttribute: stubFn().returns("generatorusername"),
-		};
-		walletRepository.findByPublicKey.returns(generatorWallet);
-		stateStore.getLastBlock.returns({ data: { height: 2 } });
-		stateStore.getLastBlocks.returns([{ data: { height: 2 }, transactions: [transactionData, transactionData2] }]);
-		stateStore.getLastStoredBlockHeight.returns(1);
+
+		stub(context.walletRepository, "getNonce").returnValue(Utils.BigNumber.ONE);
+		stub(context.roundState, "getActiveDelegates").returnValue([]);
+		stub(context.blockchain, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.walletRepository, "findByPublicKey").returnValue({
+			getAttribute: () => "generatorusername",
+		});
+		stub(context.transactionRepository, "getForgedTransactionsIds").returnValue([]);
+		stub(context.stateStore, "getLastBlock").returnValue({ data: { height: 2 } });
+		stub(context.stateStore, "getLastBlocks").returnValue([
+			{ data: { height: 2 }, transactions: [transactionData, transactionData2] },
+		]);
+		stub(context.stateStore, "getLastStoredBlockHeight").returnValue(1);
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.alreadyForgedHandler.execute.calledOnce);
+		context.alreadyForgedHandlerSpy.calledOnce();
 	});
 
-	it.only("should execute AcceptBlockHandler when all above verifications passed", async (context) => {
+	it("should execute AcceptBlockHandler when all above verifications passed", async (context) => {
 		const block = {
-			...chainedBlock,
+			...context.chainedBlock,
 		};
-		roundState.getActiveDelegates.returns([]);
-		blockchain.getLastBlock.returns(context.baseBlock);
-		transactionRepository.getForgedTransactionsIds.returns([]);
-		const generatorWallet = {
-			getAttribute: stubFn().returns("generatorusername"),
-		};
-		walletRepository.findByPublicKey.returns(generatorWallet);
+		stub(context.roundState, "getActiveDelegates").returnValue([]);
+		stub(context.blockchain, "getLastBlock").returnValue(context.baseBlock);
+		stub(context.walletRepository, "findByPublicKey").returnValue({
+			getAttribute: () => "generatorusername",
+		});
+		stub(context.transactionRepository, "getForgedTransactionsIds").returnValue([]);
 
 		await context.blockProcessor.process(block);
 
-		assert.true(context.acceptBlockHandler.execute.calledOnce);
+		context.acceptBlockHandlerSpy.calledOnce();
 	});
 });
