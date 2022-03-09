@@ -14,7 +14,7 @@ import {
 import { Keys } from "../identities";
 import { IDecryptResult } from "../interfaces";
 import { Base58 } from "../utils/base58";
-import { HashAlgorithms } from ".";
+import { HashAlgorithms } from "./hash-algorithms";
 
 const SCRYPT_PARAMS = {
 	N: 16_384,
