@@ -1,10 +1,8 @@
-import "jest-extended";
-
-import { TransactionTypeError } from "@packages/crypto/source/errors";
-import { Keys } from "@packages/crypto/source/identities";
-import { ITransaction } from "@packages/crypto/source/interfaces";
-import { configManager } from "@packages/crypto/source/managers";
-import { BuilderFactory } from "@packages/crypto/source/transactions";
+import { TransactionTypeError } from "../../source/errors";
+import { Keys } from "../../source/identities";
+import { ITransaction } from "../../source/interfaces";
+import { configManager } from "../../source/managers";
+import { BuilderFactory } from "../../source/transactions";
 
 export const createRandomTx = (type) => {
 	let transaction: ITransaction;
