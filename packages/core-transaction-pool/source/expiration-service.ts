@@ -15,7 +15,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public canExpire(transaction: Contracts.Crypto.ITransaction): boolean {
 		if (transaction.data.version && transaction.data.version >= 2) {
@@ -41,7 +41,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 			const currentHeight: number = this.stateStore.getLastHeight();
 
 			const createdSecondsAgo: number = this.slots.getTime() - transaction.data.timestamp;
-			const createdBlocksAgo: number = this.slots.getSlotNumber(createdSecondsAgo);
+			const createdBlocksAgo: number = await this.slots.getSlotNumber(createdSecondsAgo);
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 
 			return Math.floor(currentHeight - createdBlocksAgo + maxTransactionAge);

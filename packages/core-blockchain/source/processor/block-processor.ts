@@ -50,7 +50,7 @@ export class BlockProcessor {
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public async process(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		if (!(await this.verifyBlock(block))) {

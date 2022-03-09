@@ -15,7 +15,7 @@ export class GetCurrentRoundAction extends Services.Triggers.Action {
 	private readonly databaseInteraction!: DatabaseInteraction;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public async execute(): Promise<Contracts.P2P.CurrentRound> {
 		const lastBlock = this.blockchain.getLastBlock();

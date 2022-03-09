@@ -12,12 +12,12 @@ export class GetStatusController {
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public async invoke(request: FastifyRequest): Promise<Contracts.P2P.PeerPingResponse> {
 		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
-		const slotInfo = this.slots.getSlotInfo();
+		const slotInfo = await this.slots.getSlotInfo();
 
 		return {
 			config: getPeerConfig(this.app),

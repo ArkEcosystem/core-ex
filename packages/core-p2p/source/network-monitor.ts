@@ -38,7 +38,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots!: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;

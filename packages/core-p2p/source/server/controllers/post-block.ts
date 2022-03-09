@@ -24,7 +24,7 @@ export class PostBlockController {
 	private readonly deserializer!: Contracts.Crypto.IBlockDeserializer;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public async invoke(request: FastifyRequest): Promise<{ status: boolean; height: number }> {
 		const blockBuffer: Buffer = (request.body as any).block;

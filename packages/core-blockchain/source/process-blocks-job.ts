@@ -43,7 +43,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.Cryptography.Time.Slots)
-	private readonly slots: any;
+	private readonly slots: Contracts.Crypto.Slots;
 
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly blockTimeLookup: any;
@@ -95,8 +95,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 		try {
 			for (const block of this.blocks) {
-				const currentSlot: number = this.slots.getSlotNumber(acceptedBlockTimeLookup);
-				const blockSlot: number = this.slots.getSlotNumber(acceptedBlockTimeLookup, block.timestamp);
+				const currentSlot: number = await this.slots.getSlotNumber(acceptedBlockTimeLookup);
+				const blockSlot: number = await this.slots.getSlotNumber(acceptedBlockTimeLookup, block.timestamp);
 
 				if (blockSlot > currentSlot) {
 					this.logger.error(

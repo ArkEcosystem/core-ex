@@ -16,7 +16,7 @@ export interface SlotInfo {
 export type GetBlockTimeStampLookup = (blockheight: number) => number;
 
 @injectable()
-export class Slots {
+export class Slots implements Contracts.Crypto.Slots {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration: Contracts.Crypto.IConfiguration;
 
