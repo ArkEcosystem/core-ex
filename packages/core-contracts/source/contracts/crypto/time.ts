@@ -11,6 +11,8 @@ export interface SlotInfo {
 export type GetBlockTimeStampLookup = (blockheight: number) => number;
 
 export interface Slots {
+	withBlockTimeLookup(callback: GetBlockTimeStampLookup): Slots;
+
 	getTime(time?: number): number;
 
 	getTimeInMsUntilNextSlot(): Promise<number>;
@@ -21,10 +23,7 @@ export interface Slots {
 
 	getNextSlot(): Promise<number>;
 
-	isForgingAllowed(
-		timestamp?: number,
-		height?: number,
-	): Promise<boolean>;
+	isForgingAllowed(timestamp?: number, height?: number): Promise<boolean>;
 
 	getSlotInfo(timestamp?: number, height?: number): Promise<SlotInfo>;
 

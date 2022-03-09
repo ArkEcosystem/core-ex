@@ -5,16 +5,6 @@ import dayjs from "dayjs";
 import { BlockTimeCalculator } from "./block-time-calculator";
 import { BlockTimeLookup } from "./block-time-lookup";
 
-export interface SlotInfo {
-	startTime: number;
-	endTime: number;
-	blockTime: number;
-	slotNumber: number;
-	forgingStatus: boolean;
-}
-
-export type GetBlockTimeStampLookup = (blockheight: number) => number;
-
 @injectable()
 export class Slots implements Contracts.Crypto.Slots {
 	@inject(Identifiers.Cryptography.Configuration)
@@ -23,8 +13,16 @@ export class Slots implements Contracts.Crypto.Slots {
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly calculator: BlockTimeCalculator;
 
-	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
+	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
 	private readonly blockTimeLookup: BlockTimeLookup;
+
+	#transientBlockTimeLookup: Contracts.Crypto.GetBlockTimeStampLookup | undefined;
+
+	public withBlockTimeLookup(callback: Contracts.Crypto.GetBlockTimeStampLookup): Slots {
+		this.#transientBlockTimeLookup = callback;
+
+		return this;
+	}
 
 	public getTime(time?: number): number {
 		return time ?? dayjs().unix();
@@ -38,8 +36,11 @@ export class Slots implements Contracts.Crypto.Slots {
 	}
 
 	public async getSlotNumber(timestamp?: number, height?: number): Promise<number> {
-		return (await this.getSlotInfo(timestamp ?? this.getTime(), this.#getLatestHeight(height)))
-			.slotNumber;
+		const { slotNumber } = await this.getSlotInfo(timestamp ?? this.getTime(), this.#getLatestHeight(height));
+
+		this.#transientBlockTimeLookup = undefined;
+
+		return slotNumber;
 	}
 
 	public async getSlotTime(slot: number, height?: number): Promise<number> {
@@ -50,14 +51,11 @@ export class Slots implements Contracts.Crypto.Slots {
 		return (await this.getSlotNumber()) + 1;
 	}
 
-	public async isForgingAllowed(
-		timestamp?: number,
-		height?: number,
-	): Promise<boolean> {
+	public async isForgingAllowed(timestamp?: number, height?: number): Promise<boolean> {
 		return (await this.getSlotInfo(timestamp ?? this.getTime(), this.#getLatestHeight(height))).forgingStatus;
 	}
 
-	public async getSlotInfo(timestamp?: number, height?: number): Promise<SlotInfo> {
+	public async getSlotInfo(timestamp?: number, height?: number): Promise<Contracts.Crypto.SlotInfo> {
 		if (timestamp === undefined) {
 			timestamp = this.getTime();
 		}
@@ -75,8 +73,8 @@ export class Slots implements Contracts.Crypto.Slots {
 				break;
 			}
 
-			const spanStartTimestamp = await this.blockTimeLookup.getBlockTimeLookup(previousMilestoneHeight);
-			lastSpanEndTime = (await this.blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
+			const spanStartTimestamp = await this.#getBlockTimeLookup(previousMilestoneHeight);
+			lastSpanEndTime = (await this.#getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
 			blockTime = nextMilestone.data;
@@ -118,10 +116,7 @@ export class Slots implements Contracts.Crypto.Slots {
 		return milestones;
 	}
 
-	async #calculateSlotTime(
-		slotNumber: number,
-		height: number,
-	): Promise<number> {
+	async #calculateSlotTime(slotNumber: number, height: number): Promise<number> {
 		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
 		let milestoneHeight = 1;
@@ -134,8 +129,8 @@ export class Slots implements Contracts.Crypto.Slots {
 				break;
 			}
 
-			const spanStartTimestamp = await this.blockTimeLookup.getBlockTimeLookup(milestoneHeight);
-			lastSpanEndTime = (await this.blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
+			const spanStartTimestamp = await this.#getBlockTimeLookup(milestoneHeight);
+			lastSpanEndTime = (await this.#getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
 			blockTime = nextMilestone.data;
@@ -156,5 +151,13 @@ export class Slots implements Contracts.Crypto.Slots {
 		}
 
 		return 1;
+	}
+
+	async #getBlockTimeLookup(height: number): Promise<number> {
+		if (typeof this.#transientBlockTimeLookup === "function") {
+			return this.#transientBlockTimeLookup(height);
+		}
+
+		return this.blockTimeLookup.getBlockTimeLookup(height);
 	}
 }

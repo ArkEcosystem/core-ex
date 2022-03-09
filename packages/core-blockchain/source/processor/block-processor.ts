@@ -66,7 +66,7 @@ export class BlockProcessor {
 		}
 
 		const isValidGenerator: boolean = await this.validateGenerator(block);
-		const isChained: boolean = AppUtils.isBlockChained(
+		const isChained: boolean = await AppUtils.isBlockChained(
 			this.blockchain.getLastBlock().data,
 			block.data,
 			this.slots,
@@ -220,11 +220,10 @@ export class BlockProcessor {
 			roundInfo,
 		});
 
-		const forgingInfo: Contracts.Shared.ForgingInfo = AppUtils.forgingInfoCalculator.calculateForgingInfo(
+		const forgingInfo: Contracts.Shared.ForgingInfo = await AppUtils.forgingInfoCalculator.calculateForgingInfo(
 			block.data.timestamp,
 			block.data.height,
-			this.configuration,
-			this.slots,
+			this.app,
 		);
 
 		const forgingValidator: Contracts.State.Wallet = validators[forgingInfo.currentForger];

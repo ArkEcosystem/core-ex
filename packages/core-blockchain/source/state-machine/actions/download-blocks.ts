@@ -44,8 +44,7 @@ export class DownloadBlocks implements Action {
 
 		const empty: boolean = !blocks || blocks.length === 0;
 
-		const chained: boolean =
-			!empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], this.slots);
+		const chained: boolean = !empty && (await AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], this.slots));
 
 		if (chained) {
 			this.logger.info(

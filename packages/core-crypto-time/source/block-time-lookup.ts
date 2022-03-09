@@ -10,7 +10,8 @@ export class BlockTimeLookup {
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
 	public async getBlockTimeLookup(height: number): Promise<number> {
-		const findBlockTimestampByHeight = async (height: number): Promise<number> => (await this.databaseService.findBlockByHeights([height]))[0].data.timestamp;
+		const findBlockTimestampByHeight = async (height: number): Promise<number> =>
+			(await this.databaseService.findBlockByHeights([height]))[0].data.timestamp;
 
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
 
@@ -36,5 +37,5 @@ export class BlockTimeLookup {
 		}
 
 		return result;
-	};
+	}
 }
