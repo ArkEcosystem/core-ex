@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Exceptions,Identifiers  } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { INTERNAL_FACTORY, InternalFactory } from "./container";

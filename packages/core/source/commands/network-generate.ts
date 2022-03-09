@@ -565,7 +565,11 @@ export class Command extends Commands.Command {
 		];
 	}
 
-	private async generateCryptoGenesisBlock(genesisWallet, validators, options: Options): Promise<BaseContracts.Crypto.IBlockData> {
+	private async generateCryptoGenesisBlock(
+		genesisWallet,
+		validators,
+		options: Options,
+	): Promise<BaseContracts.Crypto.IBlockData> {
 		const premineWallet: Wallet = await this.createWallet(options.pubKeyHash);
 
 		let transactions = [];
@@ -781,7 +785,11 @@ export class Command extends Commands.Command {
 		return transaction;
 	}
 
-	private async createGenesisBlock(keys: BaseContracts.Crypto.IKeyPair, transactions, options: Options): Promise<BaseContracts.Crypto.IBlockData> {
+	private async createGenesisBlock(
+		keys: BaseContracts.Crypto.IKeyPair,
+		transactions,
+		options: Options,
+	): Promise<BaseContracts.Crypto.IBlockData> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -806,20 +814,27 @@ export class Command extends Commands.Command {
 
 		return {
 			...(
-				await this.app.get<BaseContracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
-					generatorPublicKey: keys.publicKey,
-					height: 1,
-					numberOfTransactions: transactions.length,
-					payloadHash: (await this.app.get<BaseContracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory).sha256(payloadBuffers)).toString("hex"),
-					payloadLength: 32 * transactions.length,
-					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-					reward: "0",
-					timestamp: dayjs(options.epoch).unix(),
-					totalAmount: totals.amount.toString(),
-					totalFee: totals.fee.toString(),
-					transactions,
-					version: 0,
-				}, keys)
+				await this.app.get<BaseContracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make(
+					{
+						generatorPublicKey: keys.publicKey,
+						height: 1,
+						numberOfTransactions: transactions.length,
+						payloadHash: (
+							await this.app
+								.get<BaseContracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+								.sha256(payloadBuffers)
+						).toString("hex"),
+						payloadLength: 32 * transactions.length,
+						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+						reward: "0",
+						timestamp: dayjs(options.epoch).unix(),
+						totalAmount: totals.amount.toString(),
+						totalFee: totals.fee.toString(),
+						transactions,
+						version: 0,
+					},
+					keys,
+				)
 			).data,
 			transactions,
 		};

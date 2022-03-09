@@ -22,7 +22,8 @@ const setup = (context) => {
 	context.slots = app.resolve(Slots);
 };
 
-const genesisTimestamp = (configuration: Configuration, seconds = 0): number => dayjs(configuration.getMilestone().epoch).unix() + seconds;
+const genesisTimestamp = (configuration: Configuration, seconds = 0): number =>
+	dayjs(configuration.getMilestone().epoch).unix() + seconds;
 
 describe<{
 	configuration: Configuration;
@@ -60,24 +61,57 @@ describe<{
 
 		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 24), 4), 3);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 8000), 1001), 1000);
+		assert.is(
+			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 8000), 1001),
+			1000,
+		);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 15_000), 1876), 1875);
+		assert.is(
+			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 15_000), 1876),
+			1875,
+		);
 
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_000), 21_126), 21_125);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_001), 21_126), 21_125);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_005), 21_126), 21_125);
-		assert.is(context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_007), 21_126), 21_125);
+		assert.is(
+			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_000), 21_126),
+			21_125,
+		);
+		assert.is(
+			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_001), 21_126),
+			21_125,
+		);
+		assert.is(
+			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_005), 21_126),
+			21_125,
+		);
+		assert.is(
+			context.slots.getSlotNumber(getTimeStampForBlock, genesisTimestamp(context.configuration, 169_007), 21_126),
+			21_125,
+		);
 	});
 
 	it("returns slot time", (context) => {
 		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 1, 2), genesisTimestamp(context.configuration, 8));
 		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 8, 9), genesisTimestamp(context.configuration, 64));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 50, 51), genesisTimestamp(context.configuration, 400));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 8888, 8889), genesisTimestamp(context.configuration, 71_104));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 19_614, 19_615), genesisTimestamp(context.configuration, 156_912));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 19_700, 19_701), genesisTimestamp(context.configuration, 157_600));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 169_000, 1), genesisTimestamp(context.configuration, 1_352_000));
+		assert.is(
+			context.slots.getSlotTime(getTimeStampForBlock, 50, 51),
+			genesisTimestamp(context.configuration, 400),
+		);
+		assert.is(
+			context.slots.getSlotTime(getTimeStampForBlock, 8888, 8889),
+			genesisTimestamp(context.configuration, 71_104),
+		);
+		assert.is(
+			context.slots.getSlotTime(getTimeStampForBlock, 19_614, 19_615),
+			genesisTimestamp(context.configuration, 156_912),
+		);
+		assert.is(
+			context.slots.getSlotTime(getTimeStampForBlock, 19_700, 19_701),
+			genesisTimestamp(context.configuration, 157_600),
+		);
+		assert.is(
+			context.slots.getSlotTime(getTimeStampForBlock, 169_000, 1),
+			genesisTimestamp(context.configuration, 1_352_000),
+		);
 	});
 
 	it("getSlotInfo / should return positive values when called without timestamp", (context) => {
@@ -377,7 +411,10 @@ describe<{
 		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 6, 7), genesisTimestamp(context.configuration, 53));
 		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 7, 8), genesisTimestamp(context.configuration, 63));
 		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 8, 9), genesisTimestamp(context.configuration, 71));
-		assert.is(context.slots.getSlotTime(getTimeStampForBlock, 14, 15), genesisTimestamp(context.configuration, 119));
+		assert.is(
+			context.slots.getSlotTime(getTimeStampForBlock, 14, 15),
+			genesisTimestamp(context.configuration, 119),
+		);
 	});
 
 	it("getSlotInfo / should return correct values", (context) => {
@@ -661,16 +698,36 @@ describe<{
 			{ blocktime: 5, height: 4 },
 		]);
 
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 0), 1));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 1), 1));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 3), 1));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 8), 2));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 11), 2));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 16), 3));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 18), 3));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 23), 4));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 28), 5));
-		assert.true(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 29), 5));
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 0), 1),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 1), 1),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 3), 1),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 8), 2),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 11), 2),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 16), 3),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 18), 3),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 23), 4),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 28), 5),
+		);
+		assert.true(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 29), 5),
+		);
 	});
 
 	it("isForgingAllowed / returns false when under half the time in the block remains", (context) => {
@@ -693,19 +750,45 @@ describe<{
 			{ blocktime: 5, height: 4 },
 		]);
 
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 4), 1));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 5), 1));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 6), 1));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 7), 1));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 12), 2));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 15), 2));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 19), 3));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 22), 3));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 25), 4));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 26), 4));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 27), 4));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 30), 5));
-		assert.false(context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 32), 5));
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 4), 1),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 5), 1),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 6), 1),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 7), 1),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 12), 2),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 15), 2),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 19), 3),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 22), 3),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 25), 4),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 26), 4),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 27), 4),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 30), 5),
+		);
+		assert.false(
+			context.slots.isForgingAllowed(getTimeStampForBlock, genesisTimestamp(context.configuration, 32), 5),
+		);
 	});
 });
 
@@ -764,7 +847,10 @@ describe<{
 		];
 
 		for (const item of [...expectedResults, ...missedBlocks]) {
-			assert.equal(context.slots.getSlotTime(getTimeStampForBlock, item.slot, item.height), genesisTimestamp(context.configuration, item.slotTime));
+			assert.equal(
+				context.slots.getSlotTime(getTimeStampForBlock, item.slot, item.height),
+				genesisTimestamp(context.configuration, item.slotTime),
+			);
 		}
 	});
 
