@@ -65,11 +65,14 @@ describe("Identities - Keys", ({ it, assert, stubFn }) => {
 	});
 
 	it("fromWIF - should fail with an invalid network version", () => {
+		const previousWIF = wif.decode;
+
 		wif.decode = stubFn().returns({ version: 1 });
 
 		assert.throws(() => {
 			Keys.fromWIF("invalid");
-		});
 		}, err => err instanceof Errors.NetworkVersionError);
+
+		wif.decode = previousWIF;
 	});
 });
