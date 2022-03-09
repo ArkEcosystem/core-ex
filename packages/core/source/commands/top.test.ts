@@ -64,7 +64,7 @@ describe<{
 	});
 
 	it("should throw if the process list is undefined", async ({ processManager, cli }) => {
-		stub(processManager, "list").returnValue();
+		stub(processManager, "list");
 
 		await assert.rejects(() => cli.execute(Command), "No processes are running.");
 	});
