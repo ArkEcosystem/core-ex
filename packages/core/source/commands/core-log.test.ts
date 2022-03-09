@@ -1,15 +1,26 @@
+import { Container } from "@arkecosystem/core-cli";
 import { Console, describe } from "@arkecosystem/core-test-framework";
 
 import { Command } from "./core-log";
 
 describe<{
 	cli: Console;
-}>("LogCommand", ({ beforeEach, it, assert }) => {
+}>("CoreLogCommnad", ({ beforeEach, it, stub }) => {
+	const process = {
+		log: () => {},
+	};
+
 	beforeEach((context) => {
 		context.cli = new Console();
+
+		context.cli.app.rebind(Container.Identifiers.ProcessFactory).toFactory(() => () => process);
 	});
 
-	it("should throw if the process does not exist", async ({ cli }) => {
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process does not exist.');
+	it("should call process log", async ({ cli }) => {
+		const spyLog = stub(process, "log");
+
+		await cli.execute(Command);
+
+		spyLog.calledOnce();
 	});
 });
