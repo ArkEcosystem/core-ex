@@ -1263,6 +1263,7 @@ importers:
       reflect-metadata: 0.1.13
       semver: 6.3.0
       type-fest: 0.21.3
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/crypto': link:../crypto
       '@arkecosystem/utils': link:../utils
@@ -1292,6 +1293,7 @@ importers:
       '@types/got': 9.6.12
       '@types/log-process-errors': 4.1.0
       '@types/semver': 6.2.3
+      uvu: 0.5.3
 
   packages/core-kernel/__tests__/__stubs__/stub-plugin:
     specifiers: {}
