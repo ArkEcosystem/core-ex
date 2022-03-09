@@ -1,7 +1,7 @@
 import { base58 } from "bstring";
 import moize from "fast-memoize";
 
-import { HashAlgorithms } from "../crypto";
+import { HashAlgorithms } from "../crypto/hash-algorithms";
 
 const encodeCheck = (buff: Buffer): string => {
 	const checksum: Buffer = HashAlgorithms.hash256(buff);
