@@ -8,6 +8,7 @@ describe<{
 }>("PathsCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
+		delete process.env.CORE_PATH_CONFIG;
 	});
 
 	it("should list all system paths", async ({ cli }) => {

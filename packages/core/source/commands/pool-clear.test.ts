@@ -49,8 +49,6 @@ describe<{
 		const removeSync = stub(fs, "removeSync");
 		stub(cli.app, "getCorePath").resolvedValue(null);
 
-		prompts.inject([true]);
-
 		await assert.resolves(() => cli.withFlags({ false: true }).execute(Command));
 
 		removeSync.calledOnce();
