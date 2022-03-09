@@ -1,5 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
-import { PublicKey } from "../../../../packages/crypto/source/identities/public-key";
+import { Errors } from "@arkecosystem/crypto-identities";
+import { PublicKey } from "./public-key";
 import { data, passphrase } from "../../test/identities/fixture.json";
 
 const publicKeys = {
@@ -120,21 +121,21 @@ describe("Identities - Public Key", ({ it, assert }) => {
 				min: 7,
 				publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
 			});
-		});
+		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
 
 		assert.throws(() => {
 			PublicKey.fromMultiSignatureAsset({
 				min: 1,
 				publicKeys: [],
 			});
-		});
+		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
 
 		assert.throws(() => {
 			PublicKey.fromMultiSignatureAsset({
 				min: 1,
 				publicKeys: ["garbage"],
 			});
-		});
+		}, err => err instanceof Errors.PublicKeyError);
 	});
 
 	it("verify - should pass with valid public keys", () => {

@@ -1,4 +1,5 @@
 import { PublicKey } from "../identities";
+import { Errors } from "@arkecosystem/crypto-identities";
 import { describe } from "@arkecosystem/core-test-framework";
 import { Address } from "./address";
 import { Keys } from "./keys";
@@ -25,7 +26,7 @@ describe<{
 	it("fromPublicKey - should fail with an invalid public key", () => {
 		assert.throws(() => {
 			Address.fromPublicKey("invalid");
-		});
+		}, err => err instanceof Errors.PublicKeyError);
 	});
 
 	it("fromWIF - should pass with a valid wif", () => {
@@ -72,21 +73,21 @@ describe<{
 				min: 7,
 				publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
 			});
-		});
+		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
 
 		assert.throws(() => {
 			Address.fromMultiSignatureAsset({
 				min: 1,
 				publicKeys: [],
 			});
-		});
+		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
 
 		assert.throws(() => {
 			Address.fromMultiSignatureAsset({
 				min: 1,
 				publicKeys: ["garbage"],
 			});
-		});
+		}, err => err instanceof Errors.PublicKeyError);
 	});
 
 	it("fromPrivateKey - should be OK", () => {

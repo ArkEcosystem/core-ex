@@ -1,4 +1,5 @@
 import wif from "wif";
+import { Errors } from "@arkecosystem/crypto-identities";
 import { describe } from "@arkecosystem/core-test-framework";
 import { Address } from "./address";
 import { Keys } from "./keys";
@@ -69,5 +70,6 @@ describe("Identities - Keys", ({ it, assert, stubFn }) => {
 		assert.throws(() => {
 			Keys.fromWIF("invalid");
 		});
+		}, err => err instanceof Errors.NetworkVersionError);
 	});
 });
