@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions,Identifiers } from "@arkecosystem/core-contracts";
 
 @injectable()
 export class Collator implements Contracts.TransactionPool.Collator {
@@ -38,7 +38,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 			8 + // reward
 			4 + // payloadLength
 			32 + // payloadHash
-			33; // generatorPublicKey
+			32; // generatorPublicKey
 
 		let bytesLeft: number = milestone.block.maxPayload - blockHeaderSize;
 
