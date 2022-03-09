@@ -1,4 +1,4 @@
-import { HashAlgorithms } from "../crypto";
+import { HashAlgorithms } from "../crypto/hash-algorithms";
 import { AddressNetworkError } from "../errors";
 import { ISerializeOptions, ITransactionData } from "../interfaces";
 import { Serializer } from "./serializer";
@@ -10,7 +10,6 @@ export class Utils {
 	}
 
 	public static toHash(transaction: ITransactionData, options?: ISerializeOptions): Buffer {
-		console.log("[utils] This is printed many times");
 		return HashAlgorithms.sha256(Serializer.getBytes(transaction, options));
 	}
 
