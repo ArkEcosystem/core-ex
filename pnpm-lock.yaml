@@ -1633,6 +1633,7 @@ importers:
       sinon: ^13.0.1
       util: 0.12.4
       uvu: ^0.5.3
+      wif: 2.0.6
     dependencies:
       '@arkecosystem/core-crypto-networks': link:../core-crypto-networks
       '@arkecosystem/crypto-identities': 1.2.0
@@ -1654,6 +1655,7 @@ importers:
       ipaddr.js: 2.0.1
       lodash.get: 4.4.2
       lodash.set: 4.3.2
+      wif: 2.0.6
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
       '@types/bip32': 2.0.0
