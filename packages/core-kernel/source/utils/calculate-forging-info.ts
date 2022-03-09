@@ -30,16 +30,14 @@ export const getMilestonesWhichAffectActiveValidatorCount = (
 export const calculateForgingInfo = (
 	timestamp: number,
 	height: number,
-	getTimeStampForBlock: (blockheight: number) => number,
 	configuration: Contracts.Crypto.IConfiguration,
 	slots,
 ): Contracts.Shared.ForgingInfo => {
-	const slotInfo = slots.getSlotInfo(getTimeStampForBlock, timestamp, height);
+	const slotInfo = slots.getSlotInfo(timestamp, height);
 
 	const [currentForger, nextForger] = findIndex(
 		height,
 		slotInfo.slotNumber,
-		getTimeStampForBlock,
 		configuration,
 		slots,
 	);
@@ -48,32 +46,32 @@ export const calculateForgingInfo = (
 	return { blockTimestamp: slotInfo.startTime, canForge, currentForger, nextForger };
 };
 
+// @TODO: replace calls to "getTimeStampForBlock"
 const findIndex = (
 	height: number,
 	slotNumber: number,
-	getTimeStampForBlock: (blockheight: number) => number,
 	configuration: Contracts.Crypto.IConfiguration,
 	slots,
 ): [number, number] => {
-	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
+	// let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
 
-	let lastSpanSlotNumber = 0;
-	let activeValidators = configuration.getMilestone(1).activeValidators;
+	const lastSpanSlotNumber = 0;
+	const activeValidators = configuration.getMilestone(1).activeValidators;
 
-	const milestones = getMilestonesWhichAffectActiveValidatorCount(configuration);
+	// const milestones = getMilestonesWhichAffectActiveValidatorCount(configuration);
 
-	for (let index = 0; index < milestones.length - 1; index++) {
-		if (height < nextMilestone.height) {
-			break;
-		}
+	// for (let index = 0; index < milestones.length - 1; index++) {
+	// 	if (height < nextMilestone.height) {
+	// 		break;
+	// 	}
 
-		const lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1);
-		lastSpanSlotNumber =
-			slots.getSlotInfo(getTimeStampForBlock, lastSpanEndTime, nextMilestone.height - 1).slotNumber + 1;
-		activeValidators = nextMilestone.data;
+	// 	const lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1);
+	// 	lastSpanSlotNumber =
+	// 		slots.getSlotInfo(lastSpanEndTime, nextMilestone.height - 1).slotNumber + 1;
+	// 	activeValidators = nextMilestone.data;
 
-		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
-	}
+	// 	nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
+	// }
 
 	const currentForger = (slotNumber - lastSpanSlotNumber) % activeValidators;
 	const nextForger = (currentForger + 1) % activeValidators;

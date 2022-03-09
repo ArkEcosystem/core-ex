@@ -12,15 +12,14 @@ type BlockChainedDetails = {
 const getBlockChainedDetails = (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
 	slots,
 ): BlockChainedDetails => {
 	const followsPrevious: boolean = nextBlock.previousBlock === previousBlock.id;
 	const isPlusOne: boolean = nextBlock.height === previousBlock.height + 1;
 
-	const previousSlot: number = slots.getSlotNumber(getTimeStampForBlock, previousBlock.timestamp);
+	const previousSlot: number = slots.getSlotNumber(previousBlock.timestamp);
 	console.log({ previousSlot, timestamp: previousBlock.timestamp });
-	const nextSlot: number = slots.getSlotNumber(getTimeStampForBlock, nextBlock.timestamp);
+	const nextSlot: number = slots.getSlotNumber(nextBlock.timestamp);
 	console.log({ nextSlot, timestamp: nextBlock.timestamp });
 	const isAfterPreviousSlot: boolean = previousSlot < nextSlot;
 
@@ -32,17 +31,15 @@ const getBlockChainedDetails = (
 export const isBlockChained = (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
 	slots,
-): boolean => getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock, slots).isChained;
+): boolean => getBlockChainedDetails(previousBlock, nextBlock, slots).isChained;
 
 export const getBlockNotChainedErrorMessage = (
 	previousBlock: Contracts.Crypto.IBlockData,
 	nextBlock: Contracts.Crypto.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
 	slots,
 ): string => {
-	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock, slots);
+	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, slots);
 
 	if (details.isChained) {
 		throw new Error("Block had no chain error");
