@@ -22,13 +22,13 @@ describe<{
 		decorateInjectable(ThirdPartyClass);
 
 		await assert.resolves(() => context.container.resolve(ThirdPartyClass));
-		assert.true(context.container.resolve(ThirdPartyClass) instanceof ThirdPartyClass);
+		assert.instance(context.container.resolve(ThirdPartyClass), ThirdPartyClass);
 	});
 
 	it("should allow multiple calls for same class", (context) => {
 		decorateInjectable(ThirdPartyClass);
 		decorateInjectable(ThirdPartyClass);
 
-		assert.true(context.container.resolve(ThirdPartyClass) instanceof ThirdPartyClass);
+		assert.instance(context.container.resolve(ThirdPartyClass), ThirdPartyClass);
 	});
 });
