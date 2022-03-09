@@ -69,9 +69,12 @@ describe("Identities - Keys", ({ it, assert, stubFn }) => {
 
 		wif.decode = stubFn().returns({ version: 1 });
 
-		assert.throws(() => {
-			Keys.fromWIF("invalid");
-		}, err => err instanceof Errors.NetworkVersionError);
+		assert.throws(
+			() => {
+				Keys.fromWIF("invalid");
+			},
+			(err) => err instanceof Errors.NetworkVersionError,
+		);
 
 		wif.decode = previousWIF;
 	});

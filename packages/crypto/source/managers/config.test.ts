@@ -10,9 +10,9 @@ describe<{
 
 		configManager.setConfig(devnet);
 	});
-	
+
 	afterEach((context) => configManager.setConfig(context.config));
- 
+
 	it("should be instantiated", () => {
 		assert.object(configManager);
 	});
@@ -30,7 +30,10 @@ describe<{
 	});
 
 	it('key should be "get"', () => {
-		assert.equal(configManager.get("network.nethash"), "2a44f340d76ffc3df204c5f38cd355b7496c9065a1ade2ef92071436bd72e867");
+		assert.equal(
+			configManager.get("network.nethash"),
+			"2a44f340d76ffc3df204c5f38cd355b7496c9065a1ade2ef92071436bd72e867",
+		);
 	});
 
 	it("should build milestones", () => {
@@ -79,7 +82,10 @@ describe<{
 
 	it("getNextMilestoneByKey - should throw an error if no milestones are set", () => {
 		configManager.setConfig({ ...devnet, milestones: [] });
-		assert.throws(() => configManager.getNextMilestoneWithNewKey(1, "blocktime"), `Attempted to get next milestone but none were set`);
+		assert.throws(
+			() => configManager.getNextMilestoneWithNewKey(1, "blocktime"),
+			`Attempted to get next milestone but none were set`,
+		);
 	});
 
 	it("getNextMilestoneByKey - should get the next milestone with a given key", () => {

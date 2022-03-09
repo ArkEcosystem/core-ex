@@ -44,7 +44,9 @@ describe("Identities - Public Key", ({ it, assert }) => {
 			PublicKey.fromMultiSignatureAsset({
 				min: 3,
 				publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
-			}), "0279f05076556da7173610a7676399c3620276ebbf8c67552ad3b1f26ec7627794");
+			}),
+			"0279f05076556da7173610a7676399c3620276ebbf8c67552ad3b1f26ec7627794",
+		);
 	});
 
 	it("fromMultiSignatureAddress - should create the same public key for all permutations", () => {
@@ -116,26 +118,35 @@ describe("Identities - Public Key", ({ it, assert }) => {
 	});
 
 	it("fromMultiSignatureAddress - should fail with invalid input", () => {
-		assert.throws(() => {
-			PublicKey.fromMultiSignatureAsset({
-				min: 7,
-				publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
-			});
-		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
+		assert.throws(
+			() => {
+				PublicKey.fromMultiSignatureAsset({
+					min: 7,
+					publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
+				});
+			},
+			(err) => err instanceof Errors.InvalidMultiSignatureAssetError,
+		);
 
-		assert.throws(() => {
-			PublicKey.fromMultiSignatureAsset({
-				min: 1,
-				publicKeys: [],
-			});
-		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
+		assert.throws(
+			() => {
+				PublicKey.fromMultiSignatureAsset({
+					min: 1,
+					publicKeys: [],
+				});
+			},
+			(err) => err instanceof Errors.InvalidMultiSignatureAssetError,
+		);
 
-		assert.throws(() => {
-			PublicKey.fromMultiSignatureAsset({
-				min: 1,
-				publicKeys: ["garbage"],
-			});
-		}, err => err instanceof Errors.PublicKeyError);
+		assert.throws(
+			() => {
+				PublicKey.fromMultiSignatureAsset({
+					min: 1,
+					publicKeys: ["garbage"],
+				});
+			},
+			(err) => err instanceof Errors.PublicKeyError,
+		);
 	});
 
 	it("verify - should pass with valid public keys", () => {

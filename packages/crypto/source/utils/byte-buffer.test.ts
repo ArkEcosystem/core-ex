@@ -83,29 +83,37 @@ describe("Int8", ({ assert, each }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value:", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value:",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeInt8(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readInt8(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value:", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeInt8(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readInt8(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value:",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeInt8(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("UInt8", ({ each, assert }) => {
@@ -115,30 +123,38 @@ describe("UInt8", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeUInt8(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readUInt8(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeUInt8(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
 
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readUInt8(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeUInt8(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("Int16BE", ({ each, assert }) => {
@@ -148,29 +164,37 @@ describe("Int16BE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeInt16BE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readInt16BE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeInt16BE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readInt16BE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeInt16BE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("UInt16BE", ({ each, assert }) => {
@@ -180,29 +204,37 @@ describe("UInt16BE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeUInt16BE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readUInt16BE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeUInt16BE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readUInt16BE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeUInt16BE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("Int16LE", ({ each, assert }) => {
@@ -212,29 +244,37 @@ describe("Int16LE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeInt16LE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readInt16LE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeInt16LE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readInt16LE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeInt16LE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("UInt16LE", ({ each, assert }) => {
@@ -244,29 +284,37 @@ describe("UInt16LE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeUInt16LE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readUInt16LE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeUInt16LE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readUInt16LE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeUInt16LE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("Int32BE", ({ each, assert }) => {
@@ -276,29 +324,37 @@ describe("Int32BE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeInt32BE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readInt32BE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeInt32BE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readInt32BE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeInt32BE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("UInt32BE", ({ each, assert }) => {
@@ -308,29 +364,37 @@ describe("UInt32BE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeUInt32BE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readUInt32BE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeUInt32BE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readUInt32BE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeUInt32BE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("Int32LE", ({ each, assert }) => {
@@ -340,29 +404,37 @@ describe("Int32LE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeInt32LE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readInt32LE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeInt32LE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readInt32LE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeInt32LE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("UInt32LE", ({ each, assert }) => {
@@ -372,29 +444,37 @@ describe("UInt32LE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1, max + 1];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeUInt32LE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readUInt32LE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-
-		assert.throws(() => {
 			byteBuffer.writeUInt32LE(dataset);
-		}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readUInt32LE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+
+			assert.throws(() => {
+				byteBuffer.writeUInt32LE(dataset);
+			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("BigInt64BE", ({ each, assert }) => {
@@ -404,32 +484,43 @@ describe("BigInt64BE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1n, max + 1n];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeBigInt64BE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readBigInt64BE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-        const err = `The value of "value" is out of range. It must be >= -(2n ** 63n) and < 2n ** 63n. Received ${dataset
-            .toLocaleString()
-            .replace(new RegExp(",", "g"), "_")}n`;
-
-		assert.throws(() => {
 			byteBuffer.writeBigInt64BE(dataset);
-		}, e => e.message === err);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readBigInt64BE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+			const err = `The value of "value" is out of range. It must be >= -(2n ** 63n) and < 2n ** 63n. Received ${dataset
+				.toLocaleString()
+				.replace(new RegExp(",", "g"), "_")}n`;
+
+			assert.throws(
+				() => {
+					byteBuffer.writeBigInt64BE(dataset);
+				},
+				(e) => e.message === err,
+			);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("BigUInt64BE", ({ each, assert }) => {
@@ -439,35 +530,46 @@ describe("BigUInt64BE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1n, max + 1n];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const value: bigint = dataset;
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const value: bigint = dataset;
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeBigUInt64BE(value);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readBigUInt64BE(), value);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
-
-	each("should fail writing value: ", ({ dataset }) => {
-		const value: bigint = dataset;
-
-		const buffer = Buffer.alloc(bufferSize);
-
-		const byteBuffer = new ByteBuffer(buffer);
-        const err = `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${value
-            .toLocaleString()
-            .replace(new RegExp(",", "g"), "_")}n`;
-
-		assert.throws(() => {
 			byteBuffer.writeBigUInt64BE(value);
-		}, e => e.message === err);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readBigUInt64BE(), value);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const value: bigint = dataset;
+
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = new ByteBuffer(buffer);
+			const err = `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${value
+				.toLocaleString()
+				.replace(new RegExp(",", "g"), "_")}n`;
+
+			assert.throws(
+				() => {
+					byteBuffer.writeBigUInt64BE(value);
+				},
+				(e) => e.message === err,
+			);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("BigInt64LE", ({ each, assert }) => {
@@ -477,30 +579,41 @@ describe("BigInt64LE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1n, max + 1n];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeBigInt64LE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
+			byteBuffer.writeBigInt64LE(dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
 
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readBigInt64LE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readBigInt64LE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
 
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
-		const err = `The value of "value" is out of range. It must be >= -(2n ** 63n) and < 2n ** 63n. Received ${dataset
-			.toLocaleString()
-			.replace(new RegExp(",", "g"), "_")}n`;
+			const byteBuffer = new ByteBuffer(buffer);
+			const err = `The value of "value" is out of range. It must be >= -(2n ** 63n) and < 2n ** 63n. Received ${dataset
+				.toLocaleString()
+				.replace(new RegExp(",", "g"), "_")}n`;
 
-		assert.throws(() => byteBuffer.writeBigInt64BE(dataset), e => e.message === err);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.throws(
+				() => byteBuffer.writeBigInt64BE(dataset),
+				(e) => e.message === err,
+			);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("BigUInt64LE", ({ each, assert }) => {
@@ -510,30 +623,41 @@ describe("BigUInt64LE", ({ each, assert }) => {
 	const validValues = [min, max];
 	const invalidValues = [min - 1n, max + 1n];
 
-	each("should write and read value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
+			const byteBuffer = new ByteBuffer(buffer);
 
-		byteBuffer.writeBigUInt64LE(dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
+			byteBuffer.writeBigUInt64LE(dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
 
-		byteBuffer.reset();
-		assert.equal(byteBuffer.readBigUInt64LE(), dataset);
-		assert.equal(byteBuffer.getResultLength(), bufferSize);
-	}, validValues);
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readBigUInt64LE(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
 
-	each("should fail writing value: ", ({ dataset }) => {
-		const buffer = Buffer.alloc(bufferSize);
+	each(
+		"should fail writing value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
 
-		const byteBuffer = new ByteBuffer(buffer);
-		const err = `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${dataset
-			.toLocaleString()
-			.replace(new RegExp(",", "g"), "_")}n`;
+			const byteBuffer = new ByteBuffer(buffer);
+			const err = `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${dataset
+				.toLocaleString()
+				.replace(new RegExp(",", "g"), "_")}n`;
 
-		assert.throws(() => byteBuffer.writeBigUInt64LE(dataset), e => e.message === err);
-		assert.equal(byteBuffer.getResultLength(), 0);
-	}, invalidValues);
+			assert.throws(
+				() => byteBuffer.writeBigUInt64LE(dataset),
+				(e) => e.message === err,
+			);
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		invalidValues,
+	);
 });
 
 describe("buffer", ({ it, assert }) => {

@@ -12,7 +12,7 @@ describe<{
 	beforeEach((context) => {
 		context.config = configManager.all();
 	});
-	
+
 	afterEach((context) => configManager.setConfig(context.config));
 
 	it("fromPassphrase - should be OK", () => {
@@ -24,9 +24,12 @@ describe<{
 	});
 
 	it("fromPublicKey - should fail with an invalid public key", () => {
-		assert.throws(() => {
-			Address.fromPublicKey("invalid");
-		}, err => err instanceof Errors.PublicKeyError);
+		assert.throws(
+			() => {
+				Address.fromPublicKey("invalid");
+			},
+			(err) => err instanceof Errors.PublicKeyError,
+		);
 	});
 
 	it("fromWIF - should pass with a valid wif", () => {
@@ -44,7 +47,9 @@ describe<{
 			Address.fromMultiSignatureAsset({
 				min: 3,
 				publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
-			}), "DMS861mLRrtH47QUMVif3C2rBCAdHbmwsi");
+			}),
+			"DMS861mLRrtH47QUMVif3C2rBCAdHbmwsi",
+		);
 	});
 
 	it("fromMultiSignatureAddress - should create distinct addresses for different min", () => {
@@ -68,26 +73,35 @@ describe<{
 	});
 
 	it("fromMultiSignatureAddress - should fail with invalid input", () => {
-		assert.throws(() => {
-			Address.fromMultiSignatureAsset({
-				min: 7,
-				publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
-			});
-		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
+		assert.throws(
+			() => {
+				Address.fromMultiSignatureAsset({
+					min: 7,
+					publicKeys: ["secret 1", "secret 2", "secret 3"].map((secret) => PublicKey.fromPassphrase(secret)),
+				});
+			},
+			(err) => err instanceof Errors.InvalidMultiSignatureAssetError,
+		);
 
-		assert.throws(() => {
-			Address.fromMultiSignatureAsset({
-				min: 1,
-				publicKeys: [],
-			});
-		}, err => err instanceof Errors.InvalidMultiSignatureAssetError);
+		assert.throws(
+			() => {
+				Address.fromMultiSignatureAsset({
+					min: 1,
+					publicKeys: [],
+				});
+			},
+			(err) => err instanceof Errors.InvalidMultiSignatureAssetError,
+		);
 
-		assert.throws(() => {
-			Address.fromMultiSignatureAsset({
-				min: 1,
-				publicKeys: ["garbage"],
-			});
-		}, err => err instanceof Errors.PublicKeyError);
+		assert.throws(
+			() => {
+				Address.fromMultiSignatureAsset({
+					min: 1,
+					publicKeys: ["garbage"],
+				});
+			},
+			(err) => err instanceof Errors.PublicKeyError,
+		);
 	});
 
 	it("fromPrivateKey - should be OK", () => {
