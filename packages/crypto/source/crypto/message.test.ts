@@ -23,7 +23,7 @@ describe<{
 				network: context.config.network,
 			})
 			.make();
-	
+
 		context.signedMessage = {
 			publicKey: context.identity.publicKey,
 			signature:
