@@ -30,36 +30,34 @@ export class Slots {
 		return time ?? dayjs().unix();
 	}
 
-	public getTimeInMsUntilNextSlot(): number {
-		const nextSlotTime: number = this.getSlotTime(getTimeStampForBlock, this.getNextSlot(getTimeStampForBlock));
+	public async getTimeInMsUntilNextSlot(): Promise<number> {
+		const nextSlotTime: number = await this.getSlotTime(await this.getNextSlot());
 		const now: number = this.getTime();
 
 		return (nextSlotTime - now) * 1000;
 	}
 
-	public getSlotNumber(timestamp?: number, height?: number): number {
-		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.#getLatestHeight(height))
+	public async getSlotNumber(timestamp?: number, height?: number): Promise<number> {
+		return (await this.getSlotInfo(timestamp ?? this.getTime(), this.#getLatestHeight(height)))
 			.slotNumber;
 	}
 
-	public getSlotTime(slot: number, height?: number): number {
-		return this.#calculateSlotTime(slot, this.#getLatestHeight(height), getTimeStampForBlock);
+	public async getSlotTime(slot: number, height?: number): Promise<number> {
+		return this.#calculateSlotTime(slot, this.#getLatestHeight(height));
 	}
 
-	public getNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
-		return this.getSlotNumber(getTimeStampForBlock) + 1;
+	public async getNextSlot(): Promise<number> {
+		return (await this.getSlotNumber()) + 1;
 	}
 
-	public isForgingAllowed(
-		getTimeStampForBlock: GetBlockTimeStampLookup,
+	public async isForgingAllowed(
 		timestamp?: number,
 		height?: number,
-	): boolean {
-		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.#getLatestHeight(height))
-			.forgingStatus;
+	): Promise<boolean> {
+		return (await this.getSlotInfo(timestamp ?? this.getTime(), this.#getLatestHeight(height))).forgingStatus;
 	}
 
-	public getSlotInfo(timestamp?: number, height?: number): SlotInfo {
+	public async getSlotInfo(timestamp?: number, height?: number): Promise<SlotInfo> {
 		if (timestamp === undefined) {
 			timestamp = this.getTime();
 		}
@@ -77,8 +75,8 @@ export class Slots {
 				break;
 			}
 
-			const spanStartTimestamp = this.blockTimeLookup.getBlockTimeLookup(previousMilestoneHeight);
-			lastSpanEndTime = this.blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1) + blockTime;
+			const spanStartTimestamp = await this.blockTimeLookup.getBlockTimeLookup(previousMilestoneHeight);
+			lastSpanEndTime = (await this.blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
 			blockTime = nextMilestone.data;
@@ -120,11 +118,10 @@ export class Slots {
 		return milestones;
 	}
 
-	#calculateSlotTime(
+	async #calculateSlotTime(
 		slotNumber: number,
 		height: number,
-		getTimeStampForBlock: GetBlockTimeStampLookup,
-	): number {
+	): Promise<number> {
 		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
 		let milestoneHeight = 1;
@@ -137,8 +134,8 @@ export class Slots {
 				break;
 			}
 
-			const spanStartTimestamp = getTimeStampForBlock(milestoneHeight);
-			lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1) + blockTime;
+			const spanStartTimestamp = await this.blockTimeLookup.getBlockTimeLookup(milestoneHeight);
+			lastSpanEndTime = (await this.blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1)) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
 			blockTime = nextMilestone.data;

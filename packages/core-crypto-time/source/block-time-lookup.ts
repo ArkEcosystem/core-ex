@@ -9,7 +9,7 @@ export class BlockTimeLookup {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
-	public async getBlockTimeLookup(height: number): Promise<(height: number) => number> {
+	public async getBlockTimeLookup(height: number): Promise<number> {
 		const findBlockTimestampByHeight = async (height: number): Promise<number> => (await this.databaseService.findBlockByHeights([height]))[0].data.timestamp;
 
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(1, "blocktime");
@@ -27,16 +27,14 @@ export class BlockTimeLookup {
 			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "blocktime");
 		}
 
-		return (height) => {
-			const result = heightMappedToBlockTimestamp.get(height);
+		const result = heightMappedToBlockTimestamp.get(height);
 
-			if (result === undefined) {
-				throw new Error(
-					`Attempted lookup of block height ${height} for milestone span calculation, but none exists.`,
-				);
-			}
+		if (result === undefined) {
+			throw new Error(
+				`Attempted lookup of block height ${height} for milestone span calculation, but none exists.`,
+			);
+		}
 
-			return result;
-		};
+		return result;
 	};
 }
