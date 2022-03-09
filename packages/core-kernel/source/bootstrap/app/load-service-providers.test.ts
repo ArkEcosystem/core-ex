@@ -16,7 +16,7 @@ describe<{
 	app: Application;
 	configRepository: ConfigRepository;
 	serviceProviderRepository: ServiceProviderRepository;
-}>("LoadServiceProviders", ({ assert, beforeEach, it, spy, stub }) => {
+}>("LoadServiceProviders", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.EventDispatcherService).to(MemoryEventDispatcher).inSingletonScope();
