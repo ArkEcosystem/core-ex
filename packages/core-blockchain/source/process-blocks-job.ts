@@ -45,6 +45,9 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
+	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
+	private readonly blockTimeLookup: any;
+
 	private blocks: Contracts.Crypto.IBlockData[] = [];
 
 	public getBlocks(): Contracts.Crypto.IBlockData[] {
@@ -88,7 +91,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
 		const acceptedBlockTimeLookup = (height: number) =>
-			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
+			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? this.blockTimeLookup.getBlockTimeLookup(height);
 
 		try {
 			for (const block of this.blocks) {
