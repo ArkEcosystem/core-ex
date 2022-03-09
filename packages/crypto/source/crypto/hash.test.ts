@@ -37,11 +37,11 @@ describe<{
 		const hash: Buffer = Utils.toHash(context.transaction);
 		const signature: string = Hash.signECDSA(hash, context.identity.keys);
 
-		assert.true(Hash.verifyECDSA(hash, signature, context.identity.publicKey))
+		assert.true(Hash.verifyECDSA(hash, signature, context.identity.publicKey));
 
 		assert.equal(
 			signature,
-			"30450221008682af02d5f3c6302af14f3239a997022f69c28a5e3282603d5f25912ccd3b47022023cec266362f5bb91e6a2f2fcb62f4c61829dfd7a096432ff8b4a54a83577444"
+			"30450221008682af02d5f3c6302af14f3239a997022f69c28a5e3282603d5f25912ccd3b47022023cec266362f5bb91e6a2f2fcb62f4c61829dfd7a096432ff8b4a54a83577444",
 		);
 	});
 
@@ -95,7 +95,9 @@ describe<{
 		assert.true(Hash.verifyECDSA(transactionHash, validSignature, Buffer.from(context.identity.publicKey, "hex")));
 
 		for (const invalidSignature of invalidSignatures) {
-			assert.false(Hash.verifyECDSA(transactionHash, invalidSignature, Buffer.from(context.identity.publicKey, "hex")));
+			assert.false(
+				Hash.verifyECDSA(transactionHash, invalidSignature, Buffer.from(context.identity.publicKey, "hex")),
+			);
 		}
 
 		// also check specific case where s length is 31 bytes (because s is low enough to not need 32 bytes)
