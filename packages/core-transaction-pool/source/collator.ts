@@ -29,7 +29,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 		const milestone = this.configuration.getMilestone(height);
 		const blockHeaderSize =
 			4 + // version
-			4 + // timestamp
+			8 + // timestamp
 			4 + // height
 			32 + // previousBlockId
 			4 + // numberOfTransactions
