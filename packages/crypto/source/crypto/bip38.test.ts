@@ -46,7 +46,7 @@ describe("BIP38", ({ it, assert, stub }) => {
 	});
 
 	for (const fixture of fixtures.valid) {
-		if (! fixture.decryptOnly) {
+		if (!fixture.decryptOnly) {
 			it(`encrypt - should encrypt '${fixture.description}'`, () => {
 				const buffer = Base58.decodeCheck(fixture.wif);
 				const actual = bip38.encrypt(buffer.slice(1, 33), !!buffer[33], fixture.passphrase);
@@ -60,7 +60,10 @@ describe("BIP38", ({ it, assert, stub }) => {
 		byteBuffer.writeUint8(0x01);
 		const buffer = Buffer.from(byteBuffer.toBuffer());
 
-		assert.throws(() => bip38.encrypt(buffer, true, ""), err => err instanceof errors.PrivateKeyLengthError);
+		assert.throws(
+			() => bip38.encrypt(buffer, true, ""),
+			(err) => err instanceof errors.PrivateKeyLengthError,
+		);
 	});
 
 	for (const fixture of fixtures.valid) {
