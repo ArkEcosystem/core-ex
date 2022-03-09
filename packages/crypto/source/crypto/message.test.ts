@@ -8,7 +8,7 @@ describe<{
 	config: NetworkConfig;
 	identity: any;
 	signedMessage: IMessage;
-}>("Message", ({ it, assert, beforeAll, beforeEach, afterAll }) => {
+}>("Message", ({ it, assert, beforeAll, afterAll }) => {
 	beforeAll((context) => {
 		context.originalConfig = configManager.all();
 
@@ -16,16 +16,14 @@ describe<{
 		context.config = Generators.generateCryptoConfigRaw();
 
 		configManager.setConfig(context.config);
-	});
 
-	beforeEach((context) => {
 		context.identity = Factories.factory("Identity")
 			.withOptions({
 				passphrase: "this is a top secret passphrase",
 				network: context.config.network,
 			})
 			.make();
-
+	
 		context.signedMessage = {
 			publicKey: context.identity.publicKey,
 			signature:
