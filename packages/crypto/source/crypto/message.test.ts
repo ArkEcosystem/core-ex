@@ -14,21 +14,22 @@ describe<{
 
 		// todo: completely wrap this into a function to hide the generation and setting of the config?
 		context.config = Generators.generateCryptoConfigRaw();
-	
+
 		configManager.setConfig(context.config);
 	});
-	
+
 	beforeEach((context) => {
 		context.identity = Factories.factory("Identity")
 			.withOptions({
-				passphrase: "this is a top secret passphrase", 
-				network: context.config.network
+				passphrase: "this is a top secret passphrase",
+				network: context.config.network,
 			})
 			.make();
-	
+
 		context.signedMessage = {
 			publicKey: context.identity.publicKey,
-			signature: "3045022100b5ad008d8a2935cd2261c56ef1605b2e35810f47940277d1d8a6a202a08c6de0022021fcbf9ec9db67f8c7019ff2ce07376f8a203ea77f26f2f7d564d5b8f4bde1a7",
+			signature:
+				"3045022100b5ad008d8a2935cd2261c56ef1605b2e35810f47940277d1d8a6a202a08c6de0022021fcbf9ec9db67f8c7019ff2ce07376f8a203ea77f26f2f7d564d5b8f4bde1a7",
 			message: "test",
 		};
 	});
