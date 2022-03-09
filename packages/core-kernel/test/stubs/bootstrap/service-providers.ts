@@ -1,6 +1,6 @@
 import Joi from "joi";
-import { PluginDependency } from "@packages/core-kernel/source/contracts/kernel";
-import { ServiceProvider } from "@packages/core-kernel/source/providers";
+import { PluginDependency } from "../../../source/contracts/kernel";
+import { ServiceProvider } from "../../../source/providers";
 
 export class StubServiceProvider extends ServiceProvider {
 	public async register(): Promise<void> {}

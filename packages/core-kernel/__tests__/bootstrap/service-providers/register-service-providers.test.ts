@@ -28,7 +28,7 @@ import {
 	ValidConfigurationServiceProvider,
 	RequiredDependencyVersionCanBeSatisfiedServiceProvider,
 	RequiredDependencyCanBeFoundServiceProvider,
-} from "./__stubs__/service-providers";
+} from "../../../test/stubs/bootstrap/service-providers";
 
 let app: Application;
 let container: interfaces.Container;
