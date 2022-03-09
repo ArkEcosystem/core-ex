@@ -1,6 +1,6 @@
 const {
     Providers
-} = require("@packages/core-kernel");
+} = require("../../../../source");
 
 class ServiceProvider extends Providers.ServiceProvider {
     async register() {

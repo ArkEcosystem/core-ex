@@ -3,7 +3,7 @@ const {
 } = require('./service-provider')
 const {
     defaults
-} = require('defaults')
+} = require('./defaults')
 
 exports.defaults = defaults;
 exports.ServiceProvider = ServiceProvider;
