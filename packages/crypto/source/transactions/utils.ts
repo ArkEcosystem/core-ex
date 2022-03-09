@@ -10,6 +10,7 @@ export class Utils {
 	}
 
 	public static toHash(transaction: ITransactionData, options?: ISerializeOptions): Buffer {
+		console.log("[utils] This is printed many times");
 		return HashAlgorithms.sha256(Serializer.getBytes(transaction, options));
 	}
 
