@@ -21,9 +21,11 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
+	// @TODO: duplicate
 	@inject(Identifiers.Database.Service)
 	private readonly database: Contracts.Database.IDatabaseService;
 
+	// @TODO: duplicate
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 

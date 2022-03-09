@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import dayjs from "dayjs";
 
 import { BlockTimeCalculator } from "./block-time-calculator";
+import { BlockTimeLookup } from "./block-time-lookup";
 
 export interface SlotInfo {
 	startTime: number;
@@ -22,24 +23,27 @@ export class Slots {
 	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
 	private readonly calculator: BlockTimeCalculator;
 
+	@inject(Identifiers.Cryptography.Time.BlockTimeCalculator)
+	private readonly blockTimeLookup: BlockTimeLookup;
+
 	public getTime(time?: number): number {
 		return time ?? dayjs().unix();
 	}
 
-	public getTimeInMsUntilNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
+	public getTimeInMsUntilNextSlot(): number {
 		const nextSlotTime: number = this.getSlotTime(getTimeStampForBlock, this.getNextSlot(getTimeStampForBlock));
 		const now: number = this.getTime();
 
 		return (nextSlotTime - now) * 1000;
 	}
 
-	public getSlotNumber(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): number {
-		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.getLatestHeight(height))
+	public getSlotNumber(timestamp?: number, height?: number): number {
+		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.#getLatestHeight(height))
 			.slotNumber;
 	}
 
-	public getSlotTime(getTimeStampForBlock: GetBlockTimeStampLookup, slot: number, height?: number): number {
-		return this.calculateSlotTime(slot, this.getLatestHeight(height), getTimeStampForBlock);
+	public getSlotTime(slot: number, height?: number): number {
+		return this.#calculateSlotTime(slot, this.#getLatestHeight(height), getTimeStampForBlock);
 	}
 
 	public getNextSlot(getTimeStampForBlock: GetBlockTimeStampLookup): number {
@@ -51,16 +55,16 @@ export class Slots {
 		timestamp?: number,
 		height?: number,
 	): boolean {
-		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.getLatestHeight(height))
+		return this.getSlotInfo(getTimeStampForBlock, timestamp ?? this.getTime(), this.#getLatestHeight(height))
 			.forgingStatus;
 	}
 
-	public getSlotInfo(getTimeStampForBlock: GetBlockTimeStampLookup, timestamp?: number, height?: number): SlotInfo {
+	public getSlotInfo(timestamp?: number, height?: number): SlotInfo {
 		if (timestamp === undefined) {
 			timestamp = this.getTime();
 		}
 
-		height = this.getLatestHeight(height);
+		height = this.#getLatestHeight(height);
 
 		let blockTime = this.calculator.calculateBlockTime(1);
 		let totalSlotsFromLastSpan = 0;
@@ -73,8 +77,8 @@ export class Slots {
 				break;
 			}
 
-			const spanStartTimestamp = getTimeStampForBlock(previousMilestoneHeight);
-			lastSpanEndTime = getTimeStampForBlock(nextMilestone.height - 1) + blockTime;
+			const spanStartTimestamp = this.blockTimeLookup.getBlockTimeLookup(previousMilestoneHeight);
+			lastSpanEndTime = this.blockTimeLookup.getBlockTimeLookup(nextMilestone.height - 1) + blockTime;
 			totalSlotsFromLastSpan += Math.floor((lastSpanEndTime - spanStartTimestamp) / blockTime);
 
 			blockTime = nextMilestone.data;
@@ -116,7 +120,7 @@ export class Slots {
 		return milestones;
 	}
 
-	private calculateSlotTime(
+	#calculateSlotTime(
 		slotNumber: number,
 		height: number,
 		getTimeStampForBlock: GetBlockTimeStampLookup,
@@ -145,7 +149,7 @@ export class Slots {
 		return lastSpanEndTime + (slotNumber - totalSlotsFromLastSpan) * blockTime;
 	}
 
-	private getLatestHeight(height: number | undefined): number {
+	#getLatestHeight(height: number | undefined): number {
 		if (height) {
 			return height;
 		}
