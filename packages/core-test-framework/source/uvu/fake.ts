@@ -1,7 +1,7 @@
 import assert from "uvu/assert";
 
 export abstract class Fake<T> {
-	protected subject: any;
+	protected readonly subject: any;
 
 	public constructor(subject: T) {
 		this.subject = subject;

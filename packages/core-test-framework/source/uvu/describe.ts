@@ -60,8 +60,8 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			stub.restore();
 		}
 
-		for (const stub of spies) {
-			stub.restore();
+		for (const spy of spies) {
+			spy.restore();
 		}
 
 		clocks = [];
@@ -97,13 +97,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 
 			return result;
 		},
-		spyFn: () => {
-			const result: Spy = new Spy(sinon.stub());
-
-			spies.push(result);
-
-			return result;
-		},
+		spyFn: () => new Spy(sinon.spy()),
 		stub: (owner: object, method: string) => {
 			const result: Stub = new Stub(sinon.stub(owner, method as never));
 
@@ -111,13 +105,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 
 			return result;
 		},
-		stubFn: () => {
-			const result: Stub = new Stub(sinon.stub());
-
-			stubs.push(result);
-
-			return result;
-		},
+		stubFn: () => new Stub(sinon.stub()),
 	});
 
 	suite.run();
