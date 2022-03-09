@@ -57,7 +57,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			if (schema.type === "address") {
 				this.addressSerializer.serialize(
 					result,
-					(await this.addressFactory.toBuffer(data[property])).addressBuffer,
+					await this.addressFactory.toBuffer(data[property]),
 				);
 			}
 
