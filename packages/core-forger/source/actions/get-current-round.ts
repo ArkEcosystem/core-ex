@@ -5,9 +5,6 @@ import { DatabaseInteraction } from "@arkecosystem/core-state";
 
 @injectable()
 export class GetCurrentRoundAction extends Services.Triggers.Action {
-	@inject(Identifiers.Application)
-	private readonly app: Contracts.Kernel.Application;
-
 	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
@@ -34,17 +31,10 @@ export class GetCurrentRoundAction extends Services.Triggers.Action {
 			validator: wallet.getAttribute("validator"),
 		}));
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			height,
-			this.configuration,
-		);
-
 		const timestamp = this.slots.getTime();
 		const forgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
 			timestamp,
 			height,
-			blockTimeLookup,
 			this.configuration,
 			this.slots,
 		);

@@ -14,9 +14,6 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration: Contracts.Crypto.IConfiguration;
-
 	@inject(Identifiers.Cryptography.Time.Slots)
 	private readonly slots: any;
 
@@ -41,16 +38,10 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 			AppUtils.assert.defined<number>(transaction.data.expiration);
 			return transaction.data.expiration;
 		} else {
-			// ! dynamic block time wasn't available during v1 times
 			const currentHeight: number = this.stateStore.getLastHeight();
-			const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
-				this.app,
-				currentHeight,
-				this.configuration,
-			);
 
 			const createdSecondsAgo: number = this.slots.getTime() - transaction.data.timestamp;
-			const createdBlocksAgo: number = this.slots.getSlotNumber(blockTimeLookup, createdSecondsAgo);
+			const createdBlocksAgo: number = this.slots.getSlotNumber(createdSecondsAgo);
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 
 			return Math.floor(currentHeight - createdBlocksAgo + maxTransactionAge);

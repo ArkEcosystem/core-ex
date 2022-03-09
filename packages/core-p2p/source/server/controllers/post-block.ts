@@ -7,9 +7,6 @@ import { FastifyRequest } from "fastify";
 import { mapAddr } from "../utils/map-addr";
 
 export class PostBlockController {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -60,13 +57,7 @@ export class PostBlockController {
 
 			const lastDownloadedBlock: Contracts.Crypto.IBlockData = this.blockchain.getLastDownloadedBlock();
 
-			const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-				this.app,
-				block.height,
-				this.configuration,
-			);
-
-			if (!Utils.isBlockChained(lastDownloadedBlock, block, blockTimeLookup, this.slots)) {
+			if (!Utils.isBlockChained(lastDownloadedBlock, block, this.slots)) {
 				return { height: this.blockchain.getLastHeight(), status: false };
 			}
 		}

@@ -6,9 +6,6 @@ import assert from "assert";
 
 @injectable()
 export class RoundState {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
@@ -138,14 +135,8 @@ export class RoundState {
 			return;
 		}
 
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			lastBlock.data.height,
-			this.configuration,
-		);
-
-		const lastSlot: number = this.slots.getSlotNumber(blockTimeLookup, lastBlock.data.timestamp);
-		const currentSlot: number = this.slots.getSlotNumber(blockTimeLookup, block.data.timestamp);
+		const lastSlot: number = this.slots.getSlotNumber(lastBlock.data.timestamp);
+		const currentSlot: number = this.slots.getSlotNumber(block.data.timestamp);
 
 		const missedSlots: number = Math.min(currentSlot - lastSlot - 1, this.forgingValidators.length);
 		for (let index = 0; index < missedSlots; index++) {

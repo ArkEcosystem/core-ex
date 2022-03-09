@@ -49,16 +49,9 @@ export class ValidatorTracker {
 			(validator: Contracts.State.Wallet) => validator.getPublicKey(),
 		);
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			height,
-			this.configuration,
-		);
-
 		const forgingInfo: Contracts.Shared.ForgingInfo = Utils.forgingInfoCalculator.calculateForgingInfo(
 			timestamp,
 			height,
-			blockTimeLookup,
 			this.configuration,
 			this.slots,
 		);

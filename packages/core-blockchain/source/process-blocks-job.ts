@@ -21,11 +21,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	// @TODO: duplicate
-	@inject(Identifiers.Database.Service)
-	private readonly database: Contracts.Database.IDatabaseService;
-
-	// @TODO: duplicate
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService: Contracts.Database.IDatabaseService;
 
@@ -73,18 +68,11 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			this.app,
-			this.blocks[0].height,
-			this.configuration,
-		);
-
-		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup, this.slots)) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], this.slots)) {
 			this.logger.warning(
 				Utils.getBlockNotChainedErrorMessage(
 					this.blockchain.getLastBlock().data,
 					this.blocks[0],
-					blockTimeLookup,
 					this.slots,
 				),
 			);
@@ -207,7 +195,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		// TODO: Remove, because next rounds are deleted on restore
-		await this.database.deleteRound(deleteRoundsAfter + 1);
+		await this.databaseService.deleteRound(deleteRoundsAfter + 1);
 		await this.databaseInteraction.restoreCurrentRound();
 
 		this.blockchain.clearQueue();
