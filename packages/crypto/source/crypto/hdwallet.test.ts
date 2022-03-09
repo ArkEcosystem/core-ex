@@ -11,7 +11,8 @@ describe<{
 	mnemonic: string;
 }>("HDWallet", ({ it, assert, beforeAll, afterAll }) => {
 	beforeAll((context) => {
-		context.mnemonic = "sorry hawk one science reject employ museum ride into post machine attack bar seminar myself unhappy faculty differ grain fish chest bird muffin mesh";
+		context.mnemonic =
+			"sorry hawk one science reject employ museum ride into post machine attack bar seminar myself unhappy faculty differ grain fish chest bird muffin mesh";
 		context.config = configManager.all();
 
 		configManager.setConfig(mainnet);
@@ -23,9 +24,7 @@ describe<{
 
 	it("bip32 - can create a BIP32 wallet external address", () => {
 		const path = "m/0'/0/0";
-		const root = fromSeed(
-			Buffer.from("dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "hex"),
-		);
+		const root = fromSeed(Buffer.from("dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "hex"));
 
 		const child1 = root.derivePath(path);
 
@@ -38,9 +37,7 @@ describe<{
 
 	it("bip44 - can create a BIP44, ark, account 0, external address", () => {
 		const path = "m/44'/111'/0'/0/0";
-		const root = fromSeed(
-			Buffer.from("dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "hex"),
-		);
+		const root = fromSeed(Buffer.from("dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "hex"));
 
 		const child1 = root.derivePath(path);
 
@@ -88,11 +85,11 @@ describe<{
 		const chainCode = Buffer.from("2bbe729fab21bf8bca70763caf7fe85752726a363b494dea7a65e51e2d423d7b", "hex");
 		const node = HDWallet.fromKeys(keys, chainCode);
 		assert.equal(
-			node.publicKey.toString("hex"), 
+			node.publicKey.toString("hex"),
 			"02126148679f22c162afa24a264a6b6722a61aab622248f2f536da289f48a9291f",
 		);
 		assert.equal(
-			node.privateKey.toString("hex"), 
+			node.privateKey.toString("hex"),
 			"b6f84081b674cf1f765ac182aaabd94d944c367d214263d1f7f3102d1cec98d5",
 		);
 	});
