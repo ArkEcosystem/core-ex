@@ -57,19 +57,12 @@ describe<{
 		install.calledWith("@arkecosystem/core", "latest");
 	});
 
-	// TODO: Check later
-	// it("should fail to change the channel if the new and old are the same", async ({ cli }) => {
-	// 	stub(execa, "sync").returnValue({
-	// 		stdout: '"null"',
-	// 		stderr: undefined,
-	// 		exitCode: 0,
-	// 	});
+	it("should fail to change the channel if the new and old are the same", async ({ cli, config }) => {
+		config.set("channel", "latest");
 
-	// 	await cli.withFlags({ channel: "latest" }).execute(Command);
-
-	// 	await assert.rejects(
-	// 		() => cli.withFlags({ channel: "latest" }).execute(Command),
-	// 		'You are already on the "latest" channel.',
-	// 	);
-	// });
+		await assert.rejects(
+			() => cli.withFlags({ channel: "latest" }).execute(Command),
+			'You are already on the "latest" channel.',
+		);
+	});
 });
