@@ -47,7 +47,7 @@ export class ByteBuffer {
 
 	public writeUint64(value: bigint): void {
 		if (typeof value !== "bigint") {
-			value = BigInt(value)
+			value = BigInt(value);
 		}
 
 		this.#offset = this.#buffer.writeBigUInt64LE(value, this.#offset);
