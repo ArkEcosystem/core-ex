@@ -32,7 +32,7 @@ describe<{
 	const getTimeStampForBlock = (height: number) => {
 		switch (height) {
 			case 1:
-				return 1_646_265_600;
+				return 1_646_784_000;
 			default:
 				throw new Error(`Test scenarios should not hit this line`);
 		}
@@ -42,7 +42,7 @@ describe<{
 
 	it("return epoch time as number", (context) => {
 		assert.number(context.slots.getTime());
-		assert.is(context.slots.getTime(1_646_265_600), genesisTimestamp(context.configuration));
+		assert.is(context.slots.getTime(1_646_784_000), genesisTimestamp(context.configuration));
 	});
 
 	it("return slot number", (context) => {
