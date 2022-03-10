@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "../../../../core-test-framework";
 
-import { AttributeMap } from "@packages/core-kernel/source/services/attributes/attribute-map";
-import { AttributeSet } from "@packages/core-kernel/source/services/attributes/attribute-set";
+import { AttributeMap } from "./attribute-map";
+import { AttributeSet } from "./attribute-set";
 
-describe("AttributeMap", () => {
+describe("AttributeMap", ({ assert, it }) => {
 	it("should get all attribute", () => {
 		const set: AttributeSet = new AttributeSet();
 		set.set("someAttribute");
@@ -11,7 +11,7 @@ describe("AttributeMap", () => {
 		const map: AttributeMap = new AttributeMap(set);
 		map.set("someAttribute", "value");
 
-		expect(map.all()).toEqual({ someAttribute: "value" });
+		assert.equal(map.all(), { someAttribute: "value" });
 	});
 
 	it("should get the given attribute", () => {
@@ -21,7 +21,7 @@ describe("AttributeMap", () => {
 		const map: AttributeMap = new AttributeMap(set);
 		map.set("someAttribute", "value");
 
-		expect(map.get("someAttribute")).toBe("value");
+		assert.is(map.get("someAttribute"), "value");
 	});
 
 	it("should set nested attributes", () => {
@@ -37,14 +37,14 @@ describe("AttributeMap", () => {
 		map.set("collection.key2", "value2");
 		map.set("collection.key3", "value3");
 
-		expect(map.get("collection")).toEqual({
+		assert.equal(map.get("collection"), {
 			key1: "value1",
 			key2: "value2",
 			key3: "value3",
 		});
-		expect(map.get("collection.key1")).toBe("value1");
-		expect(map.get("collection.key2")).toBe("value2");
-		expect(map.get("collection.key3")).toBe("value3");
+		assert.is(map.get("collection.key1"), "value1");
+		assert.is(map.get("collection.key2"), "value2");
+		assert.is(map.get("collection.key3"), "value3");
 	});
 
 	it("should forget the given attribute", () => {
@@ -54,11 +54,11 @@ describe("AttributeMap", () => {
 		const map: AttributeMap = new AttributeMap(set);
 		map.set("someAttribute", "value");
 
-		expect(map.has("someAttribute")).toBeTrue();
+		assert.true(map.has("someAttribute"));
 
 		map.forget("someAttribute");
 
-		expect(map.has("someAttribute")).toBeFalse();
+		assert.false(map.has("someAttribute"));
 	});
 
 	it("should forget all attributes", () => {
@@ -66,38 +66,38 @@ describe("AttributeMap", () => {
 		set.set("someAttribute");
 
 		const map: AttributeMap = new AttributeMap(set);
-		expect(map.has("someAttribute")).toBeFalse();
+		assert.false(map.has("someAttribute"));
 
 		map.set("someAttribute", "value");
 
-		expect(map.has("someAttribute")).toBeTrue();
+		assert.true(map.has("someAttribute"));
 
 		map.flush();
 
-		expect(map.has("someAttribute")).toBeFalse();
+		assert.false(map.has("someAttribute"));
 	});
 
 	it("should throw if an an unknown attribute is tried to be retrieved", () => {
 		const map: AttributeMap = new AttributeMap(new AttributeSet());
 
-		expect(() => map.get("someAttribute")).toThrow("Unknown attribute: someAttribute");
+		assert.rejects(() => map.get("someAttribute"), "Unknown attribute: someAttribute");
 	});
 
 	it("should throw if an an unknown attribute is tried to be set", () => {
 		const map: AttributeMap = new AttributeMap(new AttributeSet());
 
-		expect(() => map.set("someAttribute", "value")).toThrow("Unknown attribute: someAttribute");
+		assert.rejects(() => map.set("someAttribute", "value"), "Unknown attribute: someAttribute");
 	});
 
 	it("should throw if an an unknown attribute is tried to be forgotten", () => {
 		const map: AttributeMap = new AttributeMap(new AttributeSet());
 
-		expect(() => map.forget("someAttribute")).toThrow("Unknown attribute: someAttribute");
+		assert.rejects(() => map.forget("someAttribute"), "Unknown attribute: someAttribute");
 	});
 
 	it("should throw if an an unknown attribute is tried to be checked", () => {
 		const map: AttributeMap = new AttributeMap(new AttributeSet());
 
-		expect(() => map.has("someAttribute")).toThrow("Unknown attribute: someAttribute");
+		assert.rejects(() => map.has("someAttribute"), "Unknown attribute: someAttribute");
 	});
 });
