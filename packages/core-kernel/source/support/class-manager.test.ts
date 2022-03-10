@@ -20,7 +20,7 @@ class MyManager extends ClassManager {
 	}
 }
 
-describe("ClassManager.driver", ({ assert, it }) => {
+describe("ClassManager", ({ assert, it }) => {
 	it("should return default driver instance", async () => {
 		const manager = new MyManager();
 		const memoryDriver = await manager.driver();

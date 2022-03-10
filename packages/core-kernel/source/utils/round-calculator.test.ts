@@ -1,7 +1,7 @@
+import { Errors, Interfaces, Managers, Networks } from "@arkecosystem/crypto";
 import { describe } from "../../../core-test-framework";
 
 import { calculateRound, isNewRound } from "./round-calculator";
-import { Errors, Interfaces, Managers, Networks } from "@arkecosystem/crypto";
 
 describe<{
 	config: Interfaces.NetworkConfig;
@@ -10,7 +10,6 @@ describe<{
 		context.config = Managers.configManager.all();
 	});
 	afterEach((context) => {
-		// @ts-ignore
 		Managers.configManager.setConfig(context.config);
 	});
 	it("static delegate count - should calculate the round when nextRound is the same", () => {
@@ -141,7 +140,6 @@ describe<{
 		context.config = Managers.configManager.all();
 	});
 	afterEach((context) => {
-		// @ts-ignore
 		Managers.configManager.setConfig(context.config);
 	});
 	it("should determine the beginning of a new round", () => {

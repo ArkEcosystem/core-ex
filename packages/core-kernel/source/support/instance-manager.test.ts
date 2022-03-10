@@ -30,7 +30,7 @@ class MyInvalidManager extends InstanceManager<MyDriver> {
 	}
 }
 
-describe("ClassManager.boot", ({ assert, it }) => {
+describe("ClassManager", ({ assert, it }) => {
 	it("should throw when default driver cannot be created", async () => {
 		const invalidManager = new MyInvalidManager();
 		const promise = invalidManager.boot();
