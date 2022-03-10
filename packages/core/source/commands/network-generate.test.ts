@@ -1,13 +1,14 @@
 import { Console, describe } from "@arkecosystem/core-test-framework";
-import { Command } from "./network-generate";
 import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";
 import prompts from "prompts";
 
+import { Command } from "./network-generate";
+
 describe<{
 	cli: Console;
-}>("GenerateCommand", ({ beforeEach, it, stub, assert }) => {
+}>("GenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
 	const configCrypto = join(configCore, "crypto");
@@ -24,20 +25,20 @@ describe<{
 
 		await cli
 			.withFlags({
+				blocktime: "9",
+				delegates: "47",
+				distribute: "true",
+				explorer: "myex.io",
+				maxBlockPayload: "123444",
+				maxTxPerBlock: "122",
 				network: "testnet",
 				premine: "120000000000",
-				delegates: "47",
-				blocktime: "9",
-				maxTxPerBlock: "122",
-				maxBlockPayload: "123444",
-				rewardHeight: "23000",
-				rewardAmount: "66000",
 				pubKeyHash: "168",
-				wif: "27",
-				token: "myn",
+				rewardAmount: "66000",
+				rewardHeight: "23000",
 				symbol: "my",
-				explorer: "myex.io",
-				distribute: "true",
+				token: "myn",
+				wif: "27",
 			})
 			.execute(Command);
 
@@ -50,46 +51,42 @@ describe<{
 		writeJSONSync.calledTimes(8); // 5x Core + 2x Crypto + App
 		writeFileSync.calledTimes(2); // index.ts && .env
 
-		const callArgs = writeJSONSync.getCallArgs(2);
-		assert.true(callArgs[0].includes("crypto/milestones.json"));
-
-		// TODO: later
-		// writeJSONSync.calledWith(
-		// 	expect.stringContaining("crypto/milestones.json"),
-		// 	[
-		// 		{
-		// 			height: 1,
-		// 			reward: "0",
-		// 			activeDelegates: 47,
-		// 			blocktime: 9,
-		// 			block: {
-		// 				version: 0,
-		// 				idFullSha256: true,
-		// 				maxTransactions: 122,
-		// 				maxPayload: 123444,
-		// 			},
-		// 			epoch: expect.any(String),
-		// 			fees: {
-		// 				staticFees: {
-		// 					transfer: 10000000,
-		// 					delegateRegistration: 2500000000,
-		// 					vote: 100000000,
-		// 					multiSignature: 500000000,
-		// 					multiPayment: 10000000,
-		// 					delegateResignation: 2500000000,
-		// 				},
-		// 			},
-		// 			vendorFieldLength: 255,
-		// 			multiPaymentLimit: 256,
-		// 			aip11: true,
-		// 		},
-		// 		{
-		// 			height: 23000,
-		// 			reward: 66000,
-		// 		},
-		// 	],
-		// 	{ spaces: 4 },
-		// );
+		writeJSONSync.calledWith(
+			match("crypto/milestones.json"),
+			[
+				match({
+					activeDelegates: 47,
+					aip11: true,
+					block: {
+						idFullSha256: true,
+						maxPayload: 123_444,
+						maxTransactions: 122,
+						version: 0,
+					},
+					blocktime: 9,
+					epoch: match.string,
+					fees: {
+						staticFees: {
+							delegateRegistration: 2_500_000_000,
+							delegateResignation: 2_500_000_000,
+							multiPayment: 10_000_000,
+							multiSignature: 500_000_000,
+							transfer: 10_000_000,
+							vote: 100_000_000,
+						},
+					},
+					height: 1,
+					multiPaymentLimit: 256,
+					reward: "0",
+					vendorFieldLength: 255,
+				}),
+				{
+					height: 23_000,
+					reward: 66_000,
+				},
+			],
+			{ spaces: 4 },
+		);
 	});
 
 	it("should throw if the core configuration destination already exists", async ({ cli }) => {
@@ -99,20 +96,20 @@ describe<{
 			() =>
 				cli
 					.withFlags({
+						blocktime: "9",
+						delegates: "47",
+						distribute: "true",
+						explorer: "myex.io",
+						maxBlockPayload: "123444",
+						maxTxPerBlock: "122",
 						network: "testnet",
 						premine: "120000000000",
-						delegates: "47",
-						blocktime: "9",
-						maxTxPerBlock: "122",
-						maxBlockPayload: "123444",
-						rewardHeight: "23000",
-						rewardAmount: "66000",
 						pubKeyHash: "168",
-						wif: "27",
-						token: "myn",
+						rewardAmount: "66000",
+						rewardHeight: "23000",
 						symbol: "my",
-						explorer: "myex.io",
-						distribute: "true",
+						token: "myn",
+						wif: "27",
 					})
 					.execute(Command),
 			`${configCore} already exists.`,
@@ -127,20 +124,20 @@ describe<{
 			() =>
 				cli
 					.withFlags({
+						blocktime: "9",
+						delegates: "47",
+						distribute: "true",
+						explorer: "myex.io",
+						maxBlockPayload: "123444",
+						maxTxPerBlock: "122",
 						network: "testnet",
 						premine: "120000000000",
-						delegates: "47",
-						blocktime: "9",
-						maxTxPerBlock: "122",
-						maxBlockPayload: "123444",
-						rewardHeight: "23000",
-						rewardAmount: "66000",
 						pubKeyHash: "168",
-						wif: "27",
-						token: "myn",
+						rewardAmount: "66000",
+						rewardHeight: "23000",
 						symbol: "my",
-						explorer: "myex.io",
-						distribute: "true",
+						token: "myn",
+						wif: "27",
 					})
 					.execute(Command),
 			`${configCrypto} already exists.`,
@@ -291,46 +288,46 @@ describe<{
 
 		await cli
 			.withFlags({
-				network: "testnet",
-				premine: "120000000000",
-				delegates: "47",
 				blocktime: "9",
-				maxTxPerBlock: "122",
-				maxBlockPayload: "123444",
-				rewardHeight: "23000",
-				rewardAmount: "66000",
-				pubKeyHash: "168",
-				vendorFieldLength: "64",
-				wif: "27",
-				token: "myn",
-				symbol: "my",
-				explorer: "myex.io",
+				delegates: "47",
 				distribute: "true",
 				epoch: "2020-11-04T00:00:00.000Z",
-				feeStaticTransfer: 1,
+				explorer: "myex.io",
+				feeDynamicBytesDelegateRegistration: 3,
+				feeDynamicEnabled: true,
+				feeDynamicBytesMultiSignature: 5,
+				feeDynamicMinFeeBroadcast: 200,
+				feeDynamicBytesDelegateResignation: 8,
 				feeStaticDelegateRegistration: 3,
-				feeStaticVote: 4,
+				coreDBHost: "127.0.0.1",
+				feeStaticDelegateResignation: 8,
+				coreDBPassword: "password",
+				maxBlockPayload: "123444",
+				coreDBDatabase: "database",
+				maxTxPerBlock: "122",
+				coreAPIPort: 3003,
+				network: "testnet",
+				coreDBPort: 3001,
+				premine: "120000000000",
+				coreDBUsername: "username",
+				pubKeyHash: "168",
+				coreMonitorPort: 3005,
+				rewardAmount: "66000",
+				coreP2PPort: 3002,
+				rewardHeight: "23000",
+				coreWebhooksPort: 3004,
+				token: "myn",
+				feeDynamicBytesMultiPayment: 7,
+				vendorFieldLength: "64",
+				feeDynamicBytesTransfer: 1,
+				wif: "27",
+				feeDynamicBytesVote: 4,
+				symbol: "my",
+				feeDynamicMinFeePool: 100,
 				feeStaticMultiSignature: 5,
 				feeStaticMultiPayment: 7,
-				feeStaticDelegateResignation: 8,
-				feeDynamicEnabled: true,
-				feeDynamicMinFeePool: 100,
-				feeDynamicMinFeeBroadcast: 200,
-				feeDynamicBytesTransfer: 1,
-				feeDynamicBytesDelegateRegistration: 3,
-				feeDynamicBytesVote: 4,
-				feeDynamicBytesMultiSignature: 5,
-				feeDynamicBytesMultiPayment: 7,
-				feeDynamicBytesDelegateResignation: 8,
-				coreDBHost: "127.0.0.1",
-				coreDBPort: 3001,
-				coreDBUsername: "username",
-				coreDBPassword: "password",
-				coreDBDatabase: "database",
-				coreP2PPort: 3002,
-				coreAPIPort: 3003,
-				coreWebhooksPort: 3004,
-				coreMonitorPort: 3005,
+				feeStaticTransfer: 1,
+				feeStaticVote: 4,
 				peers: "127.0.0.1:4444,127.0.0.2",
 			})
 			.execute(Command);
@@ -342,43 +339,42 @@ describe<{
 		writeJSONSync.calledTimes(8); // 5x Core + 2x Crypto + App
 		writeFileSync.calledTimes(2); // index.ts && .env
 
-		// TODO: later
-		// expect(writeJSONSync).toHaveBeenCalledWith(
-		// 	expect.stringContaining("crypto/milestones.json"),
-		// 	[
-		// 		{
-		// 			height: 1,
-		// 			reward: "0",
-		// 			activeDelegates: 47,
-		// 			blocktime: 9,
-		// 			block: {
-		// 				version: 0,
-		// 				idFullSha256: true,
-		// 				maxTransactions: 122,
-		// 				maxPayload: 123444,
-		// 			},
-		// 			epoch: "2020-11-04T00:00:00.000Z",
-		// 			fees: {
-		// 				staticFees: {
-		// 					transfer: 1,
-		// 					delegateRegistration: 3,
-		// 					vote: 4,
-		// 					multiSignature: 5,
-		// 					multiPayment: 7,
-		// 					delegateResignation: 8,
-		// 				},
-		// 			},
-		// 			vendorFieldLength: 64,
-		// 			multiPaymentLimit: 256,
-		// 			aip11: true,
-		// 		},
-		// 		{
-		// 			height: 23000,
-		// 			reward: 66000,
-		// 		},
-		// 	],
-		// 	{ spaces: 4 },
-		// );
+		writeJSONSync.calledWith(
+			match("crypto/milestones.json"),
+			[
+				match({
+					activeDelegates: 47,
+					aip11: true,
+					block: {
+						idFullSha256: true,
+						maxPayload: 123_444,
+						maxTransactions: 122,
+						version: 0,
+					},
+					blocktime: 9,
+					epoch: "2020-11-04T00:00:00.000Z",
+					fees: {
+						staticFees: {
+							delegateRegistration: 3,
+							delegateResignation: 8,
+							multiPayment: 7,
+							multiSignature: 5,
+							transfer: 1,
+							vote: 4,
+						},
+					},
+					height: 1,
+					multiPaymentLimit: 256,
+					reward: "0",
+					vendorFieldLength: 64,
+				}),
+				{
+					height: 23_000,
+					reward: 66_000,
+				},
+			],
+			{ spaces: 4 },
+		);
 	});
 
 	it("should generate a new configuration using force option", async ({ cli }) => {
@@ -389,8 +385,8 @@ describe<{
 
 		await cli
 			.withFlags({
-				token: "myn",
 				force: true,
+				token: "myn",
 			})
 			.execute(Command);
 
@@ -410,21 +406,21 @@ describe<{
 
 		await cli
 			.withFlags({
-				network: "testnet",
-				premine: "120000000000",
-				delegates: "47",
 				blocktime: "9",
-				maxTxPerBlock: "122",
-				maxBlockPayload: "123444",
-				rewardHeight: "23000",
-				rewardAmount: "66000",
-				pubKeyHash: "168",
-				wif: "27",
-				token: "myn",
-				symbol: "my",
-				explorer: "myex.io",
+				delegates: "47",
 				distribute: "true",
+				explorer: "myex.io",
+				maxBlockPayload: "123444",
+				maxTxPerBlock: "122",
+				network: "testnet",
 				overwriteConfig: "true",
+				premine: "120000000000",
+				pubKeyHash: "168",
+				rewardAmount: "66000",
+				rewardHeight: "23000",
+				symbol: "my",
+				token: "myn",
+				wif: "27",
 			})
 			.execute(Command);
 
@@ -444,21 +440,21 @@ describe<{
 
 		await cli
 			.withFlags({
+				blocktime: "9",
+				configPath: "/path/to/config",
+				delegates: "47",
+				distribute: "true",
+				explorer: "myex.io",
+				maxBlockPayload: "123444",
+				maxTxPerBlock: "122",
 				network: "testnet",
 				premine: "120000000000",
-				delegates: "47",
-				blocktime: "9",
-				maxTxPerBlock: "122",
-				maxBlockPayload: "123444",
-				rewardHeight: "23000",
-				rewardAmount: "66000",
 				pubKeyHash: "168",
-				wif: "27",
-				token: "myn",
+				rewardAmount: "66000",
+				rewardHeight: "23000",
 				symbol: "my",
-				explorer: "myex.io",
-				distribute: "true",
-				configPath: "/path/to/config",
+				token: "myn",
+				wif: "27",
 			})
 			.execute(Command);
 
@@ -478,21 +474,21 @@ describe<{
 
 		await cli
 			.withFlags({
-				network: "testnet",
-				premine: "120000000000",
-				delegates: "47",
 				blocktime: "9",
-				maxTxPerBlock: "122",
-				maxBlockPayload: "123444",
-				rewardHeight: "23000",
-				rewardAmount: "66000",
-				pubKeyHash: "168",
-				wif: "27",
-				token: "myn",
-				symbol: "my",
-				explorer: "myex.io",
+				delegates: "47",
 				distribute: "true",
+				explorer: "myex.io",
+				maxBlockPayload: "123444",
+				maxTxPerBlock: "122",
+				network: "testnet",
 				peers: "",
+				premine: "120000000000",
+				pubKeyHash: "168",
+				rewardAmount: "66000",
+				rewardHeight: "23000",
+				symbol: "my",
+				token: "myn",
+				wif: "27",
 			})
 			.execute(Command);
 
