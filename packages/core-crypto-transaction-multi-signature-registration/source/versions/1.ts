@@ -60,7 +60,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
-		// @TODO
+		// @TODO: take public key length from plugins into account
 		const buff: ByteBuffer = ByteBuffer.fromSize(2 + publicKeys.length * 32);
 
 		buff.writeUint8(min);

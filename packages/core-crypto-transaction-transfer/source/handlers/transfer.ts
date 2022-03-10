@@ -49,7 +49,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
 
-		// @TODO
+		// @TODO: ensure that this check works for all types of addresses
 		if (!TransactionUtils.isRecipientOnActiveNetwork(recipientId, undefined, this.configuration)) {
 			const network: string = this.configuration.get<string>("network.pubKeyHash");
 			throw new Exceptions.PoolError(

@@ -27,16 +27,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	}
 
 	public set<T = any>(key: string, value: T): void {
-		// @TODO: remove this and throw if no config is set
 		if (!this.#config) {
-			this.#config = {
-				// @ts-ignore
-				genesisBlock: {},
-				// @ts-ignore
-				milestones: {},
-				// @ts-ignore
-				network: {},
-			};
+			throw new Error("No cryptography configuration has been set.");
 		}
 
 		set(this.#config, key, value);
