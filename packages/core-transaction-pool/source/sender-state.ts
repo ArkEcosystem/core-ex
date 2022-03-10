@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@arkecosystem/core-container";
-import { Contracts, Exceptions,Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
 
 @injectable()
@@ -47,7 +47,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			await this.events.dispatch(Enums.TransactionEvent.Expired, transaction.data);
 
 			throw new Exceptions.TransactionHasExpiredError(
-				transaction, await this.expirationService.getExpirationHeight(transaction),
+				transaction,
+				await this.expirationService.getExpirationHeight(transaction),
 			);
 		}
 
