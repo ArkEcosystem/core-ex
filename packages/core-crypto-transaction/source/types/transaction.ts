@@ -1,31 +1,19 @@
-import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import {
-	BINDINGS,
-	IAddressFactory,
-	ISchemaValidationResult,
-	ISerializeOptions,
-	ITransaction,
-	ITransactionData,
-	ITransactionJson,
-	ITransactionVerifier,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-import { TransactionTypeGroup } from "../enums";
-import { NotImplemented } from "../errors";
 import { TransactionSchema } from "./schemas";
 
-@Container.injectable()
-export abstract class Transaction implements ITransaction {
-	@Container.inject(BINDINGS.Identity.AddressFactory)
-	protected readonly addressFactory: IAddressFactory;
+@injectable()
+export abstract class Transaction implements Contracts.Crypto.ITransaction {
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	protected readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
-	@Container.inject(BINDINGS.Configuration)
-	protected readonly configuration: Configuration;
+	@inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Transaction.Verifier)
-	private readonly verifier: ITransactionVerifier;
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
+	private readonly verifier: Contracts.Crypto.ITransactionVerifier;
 
 	public static type: number | undefined = undefined;
 	public static typeGroup: number | undefined = undefined;
@@ -36,19 +24,19 @@ export abstract class Transaction implements ITransaction {
 
 	public isVerified = false;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
-	public data: ITransactionData;
+	public data: Contracts.Crypto.ITransactionData;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: Buffer;
 	// @ts-ignore - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public timestamp: number;
 
 	public static getSchema(): TransactionSchema {
-		throw new NotImplemented();
+		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
 	}
 
 	public static staticFee(
-		configuration: Configuration,
-		feeContext: { height?: number; data?: ITransactionData } = {},
+		configuration: Contracts.Crypto.IConfiguration,
+		feeContext: { height?: number; data?: Contracts.Crypto.ITransactionData } = {},
 	): BigNumber {
 		const milestones = configuration.getMilestone(feeContext.height);
 
@@ -63,26 +51,22 @@ export abstract class Transaction implements ITransaction {
 		return this.defaultStaticFee;
 	}
 
-	public async verify(options?: ISerializeOptions): Promise<boolean> {
-		return this.verifier.verify(this.data, options);
+	public async verify(): Promise<boolean> {
+		return this.verifier.verifyHash(this.data);
 	}
 
-	public verifySchema(): ISchemaValidationResult {
+	public verifySchema(): Contracts.Crypto.ISchemaValidationResult {
 		return this.verifier.verifySchema(this.data);
 	}
 
-	public toJson(): ITransactionJson {
-		const data: ITransactionJson = JSON.parse(JSON.stringify(this.data));
+	public toJson(): Contracts.Crypto.ITransactionJson {
+		const data: Contracts.Crypto.ITransactionJson = JSON.parse(JSON.stringify(this.data));
 
-		if (data.typeGroup === TransactionTypeGroup.Core) {
+		if (data.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core) {
 			delete data.typeGroup;
 		}
 
-		if (data.version === 1) {
-			delete data.nonce;
-		} else {
-			delete data.timestamp;
-		}
+		delete data.timestamp;
 
 		return data;
 	}
@@ -91,19 +75,9 @@ export abstract class Transaction implements ITransaction {
 		const parts: string[] = [];
 
 		if (this.data.senderPublicKey && this.data.nonce) {
-			parts.push(
-				`${await this.addressFactory.fromPublicKey(
-					this.data.senderPublicKey,
-					this.configuration.get("network"),
-				)}#${this.data.nonce}`,
-			);
+			parts.push(`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey)}#${this.data.nonce}`);
 		} else if (this.data.senderPublicKey) {
-			parts.push(
-				`${await this.addressFactory.fromPublicKey(
-					this.data.senderPublicKey,
-					this.configuration.get("network"),
-				)}`,
-			);
+			parts.push(`${await this.addressFactory.fromPublicKey(this.data.senderPublicKey)}`);
 		}
 
 		if (this.data.id) {

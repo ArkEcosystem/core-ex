@@ -17,10 +17,12 @@
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
+		"bip38": "^3.1.1",
 		"joi": "17.4.2",
 		"node-forge": "1.2.1",
 		"wif": "2.0.6"

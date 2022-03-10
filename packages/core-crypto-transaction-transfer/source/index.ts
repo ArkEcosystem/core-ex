@@ -1,19 +1,21 @@
-import { Container } from "@arkecosystem/core-container";
-import { BINDINGS } from "@arkecosystem/core-crypto-contracts";
+import { injectable } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
 import { Providers } from "@arkecosystem/core-kernel";
 
-import { One } from "./versions/1";
-import { Two } from "./versions/2";
+import { TransferTransactionHandler } from "./handlers";
+import { TransferTransaction } from "./versions";
 
 export * from "./builder";
+export * from "./versions";
 
-@Container.injectable()
+@injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const registry: TransactionRegistry = this.app.get(BINDINGS.Transaction.Registry);
+		const registry: TransactionRegistry = this.app.get(Identifiers.Cryptography.Transaction.Registry);
 
-		registry.registerTransactionType(One);
-		registry.registerTransactionType(Two);
+		registry.registerTransactionType(TransferTransaction);
+
+		this.app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
 	}
 }

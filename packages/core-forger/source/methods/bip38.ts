@@ -1,13 +1,27 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto, Identities, Interfaces, Managers } from "@arkecosystem/crypto";
+import bip38 from "bip38";
 import forge from "node-forge";
 import wif from "wif";
 
-import { Delegate } from "../interfaces";
 import { Method } from "./method";
 
-export class BIP38 extends Method implements Delegate {
-	public keys: Interfaces.IKeyPair | undefined;
+@injectable()
+export class BIP38 extends Method implements Contracts.Forger.Validator {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
+
+	@inject(Identifiers.Cryptography.Identity.WifFactory)
+	private readonly wifFactory: Contracts.Crypto.IWIFFactory;
+
+	public keys: Contracts.Crypto.IKeyPair | undefined;
 
 	public publicKey: string;
 
@@ -23,59 +37,62 @@ export class BIP38 extends Method implements Delegate {
 
 	private readonly iterations: number = 5000;
 
-	public constructor(bip38: string, password: string) {
-		super();
-
-		this.keys = this.decryptPassphrase(bip38, password);
+	public async configure(bip38: string, password: string): Promise<BIP38> {
+		this.keys = await this.decryptPassphrase(bip38, password);
 		this.publicKey = this.keys.publicKey;
-		this.address = Identities.Address.fromPublicKey(this.keys.publicKey);
+		this.address = await this.addressFactory.fromPublicKey(this.keys.publicKey);
 		this.otpSecret = forge.random.getBytesSync(128);
 
-		this.encryptKeysWithOtp();
+		await this.encryptKeysWithOtp();
+
+		return this;
 	}
 
-	public forge(transactions: Interfaces.ITransactionData[], options: Record<string, any>): Interfaces.IBlock {
-		this.decryptKeysWithOtp();
+	public async forge(
+		transactions: Contracts.Crypto.ITransactionData[],
+		options: Record<string, any>,
+	): Promise<Contracts.Crypto.IBlock> {
+		await this.decryptKeysWithOtp();
 
-		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
+		AppUtils.assert.defined<Contracts.Crypto.IKeyPair>(this.keys);
 
-		const block: Interfaces.IBlock = this.createBlock(this.keys, transactions, options);
+		const block: Contracts.Crypto.IBlock = await this.createBlock(this.keys, transactions, options);
 
-		this.encryptKeysWithOtp();
+		await this.encryptKeysWithOtp();
 
 		return block;
 	}
 
-	private encryptKeysWithOtp(): void {
-		AppUtils.assert.defined<Interfaces.IKeyPair>(this.keys);
+	private async encryptKeysWithOtp(): Promise<void> {
+		AppUtils.assert.defined<Contracts.Crypto.IKeyPair>(this.keys);
 
-		const wifKey: string = Identities.WIF.fromKeys(this.keys);
+		const wifKey: string = await this.wifFactory.fromKeys(this.keys);
 
 		this.keys = undefined;
 		this.otp = forge.random.getBytesSync(16);
 		this.encryptedKeys = this.encryptDataWithOtp(wifKey, this.otp);
 	}
 
-	private decryptKeysWithOtp(): void {
+	private async decryptKeysWithOtp(): Promise<void> {
 		AppUtils.assert.defined<string>(this.encryptedKeys);
 		AppUtils.assert.defined<string>(this.otp);
 
 		const wifKey: string = this.decryptDataWithOtp(this.encryptedKeys, this.otp);
 
-		this.keys = Identities.Keys.fromWIF(wifKey);
+		this.keys = await this.keyPairFactory.fromWIF(wifKey);
 		this.otp = undefined;
 		this.encryptedKeys = undefined;
 	}
 
-	private decryptPassphrase(passphrase: string, password: string): Interfaces.IKeyPair {
-		const decryptedWif: Interfaces.IDecryptResult = Crypto.bip38.decrypt(passphrase, password);
+	private async decryptPassphrase(passphrase: string, password: string): Promise<Contracts.Crypto.IKeyPair> {
+		const decryptedWif: Contracts.Crypto.IDecryptResult = bip38.decrypt(passphrase, password);
 		const wifKey: string = wif.encode(
-			Managers.configManager.get("network.wif"),
+			this.configuration.get("network.wif"),
 			decryptedWif.privateKey,
 			decryptedWif.compressed,
 		);
 
-		return Identities.Keys.fromWIF(wifKey);
+		return this.keyPairFactory.fromWIF(wifKey);
 	}
 
 	private encryptDataWithOtp(content: string, password: string): string {

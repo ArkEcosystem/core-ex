@@ -1,37 +1,31 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IKeyPairFactory,
-	IMultiSignatureAsset,
-	IPublicKeyFactory,
-} from "@arkecosystem/core-crypto-contracts";
-import { InvalidMultiSignatureAssetError, PublicKeyError } from "@arkecosystem/core-crypto-errors";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { secp256k1 } from "bcrypto";
 
-@Container.injectable()
-export class PublicKeyFactory implements IPublicKeyFactory {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+@injectable()
+export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
 	}
 
-	public async fromWIF(wif: string, version: number): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif, version)).publicKey;
+	public async fromWIF(wif: string): Promise<string> {
+		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
-	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
-		const { min, publicKeys }: IMultiSignatureAsset = asset;
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+		const { min, publicKeys }: Contracts.Crypto.IMultiSignatureAsset = asset;
 
 		for (const publicKey of publicKeys) {
 			if (!this.verify(publicKey)) {
-				throw new PublicKeyError(publicKey);
+				throw new Exceptions.PublicKeyError(publicKey);
 			}
 		}
 
 		if (min < 1 || min > publicKeys.length) {
-			throw new InvalidMultiSignatureAssetError();
+			throw new Exceptions.InvalidMultiSignatureAssetError();
 		}
 
 		const minKey: string = await this.fromMnemonic(this.#numberToHex(min));

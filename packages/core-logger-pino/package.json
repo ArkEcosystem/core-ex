@@ -16,6 +16,8 @@
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"chalk": "4.1.2",
 		"joi": "17.4.2",
@@ -28,7 +30,6 @@
 		"split2": "3.2.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
 		"@types/pino": "6.3.11",
 		"@types/pump": "1.1.1",

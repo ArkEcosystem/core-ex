@@ -17,15 +17,15 @@
 		"test:coverage": "c8 pnpm run test"
 	},
 	"dependencies": {
-		"@arkecosystem/core-database": "workspace:*",
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"immutable": "4.0.0-rc.14",
-		"joi": "17.4.2"
+		"joi": "17.4.2",
+		"lmdb": "^2.2.4"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"import-fresh": "3.3.0",
 		"sinon": "^13.0.1",
 		"uvu": "^0.5.3"

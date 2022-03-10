@@ -1,27 +1,42 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	AddressFactory as Contract,
-	BINDINGS,
-	IConfiguration,
-	IKeyPairFactory,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { hexToU8a, isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress } from "@polkadot/util-crypto";
 
-@Container.injectable()
-export class AddressFactory implements Contract {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+@injectable()
+export class AddressFactory implements Contracts.Crypto.IAddressFactory {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey, "hex"));
+		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey);
 	}
 
-	public async fromPublicKey(publicKey: Buffer): Promise<string> {
-		return encodeAddress(publicKey, this.configuration.get("network.address.ss58"));
+	public async fromPublicKey(publicKey: string): Promise<string> {
+		return encodeAddress(Buffer.from(publicKey, "hex"), this.configuration.get("network.address.ss58"));
+	}
+
+	public async fromWIF(wif: string): Promise<string> {
+		return "";
+	}
+
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+		return "";
+	}
+
+	public async fromPrivateKey(privateKey: Contracts.Crypto.IKeyPair): Promise<string> {
+		return "";
+	}
+
+	public async fromBuffer(buffer: Buffer): Promise<string> {
+		return "";
+	}
+
+	public async toBuffer(address: string): Promise<Buffer> {
+		return Buffer.alloc(1);
 	}
 
 	public async validate(address: string): Promise<boolean> {

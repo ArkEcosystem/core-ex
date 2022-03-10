@@ -1,3 +1,5 @@
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 import {
 	copyFile,
 	ensureDir,
@@ -13,12 +15,9 @@ import {
 } from "fs-extra";
 import { resolve } from "path";
 
-import { Filesystem } from "../../../contracts/kernel/filesystem";
-import { injectable } from "../../../ioc";
-
 @injectable()
-export class LocalFilesystem implements Filesystem {
-	public async make(): Promise<Filesystem> {
+export class LocalFilesystem implements Contracts.Kernel.Filesystem {
+	public async make(): Promise<Contracts.Kernel.Filesystem> {
 		return this;
 	}
 

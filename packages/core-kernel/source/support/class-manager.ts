@@ -1,5 +1,6 @@
-import { Kernel } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+
 // todo: revisit the implementation of the class and see if it can be removed
 // import { Class } from "../types";
 import { pascalCase } from "../utils";
@@ -7,7 +8,7 @@ import { pascalCase } from "../utils";
 @injectable()
 export abstract class ClassManager {
 	@inject(Identifiers.Application)
-	protected readonly app!: Kernel.Application;
+	protected readonly app!: Contracts.Kernel.Application;
 
 	private defaultDriver: string;
 

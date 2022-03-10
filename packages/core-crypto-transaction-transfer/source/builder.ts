@@ -1,16 +1,19 @@
-import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import { injectable, postConstruct } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Two } from "./versions/2";
+import { TransferTransaction } from "./versions/1";
 
+@injectable()
 export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
-	public constructor() {
-		super();
+	@postConstruct()
+	public postConstruct() {
+		this.initializeData();
 
-		this.data.type = Two.type;
-		this.data.typeGroup = Two.typeGroup;
-		this.data.fee = Two.staticFee(this.configuration);
+		this.data.type = TransferTransaction.type;
+		this.data.typeGroup = TransferTransaction.typeGroup;
+		this.data.fee = TransferTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;
@@ -23,8 +26,8 @@ export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 		return this.instance();
 	}
 
-	public async getStruct(): Promise<ITransactionData> {
-		const struct: ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
+		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;

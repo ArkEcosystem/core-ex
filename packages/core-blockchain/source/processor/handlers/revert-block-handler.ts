@@ -1,38 +1,36 @@
-import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Interfaces } from "@arkecosystem/crypto";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class RevertBlockHandler implements BlockHandler {
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.DatabaseInteraction)
+	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
-	private readonly database!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly database: Contracts.Database.IDatabaseService;
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	public async execute(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		try {
 			await this.databaseInteraction.revertBlock(block);
 
-			// TODO: Check if same situation applies to fork revert
 			for (const transaction of block.transactions) {
 				await this.transactionPool.addTransaction(transaction);
 			}
 
 			// Remove last block, take from DB if list is empty
-			let previousBlock: Interfaces.IBlock | undefined = this.state
+			let previousBlock: Contracts.Crypto.IBlock | undefined = this.state
 				.getLastBlocks()
 				.find((stateBlock) => stateBlock.data.height === block.data.height - 1);
 

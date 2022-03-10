@@ -1,23 +1,23 @@
-import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
-import { Crypto, Identities, Managers, Networks } from "@arkecosystem/crypto";
+import { Commands, Contracts } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import { validateMnemonic } from "bip39";
-import { writeJSONSync } from "fs-extra";
+// import { writeJSONSync } from "fs-extra";
 import Joi from "joi";
 import wif from "wif";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "config:forger:bip38";
 
-	public description = "Configure the forging delegate (BIP38).";
+	public description = "Configure the forging validator (BIP38).";
 
 	public isHidden = true;
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
-			.setFlag("bip39", "A delegate plain text passphrase. Referred to as BIP39.", Joi.string())
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
+			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
@@ -29,10 +29,10 @@ export class Command extends Commands.Command {
 
 		const response = await this.components.prompt([
 			{
-				message: "Please enter your delegate plain text passphrase. Referred to as BIP39.",
+				message: "Please enter your validator plain text passphrase. Referred to as BIP39.",
 				name: "bip39",
 				type: "password",
-				validate: /* istanbul ignore next */ (value) =>
+				validate: (value) =>
 					!validateMnemonic(value) && !this.getFlag("skipValidation")
 						? "Failed to verify the given passphrase as BIP39 compliant."
 						: true,
@@ -41,8 +41,7 @@ export class Command extends Commands.Command {
 				message: "Please enter your custom password that encrypts the BIP39. Referred to as BIP38.",
 				name: "password",
 				type: "password",
-				validate: /* istanbul ignore next */ (value) =>
-					typeof value !== "string" ? "The BIP38 password has to be a string." : true,
+				validate: (value) => (typeof value !== "string" ? "The BIP38 password has to be a string." : true),
 			},
 		]);
 
@@ -51,7 +50,7 @@ export class Command extends Commands.Command {
 				message: "Confirm custom password that encrypts the BIP39. Referred to as BIP38.",
 				name: "passwordConfirmation",
 				type: "password",
-				validate: /* istanbul ignore next */ (value) =>
+				validate: (value) =>
 					value !== response.password ? "Confirm password does not match BIP38 password." : true,
 			},
 		]);
@@ -68,7 +67,7 @@ export class Command extends Commands.Command {
 	}
 
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
-		let decodedWIF;
+		// let decodedWIF;
 
 		await this.components.taskList([
 			{
@@ -79,35 +78,35 @@ export class Command extends Commands.Command {
 				},
 				title: "Validating passphrase is BIP39 compliant.",
 			},
-			{
-				task: () => {
-					Managers.configManager.setFromPreset(flags.network);
-				},
-				title: "Prepare crypto.",
-			},
+			// {
+			// 	task: () => {
+			// 		this.configuration.setFromPreset(flags.network);
+			// 	},
+			// 	title: "Prepare crypto.",
+			// },
 			{
 				task: () => {
 					// @ts-ignore
-					decodedWIF = wif.decode(Identities.WIF.fromPassphrase(flags.bip39));
+					decodedWIF = wif.decode(Identities.WIF.fromMnemonic(flags.bip39));
 				},
 				title: "Loading private key.",
 			},
-			{
-				task: () => {
-					const delegatesConfig = this.app.getCorePath("config", "delegates.json");
+			// {
+			// 	task: () => {
+			// 		const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
-					const delegates = require(delegatesConfig);
-					delegates.bip38 = Crypto.bip38.encrypt(
-						decodedWIF.privateKey,
-						decodedWIF.compressed,
-						flags.password,
-					);
-					delegates.secrets = [];
+			// 		const validators = require(validatorsConfig);
+			// 		validators.bip38 = Crypto.bip38.encrypt(
+			// 			decodedWIF.privateKey,
+			// 			decodedWIF.compressed,
+			// 			flags.password,
+			// 		);
+			// 		validators.secrets = [];
 
-					writeJSONSync(delegatesConfig, delegates);
-				},
-				title: "Encrypting BIP39 passphrase.",
-			},
+			// 		writeJSONSync(validatorsConfig, validators);
+			// 	},
+			// 	title: "Encrypting BIP39 passphrase.",
+			// },
 		]);
 	}
 }

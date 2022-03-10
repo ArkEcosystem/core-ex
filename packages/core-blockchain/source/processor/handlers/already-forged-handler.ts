@@ -1,17 +1,17 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class AlreadyForgedHandler implements BlockHandler {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	public async execute(block?: Interfaces.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block?: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		this.blockchain.resetLastDownloadedBlock();
 
 		return BlockProcessorResult.DiscardedButCanBeBroadcasted;

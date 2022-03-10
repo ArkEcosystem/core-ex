@@ -1,15 +1,21 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-@Container.injectable()
+@injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
-	@Container.inject(Container.Identifiers.TransactionPoolWorkerIpcSubprocessFactory)
-	private readonly createWorkerSubprocess!: Contracts.TransactionPool.WorkerIpcSubprocessFactory;
+	@inject(Identifiers.TransactionPoolWorkerIpcSubprocessFactory)
+	private readonly createWorkerSubprocess: Contracts.TransactionPool.WorkerIpcSubprocessFactory;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerIpcSubprocess;
 	private lastHeight = 0;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		this.ipcSubprocess = this.createWorkerSubprocess();
 	}
@@ -19,12 +25,12 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async getTransactionFromData(
-		transactionData: Interfaces.ITransactionData | Buffer,
-	): Promise<Interfaces.ITransaction> {
-		const currentHeight = Managers.configManager.getHeight()!;
+		transactionData: Contracts.Crypto.ITransactionData | Buffer,
+	): Promise<Contracts.Crypto.ITransaction> {
+		const currentHeight = this.configuration.getHeight()!;
 		if (currentHeight !== this.lastHeight) {
 			this.lastHeight = currentHeight;
-			this.ipcSubprocess.sendAction("setConfig", Managers.configManager.all());
+			this.ipcSubprocess.sendAction("setConfig", this.configuration.all());
 			this.ipcSubprocess.sendAction("setHeight", currentHeight);
 		}
 
@@ -32,7 +38,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			"getTransactionFromData",
 			transactionData instanceof Buffer ? transactionData.toString("hex") : transactionData,
 		);
-		const transaction = Transactions.TransactionFactory.fromBytesUnsafe(Buffer.from(serialized, "hex"), id);
+		const transaction = await this.transactionFactory.fromBytesUnsafe(Buffer.from(serialized, "hex"), id);
 		transaction.isVerified = isVerified;
 
 		return transaction;

@@ -1,10 +1,10 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Environment)
+	@inject(Container.Identifiers.Environment)
 	private readonly environment!: Services.Environment;
 
 	public signature = "config:database";
@@ -15,8 +15,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("host", "The host address of the database.", Joi.string())
 			.setFlag("port", "The port of the database.", Joi.number())
 			.setFlag("database", "The name of the database.", Joi.string())
@@ -25,10 +25,10 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const envFile = this.app.getCorePath("config", ".env");
+		const environmentFile = this.app.getCorePath("config", ".env");
 
 		if (this.validFlags.some((flag: string) => this.hasFlag(flag))) {
-			this.environment.updateVariables(envFile, this.confirm(this.getFlags()));
+			this.environment.updateVariables(environmentFile, this.confirm(this.getFlags()));
 
 			return;
 		}
@@ -45,8 +45,7 @@ export class Command extends Commands.Command {
 				message: "What port do you want to use?",
 				name: "port",
 				type: "text",
-				validate: /* istanbul ignore next */ (value) =>
-					value < 1 || value > 65_535 ? `The port must be in the range of 1-65535.` : true,
+				validate: (value) => (value < 1 || value > 65_535 ? `The port must be in the range of 1-65535.` : true),
 			},
 			{
 				initial: `${this.getFlag("token")}_${this.getFlag("network")}`,
@@ -77,7 +76,7 @@ export class Command extends Commands.Command {
 			this.components.fatal("You'll need to confirm the input to continue.");
 		}
 
-		this.environment.updateVariables(envFile, this.confirm(response));
+		this.environment.updateVariables(environmentFile, this.confirm(response));
 	}
 
 	private confirm(flags: Contracts.AnyObject): Contracts.AnyObject {

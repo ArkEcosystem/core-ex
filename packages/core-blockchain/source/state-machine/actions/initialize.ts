@@ -1,39 +1,42 @@
-import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Interfaces, Managers } from "@arkecosystem/crypto";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class Initialize implements Action {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
-	private readonly databaseService!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
-	@Container.inject(Container.Identifiers.DatabaseInteraction)
+	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
+	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
 	public async handle(): Promise<void> {
 		try {
-			const block: Interfaces.IBlock = this.stateStore.getLastBlock();
+			const block: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
 
 			if (!this.stateStore.getRestoredDatabaseIntegrity()) {
 				this.logger.info("Verifying database integrity");
@@ -49,8 +52,12 @@ export class Initialize implements Action {
 
 			// only genesis block? special case of first round needs to be dealt with
 			if (block.data.height === 1) {
-				if (block.data.payloadHash !== Managers.configManager.get("network.nethash")) {
-					this.logger.error("FATAL: The genesis block payload hash is different from configured the nethash");
+				if (block.data.payloadHash !== this.configuration.get("network.nethash")) {
+					this.logger.error(
+						`FATAL: The genesis block payload hash (${
+							block.data.payloadHash
+						}) is different from configured the nethash (${this.configuration.get("network.nethash")})`,
+					);
 
 					return this.blockchain.dispatch("FAILURE");
 				}
@@ -62,11 +69,11 @@ export class Initialize implements Action {
 			 *  state machine data init      *
 			 ******************************* */
 			// Delete all rounds from the future due to shutdown before processBlocks finished writing the blocks.
-			const roundInfo = AppUtils.roundCalculator.calculateRound(block.data.height);
+			const roundInfo = AppUtils.roundCalculator.calculateRound(block.data.height, this.configuration);
 			await this.databaseService.deleteRound(roundInfo.round + 1);
 
 			if (this.stateStore.getNetworkStart()) {
-				await this.app.get<Contracts.State.StateBuilder>(Container.Identifiers.StateBuilder).run();
+				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 				await this.databaseInteraction.restoreCurrentRound();
 				await this.transactionPool.readdTransactions();
 				await this.networkMonitor.boot();
@@ -77,7 +84,7 @@ export class Initialize implements Action {
 			if (process.env.NODE_ENV === "test") {
 				this.logger.notice("TEST SUITE DETECTED! SYNCING WALLETS AND STARTING IMMEDIATELY.");
 
-				await this.app.get<Contracts.State.StateBuilder>(Container.Identifiers.StateBuilder).run();
+				await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 				await this.databaseInteraction.restoreCurrentRound();
 				await this.networkMonitor.boot();
 
@@ -91,7 +98,7 @@ export class Initialize implements Action {
 			 ******************************* */
 			// Integrity Verification
 
-			await this.app.get<Contracts.State.StateBuilder>(Container.Identifiers.StateBuilder).run();
+			await this.app.get<Contracts.State.StateBuilder>(Identifiers.StateBuilder).run();
 
 			await this.databaseInteraction.restoreCurrentRound();
 			await this.transactionPool.readdTransactions();

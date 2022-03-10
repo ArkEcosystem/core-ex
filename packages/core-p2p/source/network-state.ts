@@ -1,5 +1,5 @@
-import { Container, Contracts, Providers, Utils } from "@arkecosystem/core-kernel";
-import { Crypto, Interfaces } from "@arkecosystem/crypto";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Utils } from "@arkecosystem/core-kernel";
 
 import { NetworkStateStatus } from "./enums";
 
@@ -21,7 +21,6 @@ class QuorumDetails {
 	public getQuorum() {
 		const quorum = this.peersQuorum / (this.peersQuorum + this.peersNoQuorum);
 
-		/* istanbul ignore next */
 		return isFinite(quorum) ? quorum : 0;
 	}
 }
@@ -32,7 +31,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	private lastBlockId?: string;
 	private quorumDetails: QuorumDetails;
 
-	public constructor(public readonly status: NetworkStateStatus, lastBlock?: Interfaces.IBlock) {
+	public constructor(public readonly status: NetworkStateStatus, lastBlock?: Contracts.Crypto.IBlock) {
 		this.quorumDetails = new QuorumDetails();
 
 		if (lastBlock) {
@@ -43,22 +42,15 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	public static async analyze(
 		monitor: Contracts.P2P.NetworkMonitor,
 		repository: Contracts.P2P.PeerRepository,
+		slots: Contracts.Crypto.Slots,
 	): Promise<Contracts.P2P.NetworkState> {
 		// @ts-ignore - app exists but isn't on the interface for now
-		const lastBlock: Interfaces.IBlock = monitor.app
-			.get<any>(Container.Identifiers.BlockchainService)
-			.getLastBlock();
-
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(
-			// @ts-ignore - app exists but isn't on the interface for now
-			monitor.app,
-			lastBlock.data.height,
-		);
+		const lastBlock: Contracts.Crypto.IBlock = monitor.app.get<any>(Identifiers.BlockchainService).getLastBlock();
 
 		const peers: Contracts.P2P.Peer[] = repository.getPeers();
 		// @ts-ignore - app exists but isn't on the interface for now
 		const configuration = monitor.app.getTagged<Providers.PluginConfiguration>(
-			Container.Identifiers.PluginConfiguration,
+			Identifiers.PluginConfiguration,
 			"plugin",
 			"core-p2p",
 		);
@@ -73,7 +65,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 			return new NetworkState(NetworkStateStatus.BelowMinimumPeers, lastBlock);
 		}
 
-		return this.analyzeNetwork(lastBlock, peers, blockTimeLookup);
+		return this.analyzeNetwork(lastBlock, peers, slots);
 	}
 
 	public static parse(data: any): Contracts.P2P.NetworkState {
@@ -89,13 +81,9 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		return networkState;
 	}
 
-	private static analyzeNetwork(
-		lastBlock,
-		peers: Contracts.P2P.Peer[],
-		getTimeStampForBlock: (height: number) => number,
-	): Contracts.P2P.NetworkState {
+	private static analyzeNetwork(lastBlock, peers: Contracts.P2P.Peer[], slots): Contracts.P2P.NetworkState {
 		const networkState = new NetworkState(NetworkStateStatus.Default, lastBlock);
-		const currentSlot = Crypto.Slots.getSlotNumber(getTimeStampForBlock);
+		const currentSlot = slots.getSlotNumber();
 
 		for (const peer of peers) {
 			networkState.update(peer, currentSlot);
@@ -132,7 +120,7 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		return JSON.stringify(data, undefined, 2);
 	}
 
-	private setLastBlock(lastBlock: Interfaces.IBlock): void {
+	private setLastBlock(lastBlock: Contracts.Crypto.IBlock): void {
 		this.nodeHeight = lastBlock.data.height;
 		this.lastBlockId = lastBlock.data.id;
 	}

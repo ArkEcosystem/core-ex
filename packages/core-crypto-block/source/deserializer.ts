@@ -1,40 +1,78 @@
-import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { BINDINGS, IBlockData, IBlockDeserializer, ITransaction } from "@arkecosystem/core-crypto-contracts";
+/* eslint-disable sort-keys-fix/sort-keys-fix */
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { TransactionFactory } from "@arkecosystem/core-crypto-transaction";
-import { BigNumber } from "@arkecosystem/utils";
-import ByteBuffer from "bytebuffer";
+import { ByteBuffer } from "@arkecosystem/utils";
 
 import { IDFactory } from "./id.factory";
 
-@Container.injectable()
-export class Deserializer implements IBlockDeserializer {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
-	@Container.inject(BINDINGS.Block.IDFactory)
+@injectable()
+export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
+	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
-	@Container.inject(BINDINGS.Transaction.Factory)
+	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory: TransactionFactory;
+
+	@inject(Identifiers.Cryptography.Serializer)
+	private readonly serializer: Contracts.Serializer.ISerializer;
 
 	public async deserialize(
 		serialized: Buffer,
 		headerOnly = false,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
-	): Promise<{ data: IBlockData; transactions: ITransaction[] }> {
-		const block = {} as IBlockData;
-		let transactions: ITransaction[] = [];
+	): Promise<{ data: Contracts.Crypto.IBlockData; transactions: Contracts.Crypto.ITransaction[] }> {
+		const block = {} as Contracts.Crypto.IBlockData;
+		let transactions: Contracts.Crypto.ITransaction[] = [];
 
-		const buf: ByteBuffer = new ByteBuffer(serialized.length, true);
-		buf.append(serialized);
-		buf.reset();
+		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		this.deserializeHeader(block, buf);
+		await this.serializer.deserialize<Contracts.Crypto.IBlockData>(buffer, block, {
+			length: 512,
+			schema: {
+				version: {
+					type: "uint32",
+				},
+				timestamp: {
+					type: "uint32",
+				},
+				height: {
+					type: "uint32",
+				},
+				previousBlock: {
+					type: "hash",
+				},
+				numberOfTransactions: {
+					type: "uint32",
+				},
+				totalAmount: {
+					type: "bigint",
+				},
+				totalFee: {
+					type: "bigint",
+				},
+				reward: {
+					type: "bigint",
+				},
+				payloadLength: {
+					type: "uint32",
+				},
+				payloadHash: {
+					type: "hash",
+				},
+				generatorPublicKey: {
+					type: "publicKey",
+				},
+				blockSignature: {
+					type: "signature",
+				},
+			},
+		});
 
-		headerOnly = headerOnly || buf.remaining() === 0;
+		headerOnly = headerOnly || buffer.getRemainderLength() === 0;
+
 		if (!headerOnly) {
-			transactions = await this.deserializeTransactions(block, buf, options.deserializeTransactionsUnchecked);
+			transactions = await this.deserializeTransactions(block, buffer, options.deserializeTransactionsUnchecked);
 		}
 
 		block.id = await this.idFactory.make(block);
@@ -42,63 +80,35 @@ export class Deserializer implements IBlockDeserializer {
 		return { data: block, transactions };
 	}
 
-	private deserializeHeader(block: IBlockData, buf: ByteBuffer): void {
-		block.version = buf.readUint32();
-		block.timestamp = buf.readUint32();
-		block.height = buf.readUint32();
-
-		const constants = this.configuration.getMilestone(block.height - 1 || 1);
-
-		if (constants.block.idFullSha256) {
-			const previousBlockFullSha256 = buf.readBytes(32).toString("hex");
-			block.previousBlockHex = previousBlockFullSha256;
-			block.previousBlock = previousBlockFullSha256;
-		} else {
-			block.previousBlockHex = buf.readBytes(8).toString("hex");
-			block.previousBlock = BigNumber.make(`0x${block.previousBlockHex}`).toString();
-		}
-
-		block.numberOfTransactions = buf.readUint32();
-		block.totalAmount = BigNumber.make(buf.readUint64().toString());
-		block.totalFee = BigNumber.make(buf.readUint64().toString());
-		block.reward = BigNumber.make(buf.readUint64().toString());
-		block.payloadLength = buf.readUint32();
-		block.payloadHash = buf.readBytes(32).toString("hex");
-		block.generatorPublicKey = buf.readBytes(33).toString("hex");
-
-		const signatureLength = (): number => {
-			buf.mark();
-
-			const lengthHex: string = buf.skip(1).readBytes(1).toString("hex");
-
-			buf.reset();
-
-			return Number.parseInt(lengthHex, 16) + 2;
-		};
-
-		block.blockSignature = buf.readBytes(signatureLength()).toString("hex");
-	}
-
 	private async deserializeTransactions(
-		block: IBlockData,
+		block: Contracts.Crypto.IBlockData,
 		buf: ByteBuffer,
 		deserializeTransactionsUnchecked = false,
-	): Promise<ITransaction[]> {
-		const transactionLengths: number[] = [];
+	): Promise<Contracts.Crypto.ITransaction[]> {
+		await this.serializer.deserialize<Contracts.Crypto.IBlockData>(buf, block, {
+			schema: {
+				transactions: {
+					type: "transactions",
+				},
+			},
+		});
 
-		for (let index = 0; index < block.numberOfTransactions; index++) {
-			transactionLengths.push(buf.readUint32());
-		}
+		/**
+		 * After unpacking we need to turn the transactions into DTOs!
+		 *
+		 * We keep this behaviour out of the (de)serialiser because it
+		 * is very specific to this bit of code in this specific class.
+		 */
+		const transactions: Contracts.Crypto.ITransaction[] = [];
 
-		const transactions: ITransaction[] = [];
-		block.transactions = [];
-		for (const length of transactionLengths) {
-			const transactionBytes = buf.readBytes(length).toBuffer();
+		for (let index = 0; index < block.transactions.length; index++) {
 			const transaction = deserializeTransactionsUnchecked
-				? await this.transactionFactory.fromBytesUnsafe(transactionBytes)
-				: await this.transactionFactory.fromBytes(transactionBytes);
+				? await this.transactionFactory.fromBytesUnsafe(block.transactions[index] as any)
+				: await this.transactionFactory.fromBytes(block.transactions[index] as any);
+
 			transactions.push(transaction);
-			block.transactions.push(transaction.data);
+
+			block.transactions[index] = transaction.data;
 		}
 
 		return transactions;

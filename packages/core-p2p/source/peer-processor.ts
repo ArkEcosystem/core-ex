@@ -1,38 +1,40 @@
-import { Container, Contracts, Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { isValidPeer } from "@arkecosystem/core-crypto-validation";
+import { Enums, Providers, Utils as KernelUtils } from "@arkecosystem/core-kernel";
 
 import { PeerFactory } from "./contracts";
 import { DisconnectInvalidPeers } from "./listeners";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.PeerCommunicator)
+	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@Container.inject(Container.Identifiers.PeerConnector)
+	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public server: any;
-	public nextUpdateNetworkStatusScheduled: boolean = false;
+	public nextUpdateNetworkStatusScheduled = false;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		this.events.listen(Enums.CryptoEvent.MilestoneChanged, this.app.resolve(DisconnectInvalidPeers));
 	}
@@ -45,7 +47,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		peer: Contracts.P2P.Peer,
 		options: Contracts.P2P.AcceptNewPeerOptions = {},
 	): Promise<void> {
-		/* istanbul ignore else */
 		if (this.validatePeerIp(peer, options)) {
 			await this.acceptNewPeer(peer, options);
 		}
@@ -58,7 +59,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		if (!Utils.isValidPeer(peer) || this.repository.hasPendingPeer(peer.ip)) {
+		if (!isValidPeer(peer) || this.repository.hasPendingPeer(peer.ip)) {
 			return false;
 		}
 
@@ -75,7 +76,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
 
 		if (this.repository.getSameSubnetPeers(peer.ip).length >= maxSameSubnetPeers && !options.seed) {
-			/* istanbul ignore else */
 			if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
 				this.logger.warning(
 					`Rejected ${peer.ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
@@ -93,7 +93,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return;
 		}
 
-		const newPeer: Contracts.P2P.Peer = this.app.get<PeerFactory>(Container.Identifiers.PeerFactory)(peer.ip);
+		const newPeer: Contracts.P2P.Peer = this.app.get<PeerFactory>(Identifiers.PeerFactory)(peer.ip);
 
 		try {
 			this.repository.setPendingPeer(peer);
@@ -104,13 +104,12 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 			this.repository.setPeer(newPeer);
 
-			/* istanbul ignore next */
 			if (!options.lessVerbose || process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
 				this.logger.debug(`Accepted new peer ${newPeer.ip}:${newPeer.port} (v${newPeer.version})`);
 			}
 
 			this.events.dispatch(Enums.PeerEvent.Added, newPeer);
-		} catch (error) {
+		} catch {
 			this.connector.disconnect(newPeer);
 		} finally {
 			this.repository.forgetPendingPeer(peer);

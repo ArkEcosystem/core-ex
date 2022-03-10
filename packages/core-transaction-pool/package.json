@@ -16,15 +16,15 @@
 		"test": "uvu -r tsm source .test.ts"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"better-sqlite3": "7.4.3",
 		"fs-extra": "8.1.0",
 		"joi": "17.4.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"@types/better-sqlite3": "5.4.3",
 		"@types/fs-extra": "8.1.2",
 		"import-fresh": "3.3.0",

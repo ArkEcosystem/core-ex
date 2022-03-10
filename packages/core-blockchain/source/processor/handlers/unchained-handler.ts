@@ -1,5 +1,6 @@
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Services, Utils } from "@arkecosystem/core-kernel";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
 
@@ -12,18 +13,21 @@ enum UnchainedBlockStatus {
 	InvalidTimestamp,
 }
 
-@Container.injectable()
+@injectable()
 export class UnchainedHandler implements BlockHandler {
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	private isValidGenerator: boolean = false;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	private isValidGenerator = false;
 
 	// todo: remove the need for this method
 	public initialize(isValidGenerator: boolean): this {
@@ -32,7 +36,7 @@ export class UnchainedHandler implements BlockHandler {
 		return this;
 	}
 
-	public async execute(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		this.blockchain.resetLastDownloadedBlock();
 
 		this.blockchain.clearQueue();
@@ -41,13 +45,16 @@ export class UnchainedHandler implements BlockHandler {
 
 		switch (status) {
 			case UnchainedBlockStatus.DoubleForging: {
-				const roundInfo: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(block.data.height);
+				const roundInfo: Contracts.Shared.RoundInfo = Utils.roundCalculator.calculateRound(
+					block.data.height,
+					this.configuration,
+				);
 
-				const delegates: Contracts.State.Wallet[] = (await this.triggers.call("getActiveDelegates", {
+				const validators: Contracts.State.Wallet[] = await this.triggers.call("getActiveValidators", {
 					roundInfo,
-				})) as Contracts.State.Wallet[];
+				});
 
-				if (delegates.some((delegate) => delegate.getPublicKey() === block.data.generatorPublicKey)) {
+				if (validators.some((validator) => validator.getPublicKey() === block.data.generatorPublicKey)) {
 					return BlockProcessorResult.Rollback;
 				}
 
@@ -66,8 +73,8 @@ export class UnchainedHandler implements BlockHandler {
 		}
 	}
 
-	private checkUnchainedBlock(block: Interfaces.IBlock): UnchainedBlockStatus {
-		const lastBlock: Interfaces.IBlock = this.blockchain.getLastBlock();
+	private checkUnchainedBlock(block: Contracts.Crypto.IBlock): UnchainedBlockStatus {
+		const lastBlock: Contracts.Crypto.IBlock = this.blockchain.getLastBlock();
 
 		// todo: clean up this if-else-if-else-if-else mess
 		if (block.data.height > lastBlock.data.height + 1) {
@@ -96,7 +103,7 @@ export class UnchainedHandler implements BlockHandler {
 			}
 
 			this.logger.info(
-				`Forked block disregarded because it is not allowed to be forged. Caused by delegate: ${block.data.generatorPublicKey}`,
+				`Forked block disregarded because it is not allowed to be forged. Caused by validator: ${block.data.generatorPublicKey}`,
 			);
 
 			return UnchainedBlockStatus.GeneratorMismatch;

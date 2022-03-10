@@ -1,49 +1,39 @@
-import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import {
-	BINDINGS,
-	IBlock,
-	IBlockData,
-	IBlockJson,
-	IBlockVerification,
-	IHashFactory,
-	ITransaction,
-	ITransactionData,
-	Signatory,
-} from "@arkecosystem/core-crypto-contracts";
-import { Slots } from "@arkecosystem/core-crypto-time";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Serializer } from "./serializer";
+@injectable()
+export class Block implements Contracts.Crypto.IBlock {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-@Container.injectable()
-export class Block implements IBlock {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
-	@Container.inject(BINDINGS.Block.Serializer)
-	private readonly serializer: Serializer; // @TODO: create contract for block serializer
+	@inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@inject(Identifiers.Cryptography.Signature)
+	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
-	@Container.inject(BINDINGS.SignatureFactory)
-	private readonly signatureFactory: Signatory;
-
-	@Container.inject(BINDINGS.Time.Slots)
-	private readonly slots: Slots;
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots: Contracts.Crypto.Slots;
 
 	//  - todo: this is public but not initialised on creation, either make it private or declare it as undefined
 	public serialized: string;
-	public data: IBlockData;
-	public transactions: ITransaction[];
-	public verification: IBlockVerification;
+	public data: Contracts.Crypto.IBlockData;
+	public transactions: Contracts.Crypto.ITransaction[];
+	public verification: Contracts.Crypto.IBlockVerification;
 
-	public constructor(
-		configuration: Configuration,
-		{ data, transactions, id }: { data: IBlockData; transactions: ITransaction[]; id?: string },
-	) {
-		this.configuration = configuration;
+	public async init({
+		data,
+		transactions,
+		id,
+	}: {
+		data: Contracts.Crypto.IBlockData;
+		transactions: Contracts.Crypto.ITransaction[];
+		id?: string;
+	}) {
 		this.data = data;
 
 		// fix on real timestamp, this is overloading transaction
@@ -59,11 +49,13 @@ export class Block implements IBlock {
 
 		delete this.data.transactions;
 
-		this.verification = void this.verify();
+		this.verification = await this.verify();
+
+		return this;
 	}
 
-	public getHeader(): IBlockData {
-		const header: IBlockData = Object.assign({}, this.data);
+	public getHeader(): Contracts.Crypto.IBlockData {
+		const header: Contracts.Crypto.IBlockData = Object.assign({}, this.data);
 
 		delete header.transactions;
 
@@ -71,7 +63,7 @@ export class Block implements IBlock {
 	}
 
 	public async verifySignature(): Promise<boolean> {
-		const bytes: Buffer = this.serializer.serialize(this.data, false);
+		const bytes: Buffer = await this.serializer.serialize(this.data, false);
 		const hash: Buffer = await this.hashFactory.sha256(bytes);
 
 		if (!this.data.blockSignature) {
@@ -85,8 +77,8 @@ export class Block implements IBlock {
 		);
 	}
 
-	public toJson(): IBlockJson {
-		const data: IBlockJson = JSON.parse(JSON.stringify(this.data));
+	public toJson(): Contracts.Crypto.IBlockJson {
+		const data: Contracts.Crypto.IBlockJson = JSON.parse(JSON.stringify(this.data));
 		data.reward = this.data.reward.toString();
 		data.totalAmount = this.data.totalAmount.toString();
 		data.totalFee = this.data.totalFee.toString();
@@ -95,9 +87,9 @@ export class Block implements IBlock {
 		return data;
 	}
 
-	public async verify(): Promise<IBlockVerification> {
-		const block: IBlockData = this.data;
-		const result: IBlockVerification = {
+	public async verify(): Promise<Contracts.Crypto.IBlockVerification> {
+		const block: Contracts.Crypto.IBlockData = this.data;
+		const result: Contracts.Crypto.IBlockVerification = {
 			containsMultiSignatures: false,
 			errors: [],
 			verified: false,
@@ -124,7 +116,7 @@ export class Block implements IBlock {
 				result.errors.push("Invalid block version");
 			}
 
-			if (block.timestamp > this.slots.getTime() + this.configuration.getMilestone(block.height).blocktime) {
+			if (block.timestamp > this.slots.getTime() + this.configuration.getMilestone(block.height).blockTime) {
 				result.errors.push("Invalid block timestamp");
 			}
 
@@ -133,7 +125,7 @@ export class Block implements IBlock {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
 
-			const invalidTransactions: ITransaction[] = this.transactions.filter((tx) => !tx.verified);
+			const invalidTransactions: Contracts.Crypto.ITransaction[] = this.transactions.filter((tx) => !tx.verified);
 			if (invalidTransactions.length > 0) {
 				result.errors.push("One or more transactions are not verified:");
 
@@ -153,7 +145,7 @@ export class Block implements IBlock {
 			}
 
 			// Checking if transactions of the block adds up to block values.
-			const appliedTransactions: Record<string, ITransactionData> = {};
+			const appliedTransactions: Record<string, Contracts.Crypto.ITransactionData> = {};
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;
@@ -176,15 +168,6 @@ export class Block implements IBlock {
 					transaction.data.expiration <= this.data.height
 				) {
 					result.errors.push(`Encountered expired transaction: ${transaction.data.id}`);
-				}
-
-				if (transaction.data.version === 1) {
-					const now: number = block.timestamp;
-					if (transaction.data.timestamp > now + 3600 + constants.blocktime) {
-						result.errors.push(`Encountered future transaction: ${transaction.data.id}`);
-					} else if (now - transaction.data.timestamp > 21_600) {
-						result.errors.push(`Encountered expired transaction: ${transaction.data.id}`);
-					}
 				}
 
 				appliedTransactions[transaction.data.id] = transaction.data;

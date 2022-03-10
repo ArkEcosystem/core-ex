@@ -1,15 +1,17 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import winston from "winston";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 import { inspect } from "util";
+import winston from "winston";
 
-@Container.injectable()
+@injectable()
 export class Logger implements Contracts.Kernel.Logger {
 	#logger: winston.Logger;
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#logger = winston.createLogger({
-			level: options.levels.console,
 			format: winston.format.json(),
+			level: options.levels.console,
 			transports: [
 				new winston.transports.Console({
 					format: winston.format.simple(),

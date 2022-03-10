@@ -1,80 +1,73 @@
-import { Container, Contracts, Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { NetworkStateStatus } from "@arkecosystem/core-p2p";
-import { Handlers } from "@arkecosystem/core-transactions";
-import { Blocks, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
-
-import { Client } from "./client";
-import { HostNoResponseError, RelayCommunicationError } from "./errors";
-import { Delegate } from "./interfaces";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Enums, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 // todo: review the implementation - quite a mess right now with quite a few responsibilities
-@Container.injectable()
+@injectable()
 export class ForgerService {
-	@Container.inject(Container.Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
+	@inject(Identifiers.Application)
+	private readonly app: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.BlockchainService)
+	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerProvider)
-	private readonly handlerProvider!: Handlers.TransactionHandlerProvider;
+	@inject(Identifiers.EventDispatcherService)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	private client!: Client;
+	@inject(Identifiers.LogService)
+	private readonly logger: Contracts.Kernel.Logger;
 
-	private delegates: Delegate[] = [];
+	@inject(Identifiers.PeerNetworkMonitor)
+	private readonly peerNetworkMonitor!: Contracts.P2P.NetworkMonitor;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	private validators: Contracts.Forger.Validator[] = [];
 
 	private usernames: { [key: string]: string } = {};
 
-	private isStopped: boolean = false;
+	private isStopped = false;
 
 	private round: Contracts.P2P.CurrentRound | undefined;
 
-	private lastForgedBlock: Interfaces.IBlock | undefined;
+	private initialized = false;
 
-	private initialized: boolean = false;
-
-	private logAppReady: boolean = true;
+	private logAppReady = true;
 
 	public getRound(): Contracts.P2P.CurrentRound | undefined {
 		return this.round;
 	}
 
 	public getRemainingSlotTime(): number | undefined {
-		return this.round ? this.getRoundRemainingSlotTime(this.round) : undefined;
-	}
+		if (this.round) {
+			const { blockTime } = this.configuration.getMilestone(this.round.lastBlock.height);
 
-	public getLastForgedBlock(): Interfaces.IBlock | undefined {
-		return this.lastForgedBlock;
-	}
-
-	public register(options): void {
-		this.client = this.app.resolve<Client>(Client);
-		this.client.register(options.hosts);
-	}
-
-	public async boot(delegates: Delegate[]): Promise<void> {
-		if (this.handlerProvider.isRegistrationRequired()) {
-			this.handlerProvider.registerHandlers();
+			return this.round.timestamp * 1000 + blockTime * 1000 - Date.now();
 		}
 
-		this.delegates = delegates;
+		return undefined;
+	}
 
-		let timeout: number = 2000;
+	public async boot(validators: Contracts.Forger.Validator[]): Promise<void> {
+		this.validators = validators;
+
+		let timeout = 2000;
 		try {
-			await this.loadRound();
+			await this.#loadRound();
+
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
-			timeout = Math.max(0, this.getRoundRemainingSlotTime(this.round));
-		} catch (error) {
+
+			timeout = Math.max(0, this.getRemainingSlotTime());
+		} catch {
 			this.logger.warning("Waiting for a responsive host");
 		} finally {
-			this.checkLater(timeout);
+			this.#checkLater(timeout);
 		}
 	}
 
 	public async dispose(): Promise<void> {
 		this.isStopped = true;
-
-		this.client.dispose();
 	}
 
 	public async checkSlot(): Promise<void> {
@@ -83,36 +76,38 @@ export class ForgerService {
 				return;
 			}
 
-			await this.loadRound();
+			await this.#loadRound();
 
 			AppUtils.assert.defined<Contracts.P2P.CurrentRound>(this.round);
 
 			if (!this.round.canForge) {
 				// basically looping until we lock at beginning of next slot
-				return this.checkLater(200);
+				return this.#checkLater(200);
 			}
 
 			AppUtils.assert.defined<string>(this.round.currentForger.publicKey);
 
-			const delegate: Delegate | undefined = this.isActiveDelegate(this.round.currentForger.publicKey);
+			const validator: Contracts.Forger.Validator | undefined = this.#isActiveValidator(
+				this.round.currentForger.publicKey,
+			);
 
-			if (!delegate) {
+			if (!validator) {
 				AppUtils.assert.defined<string>(this.round.nextForger.publicKey);
 
-				if (this.isActiveDelegate(this.round.nextForger.publicKey)) {
+				if (this.#isActiveValidator(this.round.nextForger.publicKey)) {
 					const username = this.usernames[this.round.nextForger.publicKey];
 
 					this.logger.info(
-						`Next forging delegate ${username} (${this.round.nextForger.publicKey}) is active on this node.`,
+						`Next forging validator ${username} (${this.round.nextForger.publicKey}) is active on this node.`,
 					);
 
-					await this.client.syncWithNetwork();
+					await this.blockchain.forceWakeup();
 				}
 
-				return this.checkLater(this.getRoundRemainingSlotTime(this.round));
+				return this.#checkLater(this.getRemainingSlotTime());
 			}
 
-			const networkState: Contracts.P2P.NetworkState = await this.client.getNetworkState();
+			const networkState: Contracts.P2P.NetworkState = await this.peerNetworkMonitor.getNetworkState();
 
 			if (networkState.getNodeHeight() !== this.round.lastBlock.height) {
 				this.logger.warning(
@@ -124,21 +119,25 @@ export class ForgerService {
 
 			if (
 				await this.app
-					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-					.call("isForgingAllowed", { forgerService: this, delegate, networkState })
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.call("isForgingAllowed", { forgerService: this, networkState, validator })
 			) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-					.call("forgeNewBlock", { forgerService: this, delegate, round: this.round, networkState });
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.call("forgeNewBlock", { forgerService: this, networkState, round: this.round, validator });
 			}
 
 			this.logAppReady = true;
 
-			return this.checkLater(this.getRoundRemainingSlotTime(this.round));
+			return this.#checkLater(this.getRemainingSlotTime());
 		} catch (error) {
-			if (error instanceof HostNoResponseError || error instanceof RelayCommunicationError) {
+			console.log(error);
+
+			if (
+				error instanceof Exceptions.HostNoResponseError ||
+				error instanceof Exceptions.RelayCommunicationError
+			) {
 				if (error.message.includes("blockchain isn't ready") || error.message.includes("App is not ready")) {
-					/* istanbul ignore else */
 					if (this.logAppReady) {
 						this.logger.info("Waiting for relay to become ready.");
 						this.logAppReady = false;
@@ -155,147 +154,36 @@ export class ForgerService {
 					);
 				}
 
-				this.client.emitEvent(Enums.ForgerEvent.Failed, { error: error.message });
+				await this.events.dispatch(Enums.ForgerEvent.Failed, { error: error.message });
 			}
 
 			// no idea when this will be ok, so waiting 2s before checking again
-			return this.checkLater(2000);
+			return this.#checkLater(2000);
 		}
 	}
 
-	public async forgeNewBlock(
-		delegate: Delegate,
-		round: Contracts.P2P.CurrentRound,
-		networkState: Contracts.P2P.NetworkState,
-	): Promise<void> {
-		AppUtils.assert.defined<number>(networkState.getNodeHeight());
-		Managers.configManager.setHeight(networkState.getNodeHeight()!);
-
-		const transactions: Interfaces.ITransactionData[] = await this.getTransactionsForForging();
-
-		const block: Interfaces.IBlock | undefined = delegate.forge(transactions, {
-			previousBlock: {
-				id: networkState.getLastBlockId(),
-				idHex: Managers.configManager.getMilestone().block.idFullSha256
-					? networkState.getLastBlockId()
-					: Blocks.Block.toBytesHex(networkState.getLastBlockId()),
-				height: networkState.getNodeHeight(),
-			},
-			timestamp: round.timestamp,
-			reward: round.reward,
-		});
-
-		AppUtils.assert.defined<Interfaces.IBlock>(block);
-		AppUtils.assert.defined<string>(delegate.publicKey);
-
-		const minimumMs = 2000;
-		const timeLeftInMs: number = this.getRoundRemainingSlotTime(round);
-		const prettyName = `${this.usernames[delegate.publicKey]} (${delegate.publicKey})`;
-
-		if (timeLeftInMs >= minimumMs) {
-			this.logger.info(`Forged new block ${block.data.id} by delegate ${prettyName}`);
-
-			await this.client.broadcastBlock(block);
-
-			this.lastForgedBlock = block;
-			this.client.emitEvent(Enums.BlockEvent.Forged, block.data);
-
-			for (const transaction of transactions) {
-				this.client.emitEvent(Enums.TransactionEvent.Forged, transaction);
-			}
-		} else if (timeLeftInMs > 0) {
-			this.logger.warning(
-				`Failed to forge new block by delegate ${prettyName}, because there were ${timeLeftInMs}ms left in the current slot (less than ${minimumMs}ms).`,
-			);
-		} else {
-			this.logger.warning(`Failed to forge new block by delegate ${prettyName}, because already in next slot.`);
-		}
+	#isActiveValidator(publicKey: string): Contracts.Forger.Validator | undefined {
+		return this.validators.find((validator) => validator.publicKey === publicKey);
 	}
 
-	public async getTransactionsForForging(): Promise<Interfaces.ITransactionData[]> {
-		const response = await this.client.getTransactions();
-		if (AppUtils.isEmpty(response)) {
-			this.logger.error("Could not get unconfirmed transactions from transaction pool.");
-			return [];
-		}
-		const transactions = response.transactions.map(
-			(hex) => Transactions.TransactionFactory.fromBytesUnsafe(Buffer.from(hex, "hex")).data,
-		);
-		this.logger.debug(
-			`Received ${AppUtils.pluralize("transaction", transactions.length, true)} ` +
-				`from the pool containing ${AppUtils.pluralize("transaction", response.poolSize, true)} total`,
-		);
-		return transactions;
-	}
+	async #loadRound(): Promise<void> {
+		this.round = await this.app.get<Services.Triggers.Triggers>(Identifiers.TriggerService).call("getCurrentRound");
 
-	public isForgingAllowed(networkState: Contracts.P2P.NetworkState, delegate: Delegate): boolean {
-		if (networkState.status === NetworkStateStatus.Unknown) {
-			this.logger.info("Failed to get network state from client. Will not forge.");
-			return false;
-		} else if (networkState.status === NetworkStateStatus.ColdStart) {
-			this.logger.info("Skipping slot because of cold start. Will not forge.");
-			return false;
-		} else if (networkState.status === NetworkStateStatus.BelowMinimumPeers) {
-			this.logger.info("Network reach is not sufficient to get quorum. Will not forge.");
-			return false;
-		}
-
-		const overHeightBlockHeaders: Array<{
-			[id: string]: any;
-		}> = networkState.getOverHeightBlockHeaders();
-		if (overHeightBlockHeaders.length > 0) {
-			this.logger.info(
-				`Detected ${AppUtils.pluralize(
-					"distinct overheight block header",
-					overHeightBlockHeaders.length,
-					true,
-				)}.`,
-			);
-
-			for (const overHeightBlockHeader of overHeightBlockHeaders) {
-				if (overHeightBlockHeader.generatorPublicKey === delegate.publicKey) {
-					AppUtils.assert.defined<string>(delegate.publicKey);
-
-					const username: string = this.usernames[delegate.publicKey];
-
-					this.logger.warning(
-						`Possible double forging delegate: ${username} (${delegate.publicKey}) - Block: ${overHeightBlockHeader.id}.`,
-					);
-				}
-			}
-		}
-
-		if (networkState.getQuorum() < 0.66) {
-			this.logger.info("Not enough quorum to forge next block. Will not forge.");
-			this.logger.debug(`Network State: ${networkState.toJson()}`);
-
-			return false;
-		}
-
-		return true;
-	}
-
-	private isActiveDelegate(publicKey: string): Delegate | undefined {
-		return this.delegates.find((delegate) => delegate.publicKey === publicKey);
-	}
-
-	private async loadRound(): Promise<void> {
-		this.round = await this.client.getRound();
-
-		this.usernames = this.round.delegates.reduce((acc, wallet) => {
+		this.usernames = this.round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
 
-			return Object.assign(acc, {
-				[wallet.publicKey]: wallet.delegate.username,
+			return Object.assign(accumulator, {
+				[wallet.publicKey]: wallet.validator.username,
 			});
 		}, {});
 
-		if (!this.initialized) {
-			this.printLoadedDelegates();
+		this.app.rebind(Identifiers.Forger.Usernames).toConstantValue(this.usernames);
 
-			// @ts-ignore
-			this.client.emitEvent(Enums.ForgerEvent.Started, {
-				activeDelegates: this.delegates.map((delegate) => delegate.publicKey),
+		if (!this.initialized) {
+			this.#printLoadedValidators();
+
+			await this.events.dispatch(Enums.ForgerEvent.Started, {
+				activeValidators: this.validators.map((validator) => validator.publicKey),
 			});
 
 			this.logger.info(`Forger Manager started.`);
@@ -304,48 +192,37 @@ export class ForgerService {
 		this.initialized = true;
 	}
 
-	private checkLater(timeout: number): void {
+	#checkLater(timeout: number): void {
 		setTimeout(() => this.checkSlot(), timeout);
 	}
 
-	private printLoadedDelegates(): void {
-		const activeDelegates: Delegate[] = this.delegates.filter((delegate) => {
-			AppUtils.assert.defined<string>(delegate.publicKey);
+	#printLoadedValidators(): void {
+		const activeValidators: Contracts.Forger.Validator[] = this.validators.filter((validator) => {
+			AppUtils.assert.defined<string>(validator.publicKey);
 
-			return this.usernames.hasOwnProperty(delegate.publicKey);
+			return this.usernames.hasOwnProperty(validator.publicKey);
 		});
 
-		if (activeDelegates.length > 0) {
-			this.logger.info(
-				`Loaded ${AppUtils.pluralize("active delegate", activeDelegates.length, true)}: ${activeDelegates
-					.map(({ publicKey }) => {
-						AppUtils.assert.defined<string>(publicKey);
+		if (activeValidators.length > 0) {
+			for (const { publicKey } of activeValidators) {
+				this.logger.info(`Loaded validator ${this.usernames[publicKey]} (${publicKey})`);
+			}
 
-						return `${this.usernames[publicKey]} (${publicKey})`;
-					})
-					.join(", ")}`,
-			);
+			this.logger.info(`Loaded ${AppUtils.pluralize("validator", activeValidators.length, true)}.`);
 		}
 
-		if (this.delegates.length > activeDelegates.length) {
-			const inactiveDelegates: (string | undefined)[] = this.delegates
-				.filter((delegate) => !activeDelegates.includes(delegate))
-				.map((delegate) => delegate.publicKey);
+		if (this.validators.length > activeValidators.length) {
+			const inactiveValidators: (string | undefined)[] = this.validators
+				.filter((validator) => !activeValidators.includes(validator))
+				.map((validator) => validator.publicKey);
 
 			this.logger.info(
 				`Loaded ${AppUtils.pluralize(
-					"inactive delegate",
-					inactiveDelegates.length,
+					"inactive validator",
+					inactiveValidators.length,
 					true,
-				)}: ${inactiveDelegates.join(", ")}`,
+				)}: ${inactiveValidators.join(", ")}`,
 			);
 		}
-	}
-
-	private getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
-		const epoch = new Date(Managers.configManager.getMilestone(1).epoch).getTime();
-		const blocktime = Managers.configManager.getMilestone(round.lastBlock.height).blocktime;
-
-		return epoch + round.timestamp * 1000 + blocktime * 1000 - Date.now();
 	}
 }

@@ -1,57 +1,40 @@
-import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import {
-	BINDINGS,
-	IBlock,
-	IBlockData,
-	IBlockFactory,
-	IBlockJson,
-	IHashFactory,
-	IKeyPair,
-	ITransaction,
-	IValidator,
-	Signatory,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Block } from "./block";
 import { INTERNAL_FACTORY, InternalFactory } from "./container";
 import { Deserializer } from "./deserializer";
-import { BlockSchemaError } from "./errors";
 import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
 
-@Container.injectable()
-export class BlockFactory implements IBlockFactory {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
-	@Container.inject(BINDINGS.Block.Serializer)
+@injectable()
+export class BlockFactory implements Contracts.Crypto.IBlockFactory {
+	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer: Serializer; // @TODO: create contract for block serializer
 
-	@Container.inject(BINDINGS.Block.Deserializer)
+	@inject(Identifiers.Cryptography.Block.Deserializer)
 	private readonly deserializer: Deserializer; // @TODO: create contract for block deserializer
 
-	@Container.inject(INTERNAL_FACTORY)
+	@inject(INTERNAL_FACTORY)
 	private readonly blockFactory: InternalFactory; // @TODO: create contract for block deserializer
 
-	@Container.inject(BINDINGS.Block.IDFactory)
+	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory: IDFactory;
 
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
-	@Container.inject(BINDINGS.SignatureFactory)
-	private readonly signatureFactory: Signatory;
+	@inject(Identifiers.Cryptography.Signature)
+	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
-	@Container.inject(BINDINGS.Validator)
-	private readonly validator: IValidator;
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator: Contracts.Crypto.IValidator;
 
 	// @todo: add a proper type hint for data
-	public async make(data: any, keys: IKeyPair): Promise<IBlock | undefined> {
+	public async make(data: any, keys: Contracts.Crypto.IKeyPair): Promise<Contracts.Crypto.IBlock | undefined> {
 		data.generatorPublicKey = keys.publicKey;
 
-		const payloadHash: Buffer = this.serializer.serialize(data, false);
+		const payloadHash: Buffer = await this.serializer.serialize(data, false);
 		const hash: Buffer = await this.hashFactory.sha256(payloadHash);
 
 		data.blockSignature = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
@@ -61,17 +44,17 @@ export class BlockFactory implements IBlockFactory {
 		return this.fromData(data);
 	}
 
-	public async fromHex(hex: string): Promise<IBlock> {
+	public async fromHex(hex: string): Promise<Contracts.Crypto.IBlock> {
 		return this.fromSerialized(Buffer.from(hex, "hex"));
 	}
 
-	public async fromBytes(buff: Buffer): Promise<IBlock> {
+	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.IBlock> {
 		return this.fromSerialized(buff);
 	}
 
-	public async fromJson(json: IBlockJson): Promise<IBlock | undefined> {
+	public async fromJson(json: Contracts.Crypto.IBlockJson): Promise<Contracts.Crypto.IBlock | undefined> {
 		// @ts-ignore
-		const data: IBlockData = { ...json };
+		const data: Contracts.Crypto.IBlockData = { ...json };
 		data.totalAmount = BigNumber.make(data.totalAmount);
 		data.totalFee = BigNumber.make(data.totalFee);
 		data.reward = BigNumber.make(data.reward);
@@ -80,6 +63,7 @@ export class BlockFactory implements IBlockFactory {
 			for (const transaction of data.transactions) {
 				transaction.amount = BigNumber.make(transaction.amount);
 				transaction.fee = BigNumber.make(transaction.fee);
+				transaction.nonce = BigNumber.make(transaction.nonce);
 			}
 		}
 
@@ -87,41 +71,38 @@ export class BlockFactory implements IBlockFactory {
 	}
 
 	public async fromData(
-		data: IBlockData,
+		data: Contracts.Crypto.IBlockData,
 		options: { deserializeTransactionsUnchecked?: boolean } = {},
-	): Promise<IBlock | undefined> {
-		if (await this.#applySchema(data)) {
-			const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
-			const block: IBlock = this.blockFactory({
-				...(await this.deserializer.deserialize(serialized, false, options)),
-				id: data.id,
-			});
-			block.serialized = serialized.toString("hex");
+	): Promise<Contracts.Crypto.IBlock | undefined> {
+		await this.#applySchema(data);
 
-			return block;
-		}
-
-		return undefined;
-	}
-
-	private async fromSerialized(serialized: Buffer): Promise<IBlock> {
-		const deserialized: { data: IBlockData; transactions: ITransaction[] } = await this.deserializer.deserialize(
-			serialized,
-		);
-
-		const validated: IBlockData | undefined = await this.#applySchema(deserialized.data);
-
-		if (validated) {
-			deserialized.data = validated;
-		}
-
-		const block: IBlock = new Block(this.configuration, deserialized);
+		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
+		const block: Contracts.Crypto.IBlock = await this.blockFactory({
+			...(await this.deserializer.deserialize(serialized, false, options)),
+			id: data.id,
+		});
 		block.serialized = serialized.toString("hex");
 
 		return block;
 	}
 
-	async #applySchema(data: IBlockData): Promise<IBlockData | undefined> {
+	private async fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.IBlock> {
+		const deserialized: { data: Contracts.Crypto.IBlockData; transactions: Contracts.Crypto.ITransaction[] } =
+			await this.deserializer.deserialize(serialized);
+
+		const validated: Contracts.Crypto.IBlockData | undefined = await this.#applySchema(deserialized.data);
+
+		if (validated) {
+			deserialized.data = validated;
+		}
+
+		const block: Contracts.Crypto.IBlock = await this.blockFactory(deserialized);
+		block.serialized = serialized.toString("hex");
+
+		return block;
+	}
+
+	async #applySchema(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockData | undefined> {
 		const result = await this.validator.validate("block", data);
 
 		if (!result.error) {
@@ -147,7 +128,7 @@ export class BlockFactory implements IBlockFactory {
 			}
 
 			if (fatal) {
-				throw new BlockSchemaError(
+				throw new Exceptions.BlockSchemaError(
 					data.height,
 					`Invalid data${error.dataPath ? " at " + error.dataPath : ""}: ` +
 						`${error.message}: ${JSON.stringify(error.data)}`,

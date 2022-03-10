@@ -1,21 +1,19 @@
-import { existsSync, removeSync, writeFileSync } from "fs-extra";
+// eslint-disable-next-line simple-import-sort/imports
 import { join } from "path";
+import { Identifiers, Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { existsSync, removeSync, writeFileSync } from "fs-extra";
 
-import * as Bootstrappers from "./bootstrap";
+import { Bootstrappers } from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
-import * as Contracts from "./contracts";
 import { KernelEvent } from "./enums";
-import { DirectoryCannotBeFound } from "./exceptions/filesystem";
-import { Identifiers } from "./ioc";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
-// import { ShutdownSignal } from "./enums/process";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
 import { JsonObject, KeyValuePair } from "./types";
 import { Constructor } from "./types/container";
 
 export class Application implements Contracts.Kernel.Application {
-	private booted: boolean = false;
+	private booted = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
 		// todo: enable this after solving the event emitter limit issues
@@ -154,7 +152,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public enableMaintenance(): void {
-		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: +new Date() }));
+		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
 
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
 
@@ -234,15 +232,15 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	private async bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Array<Constructor<Bootstrapper>> = Object.values(Bootstrappers[type]);
+		const bootstrappers: Constructor<Bootstrapper>[] = Object.values(Bootstrappers[type]);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
 
 		for (const bootstrapper of bootstrappers) {
-			events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
+			await events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
 
 			await this.resolve<Bootstrapper>(bootstrapper).bootstrap();
 
-			events.dispatch(KernelEvent.Bootstrapped, { bootstrapper: bootstrapper.name });
+			await events.dispatch(KernelEvent.Bootstrapped, { bootstrapper: bootstrapper.name });
 		}
 	}
 
@@ -268,7 +266,7 @@ export class Application implements Contracts.Kernel.Application {
 		const path: string = this.get<string>(`path.${type}`);
 
 		if (!existsSync(path)) {
-			throw new DirectoryCannotBeFound(path);
+			throw new Exceptions.DirectoryCannotBeFound(path);
 		}
 
 		return path;
@@ -276,7 +274,7 @@ export class Application implements Contracts.Kernel.Application {
 
 	private usePath(type: string, path: string): void {
 		if (!existsSync(path)) {
-			throw new DirectoryCannotBeFound(path);
+			throw new Exceptions.DirectoryCannotBeFound(path);
 		}
 
 		this.rebind<string>(`path.${type}`).toConstantValue(path);

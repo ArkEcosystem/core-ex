@@ -1,20 +1,19 @@
-import { Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
 
-let mockTransactions: Partial<Transactions.Transaction>[] = [];
+let mockTransactions: Partial<Contracts.Crypto.ITransaction>[] = [];
 
-export const setTransactions = (transactions: Partial<Interfaces.ITransaction>[]) => {
+export const setTransactions = (transactions: Partial<Contracts.Crypto.ITransaction>[]) => {
 	mockTransactions = transactions;
 };
 
 export class CustomQueryIterable implements Partial<Contracts.TransactionPool.QueryIterable> {
-	public transactions: Interfaces.ITransaction[];
+	public transactions: Contracts.Crypto.ITransaction[];
 
 	public constructor(items) {
 		this.transactions = items;
 	}
 
-	public *[Symbol.iterator](): Iterator<Interfaces.ITransaction> {
+	public *[Symbol.iterator](): Iterator<Contracts.Crypto.ITransaction> {
 		for (const transaction of this.transactions) {
 			yield transaction;
 		}
@@ -28,7 +27,7 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 		return this.transactions.length > 0;
 	}
 
-	public first(): Interfaces.ITransaction {
+	public first(): Contracts.Crypto.ITransaction {
 		return this.transactions[0];
 	}
 }

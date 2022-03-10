@@ -1,19 +1,23 @@
-import { Container, Contracts, Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto, Interfaces } from "@arkecosystem/crypto";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Providers, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
-@Container.injectable()
+@injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
-	private readonly configuration!: Providers.PluginConfiguration;
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	public canExpire(transaction: Interfaces.ITransaction): boolean {
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots: Contracts.Crypto.Slots;
+
+	public canExpire(transaction: Contracts.Crypto.ITransaction): boolean {
 		if (transaction.data.version && transaction.data.version >= 2) {
 			return !!transaction.data.expiration;
 		} else {
@@ -21,7 +25,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		}
 	}
 
-	public async isExpired(transaction: Interfaces.ITransaction): Promise<boolean> {
+	public async isExpired(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
 		if (this.canExpire(transaction)) {
 			return (await this.getExpirationHeight(transaction)) <= this.stateStore.getLastHeight() + 1;
 		} else {
@@ -29,18 +33,16 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		}
 	}
 
-	public async getExpirationHeight(transaction: Interfaces.ITransaction): Promise<number> {
+	public async getExpirationHeight(transaction: Contracts.Crypto.ITransaction): Promise<number> {
 		if (transaction.data.version && transaction.data.version >= 2) {
 			AppUtils.assert.defined<number>(transaction.data.expiration);
 			return transaction.data.expiration;
 		} else {
-			// ! dynamic block time wasn't available during v1 times
 			const currentHeight: number = this.stateStore.getLastHeight();
-			const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, currentHeight);
 
-			const createdSecondsAgo: number = Crypto.Slots.getTime() - transaction.data.timestamp;
-			const createdBlocksAgo: number = Crypto.Slots.getSlotNumber(blockTimeLookup, createdSecondsAgo);
-			const maxTransactionAge: number = this.configuration.getRequired<number>("maxTransactionAge");
+			const createdSecondsAgo: number = this.slots.getTime() - transaction.data.timestamp;
+			const createdBlocksAgo: number = await this.slots.getSlotNumber(createdSecondsAgo);
+			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 
 			return Math.floor(currentHeight - createdBlocksAgo + maxTransactionAge);
 		}

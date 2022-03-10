@@ -1,9 +1,9 @@
-import { Repositories } from "@arkecosystem/core-database";
-import { Container, Contracts, Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces } from "@arkecosystem/crypto";
-import { BlockProcessorResult } from "./contracts";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Services, Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
+import { BlockProcessorResult } from "./contracts";
 import {
 	AcceptBlockHandler,
 	AlreadyForgedHandler,
@@ -14,31 +14,37 @@ import {
 	VerificationFailedHandler,
 } from "./handlers";
 
-@Container.injectable()
+@injectable()
 export class BlockProcessor {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.DatabaseTransactionRepository)
-	private readonly transactionRepository!: Repositories.TransactionRepository;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
-	@Container.inject(Container.Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	public async process(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots: Contracts.Crypto.Slots;
+
+	public async process(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		if (!(await this.verifyBlock(block))) {
 			return this.app.resolve<VerificationFailedHandler>(VerificationFailedHandler).execute(block);
 		}
@@ -51,13 +57,11 @@ export class BlockProcessor {
 			return this.app.resolve<NonceOutOfOrderHandler>(NonceOutOfOrderHandler).execute();
 		}
 
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.data.height);
-
 		const isValidGenerator: boolean = await this.validateGenerator(block);
-		const isChained: boolean = AppUtils.isBlockChained(
+		const isChained: boolean = await AppUtils.isBlockChained(
 			this.blockchain.getLastBlock().data,
 			block.data,
-			blockTimeLookup,
+			this.slots,
 		);
 		if (!isChained) {
 			return this.app.resolve<UnchainedHandler>(UnchainedHandler).initialize(isValidGenerator).execute(block);
@@ -75,12 +79,12 @@ export class BlockProcessor {
 		return this.app.resolve<AcceptBlockHandler>(AcceptBlockHandler).execute(block);
 	}
 
-	private async verifyBlock(block: Interfaces.IBlock): Promise<boolean> {
+	private async verifyBlock(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		if (block.verification.containsMultiSignatures) {
 			try {
 				for (const transaction of block.transactions) {
-					const registry = this.app.getTagged<Handlers.Registry>(
-						Container.Identifiers.TransactionHandlerRegistry,
+					const registry = this.app.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
+						Identifiers.TransactionHandlerRegistry,
 						"state",
 						"blockchain",
 					);
@@ -88,7 +92,7 @@ export class BlockProcessor {
 					await handler.verify(transaction);
 				}
 
-				block.verification = block.verify();
+				block.verification = await block.verify();
 			} catch (error) {
 				this.logger.warning(`Failed to verify block, because: ${error.message}`);
 				block.verification.verified = false;
@@ -111,7 +115,7 @@ export class BlockProcessor {
 		return true;
 	}
 
-	private async checkBlockContainsForgedTransactions(block: Interfaces.IBlock): Promise<boolean> {
+	private async checkBlockContainsForgedTransactions(block: Contracts.Crypto.IBlock): Promise<boolean> {
 		if (block.transactions.length > 0) {
 			const transactionIds = block.transactions.map((tx) => {
 				AppUtils.assert.defined<string>(tx.id);
@@ -119,7 +123,7 @@ export class BlockProcessor {
 				return tx.id;
 			});
 
-			const forgedIds: string[] = await this.transactionRepository.getForgedTransactionsIds(transactionIds);
+			const forgedIds: string[] = await this.databaseService.getForgedTransactionsIds(transactionIds);
 
 			if (this.stateStore.getLastBlock().data.height !== this.stateStore.getLastStoredBlockHeight()) {
 				const transactionIdsSet = new Set<string>(transactionIds);
@@ -127,17 +131,16 @@ export class BlockProcessor {
 				for (const stateBlock of this.stateStore
 					.getLastBlocks()
 					.filter((block) => block.data.height > this.stateStore.getLastStoredBlockHeight())) {
-					stateBlock.transactions.forEach((tx) => {
+					for (const tx of stateBlock.transactions) {
 						AppUtils.assert.defined<string>(tx.id);
 
 						if (transactionIdsSet.has(tx.id)) {
 							forgedIds.push(tx.id);
 						}
-					});
+					}
 				}
 			}
 
-			/* istanbul ignore else */
 			if (forgedIds.length > 0) {
 				this.logger.warning(
 					`Block ${block.data.height.toLocaleString()} disregarded, because it contains already forged transactions`,
@@ -152,9 +155,9 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private blockContainsIncompatibleTransactions(block: Interfaces.IBlock): boolean {
-		for (let i = 1; i < block.transactions.length; i++) {
-			if (block.transactions[i].data.version !== block.transactions[0].data.version) {
+	private blockContainsIncompatibleTransactions(block: Contracts.Crypto.IBlock): boolean {
+		for (let index = 1; index < block.transactions.length; index++) {
+			if (block.transactions[index].data.version !== block.transactions[0].data.version) {
 				return true;
 			}
 		}
@@ -162,7 +165,7 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private blockContainsOutOfOrderNonce(block: Interfaces.IBlock): boolean {
+	private blockContainsOutOfOrderNonce(block: Contracts.Crypto.IBlock): boolean {
 		const nonceBySender = {};
 
 		for (const transaction of block.transactions) {
@@ -182,7 +185,7 @@ export class BlockProcessor {
 
 			AppUtils.assert.defined<string>(data.nonce);
 
-			const nonce: AppUtils.BigNumber = data.nonce;
+			const nonce: BigNumber = BigNumber.make(data.nonce);
 
 			if (!nonceBySender[sender].plus(1).isEqualTo(nonce)) {
 				this.logger.warning(
@@ -200,61 +203,64 @@ export class BlockProcessor {
 		return false;
 	}
 
-	private async validateGenerator(block: Interfaces.IBlock): Promise<boolean> {
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, block.data.height);
-
-		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(block.data.height);
-		const delegates: Contracts.State.Wallet[] = await this.triggers.call("getActiveDelegates", {
+	private async validateGenerator(block: Contracts.Crypto.IBlock): Promise<boolean> {
+		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(
+			block.data.height,
+			this.configuration,
+		);
+		const validators: Contracts.State.Wallet[] = await this.triggers.call("getActiveValidators", {
 			roundInfo,
 		});
 
-		const forgingInfo: Contracts.Shared.ForgingInfo = AppUtils.forgingInfoCalculator.calculateForgingInfo(
+		const forgingInfo: Contracts.Shared.ForgingInfo = await AppUtils.forgingInfoCalculator.calculateForgingInfo(
 			block.data.timestamp,
 			block.data.height,
-			blockTimeLookup,
+			this.app,
 		);
 
-		const forgingDelegate: Contracts.State.Wallet = delegates[forgingInfo.currentForger];
+		const forgingValidator: Contracts.State.Wallet = validators[forgingInfo.currentForger];
 
 		const walletRepository = this.app.getTagged<Contracts.State.WalletRepository>(
-			Container.Identifiers.WalletRepository,
+			Identifiers.WalletRepository,
 			"state",
 			"blockchain",
 		);
-		const generatorWallet: Contracts.State.Wallet = walletRepository.findByPublicKey(block.data.generatorPublicKey);
+		const generatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+			block.data.generatorPublicKey,
+		);
 
 		let generatorUsername: string;
 		try {
-			generatorUsername = generatorWallet.getAttribute("delegate.username");
+			generatorUsername = generatorWallet.getAttribute("validator.username");
 		} catch {
 			return false;
 		}
 
-		if (!forgingDelegate) {
+		if (!forgingValidator) {
 			this.logger.debug(
-				`Could not decide if delegate ${generatorUsername} (${
+				`Could not decide if validator ${generatorUsername} (${
 					block.data.generatorPublicKey
 				}) is allowed to forge block ${block.data.height.toLocaleString()}`,
 			);
-		} /* istanbul ignore next */ else if (forgingDelegate.getPublicKey() !== block.data.generatorPublicKey) {
-			AppUtils.assert.defined<string>(forgingDelegate.getPublicKey());
+		} else if (forgingValidator.getPublicKey() !== block.data.generatorPublicKey) {
+			AppUtils.assert.defined<string>(forgingValidator.getPublicKey());
 
-			const forgingWallet: Contracts.State.Wallet = walletRepository.findByPublicKey(
-				forgingDelegate.getPublicKey()!,
+			const forgingWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+				forgingValidator.getPublicKey()!,
 			);
-			const forgingUsername: string = forgingWallet.getAttribute("delegate.username");
+			const forgingUsername: string = forgingWallet.getAttribute("validator.username");
 
 			this.logger.warning(
-				`Delegate ${generatorUsername} (${
+				`Validator ${generatorUsername} (${
 					block.data.generatorPublicKey
-				}) not allowed to forge, should be ${forgingUsername} (${forgingDelegate.getPublicKey()})`,
+				}) not allowed to forge, should be ${forgingUsername} (${forgingValidator.getPublicKey()})`,
 			);
 
 			return false;
 		}
 
 		this.logger.debug(
-			`Delegate ${generatorUsername} (${
+			`Validator ${generatorUsername} (${
 				block.data.generatorPublicKey
 			}) allowed to forge block ${block.data.height.toLocaleString()}`,
 		);

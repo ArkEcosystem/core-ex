@@ -1,33 +1,59 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	AddressFactory as Contract,
-	BINDINGS,
-	IConfiguration,
-	IKeyPairFactory,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { RIPEMD160, SHA256 } from "bcrypto";
 import { base58 } from "bstring";
 
-@Container.injectable()
-export class AddressFactory implements Contract {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: IConfiguration;
+@injectable()
+export class AddressFactory implements Contracts.Crypto.IAddressFactory {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
+
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
+		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
 	}
 
-	public async fromPublicKey(publicKey: Buffer): Promise<string> {
-		const buffer: Buffer = RIPEMD160.digest(publicKey);
+	public async fromPublicKey(publicKey: string): Promise<string> {
+		const buffer: Buffer = RIPEMD160.digest(Buffer.from(publicKey, "hex"));
 		const payload: Buffer = Buffer.alloc(21);
 
 		payload.writeUInt8(this.configuration.get("network.address.base58"), 0);
 		buffer.copy(payload, 1);
 
 		return this.#encodeCheck(payload);
+	}
+
+	public async fromWIF(wif: string): Promise<string> {
+		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif));
+	}
+
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
+	}
+
+	public async fromPrivateKey(privateKey: Contracts.Crypto.IKeyPair): Promise<string> {
+		return this.fromPublicKey(privateKey.publicKey);
+	}
+
+	public async fromBuffer(buffer: Buffer): Promise<string> {
+		return base58.encodeCheck(buffer);
+	}
+
+	public async toBuffer(address: string): Promise<Buffer> {
+		const result: Buffer = base58.decodeCheck(address);
+
+		const pubKeyHash = this.configuration.get("network.address.base58");
+
+		if (result[0] !== pubKeyHash) {
+			throw new Error(`Expected address network byte ${pubKeyHash}, but got ${result[0]}.`);
+		}
+
+		return result;
 	}
 
 	public async validate(address: string): Promise<boolean> {

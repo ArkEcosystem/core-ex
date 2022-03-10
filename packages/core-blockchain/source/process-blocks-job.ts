@@ -1,75 +1,79 @@
-import { DatabaseService, Repositories } from "@arkecosystem/core-database";
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Services, Utils } from "@arkecosystem/core-kernel";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Blocks, Crypto, Interfaces } from "@arkecosystem/crypto";
 
 import { BlockProcessor, BlockProcessorResult } from "./processor";
 import { RevertBlockHandler } from "./processor/handlers";
-import { StateMachine } from "./state-machine/state-machine";
+import { StateMachine } from "./state-machine";
 
-@Container.injectable()
+@injectable()
 export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.StateMachine)
+	@inject(Identifiers.StateMachine)
 	private readonly stateMachine!: StateMachine;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
-	private readonly database!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
-	@Container.inject(Container.Identifiers.DatabaseBlockRepository)
-	private readonly blockRepository!: Repositories.BlockRepository;
-
-	@Container.inject(Container.Identifiers.DatabaseInteraction)
+	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
+	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	private blocks: Interfaces.IBlockData[] = [];
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	public getBlocks(): Interfaces.IBlockData[] {
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots: Contracts.Crypto.Slots;
+
+	@inject(Identifiers.Cryptography.Time.BlockTimeLookup)
+	private readonly blockTimeLookup: any;
+
+	private blocks: Contracts.Crypto.IBlockData[] = [];
+
+	public getBlocks(): Contracts.Crypto.IBlockData[] {
 		return this.blocks;
 	}
 
-	public setBlocks(blocks: Interfaces.IBlockData[]): void {
+	public setBlocks(blocks: Contracts.Crypto.IBlockData[]): void {
 		this.blocks = blocks;
 	}
 
 	public async handle(): Promise<void> {
-		if (!this.blocks.length) {
+		if (this.blocks.length === 0) {
 			return;
 		}
 
 		const lastHeight = this.blockchain.getLastBlock().data.height;
 		const fromHeight = this.blocks[0].height;
+		// eslint-disable-next-line unicorn/prefer-at
 		const toHeight = this.blocks[this.blocks.length - 1].height;
 		this.logger.debug(
 			`Processing chunk of blocks [${fromHeight.toLocaleString()}, ${toHeight.toLocaleString()}] on top of ${lastHeight.toLocaleString()}`,
 		);
 
-		const blockTimeLookup = await Utils.forgingInfoCalculator.getBlockTimeLookup(this.app, this.blocks[0].height);
-
-		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], blockTimeLookup)) {
+		if (!Utils.isBlockChained(this.blockchain.getLastBlock().data, this.blocks[0], this.slots)) {
 			this.logger.warning(
-				Utils.getBlockNotChainedErrorMessage(
-					this.blockchain.getLastBlock().data,
-					this.blocks[0],
-					blockTimeLookup,
-				),
+				Utils.getBlockNotChainedErrorMessage(this.blockchain.getLastBlock().data, this.blocks[0], this.slots),
 			);
 			// Discard remaining blocks as it won't go anywhere anyway.
 			this.blockchain.clearQueue();
@@ -77,19 +81,23 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			return;
 		}
 
-		const acceptedBlocks: Interfaces.IBlock[] = [];
-		let forkBlock: Interfaces.IBlock | undefined = undefined;
+		const acceptedBlocks: Contracts.Crypto.IBlock[] = [];
+		let forkBlock: Contracts.Crypto.IBlock | undefined;
 		let lastProcessResult: BlockProcessorResult | undefined;
-		let lastProcessedBlock: Interfaces.IBlock | undefined = undefined;
+		let lastProcessedBlock: Contracts.Crypto.IBlock | undefined;
 
-		const acceptedBlockTimeLookup = (height: number) => {
-			return acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ?? blockTimeLookup(height);
-		};
+		const acceptedBlockTimeLookup = (height: number) =>
+			acceptedBlocks.find((b) => b.data.height === height)?.data.timestamp ??
+			this.blockTimeLookup.getBlockTimeLookup(height);
 
 		try {
 			for (const block of this.blocks) {
-				const currentSlot: number = Crypto.Slots.getSlotNumber(acceptedBlockTimeLookup);
-				const blockSlot: number = Crypto.Slots.getSlotNumber(acceptedBlockTimeLookup, block.timestamp);
+				const currentSlot: number = await this.slots
+					.withBlockTimeLookup(acceptedBlockTimeLookup)
+					.getSlotNumber();
+				const blockSlot: number = await this.slots
+					.withBlockTimeLookup(acceptedBlockTimeLookup)
+					.getSlotNumber(block.timestamp);
 
 				if (blockSlot > currentSlot) {
 					this.logger.error(
@@ -98,12 +106,12 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 					break;
 				}
 
-				const blockInstance = Blocks.BlockFactory.fromData(block);
-				Utils.assert.defined<Interfaces.IBlock>(blockInstance);
+				const blockInstance = await this.blockFactory.fromData(block);
+				Utils.assert.defined<Contracts.Crypto.IBlock>(blockInstance);
 
 				lastProcessResult = await this.triggers.call("processBlock", {
-					blockProcessor: this.app.get<BlockProcessor>(Container.Identifiers.BlockProcessor),
 					block: blockInstance,
+					blockProcessor: this.app.get<BlockProcessor>(Identifiers.BlockProcessor),
 				});
 
 				lastProcessedBlock = blockInstance;
@@ -132,7 +140,8 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 		if (acceptedBlocks.length > 0) {
 			try {
-				await this.blockRepository.saveBlocks(acceptedBlocks);
+				await this.databaseService.saveBlocks(acceptedBlocks);
+				// eslint-disable-next-line unicorn/prefer-at
 				this.stateStore.setLastStoredBlockHeight(acceptedBlocks[acceptedBlocks.length - 1].data.height);
 			} catch (error) {
 				this.logger.error(
@@ -165,12 +174,12 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		return;
 	}
 
-	private async revertBlocks(blocksToRevert: Interfaces.IBlock[]): Promise<void> {
+	private async revertBlocks(blocksToRevert: Contracts.Crypto.IBlock[]): Promise<void> {
 		// Rounds are saved while blocks are being processed and may now be out of sync with the last
 		// block that was written into the database.
 
 		const lastHeight: number = blocksToRevert[0].data.height;
-		const deleteRoundsAfter: number = Utils.roundCalculator.calculateRound(lastHeight).round;
+		const deleteRoundsAfter: number = Utils.roundCalculator.calculateRound(lastHeight, this.configuration).round;
 
 		this.logger.info(
 			`Reverting ${Utils.pluralize(
@@ -190,7 +199,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 		}
 
 		// TODO: Remove, because next rounds are deleted on restore
-		await this.database.deleteRound(deleteRoundsAfter + 1);
+		await this.databaseService.deleteRound(deleteRoundsAfter + 1);
 		await this.databaseInteraction.restoreCurrentRound();
 
 		this.blockchain.clearQueue();

@@ -1,12 +1,12 @@
-import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BigNumber } from "@arkecosystem/utils";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 const SATOSHI = 1e8;
 
 let genesisTransactions: { [key: string]: boolean };
 let currentNetwork: number;
 
-export const formatSatoshi = (configuration: Configuration, amount: BigNumber): string => {
+export const formatSatoshi = (configuration: Contracts.Crypto.IConfiguration, amount: BigNumber): string => {
 	const localeString = (+amount / SATOSHI).toLocaleString("en", {
 		maximumFractionDigits: 8,
 		minimumFractionDigits: 0,
@@ -15,7 +15,7 @@ export const formatSatoshi = (configuration: Configuration, amount: BigNumber): 
 	return `${localeString} ${configuration.get("network.client.symbol")}`;
 };
 
-export const isGenesisTransaction = (configuration: Configuration, id: string): boolean => {
+export const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id: string): boolean => {
 	const network: number = configuration.get("network.pubKeyHash");
 
 	if (!genesisTransactions || currentNetwork !== network) {
@@ -35,19 +35,5 @@ export const numberToHex = (number_: number, padding = 2): string => {
 	return "0".repeat(padding - indexHex.length) + indexHex;
 };
 
-export const maxVendorFieldLength = (configuration: Configuration, height?: number): number =>
+export const maxVendorFieldLength = (configuration: Contracts.Crypto.IConfiguration, height?: number): number =>
 	configuration.getMilestone(height).vendorFieldLength;
-
-export const isSupportedTransactionVersion = (configuration: Configuration, version: number): boolean => {
-	const aip11: boolean = configuration.getMilestone().aip11;
-
-	if (aip11 && version !== 2) {
-		return false;
-	}
-
-	if (!aip11 && version !== 1) {
-		return false;
-	}
-
-	return true;
-};

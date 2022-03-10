@@ -1,15 +1,24 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Blocks, Crypto, Interfaces, Utils } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
+@injectable()
 export abstract class Method {
-	protected createBlock(
-		keys: Interfaces.IKeyPair,
-		transactions: Interfaces.ITransactionData[],
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
+
+	@inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
+
+	protected async createBlock(
+		keys: Contracts.Crypto.IKeyPair,
+		transactions: Contracts.Crypto.ITransactionData[],
 		options: Record<string, any>,
-	): Interfaces.IBlock {
-		const totals: { amount: Utils.BigNumber; fee: Utils.BigNumber } = {
-			amount: Utils.BigNumber.ZERO,
-			fee: Utils.BigNumber.ZERO,
+	): Promise<Contracts.Crypto.IBlock> {
+		const totals: { amount: BigNumber; fee: BigNumber } = {
+			amount: BigNumber.ZERO,
+			fee: BigNumber.ZERO,
 		};
 
 		const payloadBuffers: Buffer[] = [];
@@ -22,23 +31,22 @@ export abstract class Method {
 			payloadBuffers.push(Buffer.from(transaction.id, "hex"));
 		}
 
-		return Blocks.BlockFactory.make(
+		return this.blockFactory.make(
 			{
 				generatorPublicKey: keys.publicKey,
 				height: options.previousBlock.height + 1,
 				numberOfTransactions: transactions.length,
-				payloadHash: Crypto.HashAlgorithms.sha256(payloadBuffers).toString("hex"),
+				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength: 32 * transactions.length,
 				previousBlock: options.previousBlock.id,
-				previousBlockHex: options.previousBlock.idHex,
 				reward: options.reward,
 				timestamp: options.timestamp,
 				totalAmount: totals.amount,
-				version: 0,
 				totalFee: totals.fee,
 				transactions,
+				version: 1,
 			},
 			keys,
-		)!; // todo: this method should never return undefined
+		);
 	}
 }

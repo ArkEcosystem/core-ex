@@ -1,31 +1,32 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IHashFactory,
-	ISerializeOptions,
-	ITransactionData,
-	ITransactionUtils,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-import { TransactionTypeFactory } from "./types/factory";
+@injectable()
+export class Utils implements Contracts.Crypto.ITransactionUtils {
+	@inject(Identifiers.Cryptography.Transaction.Serializer)
+	private readonly serializer: Contracts.Crypto.ITransactionSerializer;
 
-@Container.injectable()
-export class Utils implements ITransactionUtils {
-	@Container.inject(BINDINGS.Transaction.Serializer)
-	private readonly serializer: any;
+	@inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
-	public toBytes(data: ITransactionData): Buffer {
-		return this.serializer.serialize(TransactionTypeFactory.create(data));
+	public async toBytes(data: Contracts.Crypto.ITransactionData): Promise<Buffer> {
+		return this.serializer.serialize(this.transactionTypeFactory.create(data));
 	}
 
-	public async toHash(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer> {
-		return this.hashFactory.sha256(this.serializer.getBytes(transaction, options));
+	public async toHash(
+		transaction: Contracts.Crypto.ITransactionData,
+		options?: Contracts.Crypto.ISerializeOptions,
+	): Promise<Buffer> {
+		return this.hashFactory.sha256(await this.serializer.getBytes(transaction, options));
 	}
 
-	public async getId(transaction: ITransactionData, options: ISerializeOptions = {}): Promise<string> {
+	public async getId(
+		transaction: Contracts.Crypto.ITransactionData,
+		options: Contracts.Crypto.ISerializeOptions = {},
+	): Promise<string> {
 		return (await this.toHash(transaction, options)).toString("hex");
 	}
 }

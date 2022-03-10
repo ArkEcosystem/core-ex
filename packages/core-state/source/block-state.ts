@@ -1,41 +1,48 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
-import { Enums, Identities, Interfaces, Utils } from "@arkecosystem/crypto";
+import { inject, injectable, multiInject } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
 // todo: review the implementation
-@Container.injectable()
+@injectable()
 export class BlockState implements Contracts.State.BlockState {
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@inject(Identifiers.WalletRepository)
 	private walletRepository!: Contracts.State.WalletRepository;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	private handlerRegistry!: Handlers.Registry;
+	@inject(Identifiers.TransactionHandlerRegistry)
+	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	public async applyBlock(block: Interfaces.IBlock): Promise<void> {
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly addressFactory: Contracts.Crypto.IAddressFactory;
+
+	@multiInject(Identifiers.State.ValidatorMutator)
+	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
+
+	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		if (block.data.height === 1) {
-			this.initGenesisForgerWallet(block.data.generatorPublicKey);
+			await this.initGenesisForgerWallet(block.data.generatorPublicKey);
 		}
 
 		const previousBlock = this.state.getLastBlock();
-		const forgerWallet = this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
+		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
 		// if (!forgerWallet) {
 		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
 		//     this.app.terminate(msg);
 		// }
-		const appliedTransactions: Interfaces.ITransaction[] = [];
+		const appliedTransactions: Contracts.Crypto.ITransaction[] = [];
 		try {
 			for (const transaction of block.transactions) {
 				await this.applyTransaction(transaction);
 				appliedTransactions.push(transaction);
 			}
-			this.applyBlockToForger(forgerWallet, block.data);
+			await this.applyBlockToForger(forgerWallet, block.data);
 
 			this.state.setLastBlock(block);
 		} catch (error) {
@@ -51,19 +58,19 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 	}
 
-	public async revertBlock(block: Interfaces.IBlock): Promise<void> {
-		const forgerWallet = this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
+	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
+		const forgerWallet = await this.walletRepository.findByPublicKey(block.data.generatorPublicKey);
 
 		// if (!forgerWallet) {
 		//     const msg = `Failed to lookup forger '${block.data.generatorPublicKey}' of block '${block.data.id}'.`;
 		//     this.app.terminate(msg);
 		// }
 
-		const revertedTransactions: Interfaces.ITransaction[] = [];
+		const revertedTransactions: Contracts.Crypto.ITransaction[] = [];
 		try {
-			this.revertBlockFromForger(forgerWallet, block.data);
+			await this.revertBlockFromForger(forgerWallet, block.data);
 
-			for (const transaction of block.transactions.slice().reverse()) {
+			for (const transaction of [...block.transactions].reverse()) {
 				await this.revertTransaction(transaction);
 				revertedTransactions.push(transaction);
 			}
@@ -77,14 +84,16 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 	}
 
-	public async applyTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async applyTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		await transactionHandler.apply(transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		let recipient: Contracts.State.Wallet | undefined;
 		if (transaction.data.recipientId) {
@@ -94,17 +103,17 @@ export class BlockState implements Contracts.State.BlockState {
 		}
 
 		// @ts-ignore - Apply vote balance updates
-		this.applyVoteBalances(sender, recipient, transaction.data);
+		await this.applyVoteBalances(sender, recipient, transaction.data);
 	}
 
-	public async revertTransaction(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revertTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const { data } = transaction;
 
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(data.senderPublicKey);
 
 		let recipient: Contracts.State.Wallet | undefined;
 		if (transaction.data.recipientId) {
@@ -116,191 +125,148 @@ export class BlockState implements Contracts.State.BlockState {
 		await transactionHandler.revert(transaction);
 
 		// @ts-ignore - Revert vote balance updates
-		this.revertVoteBalances(sender, recipient, data);
-	}
-
-	public increaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: AppUtils.BigNumber) {
-		// ? packages/core-transactions/source/handlers/one/vote.ts:L120 blindly sets "vote" attribute
-		// ? is it guaranteed that delegate wallet exists, so delegateWallet.getAttribute("delegate.voteBalance") is safe?
-		if (wallet.hasVoted()) {
-			const delegatePulicKey = wallet.getAttribute<string>("vote");
-			const delegateWallet = this.walletRepository.findByPublicKey(delegatePulicKey);
-			const oldDelegateVoteBalance = delegateWallet.getAttribute<AppUtils.BigNumber>("delegate.voteBalance");
-			const newDelegateVoteBalance = oldDelegateVoteBalance.plus(amount);
-			delegateWallet.setAttribute("delegate.voteBalance", newDelegateVoteBalance);
-		}
-	}
-
-	public decreaseWalletDelegateVoteBalance(wallet: Contracts.State.Wallet, amount: AppUtils.BigNumber) {
-		if (wallet.hasVoted()) {
-			const delegatePulicKey = wallet.getAttribute<string>("vote");
-			const delegateWallet = this.walletRepository.findByPublicKey(delegatePulicKey);
-			const oldDelegateVoteBalance = delegateWallet.getAttribute<AppUtils.BigNumber>("delegate.voteBalance");
-			const newDelegateVoteBalance = oldDelegateVoteBalance.minus(amount);
-			delegateWallet.setAttribute("delegate.voteBalance", newDelegateVoteBalance);
-		}
+		await this.revertVoteBalances(sender, recipient, data);
 	}
 
 	// WALLETS
-	private applyVoteBalances(
+	private async applyVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
-		transaction: Interfaces.ITransactionData,
-	): void {
+		transaction: Contracts.Crypto.ITransactionData,
+	): Promise<void> {
 		return this.updateVoteBalances(sender, recipient, transaction, false);
 	}
 
-	private revertVoteBalances(
+	private async revertVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
-		transaction: Interfaces.ITransactionData,
-	): void {
+		transaction: Contracts.Crypto.ITransactionData,
+	): Promise<void> {
 		return this.updateVoteBalances(sender, recipient, transaction, true);
 	}
 
-	private applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Interfaces.IBlockData) {
-		const delegateAttribute = forgerWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
-		delegateAttribute.producedBlocks++;
-		delegateAttribute.forgedFees = delegateAttribute.forgedFees.plus(blockData.totalFee);
-		delegateAttribute.forgedRewards = delegateAttribute.forgedRewards.plus(blockData.reward);
-		delegateAttribute.lastBlock = blockData;
-
-		const balanceIncrease = blockData.reward.plus(blockData.totalFee);
-		this.increaseWalletDelegateVoteBalance(forgerWallet, balanceIncrease);
-		forgerWallet.increaseBalance(balanceIncrease);
+	private async applyBlockToForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
+		for (const validatorMutator of this.validatorMutators) {
+			await validatorMutator.apply(forgerWallet, blockData);
+		}
 	}
 
-	private revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Interfaces.IBlockData) {
-		const delegateAttribute = forgerWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
-		delegateAttribute.producedBlocks--;
-		delegateAttribute.forgedFees = delegateAttribute.forgedFees.minus(blockData.totalFee);
-		delegateAttribute.forgedRewards = delegateAttribute.forgedRewards.minus(blockData.reward);
-		delegateAttribute.lastBlock = undefined;
-
-		const balanceDecrease = blockData.reward.plus(blockData.totalFee);
-		this.decreaseWalletDelegateVoteBalance(forgerWallet, balanceDecrease);
-		forgerWallet.decreaseBalance(balanceDecrease);
+	private async revertBlockFromForger(forgerWallet: Contracts.State.Wallet, blockData: Contracts.Crypto.IBlockData) {
+		for (const validatorMutator of this.validatorMutators) {
+			await validatorMutator.revert(forgerWallet, blockData);
+		}
 	}
 
-	private updateVoteBalances(
+	private async updateVoteBalances(
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet,
-		transaction: Interfaces.ITransactionData,
+		transaction: Contracts.Crypto.ITransactionData,
 		revert: boolean,
-	): void {
+	): Promise<void> {
 		if (
-			transaction.type === Enums.TransactionType.Vote &&
-			transaction.typeGroup === Enums.TransactionTypeGroup.Core
+			transaction.type === Contracts.Crypto.TransactionType.Vote &&
+			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
 		) {
-			AppUtils.assert.defined<Interfaces.ITransactionAsset>(transaction.asset?.votes);
+			AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.asset?.votes);
 
-			const senderDelegatedAmount = sender
+			const senderValidatordAmount = sender
 				.getBalance()
 				// balance already includes reverted fee when updateVoteBalances is called
-				.minus(revert ? transaction.fee : Utils.BigNumber.ZERO);
+				.minus(revert ? transaction.fee : BigNumber.ZERO);
 
-			for (let i = 0; i < transaction.asset.votes.length; i++) {
-				const vote: string = transaction.asset.votes[i];
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(vote.substr(1));
+			for (let index = 0; index < transaction.asset.votes.length; index++) {
+				const vote: string = transaction.asset.votes[index];
+				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote.slice(1));
 
 				// first unvote also changes vote balance by fee
-				const senderVoteDelegatedAmount =
-					i === 0 && vote.startsWith("-")
-						? senderDelegatedAmount.plus(transaction.fee)
-						: senderDelegatedAmount;
+				const senderVoteValidatordAmount =
+					index === 0 && vote.startsWith("-")
+						? senderValidatordAmount.plus(transaction.fee)
+						: senderValidatordAmount;
 
-				const voteBalanceChange: Utils.BigNumber = senderVoteDelegatedAmount
+				const voteBalanceChange: BigNumber = senderVoteValidatordAmount
 					.times(vote.startsWith("-") ? -1 : 1)
 					.times(revert ? -1 : 1);
 
-				const voteBalance: Utils.BigNumber = delegate
-					.getAttribute("delegate.voteBalance", Utils.BigNumber.ZERO)
+				const voteBalance: BigNumber = validator
+					.getAttribute("validator.voteBalance", BigNumber.ZERO)
 					.plus(voteBalanceChange);
 
-				delegate.setAttribute("delegate.voteBalance", voteBalance);
+				validator.setAttribute("validator.voteBalance", voteBalance);
 			}
 		} else {
-			// Update vote balance of the sender's delegate
+			// Update vote balance of the sender's validator
 			if (sender.hasVoted()) {
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					sender.getAttribute("vote"),
 				);
 
-				let amount: AppUtils.BigNumber = transaction.amount;
+				let amount: BigNumber = transaction.amount;
 				if (
-					transaction.type === Enums.TransactionType.MultiPayment &&
-					transaction.typeGroup === Enums.TransactionTypeGroup.Core
+					transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
+					transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
 				) {
-					AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.asset?.payments);
+					AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.asset?.payments);
 
 					amount = transaction.asset.payments.reduce(
-						(prev, curr) => prev.plus(curr.amount),
-						Utils.BigNumber.ZERO,
+						(previous, current) => previous.plus(current.amount),
+						BigNumber.ZERO,
 					);
 				}
 
-				const total: Utils.BigNumber = amount.plus(transaction.fee);
+				const total: BigNumber = amount.plus(transaction.fee);
 
-				const voteBalance: Utils.BigNumber = delegate.getAttribute(
-					"delegate.voteBalance",
-					Utils.BigNumber.ZERO,
-				);
+				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
 
-				// General case : sender delegate vote balance reduced by amount + fees (or increased if revert)
-				delegate.setAttribute(
-					"delegate.voteBalance",
+				// General case : sender validator vote balance reduced by amount + fees (or increased if revert)
+				validator.setAttribute(
+					"validator.voteBalance",
 					revert ? voteBalance.plus(total) : voteBalance.minus(total),
 				);
 			}
 
 			if (
-				transaction.type === Enums.TransactionType.MultiPayment &&
-				transaction.typeGroup === Enums.TransactionTypeGroup.Core
+				transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
+				transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
 			) {
-				AppUtils.assert.defined<Interfaces.IMultiPaymentItem[]>(transaction.asset?.payments);
+				AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.asset?.payments);
 
-				// go through all payments and update recipients delegates vote balance
+				// go through all payments and update recipients validators vote balance
 				for (const { recipientId, amount } of transaction.asset.payments) {
 					const recipientWallet: Contracts.State.Wallet = this.walletRepository.findByAddress(recipientId);
 					if (recipientWallet.hasVoted()) {
 						const vote = recipientWallet.getAttribute("vote");
-						const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(vote);
-						const voteBalance: Utils.BigNumber = delegate.getAttribute(
-							"delegate.voteBalance",
-							Utils.BigNumber.ZERO,
-						);
-						delegate.setAttribute(
-							"delegate.voteBalance",
+						const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
+						const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
+						validator.setAttribute(
+							"validator.voteBalance",
 							revert ? voteBalance.minus(amount) : voteBalance.plus(amount),
 						);
 					}
 				}
 			}
 
-			// Update vote balance of recipient's delegate
+			// Update vote balance of recipient's validator
 			if (recipient && recipient.hasVoted()) {
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					recipient.getAttribute("vote"),
 				);
-				const voteBalance: Utils.BigNumber = delegate.getAttribute(
-					"delegate.voteBalance",
-					Utils.BigNumber.ZERO,
-				);
+				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
 
-				delegate.setAttribute(
-					"delegate.voteBalance",
+				validator.setAttribute(
+					"validator.voteBalance",
 					revert ? voteBalance.minus(transaction.amount) : voteBalance.plus(transaction.amount),
 				);
 			}
 		}
 	}
 
-	private initGenesisForgerWallet(forgerPublicKey: string) {
+	private async initGenesisForgerWallet(forgerPublicKey: string) {
 		if (this.walletRepository.hasByPublicKey(forgerPublicKey)) {
 			return;
 		}
 
-		const forgerAddress = Identities.Address.fromPublicKey(forgerPublicKey);
+		const forgerAddress = await this.addressFactory.fromPublicKey(forgerPublicKey);
 		const forgerWallet = this.walletRepository.createWallet(forgerAddress);
 		forgerWallet.setPublicKey(forgerPublicKey);
 		this.walletRepository.index(forgerWallet);

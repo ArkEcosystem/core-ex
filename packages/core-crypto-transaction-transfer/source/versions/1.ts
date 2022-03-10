@@ -1,12 +1,15 @@
-import { Container } from "@arkecosystem/core-container";
-import { ISerializeOptions, TransactionType, TransactionTypeGroup } from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
-@Container.injectable()
-export abstract class One extends Transaction {
-	public static typeGroup: number = TransactionTypeGroup.Core;
-	public static type: number = TransactionType.Transfer;
+@injectable()
+export class TransferTransaction extends Transaction {
+	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
+	private readonly addressSerializer: Contracts.Crypto.IAddressSerializer;
+
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
+	public static type: number = Contracts.Crypto.TransactionType.Transfer;
 	public static key = "transfer";
 	public static version = 1;
 
@@ -19,7 +22,7 @@ export abstract class One extends Transaction {
 				expiration: { minimum: 0, type: "integer" },
 				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
 				recipientId: { $ref: "address" },
-				type: { transactionType: TransactionType.Transfer },
+				type: { transactionType: Contracts.Crypto.TransactionType.Transfer },
 				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
 			},
 			required: ["recipientId"],
@@ -30,23 +33,14 @@ export abstract class One extends Transaction {
 		return true;
 	}
 
-	public async serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
-		const buff: ByteBuffer = new ByteBuffer(Buffer.alloc(33));
-		buff.writeBigUInt64LE(data.amount.toBigInt());
-		buff.writeUInt32LE(data.expiration || 0);
+		const buff: ByteBuffer = ByteBuffer.fromSize(64);
+		buff.writeUint64(data.amount.toBigInt());
+		buff.writeUint32(data.expiration || 0);
 
 		if (data.recipientId) {
-			const { addressBuffer, addressError } = await this.addressFactory.toBuffer(
-				data.recipientId,
-				this.configuration.get("network.pubKeyHash"),
-			);
-
-			if (options) {
-				options.addressError = addressError;
-			}
-
-			buff.writeBuffer(addressBuffer);
+			this.addressSerializer.serialize(buff, await this.addressFactory.toBuffer(data.recipientId));
 		}
 
 		return buff;
@@ -54,8 +48,8 @@ export abstract class One extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		data.amount = BigNumber.make(buf.readBigUInt64LE().toString());
-		data.expiration = buf.readUInt32LE();
-		data.recipientId = await this.addressFactory.fromBuffer(buf.readBuffer(21));
+		data.amount = BigNumber.make(buf.readUint64().toString());
+		data.expiration = buf.readUint32();
+		data.recipientId = await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf));
 	}
 }

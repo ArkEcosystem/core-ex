@@ -1,4 +1,4 @@
-import { Interfaces } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 export enum BlockProcessorResult {
 	Accepted,
@@ -10,5 +10,5 @@ export enum BlockProcessorResult {
 }
 
 export interface BlockHandler {
-	execute(block?: Interfaces.IBlock): Promise<BlockProcessorResult>;
+	execute(block?: Contracts.Crypto.IBlock): Promise<BlockProcessorResult>;
 }

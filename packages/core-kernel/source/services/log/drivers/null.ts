@@ -1,9 +1,9 @@
-import { Logger } from "../../../contracts/kernel/log";
-import { injectable } from "../../../ioc";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class NullLogger implements Logger {
-	public async make(options?: any): Promise<Logger> {
+export class NullLogger implements Contracts.Kernel.Logger {
+	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		return this;
 	}
 

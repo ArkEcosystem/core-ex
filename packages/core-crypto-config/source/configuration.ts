@@ -1,20 +1,18 @@
-import { Container } from "@arkecosystem/core-container";
-import { IConfiguration, IMilestone, MilestoneSearchResult, NetworkConfig } from "@arkecosystem/core-crypto-contracts";
-import { InvalidMilestoneConfigurationError } from "@arkecosystem/core-crypto-errors";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
 
-@Container.injectable()
-export class Configuration implements IConfiguration {
-	#config: NetworkConfig | undefined;
+@injectable()
+export class Configuration implements Contracts.Crypto.IConfiguration {
+	#config: Contracts.Crypto.NetworkConfig | undefined;
 	#height: number | undefined;
-	#milestone: IMilestone | undefined;
+	#milestone: Contracts.Crypto.IMilestone | undefined;
 	#milestones: Record<string, any> | undefined;
 
-	public setConfig(config: NetworkConfig): void {
+	public setConfig(config: Contracts.Crypto.NetworkConfig): void {
 		this.#config = {
-			exceptions: config.exceptions,
 			genesisBlock: config.genesisBlock,
 			milestones: config.milestones,
 			network: config.network,
@@ -24,16 +22,32 @@ export class Configuration implements IConfiguration {
 		this.buildConstants();
 	}
 
-	public all(): NetworkConfig | undefined {
+	public all(): Contracts.Crypto.NetworkConfig | undefined {
 		return this.#config;
 	}
 
 	public set<T = any>(key: string, value: T): void {
+		// @TODO: remove this and throw if no config is set
 		if (!this.#config) {
-			throw new Error();
+			this.#config = {
+				// @ts-ignore
+				genesisBlock: {},
+				// @ts-ignore
+				milestones: {},
+				// @ts-ignore
+				network: {},
+			};
 		}
 
 		set(this.#config, key, value);
+
+		try {
+			this.validateMilestones();
+
+			this.buildConstants();
+		} catch {
+			//
+		}
 	}
 
 	public get<T = any>(key: string): T {
@@ -87,7 +101,7 @@ export class Configuration implements IConfiguration {
 		return this.#milestone.data;
 	}
 
-	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): MilestoneSearchResult {
+	public getNextMilestoneWithNewKey(previousMilestone: number, key: string): Contracts.Crypto.MilestoneSearchResult {
 		if (!this.#milestones || this.#milestones.length === 0) {
 			throw new Error(`Attempted to get next milestone but none were set`);
 		}
@@ -150,21 +164,21 @@ export class Configuration implements IConfiguration {
 			throw new Error();
 		}
 
-		const delegateMilestones = this.#config.milestones
+		const validatorMilestones = this.#config.milestones
 			.sort((a, b) => a.height - b.height)
-			.filter((milestone) => milestone.activeDelegates);
+			.filter((milestone) => milestone.activeValidators);
 
-		for (let index = 1; index < delegateMilestones.length; index++) {
-			const previous = delegateMilestones[index - 1];
-			const current = delegateMilestones[index];
+		for (let index = 1; index < validatorMilestones.length; index++) {
+			const previous = validatorMilestones[index - 1];
+			const current = validatorMilestones[index];
 
-			if (previous.activeDelegates === current.activeDelegates) {
+			if (previous.activeValidators === current.activeValidators) {
 				continue;
 			}
 
-			if ((current.height - previous.height) % previous.activeDelegates !== 0) {
-				throw new InvalidMilestoneConfigurationError(
-					`Bad milestone at height: ${current.height}. The number of delegates can only be changed at the beginning of a new round.`,
+			if ((current.height - previous.height) % previous.activeValidators !== 0) {
+				throw new Exceptions.InvalidMilestoneConfigurationError(
+					`Bad milestone at height: ${current.height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
 			}
 		}

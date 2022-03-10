@@ -1,30 +1,24 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IKeyPairFactory,
-	IMultiSignatureAsset,
-	IPublicKeyFactory,
-} from "@arkecosystem/core-crypto-contracts";
-import { NotImplemented } from "@arkecosystem/core-crypto-errors";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
-@Container.injectable()
-export class PublicKeyFactory implements IPublicKeyFactory {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+@injectable()
+export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
 	}
 
-	public async fromWIF(wif: string, version: number): Promise<string> {
-		return (await this.keyPairFactory.fromWIF(wif, version)).publicKey;
+	public async fromWIF(wif: string): Promise<string> {
+		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
-	public async fromMultiSignatureAsset(asset: IMultiSignatureAsset): Promise<string> {
-		throw new NotImplemented();
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+		throw new Exceptions.NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
-		throw new NotImplemented();
+		throw new Exceptions.NotImplemented(this.constructor.name, "verify");
 	}
 }

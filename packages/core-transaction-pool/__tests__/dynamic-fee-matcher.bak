@@ -1,7 +1,8 @@
 import "jest-extended";
 
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Utils } from "@arkecosystem/crypto";
+import { inject,injectable } from "@arkecosystem/core-container";
+import Contracts, { Crypto, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/crypto";
 
 import { DynamicFeeMatcher } from "../../../packages/core-transaction-pool/source/dynamic-fee-matcher";
 import {
@@ -16,10 +17,10 @@ const stateStore = { getLastHeight: jest.fn() };
 const logger = { debug: jest.fn(), notice: jest.fn() };
 
 const container = new Container.Container();
-container.bind(Container.Identifiers.PluginConfiguration).toConstantValue(configuration);
-container.bind(Container.Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
-container.bind(Container.Identifiers.StateStore).toConstantValue(stateStore);
-container.bind(Container.Identifiers.LogService).toConstantValue(logger);
+container.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(handlerRegistry);
+container.bind(Identifiers.StateStore).toConstantValue(stateStore);
+container.bind(Identifiers.LogService).toConstantValue(logger);
 
 beforeEach(() => {
 	handler.dynamicFee.mockReset();
@@ -41,15 +42,15 @@ describe("when dynamic fees are enabled", () => {
 	beforeEach(() => {
 		configuration.getRequired.mockReturnValueOnce({ enabled: true, minFeePool, minFeeBroadcast, addonBytes });
 		stateStore.getLastHeight.mockReturnValueOnce(height);
-		handler.dynamicFee.mockReturnValueOnce(new Utils.BigNumber(1000));
+		handler.dynamicFee.mockReturnValueOnce(new BigNumber(1000));
 	});
 
 	describe("DynamicFeeMatcher.throwIfCannotEnterPool", () => {
 		it("should allow entering pool when fee is higher or equal than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(1000) },
-			} as Interfaces.ITransaction;
+				data: { fee: new BigNumber(1000) },
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			const dynamicFeeContext: Contracts.Shared.DynamicFeeContext = {
@@ -70,8 +71,8 @@ describe("when dynamic fees are enabled", () => {
 		it("should not allow entering pool when fee is lower than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(999) },
-			} as Interfaces.ITransaction;
+				data: { fee: new BigNumber(999) },
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			const dynamicFeeContext: Contracts.Shared.DynamicFeeContext = {
@@ -96,8 +97,8 @@ describe("when dynamic fees are enabled", () => {
 		it("should allow broadcast when fee is higher or equal than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(1000) },
-			} as Interfaces.ITransaction;
+				data: { fee: new BigNumber(1000) },
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			const dynamicFeeContext: Contracts.Shared.DynamicFeeContext = {
@@ -118,8 +119,8 @@ describe("when dynamic fees are enabled", () => {
 		it("should not allow broadcast when fee is lower than dynamic fee", async () => {
 			const transaction = {
 				key: "transfer",
-				data: { fee: new Utils.BigNumber(999) },
-			} as Interfaces.ITransaction;
+				data: { fee: new BigNumber(999) },
+			} as Crypto.ITransaction;
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(dynamicFeeMatcher.throwIfCannotBroadcast(transaction)).rejects.toThrowError(
@@ -149,12 +150,12 @@ describe("when dynamic fees are disabled", () => {
 		it("should allow entering pool when fee equals static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1000) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1000) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
-			await expect(dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Interfaces.ITransaction)).toResolve();
+			await expect(dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Crypto.ITransaction)).toResolve();
 
 			expect(logger.debug).toBeCalled();
 		});
@@ -162,13 +163,13 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is lower than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(999) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(999) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToLowError);
 
 			expect(logger.notice).toBeCalled();
@@ -177,13 +178,13 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is higher than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1001) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1001) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotEnterPool(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToHighError);
 
 			expect(logger.notice).toBeCalled();
@@ -194,12 +195,12 @@ describe("when dynamic fees are disabled", () => {
 		it("should allow entering pool when fee equals static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1000) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1000) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
-			await expect(dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Interfaces.ITransaction)).toResolve();
+			await expect(dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Crypto.ITransaction)).toResolve();
 
 			expect(logger.debug).toBeCalled();
 		});
@@ -207,13 +208,13 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is lower than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(999) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(999) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToLowError);
 
 			expect(logger.notice).toBeCalled();
@@ -222,13 +223,13 @@ describe("when dynamic fees are disabled", () => {
 		it("should not allow entering pool when fee is higher than static fee", async () => {
 			const transaction = {
 				key: "transfer",
-				staticFee: new Utils.BigNumber(1000),
-				data: { fee: new Utils.BigNumber(1001) },
+				staticFee: new BigNumber(1000),
+				data: { fee: new BigNumber(1001) },
 			};
 
 			const dynamicFeeMatcher = container.resolve(DynamicFeeMatcher);
 			await expect(
-				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Interfaces.ITransaction),
+				dynamicFeeMatcher.throwIfCannotBroadcast(transaction as Crypto.ITransaction),
 			).rejects.toThrowError(TransactionFeeToHighError);
 
 			expect(logger.notice).toBeCalled();

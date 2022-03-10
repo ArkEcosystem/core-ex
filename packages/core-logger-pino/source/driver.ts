@@ -1,4 +1,6 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 import chalk, { Chalk } from "chalk";
 import * as console from "console";
 import pino, { PrettyOptions } from "pino";
@@ -11,13 +13,10 @@ import split from "split2";
 import { PassThrough, Writable } from "stream";
 import { inspect } from "util";
 
-@Container.injectable()
+@injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
-
-	@Container.inject(Container.Identifiers.ConfigFlags)
-	private readonly configFlags!: { processType: string };
 
 	private readonly levelStyles: Record<string, Chalk> = {
 		alert: chalk.red,
@@ -73,9 +72,9 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				// @ts-ignore - Object literal may only specify known properties, and 'colorize' does not exist in type 'PrettyOptions'.
 				this.createPrettyTransport(options.levels.console, { colorize: true }),
 				process.stdout,
-				/* istanbul ignore next */
-				(err) => {
-					console.error("Stdout stream closed due to an error:", err);
+
+				(error) => {
+					console.error("Stdout stream closed due to an error:", error);
 				},
 			);
 		}
@@ -88,8 +87,8 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				this.getFileStream(options.fileRotator),
 			);
 
-			this.combinedFileStream.on("error", (err) => {
-				console.error("File stream closed due to an error:", err);
+			this.combinedFileStream.on("error", (error) => {
+				console.error("File stream closed due to an error:", error);
 			});
 
 			this.stream.pipe(this.combinedFileStream);
@@ -177,7 +176,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		const formatLevel = (level: string): string => this.levelStyles[level](level.toUpperCase());
 
 		return new Transform({
-			transform(chunk, enc, cb) {
+			transform(chunk, enc, callback) {
 				try {
 					const json = JSON.parse(chunk);
 
@@ -185,13 +184,12 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 						const line: string | undefined = pinoPretty(json);
 
 						if (line !== undefined) {
-							return cb(undefined, line.replace("USERLVL", formatLevel(json.level)));
+							return callback(undefined, line.replace("USERLVL", formatLevel(json.level)));
 						}
 					}
 				} catch {}
 
-				/* istanbul ignore next */
-				return cb();
+				return callback();
 			},
 		});
 	}
@@ -200,11 +198,10 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return createStream(
 			(time: number | Date, index?: number): string => {
 				if (!time) {
-					return `${this.app.namespace()}-${this.configFlags.processType}-current.log`;
+					return `${this.app.namespace()}-current.log`;
 				}
 
 				if (typeof time === "number") {
-					/* istanbul ignore next */
 					time = new Date(time);
 				}
 
@@ -214,7 +211,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 					filename += `.${index}`;
 				}
 
-				return `${this.app.namespace()}-${this.configFlags.processType}-${filename}.log.gz`;
+				return `${this.app.namespace()}-${filename}.log.gz`;
 			},
 			{
 				compress: "gzip",

@@ -1,40 +1,25 @@
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { dotenv, get, set } from "@arkecosystem/utils";
 import { existsSync, readFileSync } from "fs";
 import importFresh from "import-fresh";
 import Joi from "joi";
 import { extname } from "path";
 
-import { Application } from "../../../contracts/kernel";
-import { ConfigLoader } from "../../../contracts/kernel/config";
-import { Validator } from "../../../contracts/kernel/validation";
-import {
-	ApplicationConfigurationCannotBeLoaded,
-	EnvironmentConfigurationCannotBeLoaded,
-} from "../../../exceptions/config";
-import { FileException } from "../../../exceptions/filesystem";
-import { Identifiers, inject, injectable } from "../../../ioc";
 import { JsonObject, KeyValuePair, Primitive } from "../../../types";
 import { assert } from "../../../utils";
 import { ConfigRepository } from "../repository";
 
-const processSchema = {
-	flags: Joi.array().items(Joi.string()).optional(),
-	services: Joi.object().optional(),
-	plugins: Joi.array()
-		.items(Joi.object().keys({ package: Joi.string(), options: Joi.object().optional() }))
-		.required(),
-};
-
 @injectable()
-export class LocalConfigLoader implements ConfigLoader {
+export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.Application)
-	protected readonly app!: Application;
+	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
 	@inject(Identifiers.ValidationService)
-	private readonly validationService!: Validator;
+	private readonly validationService!: Contracts.Kernel.Validator;
 
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
@@ -46,7 +31,7 @@ export class LocalConfigLoader implements ConfigLoader {
 				}
 			}
 		} catch (error) {
-			throw new EnvironmentConfigurationCannotBeLoaded(error.message);
+			throw new Exceptions.EnvironmentConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
@@ -56,23 +41,23 @@ export class LocalConfigLoader implements ConfigLoader {
 
 			this.loadPeers();
 
-			this.loadDelegates();
+			this.loadValidators();
 
 			this.loadCryptography();
 		} catch (error) {
-			throw new ApplicationConfigurationCannotBeLoaded(error.message);
+			throw new Exceptions.ApplicationConfigurationCannotBeLoaded(error.message);
 		}
 	}
 
 	private loadApplication(): void {
-		const processType: string = this.app.get<KeyValuePair>(Identifiers.ConfigFlags).processType;
-
 		this.validationService.validate(
 			this.loadFromLocation(["app.json", "app.js"]),
 			Joi.object({
-				core: Joi.object().keys(processSchema).required(),
-				relay: Joi.object().keys(processSchema).required(),
-				forger: Joi.object().keys(processSchema).required(),
+				flags: Joi.array().items(Joi.string()).optional(),
+				plugins: Joi.array()
+					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
+					.required(),
+				services: Joi.object().optional(),
 			}).unknown(true),
 		);
 
@@ -82,10 +67,10 @@ export class LocalConfigLoader implements ConfigLoader {
 
 		this.configRepository.set("app.flags", {
 			...this.app.get<JsonObject>(Identifiers.ConfigFlags),
-			...get(this.validationService.valid(), `${processType}.flags`, {}),
+			...get(this.validationService.valid(), "flags", {}),
 		});
 
-		this.configRepository.set("app.plugins", get(this.validationService.valid(), `${processType}.plugins`, []));
+		this.configRepository.set("app.plugins", get(this.validationService.valid(), "plugins", []));
 	}
 
 	private loadPeers(): void {
@@ -113,12 +98,12 @@ export class LocalConfigLoader implements ConfigLoader {
 		this.configRepository.set("peers", this.validationService.valid());
 	}
 
-	private loadDelegates(): void {
+	private loadValidators(): void {
 		this.validationService.validate(
-			this.loadFromLocation(["delegates.json"]),
+			this.loadFromLocation(["validators.json"]),
 			Joi.object({
-				secrets: Joi.array().items(Joi.string()).optional(),
 				bip38: Joi.string().optional(),
+				secrets: Joi.array().items(Joi.string()).optional(),
 			}),
 		);
 
@@ -126,21 +111,15 @@ export class LocalConfigLoader implements ConfigLoader {
 			throw new Error(JSON.stringify(this.validationService.errors()));
 		}
 
-		this.configRepository.set("delegates", this.validationService.valid());
+		this.configRepository.set("validators", this.validationService.valid());
 	}
 
 	private loadCryptography(): void {
-		const files: string[] = ["genesisBlock", "exceptions", "milestones", "network"];
-
-		for (const file of files) {
-			if (!existsSync(this.app.configPath(`crypto/${file}.json`))) {
-				return;
-			}
+		if (!existsSync(this.app.configPath("crypto.json"))) {
+			return;
 		}
 
-		for (const file of files) {
-			this.configRepository.set(`crypto.${file}`, this.loadFromLocation([`crypto/${file}.json`]));
-		}
+		this.configRepository.set("crypto", this.loadFromLocation(["crypto.json"]));
 	}
 
 	private loadFromLocation(files: string[]): KeyValuePair {
@@ -159,6 +138,6 @@ export class LocalConfigLoader implements ConfigLoader {
 			}
 		}
 
-		throw new FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
+		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
 	}
 }

@@ -1,18 +1,19 @@
-import { MaximumPaymentCountExceededError, MinimumPaymentCountSubceededError } from "@arkecosystem/core-crypto-errors";
-import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
-
-import { BigNumber } from "@arkecosystem/utils";
+import { injectable, postConstruct } from "@arkecosystem/core-container";
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
+import { BigNumber } from "@arkecosystem/utils";
 
-import { Two } from "./versions/2";
+import { MultiPaymentTransaction } from "./versions/1";
 
+@injectable()
 export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder> {
-	public constructor() {
-		super();
+	@postConstruct()
+	public postConstruct() {
+		this.initializeData();
 
-		this.data.type = Two.type;
-		this.data.typeGroup = Two.typeGroup;
-		this.data.fee = Two.staticFee(this.configuration);
+		this.data.type = MultiPaymentTransaction.type;
+		this.data.typeGroup = MultiPaymentTransaction.typeGroup;
+		this.data.fee = MultiPaymentTransaction.staticFee(this.configuration);
 		this.data.vendorField = undefined;
 		this.data.asset = {
 			payments: [],
@@ -25,7 +26,7 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 			const limit: number = this.configuration.getMilestone().multiPaymentLimit || 256;
 
 			if (this.data.asset.payments.length >= limit) {
-				throw new MaximumPaymentCountExceededError(limit);
+				throw new Exceptions.MaximumPaymentCountExceededError(limit);
 			}
 
 			this.data.asset.payments.push({
@@ -37,17 +38,17 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 		return this;
 	}
 
-	public async getStruct(): Promise<ITransactionData> {
+	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
 		if (
 			!this.data.asset ||
 			!this.data.asset.payments ||
 			!Array.isArray(this.data.asset.payments) ||
 			this.data.asset.payments.length <= 1
 		) {
-			throw new MinimumPaymentCountSubceededError();
+			throw new Exceptions.MinimumPaymentCountSubceededError();
 		}
 
-		const struct: ITransactionData = await super.getStruct();
+		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
 		struct.senderPublicKey = this.data.senderPublicKey;
 		struct.vendorField = this.data.vendorField;
 		struct.amount = this.data.amount;
