@@ -1113,11 +1113,13 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
+      joi: 17.4.2
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
+      joi: 17.4.2
 
   packages/core-fees-managed:
     specifiers:
@@ -1126,12 +1128,14 @@ importers:
       '@arkecosystem/core-fees': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
+      joi: 17.4.2
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-fees': link:../core-fees
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
+      joi: 17.4.2
 
   packages/core-fees-static:
     specifiers:

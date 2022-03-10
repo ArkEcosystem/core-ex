@@ -2,6 +2,8 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Services, Types, Utils as AppUtils } from "@arkecosystem/core-kernel";
 
+import { getRemainingSlotTime } from "../utils";
+
 @injectable()
 export class ForgeNewBlockAction extends Services.Triggers.Action {
 	@inject(Identifiers.Application)
@@ -53,7 +55,7 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 		AppUtils.assert.defined<string>(validator.publicKey);
 
 		const minimumMs = 2000;
-		const timeLeftInMs: number = this.#getRoundRemainingSlotTime(round);
+		const timeLeftInMs: number = getRemainingSlotTime(round, this.configuration);
 		const prettyName = `${this.app.get<object>(Identifiers.Forger.Usernames)[validator.publicKey]} (${
 			validator.publicKey
 		})`;
@@ -75,14 +77,6 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 		} else {
 			this.logger.warning(`Failed to forge new block by validator ${prettyName}, because already in next slot.`);
 		}
-	}
-
-	// @TODO: duplicate from forger-service.ts
-	#getRoundRemainingSlotTime(round: Contracts.P2P.CurrentRound): number {
-		const epoch = new Date(this.configuration.getMilestone(1).epoch).getTime();
-		const blockTime = this.configuration.getMilestone(round.lastBlock.height).blockTime;
-
-		return epoch + round.timestamp * 1000 + blockTime * 1000 - Date.now();
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransactionData[]> {
