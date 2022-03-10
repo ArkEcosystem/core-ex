@@ -1,6 +1,9 @@
-import { ClassManager } from "../../../../packages/core-kernel/source/support/class-manager";
+import { describe } from "../../../core-test-framework";
+
+import { ClassManager } from "./class-manager";
 
 class MyMemoryDriver {}
+
 class MyRemoteDriver {}
 
 class MyManager extends ClassManager {
@@ -17,12 +20,12 @@ class MyManager extends ClassManager {
 	}
 }
 
-describe("ClassManager.driver", () => {
+describe("ClassManager.driver", ({ assert, it }) => {
 	it("should return default driver instance", async () => {
 		const manager = new MyManager();
 		const memoryDriver = await manager.driver();
 
-		expect(memoryDriver).toBeInstanceOf(MyMemoryDriver);
+		assert.instance(memoryDriver, MyMemoryDriver);
 	});
 
 	it("should return new default driver instance after default driver change", async () => {
@@ -30,20 +33,20 @@ describe("ClassManager.driver", () => {
 		manager.setDefaultDriver("remote");
 		const remoteDriver = await manager.driver();
 
-		expect(remoteDriver).toBeInstanceOf(MyRemoteDriver);
+		assert.instance(remoteDriver, MyRemoteDriver);
 	});
 
 	it("should return driver instance", async () => {
 		const manager = new MyManager();
 		const remoteDriver = await manager.driver("remote");
 
-		expect(remoteDriver).toBeInstanceOf(MyRemoteDriver);
+		assert.instance(remoteDriver, MyRemoteDriver);
 	});
 
 	it("should throw when attempting to create unknown driver instance", async () => {
 		const manager = new MyManager();
 		const promise = manager.driver("some");
 
-		await expect(promise).rejects.toThrow();
+		await assert.rejects(() => promise);
 	});
 });
