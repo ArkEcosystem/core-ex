@@ -1611,6 +1611,7 @@ importers:
   packages/crypto:
     specifiers:
       '@arkecosystem/core-crypto-networks': workspace:*
+      '@arkecosystem/core-forger': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': 1.3.1
@@ -1667,6 +1668,7 @@ importers:
       lodash.set: 4.3.2
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-forger': link:../core-forger
       '@arkecosystem/core-test-framework': link:../core-test-framework
       '@types/bip32': 2.0.0
       '@types/bip39': 2.4.2
