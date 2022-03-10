@@ -121,7 +121,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 				}
 			} else {
 				const claimedBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
-				if (claimedBlock && !(await this.blockVerifier.verifySignature(claimedBlock))) {
+				if (claimedBlock && await this.blockVerifier.verifySignature(claimedBlock)) {
 					return true;
 				}
 			}
