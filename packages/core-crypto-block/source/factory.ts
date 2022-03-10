@@ -96,7 +96,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 			deserialized.data = validated;
 		}
 
-		const block: Contracts.Crypto.IBlock = await this.blockFactory(deserialized);
+		const block: Contracts.Crypto.IBlock = await this.app.resolve(Block).init(deserialized);
 		block.serialized = serialized.toString("hex");
 
 		return block;
