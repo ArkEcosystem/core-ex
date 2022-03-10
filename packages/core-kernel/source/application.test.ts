@@ -10,7 +10,6 @@ import { MemoryEventDispatcher } from "./services/events";
 import { resolve } from "path";
 import { dirSync } from "tmp";
 
-
 @injectable()
 class StubClass {}
 
