@@ -1,6 +1,9 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 
-export const getRemainingSlotTime = (round: Contracts.P2P.CurrentRound, configuration: Contracts.Crypto.IConfiguration): number | undefined => {
+export const getRemainingSlotTime = (
+	round: Contracts.P2P.CurrentRound,
+	configuration: Contracts.Crypto.IConfiguration,
+): number | undefined => {
 	if (round) {
 		const { blockTime } = configuration.getMilestone(round.lastBlock.height);
 
@@ -8,4 +11,4 @@ export const getRemainingSlotTime = (round: Contracts.P2P.CurrentRound, configur
 	}
 
 	return undefined;
-}
+};

@@ -47,7 +47,9 @@ export class IsForgingAllowedAction extends Services.Triggers.Action {
 				if (overHeightBlockHeader.generatorPublicKey === validator.publicKey) {
 					AppUtils.assert.defined<string>(validator.publicKey);
 
-					const username: string = this.app.get<Record<string, string>>(Identifiers.Forger.Usernames)[validator.publicKey];
+					const username: string = this.app.get<Record<string, string>>(Identifiers.Forger.Usernames)[
+						validator.publicKey
+					];
 
 					this.logger.warning(
 						`Possible double forging validator: ${username} (${validator.publicKey}) - Block: ${overHeightBlockHeader.id}.`,
