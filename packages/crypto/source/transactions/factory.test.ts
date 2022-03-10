@@ -1,18 +1,9 @@
 import { describe } from "@arkecosystem/core-test-framework";
 import { Interfaces, Utils } from "../";
-import {
-	InvalidTransactionBytesError,
-	TransactionSchemaError,
-	UnkownTransactionError,
-} from "../errors";
+import { InvalidTransactionBytesError, TransactionSchemaError, UnkownTransactionError } from "../errors";
 import { ITransactionData, ITransactionJson } from "../interfaces";
 import { configManager } from "../managers";
-import {
-	Serializer,
-	Transaction,
-	TransactionFactory,
-	Utils as TransactionUtils,
-} from "./";
+import { Serializer, Transaction, TransactionFactory, Utils as TransactionUtils } from "./";
 
 import { transaction as transactionFixture } from "../../test/fixtures/transaction";
 import { transaction as transactionDataFixture } from "../../test/fixtures/transaction";
@@ -27,7 +18,7 @@ describe<{
 }>("TransactionFactory", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		configManager.setFromPreset("devnet");
-	
+
 		context.transactionData = { ...transactionDataFixture };
 		context.transactionDataJSON = {
 			...context.transactionData,
@@ -44,7 +35,10 @@ describe<{
 	});
 
 	it("fromHex - should fail to create a transaction from hex that contains malformed bytes", () => {
-		assert.throws(() => TransactionFactory.fromHex("deadbeef"), err => err instanceof InvalidTransactionBytesError);
+		assert.throws(
+			() => TransactionFactory.fromHex("deadbeef"),
+			(err) => err instanceof InvalidTransactionBytesError,
+		);
 	});
 
 	it("fromBytes - should pass to create a transaction from a buffer", () => {
@@ -52,7 +46,10 @@ describe<{
 	});
 
 	it("fromBytes - should fail to create a transaction from a buffer that contains malformed bytes", () => {
-		assert.throws(() => TransactionFactory.fromBytes(Buffer.from("deadbeef")), err => err instanceof InvalidTransactionBytesError);
+		assert.throws(
+			() => TransactionFactory.fromBytes(Buffer.from("deadbeef")),
+			(err) => err instanceof InvalidTransactionBytesError,
+		);
 	});
 
 	it("fromBytesUnsafe - should pass to create a transaction from a buffer", () => {
@@ -60,7 +57,10 @@ describe<{
 	});
 
 	it("fromBytesUnsafe - should fail to create a transaction from a buffer that contains malformed bytes", () => {
-		assert.throws(() => TransactionFactory.fromBytesUnsafe(Buffer.from("deadbeef")), err => err instanceof InvalidTransactionBytesError);
+		assert.throws(
+			() => TransactionFactory.fromBytesUnsafe(Buffer.from("deadbeef")),
+			(err) => err instanceof InvalidTransactionBytesError,
+		);
 	});
 
 	// Old tests
@@ -79,11 +79,14 @@ describe<{
 	});
 
 	it("fromData - should fail to create a transaction from an object that contains malformed data", () => {
-		assert.throws(() =>
-			TransactionFactory.fromData({
-				...transaction.data,
-				...{ fee: Utils.BigNumber.make(0) },
-			}), err => err instanceof TransactionSchemaError);
+		assert.throws(
+			() =>
+				TransactionFactory.fromData({
+					...transaction.data,
+					...{ fee: Utils.BigNumber.make(0) },
+				}),
+			(err) => err instanceof TransactionSchemaError,
+		);
 	});
 
 	// Old tests
@@ -99,8 +102,14 @@ describe<{
 	});
 
 	it("fromData - should throw when getting garbage", () => {
-		assert.throws(() => TransactionFactory.fromData({} as ITransactionData), err => err instanceof UnkownTransactionError);
-		assert.throws(() => TransactionFactory.fromData({ type: 0 } as ITransactionData), err => err instanceof TransactionSchemaError);
+		assert.throws(
+			() => TransactionFactory.fromData({} as ITransactionData),
+			(err) => err instanceof UnkownTransactionError,
+		);
+		assert.throws(
+			() => TransactionFactory.fromData({ type: 0 } as ITransactionData),
+			(err) => err instanceof TransactionSchemaError,
+		);
 	});
 
 	it("fromJson - should pass to create a transaction from JSON", () => {
@@ -108,10 +117,13 @@ describe<{
 	});
 
 	it("fromJson - should fail to create a transaction from JSON that contains malformed data", () => {
-		assert.throws(() =>
-			TransactionFactory.fromJson({
-				...transactionJson,
-				...{ senderPublicKey: "something" },
-			}), err => err instanceof TransactionSchemaError);
+		assert.throws(
+			() =>
+				TransactionFactory.fromJson({
+					...transactionJson,
+					...{ senderPublicKey: "something" },
+				}),
+			(err) => err instanceof TransactionSchemaError,
+		);
 	});
 });
