@@ -1,7 +1,7 @@
-import "jest-extended";
-
 import { Crypto, Interfaces } from "@arkecosystem/crypto";
-import { getBlockNotChainedErrorMessage, isBlockChained } from "@packages/core-kernel/source/utils/is-block-chained";
+import { describe } from "../../../core-test-framework";
+
+import { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained";
 
 const mockGetBlockTimeLookup = (height: number) => {
 	switch (height) {
@@ -12,8 +12,8 @@ const mockGetBlockTimeLookup = (height: number) => {
 	}
 };
 
-describe("isBlockChained", () => {
-	it("should be ok", () => {
+describe("", ({ assert, it }) => {
+	it("isBlockChained should be ok", () => {
 		const previousBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
@@ -28,10 +28,10 @@ describe("isBlockChained", () => {
 			previousBlock: "1",
 		} as Interfaces.IBlockData;
 
-		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeTrue();
+		assert.true(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup));
 	});
 
-	it("should not chain when previous block does not match", () => {
+	it("isBlockChained should not chain when previous block does not match", () => {
 		const previousBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
@@ -41,33 +41,33 @@ describe("isBlockChained", () => {
 
 		const nextBlock = {
 			id: "1",
-			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
-			height: 3,
-			previousBlock: "1",
-		} as Interfaces.IBlockData;
-
-		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
-	});
-
-	it("should not chain when next height is not plus 1", () => {
-		const previousBlock = {
-			id: "1",
-			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
-			height: 1,
-			previousBlock: null,
-		} as Interfaces.IBlockData;
-
-		const nextBlock = {
-			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
 			height: 3,
 			previousBlock: "1",
 		} as Interfaces.IBlockData;
 
-		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
+		assert.false(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup));
 	});
 
-	it("should not chain when same slot", () => {
+	it("isBlockChained should not chain when next height is not plus 1", () => {
+		const previousBlock = {
+			id: "1",
+			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
+			height: 1,
+			previousBlock: null,
+		} as Interfaces.IBlockData;
+
+		const nextBlock = {
+			id: "2",
+			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
+			height: 3,
+			previousBlock: "1",
+		} as Interfaces.IBlockData;
+
+		assert.false(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup));
+	});
+
+	it("isBlockChained should not chain when same slot", () => {
 		const previousBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
@@ -82,10 +82,10 @@ describe("isBlockChained", () => {
 			previousBlock: "1",
 		} as Interfaces.IBlockData;
 
-		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
+		assert.false(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup));
 	});
 
-	it("should not chain when lower slot", () => {
+	it("isBlockChained should not chain when lower slot", () => {
 		const previousBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
@@ -100,12 +100,10 @@ describe("isBlockChained", () => {
 			previousBlock: "1",
 		} as Interfaces.IBlockData;
 
-		expect(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup)).toBeFalse();
+		assert.false(isBlockChained(previousBlock, nextBlock, mockGetBlockTimeLookup));
 	});
-});
 
-describe("getBlockNotChainedErrorMessage", () => {
-	it("should throw when blocks are chained", () => {
+	it("getBlockNotChainedErrorMessage should throw when blocks are chained", async () => {
 		const previousBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
@@ -122,10 +120,10 @@ describe("getBlockNotChainedErrorMessage", () => {
 
 		const check = () => getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
-		expect(check).toThrow();
+		await assert.rejects(check);
 	});
 
-	it("should report when previous block id does not match", () => {
+	it("getBlockNotChainedErrorMessage should report when previous block id does not match", () => {
 		const previousBlock = {
 			id: "2",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
@@ -142,12 +140,13 @@ describe("getBlockNotChainedErrorMessage", () => {
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
-		expect(msg).toBe(
+		assert.is(
+			msg,
 			"Block { height: 3, id: 1, previousBlock: 1 } is not chained to the previous block { height: 2, id: 2 }: previous block id mismatch",
 		);
 	});
 
-	it("should report when next height is not plus 1", () => {
+	it("getBlockNotChainedErrorMessage should report when next height is not plus 1", () => {
 		const previousBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
@@ -164,12 +163,13 @@ describe("getBlockNotChainedErrorMessage", () => {
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
-		expect(msg).toBe(
+		assert.is(
+			msg,
 			"Block { height: 3, id: 2, previousBlock: 1 } is not chained to the previous block { height: 1, id: 1 }: height is not plus one",
 		);
 	});
 
-	it("should not chain when same slot", () => {
+	it("getBlockNotChainedErrorMessage should not chain when same slot", () => {
 		const previousBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 0),
@@ -186,12 +186,13 @@ describe("getBlockNotChainedErrorMessage", () => {
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
-		expect(msg).toBe(
+		assert.is(
+			msg,
 			"Block { height: 2, id: 2, previousBlock: 1 } is not chained to the previous block { height: 1, id: 1 }: previous slot is not smaller: 0 (derived from timestamp 0) VS 0 (derived from timestamp 0)",
 		);
 	});
 
-	it("should not chain when lower slot", () => {
+	it("getBlockNotChainedErrorMessage should not chain when lower slot", () => {
 		const previousBlock = {
 			id: "1",
 			timestamp: Crypto.Slots.getSlotTime(mockGetBlockTimeLookup, 1),
@@ -208,7 +209,8 @@ describe("getBlockNotChainedErrorMessage", () => {
 
 		const msg = getBlockNotChainedErrorMessage(previousBlock, nextBlock, mockGetBlockTimeLookup);
 
-		expect(msg).toBe(
+		assert.is(
+			msg,
 			"Block { height: 2, id: 2, previousBlock: 1 } is not chained to the previous block { height: 1, id: 1 }: previous slot is not smaller: 1 (derived from timestamp 8) VS 0 (derived from timestamp 0)",
 		);
 	});
