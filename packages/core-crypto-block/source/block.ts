@@ -131,7 +131,7 @@ export class Block implements Contracts.Crypto.IBlock {
 			const invalidTransactions: Contracts.Crypto.ITransaction[] = [];
 
 			for (const transaction of this.transactions) {
-				if (!await this.transactionVerifier.verifyHash(transaction.data)) {
+				if (!(await this.transactionVerifier.verifyHash(transaction.data))) {
 					invalidTransactions.push(transaction);
 				}
 			}
