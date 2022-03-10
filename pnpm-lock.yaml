@@ -1299,10 +1299,10 @@ importers:
       '@types/semver': 6.2.3
       uvu: 0.5.3
 
-  packages/core-kernel/__tests__/__stubs__/stub-plugin:
+  packages/core-kernel/test/stubs/stub-plugin:
     specifiers: {}
 
-  packages/core-kernel/__tests__/__stubs__/stub-plugin-with-defaults:
+  packages/core-kernel/test/stubs/stub-plugin-with-defaults:
     specifiers: {}
 
   packages/core-logger-pino:
