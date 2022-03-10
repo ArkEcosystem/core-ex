@@ -1,5 +1,5 @@
-import { Application } from "@arkecosystem/core-kernel/source/application";
 import { Container } from "@arkecosystem/core-container";
+import { Application } from "@arkecosystem/core-kernel/source/application";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../core-test-framework";
