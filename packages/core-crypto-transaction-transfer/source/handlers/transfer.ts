@@ -26,7 +26,9 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 	public async bootstrap(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
 		for (const transaction of this.allTransactions(transactions)) {
-			this.walletRepository.findByAddress(transaction.recipientId).increaseBalance(BigNumber.make(transaction.amount));
+			this.walletRepository
+				.findByAddress(transaction.recipientId)
+				.increaseBalance(BigNumber.make(transaction.amount));
 		}
 	}
 
@@ -49,7 +51,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
 
-		if (!await this.addressFactory.validate(recipientId)) {
+		if (!(await this.addressFactory.validate(recipientId))) {
 			throw new Exceptions.PoolError(
 				`Recipient ${recipientId} is not on the same network`,
 				"ERR_INVALID_RECIPIENT",
