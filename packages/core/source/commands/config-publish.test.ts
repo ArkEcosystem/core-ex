@@ -7,7 +7,7 @@ import { Command } from "./config-publish";
 
 describe<{
 	cli: Console;
-}>("PublishCommand", ({ beforeEach, afterAll, it, assert, stub, spy }) => {
+}>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert, stub, spy }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 

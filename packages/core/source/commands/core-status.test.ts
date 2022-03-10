@@ -6,7 +6,7 @@ import { Command } from "./core-status";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StatusCommand", ({ beforeEach, it, assert, stub }) => {
+}>("CoreStatusCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

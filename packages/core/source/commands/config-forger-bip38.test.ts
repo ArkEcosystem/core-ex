@@ -8,7 +8,7 @@ import { Command } from "./config-forger-bip38";
 
 describe<{
 	cli: Console;
-}>("BIP38Command", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("ConfigForgerBIP38Commnad", ({ beforeEach, afterAll, it, assert, stub }) => {
 	const bip39 = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";
 	const bip39Flags = "venue below waste gather spin cruise title still boost mother flash tuna";
 	const bip39Prompt = "craft imitate step mixture patch forest volcano business charge around girl confirm";

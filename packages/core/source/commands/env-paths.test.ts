@@ -5,7 +5,7 @@ import { Command } from "./env-paths";
 
 describe<{
 	cli: Console;
-}>("PathsCommand", ({ beforeEach, it, stub, assert }) => {
+}>("EnvPathsCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		delete process.env.CORE_PATH_CONFIG;

@@ -5,7 +5,7 @@ import { Command } from "./relay-stop";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StopCommand", ({ beforeEach, it, assert, stub }) => {
+}>("RelayStopCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

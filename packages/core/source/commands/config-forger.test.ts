@@ -8,7 +8,7 @@ import { Command } from "./config-forger";
 
 describe<{
 	cli: Console;
-}>("ForgerCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("ConfigForgerCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
 	const password = "password";
 	const bip39 = "clay harbor enemy utility margin pretty hub comic piece aerobic umbrella acquire";
 	const bip39Flags = "venue below waste gather spin cruise title still boost mother flash tuna";

@@ -8,7 +8,7 @@ import { Command } from "./core-run";
 
 describe<{
 	cli: Console;
-}>("RunCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
+}>("CoreRunCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 

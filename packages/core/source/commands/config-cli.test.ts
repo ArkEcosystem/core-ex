@@ -7,7 +7,7 @@ import { Command } from "./config-cli";
 describe<{
 	cli: Console;
 	config: Contracts.Config;
-}>("Command", ({ beforeEach, it, assert, stub }) => {
+}>("ConfigCliCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.config = context.cli.app.get<Contracts.Config>(Container.Identifiers.Config);

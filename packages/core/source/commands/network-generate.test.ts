@@ -8,7 +8,7 @@ import { Command } from "./network-generate";
 
 describe<{
 	cli: Console;
-}>("GenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
+}>("NetworkGenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
 	const configCrypto = join(configCore, "crypto");

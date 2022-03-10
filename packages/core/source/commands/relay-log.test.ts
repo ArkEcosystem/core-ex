@@ -5,7 +5,7 @@ import { Command } from "./relay-log";
 
 describe<{
 	cli: Console;
-}>("RelayLog", ({ beforeEach, it, stub }) => {
+}>("RelayLogCommand", ({ beforeEach, it, stub }) => {
 	const process = {
 		log: () => {},
 	};

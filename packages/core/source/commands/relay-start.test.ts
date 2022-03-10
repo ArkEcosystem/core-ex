@@ -6,7 +6,7 @@ import { resolve } from "path";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StartCommand", ({ beforeEach, it, assert, stub }) => {
+}>("RelayStartCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

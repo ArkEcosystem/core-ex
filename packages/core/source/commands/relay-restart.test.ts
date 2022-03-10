@@ -6,7 +6,7 @@ import { Command } from "./relay-restart";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("RestartCommand", ({ beforeEach, it, stub, assert }) => {
+}>("RelayRestartCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

@@ -5,7 +5,7 @@ import { Command } from "./relay-share";
 
 describe<{
 	cli: Console;
-}>("ShareCommand", ({ beforeEach, it, stub, assert }) => {
+}>("RelayShareCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 	});

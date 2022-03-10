@@ -6,7 +6,7 @@ import { Command } from "./relay-status";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StatusCommand", ({ beforeEach, it, stub, assert }) => {
+}>("RelayStatusCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

@@ -6,7 +6,7 @@ import { Command } from "./env-list";
 
 describe<{
 	cli: Console;
-}>("ListCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("EnvListCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 

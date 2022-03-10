@@ -9,7 +9,7 @@ import { Command } from "./core-start";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StartCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("CoreStartCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 

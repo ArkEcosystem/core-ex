@@ -6,7 +6,7 @@ import { Command } from "./forger-stop";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StopCommand", ({ beforeEach, it, stub, assert }) => {
+}>("ForgerStopCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

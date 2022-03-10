@@ -6,7 +6,7 @@ import { Command } from "./forger-status";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StatusCommand", ({ beforeEach, it, stub, assert }) => {
+}>("ForgerStatusCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

@@ -6,7 +6,7 @@ import { Command } from "./relay-run";
 
 describe<{
 	cli: Console;
-}>("RunCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
+}>("RelayRunCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 	});

@@ -6,7 +6,7 @@ import { Command } from "./env-get";
 
 describe<{
 	cli: Console;
-}>("GetCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
+}>("EnvGetCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 

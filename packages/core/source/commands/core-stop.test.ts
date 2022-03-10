@@ -6,7 +6,7 @@ import { Command } from "./core-stop";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StopCommand", ({ beforeEach, it, assert, stub }) => {
+}>("CoreStopCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Container.Identifiers.ProcessManager);

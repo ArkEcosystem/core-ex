@@ -9,7 +9,7 @@ import { Command } from "./forger-start";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("StartCommand", ({ beforeEach, afterAll, it, stub }) => {
+}>("ForgerStartCommand", ({ beforeEach, afterAll, it, stub }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
