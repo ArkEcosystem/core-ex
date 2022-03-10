@@ -87,3 +87,9 @@ export interface IBlockSerializer {
 
 	serializeWithTransactions(block: IBlockData): Promise<Buffer>;
 }
+
+export interface IBlockVerifier {
+	verify(block: IBlockData): Promise<IBlockVerification>;
+
+	verifySignature(block: IBlockData): Promise<boolean>;
+}
