@@ -1,3 +1,5 @@
+import { describe } from "../../../core-test-framework";
+
 import {
 	everyOrCriteria,
 	handleAndCriteria,
@@ -6,7 +8,7 @@ import {
 	hasOrCriteria,
 	optimizeExpression,
 	someOrCriteria,
-} from "../../../../packages/core-kernel/source/utils/search";
+} from "./search";
 
 type UserEntity = {
 	id: number;
@@ -15,13 +17,13 @@ type UserEntity = {
 	data: Record<string, any>;
 };
 
-describe("optimizeExpression", () => {
+describe("optimizeExpression", ({ assert, it }) => {
 	it("should expand 'and' expression when it contains single expression", () => {
 		const expression = optimizeExpression<UserEntity>({
 			op: "and",
 			expressions: [{ property: "id", op: "equal", value: 5 }],
 		});
-		expect(expression).toEqual({ property: "id", op: "equal", value: 5 });
+		assert.equal(expression, { property: "id", op: "equal", value: 5 });
 	});
 
 	it("should expand 'or' expression when it contains single expression", () => {
@@ -29,7 +31,7 @@ describe("optimizeExpression", () => {
 			op: "or",
 			expressions: [{ property: "id", op: "equal", value: 5 }],
 		});
-		expect(expression).toEqual({ property: "id", op: "equal", value: 5 });
+		assert.equal(expression, { property: "id", op: "equal", value: 5 });
 	});
 
 	it("should replace 'and' expression with 'true' expression when all expressions are 'true'", () => {
@@ -37,7 +39,7 @@ describe("optimizeExpression", () => {
 			op: "and",
 			expressions: [{ op: "true" }, { op: "true" }],
 		});
-		expect(expression).toEqual({ op: "true" });
+		assert.equal(expression, { op: "true" });
 	});
 
 	it("should replace 'and' expression with 'false' expression when any expression is 'false'", () => {
@@ -45,7 +47,7 @@ describe("optimizeExpression", () => {
 			op: "and",
 			expressions: [{ op: "true" }, { op: "false" }],
 		});
-		expect(expression).toEqual({ op: "false" });
+		assert.equal(expression, { op: "false" });
 	});
 
 	it("should replace 'or' expression with 'false' expression when all expressions are 'false'", () => {
@@ -53,7 +55,7 @@ describe("optimizeExpression", () => {
 			op: "or",
 			expressions: [{ op: "false" }, { op: "false" }],
 		});
-		expect(expression).toEqual({ op: "false" });
+		assert.equal(expression, { op: "false" });
 	});
 
 	it("should replace 'or' expression with 'true' expression when any expression is 'true'", () => {
@@ -61,7 +63,7 @@ describe("optimizeExpression", () => {
 			op: "or",
 			expressions: [{ op: "true" }, { op: "false" }],
 		});
-		expect(expression).toEqual({ op: "true" });
+		assert.equal(expression, { op: "true" });
 	});
 
 	it("should merge 'and' expressions", () => {
@@ -79,7 +81,7 @@ describe("optimizeExpression", () => {
 			],
 		});
 
-		expect(expression).toEqual({
+		assert.equal(expression, {
 			op: "and",
 			expressions: [
 				{ property: "fullName", op: "like", pattern: "%Dmitry%" },
@@ -104,7 +106,7 @@ describe("optimizeExpression", () => {
 			],
 		});
 
-		expect(expression).toEqual({
+		assert.equal(expression, {
 			op: "or",
 			expressions: [
 				{ property: "fullName", op: "like", pattern: "%Dmitry%" },
@@ -115,115 +117,115 @@ describe("optimizeExpression", () => {
 	});
 });
 
-describe("someOrCriteria", () => {
+describe("someOrCriteria", ({ assert, it }) => {
 	it("should return true when some criteria matches predicate", () => {
 		const criteria = [{ age: { from: 18, to: 25 } }, { age: { from: 36, to: 45 } }];
 		const predicate = (c) => c.age.from >= 18;
 		const match = someOrCriteria(criteria, predicate);
-		expect(match).toBe(true);
+		assert.true(match);
 	});
 
 	it("should return true when criteria matches predicate", () => {
 		const criteria = { age: { from: 18, to: 25 } };
 		const predicate = (c) => c.age.from >= 18;
 		const match = someOrCriteria(criteria, predicate);
-		expect(match).toBe(true);
+		assert.true(match);
 	});
 
 	it("should return false when no criteria matches predicate", () => {
 		const criteria = [{ age: { from: 18, to: 25 } }, { age: { from: 36, to: 45 } }];
 		const predicate = (c) => c.age.from >= 46;
 		const match = someOrCriteria(criteria, predicate);
-		expect(match).toBe(false);
+		assert.false(match);
 	});
 
 	it("should return false when criteria doesn't match predicate", () => {
 		const criteria = { age: { from: 36, to: 45 } };
 		const predicate = (c) => c.age.from >= 46;
 		const match = someOrCriteria(criteria, predicate);
-		expect(match).toBe(false);
+		assert.false(match);
 	});
 
 	it("should return false when there are no criteria to match", () => {
 		const criteria = [];
 		const predicate = () => true;
 		const match = someOrCriteria(criteria, predicate);
-		expect(match).toBe(false);
+		assert.false(match);
 	});
 
 	it("should return false when criteria is undefined", () => {
 		const criteria = undefined;
 		const predicate = () => true;
 		const match = someOrCriteria(criteria, predicate);
-		expect(match).toBe(false);
+		assert.false(match);
 	});
 });
 
-describe("everyOrCriteria", () => {
+describe("everyOrCriteria", ({ assert, it }) => {
 	it("should return true when every criteria matches predicate", () => {
 		const criteria = [{ age: { from: 18, to: 25 } }, { age: { from: 36, to: 45 } }];
 		const predicate = (c) => c.age.from >= 18;
 		const match = everyOrCriteria(criteria, predicate);
-		expect(match).toBe(true);
+		assert.true(match);
 	});
 
 	it("should return true when criteria matches predicate", () => {
 		const criteria = { age: { from: 18, to: 25 } };
 		const predicate = (c) => c.age.from >= 18;
 		const match = everyOrCriteria(criteria, predicate);
-		expect(match).toBe(true);
+		assert.true(match);
 	});
 
 	it("should return false when no criteria matches predicate", () => {
 		const criteria = [{ age: { from: 18, to: 25 } }, { age: { from: 36, to: 45 } }];
 		const predicate = (c) => c.age.from >= 46;
 		const match = everyOrCriteria(criteria, predicate);
-		expect(match).toBe(false);
+		assert.false(match);
 	});
 
 	it("should return false when criteria doesn't match predicate", () => {
 		const criteria = { age: { from: 36, to: 45 } };
 		const predicate = (c) => c.age.from >= 46;
 		const match = everyOrCriteria(criteria, predicate);
-		expect(match).toBe(false);
+		assert.false(match);
 	});
 
 	it("should return true when there are no criteria to match", () => {
 		const criteria = [];
 		const predicate = () => false;
 		const match = everyOrCriteria(criteria, predicate);
-		expect(match).toBe(true);
+		assert.true(match);
 	});
 
 	it("should return true when criteria is undefined", () => {
 		const criteria = undefined;
 		const predicate = () => true;
 		const match = everyOrCriteria(criteria, predicate);
-		expect(match).toBe(true);
+		assert.true(match);
 	});
 });
 
-describe("hasOrCriteria", () => {
+describe("hasOrCriteria", ({ assert, it }) => {
 	it("should return true when there is criteria", () => {
 		const criteria = [{ age: { from: 18, to: 25 } }, { age: { from: 36, to: 45 } }];
 		const has = hasOrCriteria(criteria);
-		expect(has).toBe(true);
+		assert.true(has);
 	});
 
 	it("should return false when there are no criteria", () => {
 		const criteria = [];
 		const has = hasOrCriteria(criteria);
-		expect(has).toBe(false);
+		assert.false(has);
 	});
 
 	it("should return true when there is one criteria", () => {
 		const criteria = { age: { from: 18, to: 25 } };
 		const has = hasOrCriteria(criteria);
-		expect(has).toBe(true);
+		assert.true(has);
 	});
 });
 
-describe("handleAndCriteria", () => {
+describe("handleAndCriteria", ({ assert, it }) => {
 	it("should join properties using 'and' expression", async () => {
 		const criteria = {
 			age: { from: 18, to: 25 },
@@ -241,7 +243,7 @@ describe("handleAndCriteria", () => {
 			}
 		});
 
-		expect(expression).toEqual({
+		assert.equal(expression, {
 			op: "and",
 			expressions: [
 				{ property: "age", op: "between", from: 18, to: 25 },
@@ -251,7 +253,7 @@ describe("handleAndCriteria", () => {
 	});
 });
 
-describe("handleOrCriteria", () => {
+describe("handleOrCriteria", ({ assert, it }) => {
 	it("should join items using 'or' expression", async () => {
 		const criteria = {
 			age: [
@@ -264,7 +266,7 @@ describe("handleOrCriteria", () => {
 			return { property: "age", op: "between", from: c.from, to: c.to };
 		});
 
-		expect(expression).toEqual({
+		assert.equal(expression, {
 			op: "or",
 			expressions: [
 				{ property: "age", op: "between", from: 18, to: 25 },
@@ -279,35 +281,35 @@ describe("handleOrCriteria", () => {
 			return { property: "age", op: "between", from: c.from, to: c.to };
 		});
 
-		expect(expression).toEqual({
+		assert.equal(expression, {
 			op: "or",
 			expressions: [{ property: "age", op: "between", from: 18, to: 25 }],
 		});
 	});
 });
 
-describe("handleNumericCriteria", () => {
+describe("handleNumericCriteria", ({ assert, it }) => {
 	it("should return 'equal' expression when criteria is value", async () => {
 		const criteria = { age: 45 };
 		const expression = await handleNumericCriteria<UserEntity, "age">("age", criteria.age);
-		expect(expression).toEqual({ property: "age", op: "equal", value: 45 });
+		assert.equal(expression, { property: "age", op: "equal", value: 45 });
 	});
 
 	it("should return 'between' expression when criteria is object with 'from' and 'to' properties", async () => {
 		const criteria = { age: { from: 36, to: 45 } };
 		const expression = await handleNumericCriteria<UserEntity, "age">("age", criteria.age);
-		expect(expression).toEqual({ property: "age", op: "between", from: 36, to: 45 });
+		assert.equal(expression, { property: "age", op: "between", from: 36, to: 45 });
 	});
 
 	it("should return 'greaterThanEqual' expression when criteria is object with 'from' property", async () => {
 		const criteria = { age: { from: 36 } };
 		const expression = await handleNumericCriteria<UserEntity, "age">("age", criteria.age);
-		expect(expression).toEqual({ property: "age", op: "greaterThanEqual", value: 36 });
+		assert.equal(expression, { property: "age", op: "greaterThanEqual", value: 36 });
 	});
 
 	it("should return 'lessThanEqual' expression when criteria is object with 'to' property", async () => {
 		const criteria = { age: { to: 45 } };
 		const expression = await handleNumericCriteria<UserEntity, "age">("age", criteria.age);
-		expect(expression).toEqual({ property: "age", op: "lessThanEqual", value: 45 });
+		assert.equal(expression, { property: "age", op: "lessThanEqual", value: 45 });
 	});
 });
