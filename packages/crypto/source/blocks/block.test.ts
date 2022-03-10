@@ -577,7 +577,8 @@ describe("Block", ({ it, assert, beforeEach, stub, each }) => {
 		const dataWithPreviousBlock: any = Object.assign({}, data, {
 			previousBlock: "1234",
 		});
-		assert.equal(serialize(dataWithPreviousBlock).slice(12, 20).toString("hex"), 
+		assert.equal(
+			serialize(dataWithPreviousBlock).slice(12, 20).toString("hex"),
 			dataWithPreviousBlock.previousBlockHex,
 		);
 	});
@@ -612,16 +613,18 @@ describe("Block", ({ it, assert, beforeEach, stub, each }) => {
 		assert.equal(
 			serialize(data)
 				.slice(52, 52 + 32)
-				.toString("hex")
-		, data.payloadHash);
+				.toString("hex"),
+			data.payloadHash,
+		);
 	});
 
 	it("serialize - `generatorPublicKey` of transactions is appended, using 33 bytes, as hexadecimal", () => {
 		assert.equal(
 			serialize(data)
 				.slice(84, 84 + 33)
-				.toString("hex")
-		, data.generatorPublicKey);
+				.toString("hex"),
+			data.generatorPublicKey,
+		);
 	});
 
 	it("serialize - if the `blockSignature` is not included is not serialized", () => {
@@ -644,25 +647,32 @@ describe("Block", ({ it, assert, beforeEach, stub, each }) => {
 		assert.equal(serialize(data, false).limit, 117);
 	});
 
-	each("serializeWithTransactions - genesis block - %s", ({ dataset }) => {
-		const { network, length }: {
-			network: NetworkName, 
-			length: number
-		} = dataset;
-		
-		configManager.setFromPreset(network);
-		configManager.getMilestone().aip11 = false;
+	each(
+		"serializeWithTransactions - genesis block - %s",
+		({ dataset }) => {
+			const {
+				network,
+				length,
+			}: {
+				network: NetworkName;
+				length: number;
+			} = dataset;
 
-		const block = BlockFactory.fromJson(networks[network].genesisBlock);
+			configManager.setFromPreset(network);
+			configManager.getMilestone().aip11 = false;
 
-		assert.equal(block.serialized.length, length);
-		assert.true(block.verifySignature());
-		configManager.getMilestone().aip11 = network === "testnet";
-	}, [
-		["mainnet", 468048],
-		["devnet", 14492],
-		["testnet", 46488],
-	]);
+			const block = BlockFactory.fromJson(networks[network].genesisBlock);
+
+			assert.equal(block.serialized.length, length);
+			assert.true(block.verifySignature());
+			configManager.getMilestone().aip11 = network === "testnet";
+		},
+		[
+			["mainnet", 468048],
+			["devnet", 14492],
+			["testnet", 46488],
+		],
+	);
 
 	it("serializeWithTransactions - should validate hash", () => {
 		// @ts-ignore

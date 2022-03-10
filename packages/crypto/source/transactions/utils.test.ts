@@ -1,20 +1,11 @@
 import { BigNumber } from "../utils/bignum";
 import { describe, Generators } from "@arkecosystem/core-test-framework";
 import { TransactionFactory as TestTransactionFactory } from "@arkecosystem/core-test-framework/source/utils/transaction-factory";
-import {
-	InvalidTransactionBytesError,
-	TransactionTypeError,
-	TransactionVersionError,
-} from "../errors";
+import { InvalidTransactionBytesError, TransactionTypeError, TransactionVersionError } from "../errors";
 import { Keys } from "../identities";
 import { ITransaction, ITransactionData, NetworkConfig } from "../interfaces";
 import { configManager } from "../managers";
-import {
-	BuilderFactory,
-	Transaction,
-	TransactionFactory,
-	Utils as TransactionUtils,
-} from "./";
+import { BuilderFactory, Transaction, TransactionFactory, Utils as TransactionUtils } from "./";
 import { transaction as transactionDataFixture } from "../../test/fixtures/transaction";
 
 const createRandomTx = (type) => {
@@ -143,10 +134,22 @@ describe<{
 	});
 
 	it("toBytes / fromBytes - should throw when getting garbage", () => {
-		assert.throws(() => TransactionFactory.fromBytes(undefined), err => err instanceof TypeError);
-		assert.throws(() => TransactionFactory.fromBytes(Buffer.from("garbage")), err => err instanceof InvalidTransactionBytesError);
-		assert.throws(() => TransactionFactory.fromHex(undefined), err => err instanceof InvalidTransactionBytesError);
-		assert.throws(() => TransactionFactory.fromHex("affe"), err => err instanceof InvalidTransactionBytesError);
+		assert.throws(
+			() => TransactionFactory.fromBytes(undefined),
+			(err) => err instanceof TypeError,
+		);
+		assert.throws(
+			() => TransactionFactory.fromBytes(Buffer.from("garbage")),
+			(err) => err instanceof InvalidTransactionBytesError,
+		);
+		assert.throws(
+			() => TransactionFactory.fromHex(undefined),
+			(err) => err instanceof InvalidTransactionBytesError,
+		);
+		assert.throws(
+			() => TransactionFactory.fromHex("affe"),
+			(err) => err instanceof InvalidTransactionBytesError,
+		);
 	});
 
 	it("toBytes / fromBytes - should throw when getting an unsupported version", () => {
@@ -163,7 +166,10 @@ describe<{
 
 		let hex = transaction.serialized.toString("hex");
 		hex = hex.slice(0, 2) + "04" + hex.slice(4);
-		assert.throws(() => TransactionFactory.fromHex(hex), err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => TransactionFactory.fromHex(hex),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 
 	it("getHash - should return Buffer and Buffer must be 32 bytes length", () => {
@@ -194,7 +200,10 @@ describe<{
 			.withVersion(2)
 			.createOne();
 
-		assert.throws(() => TransactionUtils.toHash(Object.assign({}, transaction, { version: 110 })), err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => TransactionUtils.toHash(Object.assign({}, transaction, { version: 110 })),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 
 	it("getId - should return string id and be equal to 27f68f1e62b9e6e3bc13b7113488f1e27263a4e47e7d9c7acd9c9af67d7fa11c", () => {
@@ -224,6 +233,9 @@ describe<{
 			.withVersion(2)
 			.createOne();
 
-		assert.throws(() => TransactionUtils.getId(Object.assign({}, transaction, { version: 110 })), err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => TransactionUtils.getId(Object.assign({}, transaction, { version: 110 })),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 });
