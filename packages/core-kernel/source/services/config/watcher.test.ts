@@ -24,7 +24,7 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should watch the configuration files and reboot on change", async (context) => {
+	it.skip("should watch the configuration files and reboot on change", async (context) => {
 		const spyReboot = spy(context.app, "reboot");
 
 		writeFileSync(`${configPath}/.env`, "old");
