@@ -41,7 +41,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				result.errors.push(["Invalid block reward:", blockData.reward, "expected:", constants.reward].join(" "));
 			}
 
-			const valid = this.verifySignature(block.data);
+			const valid = this.#verifySignature(block.data);
 
 			if (!valid) {
 				result.errors.push("Failed to verify block signature");
@@ -140,7 +140,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 		return result;
 	}
 
-	public async verifySignature(block: Contracts.Crypto.IBlockData): Promise<boolean> {
+	async #verifySignature(block: Contracts.Crypto.IBlockData): Promise<boolean> {
 		const bytes: Buffer = await this.serializer.serialize(block, false);
 		const hash: Buffer = await this.hashFactory.sha256(bytes);
 
