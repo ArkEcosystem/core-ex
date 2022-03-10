@@ -1,5 +1,6 @@
-import { Application } from "@arkecosystem/core-kernel";
 import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application } from "@arkecosystem/core-kernel";
 import { sleep } from "@arkecosystem/utils";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
