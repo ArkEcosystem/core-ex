@@ -16,7 +16,7 @@ describe<{
 }>("TransactionBuilder", ({ it, assert, beforeAll, beforeEach, afterAll, stub, spy }) => {
 	beforeAll((context) => {
 		context.originalConfig = configManager.all();
-		
+
 		// todo: completely wrap this into a function to hide the generation and setting of the config?
 		context.config = Generators.generateCryptoConfigRaw();
 
@@ -80,7 +80,8 @@ describe<{
 			assert.equal(transaction.data.amount, BigNumber.ONE);
 			assert.equal(transaction.data.fee, BigNumber.ONE);
 			assert.equal(transaction.data.recipientId, "AZT6b2Vm6VgNF7gW49M4wvUVBBntWxdCj5");
-			assert.equal(transaction.data.senderPublicKey, 
+			assert.equal(
+				transaction.data.senderPublicKey,
 				"039180ea4a8a803ee11ecb462bb8f9613fcdb5fe917e292dbcc73409f0e98f8f22",
 			);
 			assert.equal(transaction.data.nonce, context.nonce);
@@ -100,7 +101,8 @@ describe<{
 			assert.equal(transaction.data.amount, BigNumber.make(33));
 			assert.equal(transaction.data.fee, BigNumber.make(1000));
 			assert.equal(transaction.data.recipientId, "AZT6b2Vm6VgNF7gW49M4wvUVBBntWxdCj5");
-			assert.equal(transaction.data.senderPublicKey, 
+			assert.equal(
+				transaction.data.senderPublicKey,
 				"039180ea4a8a803ee11ecb462bb8f9613fcdb5fe917e292dbcc73409f0e98f8f22",
 			);
 			assert.equal(transaction.data.nonce, context.nonce);
@@ -195,7 +197,9 @@ describe<{
 			const spyMultiSign = spy(Signer, "multiSign");
 
 			const builder = provider();
-			builder.senderPublicKey(context.identity.publicKey).multiSignWithWif(0, context.identitySecond.bip39, undefined);
+			builder
+				.senderPublicKey(context.identity.publicKey)
+				.multiSignWithWif(0, context.identitySecond.bip39, undefined);
 
 			spyKeys.calledWith(context.identitySecond.bip39, {
 				wif: 186,
@@ -212,11 +216,17 @@ describe<{
 		const transaction = BuilderFactory.transfer().version(1).amount("100").recipientId(recipientAddress);
 
 		let signedTransaction;
-		assert.not.throws(() => (signedTransaction = transaction.sign("sender's secret")), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => (signedTransaction = transaction.sign("sender's secret")),
+			(err) => err instanceof TransactionVersionError,
+		);
 		assert.equal(signedTransaction.data.version, 1);
-		assert.not.throws(() => signedTransaction.build(), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => signedTransaction.build(),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
-	
+
 	it("should not throw transaction version error when specifically setting version 1 and aip11 is true", () => {
 		configManager.setFromPreset("devnet");
 		configManager.getMilestone().aip11 = true;
@@ -225,9 +235,15 @@ describe<{
 		const transaction = BuilderFactory.transfer().version(1).amount("100").recipientId(recipientAddress);
 
 		let signedTransaction;
-		assert.not.throws(() => (signedTransaction = transaction.sign("sender's secret")), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => (signedTransaction = transaction.sign("sender's secret")),
+			(err) => err instanceof TransactionVersionError,
+		);
 		assert.equal(signedTransaction.data.version, 1);
-		assert.not.throws(() => signedTransaction.build(), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => signedTransaction.build(),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 
 	it("should not throw transaction version error when specifically setting version 2 and aip11 is false", () => {
@@ -239,9 +255,15 @@ describe<{
 
 		let signedTransaction;
 
-		assert.not.throws(() => (signedTransaction = transaction.sign("sender's secret")), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => (signedTransaction = transaction.sign("sender's secret")),
+			(err) => err instanceof TransactionVersionError,
+		);
 		assert.equal(signedTransaction.data.version, 2);
-		assert.not.throws(() => signedTransaction.build(), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => signedTransaction.build(),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 
 	it("should not throw transaction version error when specifically setting version 2 and aip11 is true", () => {
@@ -253,10 +275,16 @@ describe<{
 
 		let signedTransaction;
 
-		assert.not.throws(() => (signedTransaction = transaction.sign("sender's secret")), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => (signedTransaction = transaction.sign("sender's secret")),
+			(err) => err instanceof TransactionVersionError,
+		);
 		assert.equal(signedTransaction.data.version, 2);
 
-		assert.not.throws(() => signedTransaction.build(), err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => signedTransaction.build(),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 
 	it("should throw transaction version error when no version is specified, but it is version 1 and we have reached aip11", () => {
@@ -267,7 +295,10 @@ describe<{
 		const transaction = BuilderFactory.transfer().amount("100").recipientId(recipientAddress);
 		configManager.getMilestone().aip11 = true;
 
-		assert.throws(() => transaction.sign("sender's secret"), err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => transaction.sign("sender's secret"),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 
 	it("should throw transaction version error when no version is specified, but it is version 2 and we have not reached aip11", () => {
@@ -278,6 +309,9 @@ describe<{
 		const transaction = BuilderFactory.transfer().amount("100").recipientId(recipientAddress);
 		configManager.getMilestone().aip11 = false;
 
-		assert.throws(() => transaction.sign("sender's secret"), err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => transaction.sign("sender's secret"),
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 });
