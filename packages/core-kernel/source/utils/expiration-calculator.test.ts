@@ -1,6 +1,6 @@
-import "jest-extended";
+import { describe } from "../../../core-test-framework";
 
-import { calculateTransactionExpiration } from "@packages/core-kernel/source/utils/expiration-calculator";
+import { calculateTransactionExpiration } from "./expiration-calculator";
 
 const context = {
 	blockTime: 8,
@@ -9,9 +9,9 @@ const context = {
 	maxTransactionAge: 500,
 };
 
-describe("Calculate Transaction Expiration", () => {
+describe("Calculate Transaction Expiration", ({ assert, it }) => {
 	it("should use the transaction expiration if the transaction version is 2", () => {
-		expect(
+		assert.is(
 			calculateTransactionExpiration(
 				// @ts-ignore
 				{
@@ -20,11 +20,12 @@ describe("Calculate Transaction Expiration", () => {
 				},
 				context,
 			),
-		).toBe(100);
+			100,
+		);
 	});
 
 	it("should return undefined if the transaction version is 2 and no expiration is set", () => {
-		expect(
+		assert.undefined(
 			calculateTransactionExpiration(
 				// @ts-ignore
 				{
@@ -32,11 +33,11 @@ describe("Calculate Transaction Expiration", () => {
 				},
 				context,
 			),
-		).toBeUndefined();
+		);
 	});
 
 	it("should calculate the expiration if the transaction version is 1", () => {
-		expect(
+		assert.is(
 			calculateTransactionExpiration(
 				// @ts-ignore
 				{
@@ -44,6 +45,7 @@ describe("Calculate Transaction Expiration", () => {
 				},
 				context,
 			),
-		).toBe(475);
+			475,
+		);
 	});
 });
