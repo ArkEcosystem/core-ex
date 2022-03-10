@@ -57,19 +57,6 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		});
 	}
 
-	// public static staticFee(
-	// 	configuration: Contracts.Crypto.IConfiguration,
-	// 	feeContext: { height?: number; data?: Contracts.Crypto.ITransactionData } = {},
-	// ): BigNumber {
-	// 	if (feeContext.data?.asset?.multiSignature) {
-	// 		return super
-	// 			.staticFee(configuration, feeContext)
-	// 			.times(feeContext.data.asset.multiSignature.publicKeys.length + 1);
-	// 	}
-
-	// 	return super.staticFee(configuration, feeContext);
-	// }
-
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		const { min, publicKeys } = data.asset.multiSignature;
