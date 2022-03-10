@@ -20,7 +20,6 @@ describe<{
 	});
 
 	afterEach((context) => {
-		// @ts-ignore
 		Managers.configManager.setConfig(context.config);
 	});
 

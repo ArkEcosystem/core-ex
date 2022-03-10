@@ -1,14 +1,7 @@
-import "jest-extended";
+import { Interfaces, Managers, Networks } from "@arkecosystem/crypto";
+import { describe } from "../../../core-test-framework";
 
-import {
-	calculateForgingInfo,
-	getMilestonesWhichAffectActiveDelegateCount,
-} from "@packages/core-kernel/source/utils/calculate-forging-info";
-import { Managers } from "@packages/crypto";
-import { configManager } from "@packages/crypto/source/managers";
-import { devnet } from "@packages/crypto/source/networks";
-
-afterEach(() => jest.clearAllMocks());
+import { calculateForgingInfo, getMilestonesWhichAffectActiveDelegateCount } from "./calculate-forging-info";
 
 const mockGetBlockTimeLookup = (height: number) => {
 	switch (height) {
@@ -19,9 +12,19 @@ const mockGetBlockTimeLookup = (height: number) => {
 	}
 };
 
-describe("getMilestonesWhichAffectActiveDelegateCount", () => {
+describe<{
+	block: Interfaces.IBlock;
+	config: Interfaces.NetworkConfig;
+}>("getMilestonesWhichAffectActiveDelegateCount", ({ afterEach, assert, beforeEach, it }) => {
+	beforeEach((context) => {
+		context.config = Managers.configManager.all();
+	});
+	afterEach((context) => {
+		Managers.configManager.setConfig(context.config);
+	});
+
 	it("should return milestones which changes delegate count", () => {
-		expect(getMilestonesWhichAffectActiveDelegateCount().length).toEqual(1);
+		assert.length(getMilestonesWhichAffectActiveDelegateCount(), 1);
 
 		const milestones = [
 			{ height: 1, activeDelegates: 4 },
@@ -30,20 +33,27 @@ describe("getMilestonesWhichAffectActiveDelegateCount", () => {
 			{ height: 15, activeDelegates: 8 },
 		];
 
-		const config = { ...devnet, milestones };
-		configManager.setConfig(config);
+		const config = { ...Networks.devnet, milestones };
 		Managers.configManager.setConfig(config);
 
-		expect(getMilestonesWhichAffectActiveDelegateCount().length).toEqual(2);
+		assert.length(getMilestonesWhichAffectActiveDelegateCount(), 2);
 	});
 });
 
-describe("calculateForgingInfo", () => {
+describe<{
+	block: Interfaces.IBlock;
+	config: Interfaces.NetworkConfig;
+}>("calculateForgingInfo", ({ afterEach, assert, beforeEach, it, stub }) => {
+	beforeEach((context) => {
+		context.config = Managers.configManager.all();
+	});
+	afterEach((context) => {
+		Managers.configManager.setConfig(context.config);
+	});
 	it("should calculate forgingInfo correctly for fixed block times", async () => {
 		const milestones = [{ height: 1, blocktime: 8, activeDelegates: 4 }];
 
-		const config = { ...devnet, milestones };
-		configManager.setConfig(config);
+		const config = { ...Networks.devnet, milestones };
 		Managers.configManager.setConfig(config);
 
 		const expectedResults = [
@@ -64,7 +74,7 @@ describe("calculateForgingInfo", () => {
 		];
 
 		expectedResults.concat(offTimeResults).forEach((item) => {
-			expect(calculateForgingInfo(item.timestamp, item.height, mockGetBlockTimeLookup)).toEqual({
+			assert.equal(calculateForgingInfo(item.timestamp, item.height, mockGetBlockTimeLookup), {
 				currentForger: item.currentForger,
 				nextForger: item.nextForger,
 				blockTimestamp: item.blockTimestamp,
@@ -98,8 +108,7 @@ describe("calculateForgingInfo", () => {
 			}
 		};
 
-		const config = { ...devnet, milestones };
-		configManager.setConfig(config);
+		const config = { ...Networks.devnet, milestones };
 		Managers.configManager.setConfig(config);
 
 		const expectedResults = [
@@ -139,7 +148,7 @@ describe("calculateForgingInfo", () => {
 			.concat(offTimeResults)
 			.concat(missedBlocks)
 			.forEach((item) => {
-				expect(calculateForgingInfo(item.timestamp, item.height, mockGetBlockTimeLookup)).toEqual({
+				assert.equal(calculateForgingInfo(item.timestamp, item.height, mockGetBlockTimeLookup), {
 					currentForger: item.currentForger,
 					nextForger: item.nextForger,
 					blockTimestamp: item.blockTimestamp,
@@ -155,12 +164,9 @@ describe("calculateForgingInfo", () => {
 			{ height: 5, blocktime: 5, activeDelegates: 5 },
 		];
 
-		const config = { ...devnet, milestones };
-		// @ts-ignore
-		jest.spyOn(configManager, "validateMilestones").mockReturnValue(true);
-		// @ts-ignore
-		jest.spyOn(Managers.configManager, "validateMilestones").mockReturnValue(true);
-		configManager.setConfig(config);
+		const config = { ...Networks.devnet, milestones };
+		stub(Managers.configManager, "validateMilestones").returnValue(true);
+		Managers.configManager.setConfig(config);
 		Managers.configManager.setConfig(config);
 
 		const mockGetBlockTimeLookup = (height: number) => {
@@ -220,7 +226,7 @@ describe("calculateForgingInfo", () => {
 			.concat(offTimeResults)
 			.concat(missedBlocks)
 			.forEach((item) => {
-				expect(calculateForgingInfo(item.timestamp, item.height, mockGetBlockTimeLookup)).toEqual({
+				assert.equal(calculateForgingInfo(item.timestamp, item.height, mockGetBlockTimeLookup), {
 					currentForger: item.currentForger,
 					nextForger: item.nextForger,
 					blockTimestamp: item.blockTimestamp,
