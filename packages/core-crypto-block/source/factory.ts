@@ -77,10 +77,9 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
-		const block: Contracts.Crypto.IBlock = await this.blockFactory({
-			...(await this.deserializer.deserialize(serialized, false, options)),
-			id: data.id,
-		});
+		const block: Contracts.Crypto.IBlock = await this.blockFactory(
+			await this.deserializer.deserialize(serialized, false, options),
+		);
 		block.serialized = serialized.toString("hex");
 
 		return block;

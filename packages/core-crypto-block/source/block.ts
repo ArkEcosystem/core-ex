@@ -8,8 +8,12 @@ export class Block implements Contracts.Crypto.IBlock {
 	public data: Contracts.Crypto.IBlockData;
 	public transactions: Contracts.Crypto.ITransaction[];
 
-	public async init(data: Contracts.Crypto.IBlockData) {
+	public async init({ data, transactions }: {
+		data: Contracts.Crypto.IBlockData;
+		transactions: Contracts.Crypto.ITransaction[];
+	}) {
 		this.data = data;
+		this.transactions = transactions;
 
 		delete this.data.transactions;
 
