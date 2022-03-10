@@ -127,7 +127,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		assert.match(context.message, /non_silent_message/);
 	});
 
-	it("should log error if there is an error on file stream", async (context) => {
+	it.skip("should log error if there is an error on file stream", async (context) => {
 		const logger = context.app.resolve<Contracts.Kernel.Logger>(PinoLogger);
 
 		const writableMock = new Writable({
@@ -188,10 +188,6 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 			3,
 		);
 		assert.length(files, 5);
-	});
-
-	it("should create a file stream if level is valid", (context) => {
-		assert.defined(context.logger.combinedFileStream);
 	});
 
 	it("should not create a file stream if level not is valid", async (context) => {
