@@ -18,19 +18,15 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	private readonly slots: Contracts.Crypto.Slots;
 
 	public canExpire(transaction: Contracts.Crypto.ITransaction): boolean {
-		if (transaction.data.version && transaction.data.version >= 2) {
-			return !!transaction.data.expiration;
-		} else {
-			return true;
-		}
+		return !!transaction.data.expiration;
 	}
 
 	public async isExpired(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
 		if (this.canExpire(transaction)) {
 			return (await this.getExpirationHeight(transaction)) <= this.stateStore.getLastHeight() + 1;
-		} else {
-			return false;
 		}
+
+		return false;
 	}
 
 	public async getExpirationHeight(transaction: Contracts.Crypto.ITransaction): Promise<number> {
