@@ -1,4 +1,5 @@
-import { TransactionFactory, Utils } from "../..";
+import { TransactionFactory } from "../../factory";
+import { Utils } from "../../utils";
 import { Slots } from "../../../crypto";
 import { TransactionTypeGroup } from "../../../enums";
 import { MissingTransactionSignatureError, VendorFieldLengthExceededError } from "../../../errors";

@@ -4,7 +4,7 @@ import { Address } from "../identities";
 import { ISerializeOptions, ITransaction, ITransactionData } from "../interfaces";
 import { configManager } from "../managers/config";
 import { ByteBuffer, isSupportedTransactionVersion } from "../utils";
-import { TransactionTypeFactory } from "./types";
+import { TransactionTypeFactory } from "./types/factory";
 
 // Reference: https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-11.md
 export class Serializer {
