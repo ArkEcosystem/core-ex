@@ -16,7 +16,10 @@ export class Block implements Contracts.Crypto.IBlock {
 		transactions: Contracts.Crypto.ITransaction[];
 	}) {
 		this.data = data;
-		this.transactions = transactions;
+		this.transactions = transactions.map((transaction, index) => {
+			transaction.data.sequence = index;
+			return transaction;
+		});
 
 		delete this.data.transactions;
 
