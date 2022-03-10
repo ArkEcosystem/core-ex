@@ -1,6 +1,6 @@
 import { Blocks, Interfaces, Managers } from "@arkecosystem/crypto";
-import { describe, Generators } from "../../../core-test-framework";
 
+import { describe, Generators } from "../../../core-test-framework";
 import { assert as assertToTest } from "./assert";
 
 describe<{
@@ -51,7 +51,7 @@ describe<{
 	});
 
 	it(".defined", (context) => {
-		assert.rejects(() => assertToTest.defined(undefined), 'Expected value which is "non-null and non-undefined".');
+		assert.rejects(() => assertToTest.defined(), 'Expected value which is "non-null and non-undefined".');
 		assert.rejects(() => assertToTest.defined(null), 'Expected value which is "non-null and non-undefined".');
 		assert.resolves(() => assertToTest.defined("abc"));
 	});
@@ -86,6 +86,6 @@ describe<{
 
 	it(".undefined", (context) => {
 		assert.rejects(() => assertToTest.undefined("abc"), 'Expected value which is "undefined".');
-		assert.resolves(() => assertToTest.undefined(undefined));
+		assert.resolves(() => assertToTest.undefined());
 	});
 });

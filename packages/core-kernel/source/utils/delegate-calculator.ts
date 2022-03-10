@@ -1,6 +1,7 @@
+import { BigNumber } from "@arkecosystem/utils";
+
 import { Wallet, WalletDelegateAttributes } from "../contracts/state";
 import { calculate as calculateSupply } from "./supply-calculator";
-import { BigNumber } from "./";
 
 const toDecimal = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
 	const decimals = 2;

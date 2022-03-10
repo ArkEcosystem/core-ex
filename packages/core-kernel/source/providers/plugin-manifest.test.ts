@@ -1,10 +1,10 @@
 import { resolve } from "path";
-import { describe } from "../../../core-test-framework";
 
+import { describe } from "../../../core-test-framework";
 import { Application } from "../application";
 import { Container, Identifiers } from "../ioc";
-import { PluginManifest } from "./plugin-manifest";
 import { ConfigRepository } from "../services/config";
+import { PluginManifest } from "./plugin-manifest";
 
 describe<{
 	app: Application;

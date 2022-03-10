@@ -1,10 +1,10 @@
 import { resolve } from "path";
-import { describe } from "../../../core-test-framework";
 
+import { describe } from "../../../core-test-framework";
 import { Application } from "../application";
 import { Container, Identifiers } from "../ioc";
-import { PluginConfiguration } from "./plugin-configuration";
 import { ConfigRepository } from "../services/config";
+import { PluginConfiguration } from "./plugin-configuration";
 
 describe<{
 	app: Application;
@@ -22,7 +22,7 @@ describe<{
 
 		const instance: PluginConfiguration = context.pluginConfiguration.from("dummy", { some: "value" });
 
-		assert.equal(instance.all(), { some: "value", key: "value" });
+		assert.equal(instance.all(), { key: "value", some: "value" });
 	});
 
 	it("should discover the defaults for the given plugin", (context) => {
@@ -60,7 +60,7 @@ describe<{
 		context.pluginConfiguration.set("key", "value");
 		context.pluginConfiguration.merge({ some: "value" });
 
-		assert.equal(context.pluginConfiguration.all(), { some: "value", key: "value" });
+		assert.equal(context.pluginConfiguration.all(), { key: "value", some: "value" });
 	});
 
 	it("should merge nested object", (context) => {
