@@ -13,8 +13,6 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 
 		this.data.type = MultiPaymentTransaction.type;
 		this.data.typeGroup = MultiPaymentTransaction.typeGroup;
-		// @TODO: set fee based on the plugin that is registered
-		// this.data.fee = MultiPaymentTransaction.staticFee(this.configuration);
 		this.data.vendorField = undefined;
 		this.data.asset = {
 			payments: [],

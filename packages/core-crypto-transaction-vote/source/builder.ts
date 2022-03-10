@@ -13,8 +13,6 @@ export class VoteBuilder extends TransactionBuilder<VoteBuilder> {
 
 		this.data.type = VoteTransaction.type;
 		this.data.typeGroup = VoteTransaction.typeGroup;
-		// @TODO: set fee based on the plugin that is registered
-		// this.data.fee = VoteTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = undefined;

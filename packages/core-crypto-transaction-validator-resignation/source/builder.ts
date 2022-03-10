@@ -13,8 +13,6 @@ export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorRes
 
 		this.data.type = ValidatorResignationTransaction.type;
 		this.data.typeGroup = ValidatorResignationTransaction.typeGroup;
-		// @TODO: set fee based on the plugin that is registered
-		// this.data.fee = ValidatorResignationTransaction.staticFee(this.configuration);
 		this.data.amount = BigNumber.ZERO;
 		this.data.senderPublicKey = undefined;
 	}
