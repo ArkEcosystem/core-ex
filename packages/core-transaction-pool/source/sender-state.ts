@@ -40,14 +40,15 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		// @TODO: transactions no longer have timestamps
 		const now: number = this.slots.getTime();
 		if (transaction.timestamp > now + 3600) {
-			const secondsInFuture: number = transaction.timestamp - now;
-			throw new Exceptions.TransactionFromFutureError(transaction, secondsInFuture);
+			throw new Exceptions.TransactionFromFutureError(transaction, transaction.timestamp - now);
 		}
 
 		if (await this.expirationService.isExpired(transaction)) {
 			await this.events.dispatch(Enums.TransactionEvent.Expired, transaction.data);
-			const expirationHeight: number = await this.expirationService.getExpirationHeight(transaction);
-			throw new Exceptions.TransactionHasExpiredError(transaction, expirationHeight);
+
+			throw new Exceptions.TransactionHasExpiredError(
+				transaction, await this.expirationService.getExpirationHeight(transaction),
+			);
 		}
 
 		const handler: Contracts.Transactions.ITransactionHandler =
