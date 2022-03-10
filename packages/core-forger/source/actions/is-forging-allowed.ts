@@ -44,7 +44,7 @@ export class IsForgingAllowedAction extends Services.Triggers.Action {
 				if (overHeightBlockHeader.generatorPublicKey === validator.publicKey) {
 					AppUtils.assert.defined<string>(validator.publicKey);
 
-					// @TODO
+					// @TODO: store usernames in container so other plugins can use them
 					const username = ""; // this.usernames[validator.publicKey];
 
 					this.logger.warning(

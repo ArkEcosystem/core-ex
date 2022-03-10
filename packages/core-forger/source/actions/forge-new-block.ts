@@ -36,9 +36,7 @@ export class ForgeNewBlockAction extends Services.Triggers.Action {
 		const round: Contracts.P2P.CurrentRound = arguments_.round;
 		const networkState: Contracts.P2P.NetworkState = arguments_.networkState;
 
-		// @TODO
-		AppUtils.assert.defined<number>(networkState.getNodeHeight());
-		this.configuration.setHeight(networkState.getNodeHeight()!);
+		this.configuration.setHeight(networkState.getNodeHeight());
 
 		const transactions: Contracts.Crypto.ITransactionData[] = await this.#getTransactionsForForging();
 
