@@ -46,7 +46,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	#formatSatoshi(amount: BigNumber): string {
-		// @TODO: make 1e8 configurable
+		// @TODO: make 1e8 configurable via milestones
 		const localeString = (+amount / 1e8).toLocaleString("en", {
 			maximumFractionDigits: 8,
 			minimumFractionDigits: 0,
