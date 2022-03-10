@@ -1,7 +1,11 @@
-import { InstanceManager } from "../../../../packages/core-kernel/source/support/instance-manager";
+import { describe } from "../../../core-test-framework";
+
+import { InstanceManager } from "./instance-manager";
 
 interface MyDriver {}
+
 class MyMemoryDriver implements MyDriver {}
+
 class MyRemoteDriver implements MyDriver {
 	name: "remote";
 }
@@ -26,22 +30,20 @@ class MyInvalidManager extends InstanceManager<MyDriver> {
 	}
 }
 
-describe("ClassManager.boot", () => {
+describe("ClassManager.boot", ({ assert, it }) => {
 	it("should throw when default driver cannot be created", async () => {
 		const invalidManager = new MyInvalidManager();
 		const promise = invalidManager.boot();
 
-		await expect(promise).rejects.toThrow();
+		await assert.rejects(() => promise);
 	});
-});
 
-describe("ClassManager.driver", () => {
 	it("should return default driver instance", async () => {
 		const manager = new MyManager();
 		await manager.boot();
 		const memoryDriver = manager.driver();
 
-		expect(memoryDriver).toBeInstanceOf(MyMemoryDriver);
+		assert.instance(memoryDriver, MyMemoryDriver);
 	});
 
 	it("should return set driver instance", async () => {
@@ -51,7 +53,7 @@ describe("ClassManager.driver", () => {
 		manager.setDefaultDriver("remote");
 		const remoteDriver = manager.driver();
 
-		expect(remoteDriver).toBeInstanceOf(MyRemoteDriver);
+		assert.instance(remoteDriver, MyRemoteDriver);
 	});
 
 	it("should return driver instance", async () => {
@@ -60,27 +62,23 @@ describe("ClassManager.driver", () => {
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		const remoteDriver = manager.driver("remote");
 
-		expect(remoteDriver).toBeInstanceOf(MyRemoteDriver);
+		assert.instance(remoteDriver, MyRemoteDriver);
 	});
 
 	it("should throw when attempting to get unknown driver instance", async () => {
 		const manager = new MyManager();
 		const check = () => manager.driver("some");
 
-		expect(check).toThrow();
+		assert.rejects(check);
 	});
-});
 
-describe("ClassManager.getDrivers", () => {
 	it("should return driver instances", async () => {
 		const manager = new MyManager();
 		await manager.boot();
 		await manager.extend("remote", async () => new MyRemoteDriver());
 		const drivers = manager.getDrivers();
 
-		console.log(drivers);
-
-		expect(drivers.some((d) => d instanceof MyMemoryDriver)).toBeTrue();
-		expect(drivers.some((d) => d instanceof MyRemoteDriver)).toBeTrue();
+		assert.true(drivers.some((d) => d instanceof MyMemoryDriver));
+		assert.true(drivers.some((d) => d instanceof MyRemoteDriver));
 	});
 });
