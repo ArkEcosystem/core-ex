@@ -38,7 +38,9 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 			}
 
 			if (!blockData.reward.isEqualTo(constants.reward)) {
-				result.errors.push(["Invalid block reward:", blockData.reward, "expected:", constants.reward].join(" "));
+				result.errors.push(
+					["Invalid block reward:", blockData.reward, "expected:", constants.reward].join(" "),
+				);
 			}
 
 			const valid = this.verifySignature(block);
@@ -51,7 +53,10 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				result.errors.push("Invalid block version");
 			}
 
-			if (blockData.timestamp > this.slots.getTime() + this.configuration.getMilestone(blockData.height).blockTime) {
+			if (
+				blockData.timestamp >
+				this.slots.getTime() + this.configuration.getMilestone(blockData.height).blockTime
+			) {
 				result.errors.push("Invalid block timestamp");
 			}
 
@@ -63,7 +68,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 			const invalidTransactions: Contracts.Crypto.ITransaction[] = [];
 
 			for (const transaction of block.transactions) {
-				if (!await this.transactionVerifier.verifyHash(transaction.data)) {
+				if (!(await this.transactionVerifier.verifyHash(transaction.data))) {
 					invalidTransactions.push(transaction);
 				}
 			}

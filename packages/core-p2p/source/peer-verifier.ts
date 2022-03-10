@@ -121,7 +121,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 				}
 			} else {
 				const claimedBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
-				if (claimedBlock && !await this.blockVerifier.verifySignature(claimedBlock)) {
+				if (claimedBlock && !(await this.blockVerifier.verifySignature(claimedBlock))) {
 					return true;
 				}
 			}
@@ -245,7 +245,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			}
 
 			const ourBlocksPrint = ourBlocks.map((b) => `{ height=${b.height}, id=${b.id} }`).join(", ");
-			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[ourBlocks.length - 1].height.toLocaleString()}]`;
+			const rangePrint = `[${ourBlocks[0].height.toLocaleString()}, ${ourBlocks[
+				ourBlocks.length - 1
+			].height.toLocaleString()}]`;
 
 			const msRemaining = this.throwIfPastDeadline(deadline);
 
@@ -416,7 +418,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 
-		if (!await this.blockVerifier.verifySignature(block)) {
+		if (!(await this.blockVerifier.verifySignature(block))) {
 			this.log(
 				Severity.DEBUG_EXTRA,
 				`failure: peer's block at height ${expectedHeight} does not pass crypto-validation`,

@@ -81,7 +81,9 @@ export abstract class TransactionHandler {
 				throw new Exceptions.LegacyMultiSignatureError();
 			}
 
-			if (!this.verifySignatures(databaseSender, transaction.data, databaseSender.getAttribute("multiSignature"))) {
+			if (
+				!this.verifySignatures(databaseSender, transaction.data, databaseSender.getAttribute("multiSignature"))
+			) {
 				throw new Exceptions.InvalidMultiSignaturesError();
 			}
 		} else if (transaction.data.signatures && !isMultiSignatureRegistration) {
@@ -153,10 +155,7 @@ export abstract class TransactionHandler {
 		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
 	}
 
-	#verifyTransactionNonceApply(
-		wallet: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.ITransaction,
-	): void {
+	#verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
@@ -164,10 +163,7 @@ export abstract class TransactionHandler {
 		}
 	}
 
-	#verifyTransactionNonceRevert(
-		wallet: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.ITransaction,
-	): void {
+	#verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().isEqualTo(nonce)) {
