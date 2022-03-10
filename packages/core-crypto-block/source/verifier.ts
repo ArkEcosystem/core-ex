@@ -22,7 +22,8 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier: Contracts.Crypto.ITransactionVerifier;
 
-	public async verify(block: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockVerification> {
+	public async verify(block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IBlockVerification> {
+		const blockData: Contracts.Crypto.IBlockData = block.data;
 		const result: Contracts.Crypto.IBlockVerification = {
 			containsMultiSignatures: false,
 			errors: [],
@@ -30,39 +31,39 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 		};
 
 		try {
-			const constants = this.configuration.getMilestone(block.height);
+			const constants = this.configuration.getMilestone(blockData.height);
 
-			if (block.height !== 1 && !block.previousBlock) {
+			if (blockData.height !== 1 && !blockData.previousBlock) {
 				result.errors.push("Invalid previous block");
 			}
 
-			if (!block.reward.isEqualTo(constants.reward)) {
-				result.errors.push(["Invalid block reward:", block.reward, "expected:", constants.reward].join(" "));
+			if (!blockData.reward.isEqualTo(constants.reward)) {
+				result.errors.push(["Invalid block reward:", blockData.reward, "expected:", constants.reward].join(" "));
 			}
 
-			const valid = this.verifySignature();
+			const valid = this.verifySignature(block.data);
 
 			if (!valid) {
 				result.errors.push("Failed to verify block signature");
 			}
 
-			if (block.version !== constants.block.version) {
+			if (blockData.version !== constants.block.version) {
 				result.errors.push("Invalid block version");
 			}
 
-			if (block.timestamp > this.slots.getTime() + this.configuration.getMilestone(block.height).blockTime) {
+			if (blockData.timestamp > this.slots.getTime() + this.configuration.getMilestone(blockData.height).blockTime) {
 				result.errors.push("Invalid block timestamp");
 			}
 
-			const size: number = this.serializer.size(this);
+			const size: number = this.serializer.size(block);
 			if (size > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
 
 			const invalidTransactions: Contracts.Crypto.ITransaction[] = [];
 
-			for (const transaction of this.transactions) {
-				if (!await this.transactionVerifier.verifyHash(transaction)) {
+			for (const transaction of block.transactions) {
+				if (!await this.transactionVerifier.verifyHash(transaction.data)) {
 					invalidTransactions.push(transaction);
 				}
 			}
@@ -77,11 +78,11 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				result.containsMultiSignatures = invalidTransactions.some((tx) => !!tx.data.signatures);
 			}
 
-			if (block.transactions.length !== block.numberOfTransactions) {
+			if (block.transactions.length !== blockData.numberOfTransactions) {
 				result.errors.push("Invalid number of transactions");
 			}
 
-			if (block.transactions.length > constants.block.maxTransactions && block.height > 1) {
+			if (block.transactions.length > constants.block.maxTransactions && blockData.height > 1) {
 				result.errors.push("Transactions length is too high");
 			}
 
@@ -104,30 +105,30 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				}
 
 				if (
-					transaction.expiration &&
-					transaction.expiration > 0 &&
-					transaction.expiration <= block.height
+					transaction.data.expiration &&
+					transaction.data.expiration > 0 &&
+					transaction.data.expiration <= blockData.height
 				) {
 					result.errors.push(`Encountered expired transaction: ${transaction.id}`);
 				}
 
-				appliedTransactions[transaction.id] = transaction;
+				appliedTransactions[transaction.id] = transaction.data;
 
-				totalAmount = totalAmount.plus(transaction.amount);
-				totalFee = totalFee.plus(transaction.fee);
+				totalAmount = totalAmount.plus(transaction.data.amount);
+				totalFee = totalFee.plus(transaction.data.fee);
 
 				payloadBuffers.push(bytes);
 			}
 
-			if (!totalAmount.isEqualTo(block.totalAmount)) {
+			if (!totalAmount.isEqualTo(blockData.totalAmount)) {
 				result.errors.push("Invalid total amount");
 			}
 
-			if (!totalFee.isEqualTo(block.totalFee)) {
+			if (!totalFee.isEqualTo(blockData.totalFee)) {
 				result.errors.push("Invalid total fee");
 			}
 
-			if ((await this.hashFactory.sha256(payloadBuffers)).toString("hex") !== block.payloadHash) {
+			if ((await this.hashFactory.sha256(payloadBuffers)).toString("hex") !== blockData.payloadHash) {
 				result.errors.push("Invalid payload hash");
 			}
 		} catch (error) {

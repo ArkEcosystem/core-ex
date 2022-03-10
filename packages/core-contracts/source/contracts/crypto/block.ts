@@ -89,7 +89,7 @@ export interface IBlockSerializer {
 }
 
 export interface IBlockVerifier {
-	verify(block: IBlockData): Promise<IBlockVerification>;
+	verify(block: IBlock): Promise<IBlockVerification>;
 
-	verifySignature(block: IBlockData): Promise<boolean>;
+	verifySignature(block: IBlock): Promise<boolean>;
 }
