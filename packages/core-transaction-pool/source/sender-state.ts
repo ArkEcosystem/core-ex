@@ -21,9 +21,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly slots: Contracts.Crypto.Slots;
-
 	private corrupt = false;
 
 	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
@@ -35,12 +32,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		const currentNetwork: number = this.configuration.get<number>("network.pubKeyHash");
 		if (transaction.data.network && transaction.data.network !== currentNetwork) {
 			throw new Exceptions.TransactionFromWrongNetworkError(transaction, currentNetwork);
-		}
-
-		// @TODO: transactions no longer have timestamps
-		const now: number = this.slots.getTime();
-		if (transaction.timestamp > now + 3600) {
-			throw new Exceptions.TransactionFromFutureError(transaction, transaction.timestamp - now);
 		}
 
 		if (await this.expirationService.isExpired(transaction)) {
