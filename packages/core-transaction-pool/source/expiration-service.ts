@@ -1,5 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 
 @injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {
@@ -22,6 +23,8 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	}
 
 	public async getExpirationHeight(transaction: Contracts.Crypto.ITransaction): Promise<number> {
+		Utils.assert.defined<number>(transaction.data.expiration);
+
 		return transaction.data.expiration;
 	}
 }
