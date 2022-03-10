@@ -16,7 +16,7 @@ describe<{
 }>("Verifier", ({ it, assert, beforeAll, afterAll }) => {
 	beforeAll((context) => {
 		context.config = configManager.all();
-		
+
 		// todo: completely wrap this into a function to hide the generation and setting of the config?
 		configManager.setConfig(Generators.generateCryptoConfigRaw());
 
@@ -39,7 +39,9 @@ describe<{
 	});
 
 	it("should return false on an invalid signature", (context) => {
-		assert.false(Verifier.verifyHash(Object.assign({}, context.transaction, { senderPublicKey: context.otherPublicKey })));
+		assert.false(
+			Verifier.verifyHash(Object.assign({}, context.transaction, { senderPublicKey: context.otherPublicKey })),
+		);
 	});
 
 	it("should return false on a missing signature", (context) => {

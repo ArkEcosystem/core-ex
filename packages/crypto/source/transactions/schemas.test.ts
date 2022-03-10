@@ -80,7 +80,10 @@ describe<{
 	});
 
 	it("should be invalid with more than 64 bytes in vendor field", (context) => {
-		context.transaction.recipientId(context.address).amount(context.amount).fee(Utils.BigNumber.make(context.fee).toFixed());
+		context.transaction
+			.recipientId(context.address)
+			.amount(context.amount)
+			.fee(Utils.BigNumber.make(context.fee).toFixed());
 
 		// Bypass vendorfield check by manually assigning a vendorfield > 64 bytes
 		context.transaction.data.vendorField = "a".repeat(65);
@@ -89,7 +92,10 @@ describe<{
 		let { error } = Ajv.validate(context.transactionSchema.$id, context.transaction.getStruct());
 		assert.defined(error);
 
-		context.transaction.recipientId(context.address).amount(context.amount).fee(Utils.BigNumber.make(context.fee).toFixed());
+		context.transaction
+			.recipientId(context.address)
+			.amount(context.amount)
+			.fee(Utils.BigNumber.make(context.fee).toFixed());
 
 		// Bypass vendorfield check by manually assigning a vendorfield > 64 bytes
 		context.transaction.data.vendorField = "⊁".repeat(22);
@@ -328,7 +334,11 @@ describe<{
 
 		context.vote = "+02bcfa0951a92e7876db1fb71996a853b57f996972ed059a950d910f7d541706c9";
 		context.unvote = "-0326580718fc86ba609799ac95fcd2721af259beb5afa81bfce0ab7d9fe95de991";
-		context.votes = [context.vote, "+0310ad026647eed112d1a46145eed58b8c19c67c505a67f1199361a511ce7860c0", context.unvote];
+		context.votes = [
+			context.vote,
+			"+0310ad026647eed112d1a46145eed58b8c19c67c505a67f1199361a511ce7860c0",
+			context.unvote,
+		];
 		context.invalidVotes = [
 			"02bcfa0951a92e7876db1fb71996a853b57f996972ed059a950d910f7d541706c9",
 			"0310ad026647eed112d1a46145eed58b8c19c67c505a67f1199361a511ce7860c0",
@@ -439,7 +449,7 @@ describe<{
 			"03dfdaaa7fd28bc9359874b7e33138f4d0afe9937e152c59b83a99fae7eeb94899",
 			"03de72ef9d3ebf1b374f1214f5b8dde823690ab2aa32b4b8b3226cc568aaed1562",
 		];
-		
+
 		context.transactionSchema = TransactionTypeFactory.get(
 			TransactionType.MultiSignature,
 			TransactionTypeGroup.Core,
@@ -728,7 +738,11 @@ describe<{
 	});
 
 	it("should be invalid due to zero fee", (context) => {
-		context.multiPayment.addPayment(context.address, "150").addPayment(context.address, "100").fee("0").sign("passphrase");
+		context.multiPayment
+			.addPayment(context.address, "150")
+			.addPayment(context.address, "100")
+			.fee("0")
+			.sign("passphrase");
 
 		const { error } = Ajv.validate(context.transactionSchema.$id, context.multiPayment.getStruct());
 		assert.defined(error);

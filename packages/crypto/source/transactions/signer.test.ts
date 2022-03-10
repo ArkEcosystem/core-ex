@@ -40,22 +40,31 @@ describe<{
 	});
 
 	it("should throw for unsupported versions", (context) => {
-		assert.throws(() => {
-			Signer.sign(Object.assign({}, context.transaction, { version: 110 }), context.keys);
-		}, err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => {
+				Signer.sign(Object.assign({}, context.transaction, { version: 110 }), context.keys);
+			},
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 
 	it("should sign version 2 if aip11 milestone is true", (context) => {
 		configManager.getMilestone().aip11 = false;
 
-		assert.throws(() => {
-			Signer.sign(Object.assign({}, context.transaction, { version: 2 }), context.keys);
-		}, err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => {
+				Signer.sign(Object.assign({}, context.transaction, { version: 2 }), context.keys);
+			},
+			(err) => err instanceof TransactionVersionError,
+		);
 
 		configManager.getMilestone().aip11 = true;
 
-		assert.not.throws(() => {
-			Signer.sign(Object.assign({}, context.transaction, { version: 2 }), context.keys);
-		}, err => err instanceof TransactionVersionError);
+		assert.not.throws(
+			() => {
+				Signer.sign(Object.assign({}, context.transaction, { version: 2 }), context.keys);
+			},
+			(err) => err instanceof TransactionVersionError,
+		);
 	});
 });
