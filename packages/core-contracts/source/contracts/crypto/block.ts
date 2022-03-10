@@ -15,9 +15,6 @@ export interface IBlock {
 	transactions: ITransaction[];
 
 	getHeader(): IBlockData;
-
-	toString(): string;
-	toJson(): IBlockJson;
 }
 
 export interface IBlockData {

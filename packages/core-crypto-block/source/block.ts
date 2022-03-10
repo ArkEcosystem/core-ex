@@ -43,14 +43,4 @@ export class Block implements Contracts.Crypto.IBlock {
 
 		return header;
 	}
-
-	public toJson(): Contracts.Crypto.IBlockJson {
-		const data: Contracts.Crypto.IBlockJson = JSON.parse(JSON.stringify(this.data));
-		data.reward = this.data.reward.toString();
-		data.totalAmount = this.data.totalAmount.toString();
-		data.totalFee = this.data.totalFee.toString();
-		data.transactions = this.transactions.map((transaction) => transaction.toJson());
-
-		return data;
-	}
 }
