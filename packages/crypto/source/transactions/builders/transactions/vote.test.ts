@@ -15,11 +15,11 @@ describe<{
 }>("Vote Transaction", ({ it, assert, stub, beforeAll, beforeEach, afterAll }) => {
 	beforeAll((context) => {
 		context.config = configManager.all();
-	
+
 		// todo: completely wrap this into a function to hide the generation and setting of the config?
 		const config = Generators.generateCryptoConfigRaw();
 		configManager.setConfig(config);
-	
+
 		context.identity = Factories.factory("Identity")
 			.withOptions({ passphrase: "this is a top secret passphrase", network: config.network })
 			.make();

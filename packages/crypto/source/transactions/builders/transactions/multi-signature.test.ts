@@ -27,7 +27,7 @@ describe<{
 			min: 1,
 		};
 	});
-	
+
 	beforeEach((context) => {
 		context.builder = BuilderFactory.multiSignature();
 	});
@@ -69,7 +69,10 @@ describe<{
 			})
 			.senderPublicKey("039180ea4a8a803ee11ecb462bb8f9613fcdb5fe917e292dbcc73409f0e98f8f22");
 
-		assert.throws(() => actual.multiSign("secret 1", 0), err => err instanceof TransactionVersionError);
+		assert.throws(
+			() => actual.multiSign("secret 1", 0),
+			(err) => err instanceof TransactionVersionError,
+		);
 		configManager.getMilestone().aip11 = true;
 	});
 
