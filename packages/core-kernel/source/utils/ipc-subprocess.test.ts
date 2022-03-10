@@ -3,7 +3,6 @@ import sinon from "sinon";
 
 import { IpcSubprocess } from "./ipc-subprocess";
 
-
 type MyRpcInterface = {
 	myRpcActionMethod(a: number, b: number): void;
 	myRpcRequestMethod(a: number, b: number): Promise<string>;
