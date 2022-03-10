@@ -6,7 +6,8 @@ interface BlockArguments {
 	transactions: Contracts.Crypto.ITransaction[];
 }
 
-export const sealBlock = ({ data, serialized, transactions }: BlockArguments): Contracts.Crypto.IBlock => Object.seal({
+export const sealBlock = ({ data, serialized, transactions }: BlockArguments): Contracts.Crypto.IBlock =>
+	Object.seal({
 		data,
 		header: data,
 		serialized,
@@ -14,4 +15,4 @@ export const sealBlock = ({ data, serialized, transactions }: BlockArguments): C
 			transaction.data.sequence = index;
 			return transaction;
 		}),
-	})
+	});
