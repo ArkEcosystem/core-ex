@@ -98,7 +98,7 @@ export class BlockProcessor {
 				}
 
 				// @TODO: check if we can remove this duplicate verification
-				verification = await this.blockVerifier.verify(block.data);
+				verification = await this.blockVerifier.verify(block);
 			} catch (error) {
 				this.logger.warning(`Failed to verify block, because: ${error.message}`);
 			}
