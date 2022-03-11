@@ -1,10 +1,11 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { CheckLater } from "./check-later";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain: any;
 	stateStore: any;
 	application: any;
@@ -21,10 +22,10 @@ describe<{
 			resolve: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 	});
 
 	it("should call blockchain.setWakeUp() when !blockchain.isStopped && !stateStore.wakeUpTimeout", (context) => {

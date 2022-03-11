@@ -1,10 +1,11 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { CheckLastBlockSynced } from "./check-last-block-synced";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain: any;
 	application: any;
 }>("CheckLastBlockSynced", ({ beforeEach, it, spy, stub }) => {
@@ -17,9 +18,9 @@ describe<{
 			resolve: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 	});
 
 	it("should dispatch SYNCED if blockchain is synced", (context) => {

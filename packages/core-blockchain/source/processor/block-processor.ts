@@ -208,10 +208,12 @@ export class BlockProcessor {
 	}
 
 	private async validateGenerator(block: Contracts.Crypto.IBlock): Promise<boolean> {
+		console.log("Test");
 		const roundInfo: Contracts.Shared.RoundInfo = AppUtils.roundCalculator.calculateRound(
 			block.data.height,
 			this.configuration,
 		);
+		console.log("Test 2");
 		const validators: Contracts.State.Wallet[] = await this.triggers.call("getActiveValidators", {
 			roundInfo,
 		});

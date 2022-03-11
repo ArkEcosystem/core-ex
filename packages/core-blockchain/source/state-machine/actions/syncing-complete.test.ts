@@ -1,10 +1,11 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { SyncingComplete } from "./syncing-complete";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	logger: any;
 	blockchain: any;
 	application: any;
@@ -22,10 +23,10 @@ describe<{
 			get: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 	});
 
 	it("should dispatch SYNCFINISHED", (context) => {

@@ -1,10 +1,12 @@
-import { Container, Enums } from "@arkecosystem/core-kernel";
+import { Enums } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { BlockchainReady } from "./blockchain-ready";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	logService: any;
 	stateStore: any;
 	eventDispatcher: any;
@@ -28,11 +30,11 @@ describe<{
 			resolve: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.Application).toConstantValue(context.application);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logService);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
-		context.container.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
+		context.container = new Container();
+		context.container.bind(Identifiers.Application).toConstantValue(context.application);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logService);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
 	});
 
 	it("should set stateStore.started = true and dispatch started event", (context) => {

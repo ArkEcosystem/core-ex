@@ -1,10 +1,11 @@
-import { Container } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { describe } from "../../../../core-test-framework";
 
 import { CheckLastDownloadedBlockSynced } from "./check-last-downloaded-block-synced";
 
 describe<{
-	container: Container.Container;
+	container: Container;
 	blockchain: any;
 	stateStore: any;
 	peerNetworkMonitor: any;
@@ -43,11 +44,11 @@ describe<{
 			error: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.BlockchainService).toConstantValue(context.blockchain);
-		context.container.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
-		context.container.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Container.Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
+		context.container = new Container();
+		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
+		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.PeerNetworkMonitor).toConstantValue(context.peerNetworkMonitor);
 
 		process.env.CORE_ENV = "";
 	});
