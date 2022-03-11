@@ -7,8 +7,6 @@ import { DownloadFinished } from "./download-finished";
 import { DownloadPaused } from "./download-paused";
 import { ExitApp } from "./exit-app";
 import { Initialize } from "./initialize";
-import { RollbackDatabase } from "./rollback-database";
-import { StartForkRecovery } from "./start-fork-recovery";
 import { Stopped } from "./stopped";
 import { SyncingComplete } from "./syncing-complete";
 
@@ -21,9 +19,7 @@ export const actions = {
 	downloadFinished: DownloadFinished,
 	downloadPaused: DownloadPaused,
 	exitApp: ExitApp,
-	init: Initialize, // todo: rename the action from 'init' to 'initialize'
-	rollbackDatabase: RollbackDatabase,
-	startForkRecovery: StartForkRecovery,
+	init: Initialize, // @TODO rename the action from 'init' to 'initialize'
 	stopped: Stopped,
 	syncingComplete: SyncingComplete,
 };

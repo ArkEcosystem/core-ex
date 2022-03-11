@@ -1,7 +1,9 @@
-import { Container, Contracts, Services, Utils } from "@arkecosystem/core-kernel";
-import { DatabaseInterceptor } from "@arkecosystem/core-state";
-import { Blocks, Interfaces } from "@arkecosystem/crypto";
+/* eslint-disable unicorn/prefer-at */
 import assert from "assert";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Services, Utils } from "@arkecosystem/core-kernel";
+import { DatabaseInterceptor } from "@arkecosystem/core-state";
 import pluralize from "pluralize";
 import { inspect } from "util";
 
@@ -19,24 +21,33 @@ export class PeerVerificationResult {
 	}
 }
 
-// todo: review the implementation
-@Container.injectable()
+// @TODO review the implementation
+@injectable()
 export class PeerVerifier implements Contracts.P2P.PeerVerifier {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.DposState)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.DposState)
+	@tagged("state", "blockchain")
 	private readonly dposState!: Contracts.State.DposState;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.DatabaseInterceptor)
+	@inject(Identifiers.DatabaseInterceptor)
 	private readonly databaseInterceptor!: DatabaseInterceptor;
 
-	@Container.inject(Container.Identifiers.PeerCommunicator)
+	@inject(Identifiers.PeerCommunicator)
 	private communicator!: Contracts.P2P.PeerCommunicator;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+
+	@inject(Identifiers.Cryptography.Block.Verifier)
+	private readonly blockVerifier: Contracts.Crypto.IBlockVerifier;
 
 	private logPrefix!: string;
 
@@ -80,7 +91,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	private async checkStateHeader(claimedState: Contracts.P2P.PeerState): Promise<boolean> {
-		const blockHeader: Interfaces.IBlockData = claimedState.header as Interfaces.IBlockData;
+		const blockHeader: Contracts.Crypto.IBlockData = claimedState.header as Contracts.Crypto.IBlockData;
 		const claimedHeight = Number(blockHeader.height);
 		if (claimedHeight !== claimedState.height) {
 			this.log(
@@ -92,25 +103,25 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		}
 
 		try {
-			const ownBlock: Interfaces.IBlock | undefined = this.app
-				.get<Contracts.State.StateStore>(Container.Identifiers.StateStore)
+			const ownBlock: Contracts.Crypto.IBlock | undefined = this.app
+				.get<Contracts.State.StateStore>(Identifiers.StateStore)
 				.getLastBlocks()
 				.find((block) => block.data.height === blockHeader.height);
 
 			// Use shortcut to prevent expensive crypto if the block header equals our own.
-			if (ownBlock && JSON.stringify(ownBlock.getHeader()) === JSON.stringify(blockHeader)) {
+			if (ownBlock && JSON.stringify(ownBlock.header) === JSON.stringify(blockHeader)) {
 				return true;
 			}
 
 			if (claimedHeight < this.ourHeight()) {
-				const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight);
-				const delegates = await this.getDelegatesByRound(roundInfo);
-				if (this.verifyPeerBlock(blockHeader, claimedHeight, delegates)) {
+				const roundInfo = Utils.roundCalculator.calculateRound(claimedHeight, this.configuration);
+				const validators = await this.getValidatorsByRound(roundInfo);
+				if (this.verifyPeerBlock(blockHeader, claimedHeight, validators)) {
 					return true;
 				}
 			} else {
-				const claimedBlock: Interfaces.IBlock | undefined = Blocks.BlockFactory.fromData(blockHeader);
-				if (claimedBlock?.verifySignature()) {
+				const claimedBlock: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(blockHeader);
+				if (claimedBlock && (await this.blockVerifier.verifySignature(claimedBlock))) {
 					return true;
 				}
 			}
@@ -133,10 +144,10 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		let height: number | undefined;
 
 		try {
-			height = this.app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore).getLastHeight();
+			height = this.app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
 
 			assert(Number.isInteger(height));
-		} catch (error) {
+		} catch {
 			throw new Error(`Couldn't derive our chain height: ${height}`);
 		}
 
@@ -289,37 +300,36 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	private async verifyPeerBlocks(startHeight: number, claimedHeight: number, deadline: number): Promise<boolean> {
-		const roundInfo = Utils.roundCalculator.calculateRound(startHeight);
-		const { maxDelegates, roundHeight } = roundInfo;
-		const lastBlockHeightInRound = roundHeight + maxDelegates - 1;
+		const roundInfo = Utils.roundCalculator.calculateRound(startHeight, this.configuration);
+		const { maxValidators, roundHeight } = roundInfo;
+		const lastBlockHeightInRound = roundHeight + maxValidators - 1;
 
 		// Verify a few blocks that are not too far up from the last common block. Within the
 		// same round as the last common block or in the next round if the last common block is
-		// the last block in a round (so that the delegates calculations are still the same for
+		// the last block in a round (so that the validators calculations are still the same for
 		// both chains).
 
-		const delegates = await this.getDelegatesByRound(roundInfo);
+		const validators = await this.getValidatorsByRound(roundInfo);
 
 		const hisBlocksByHeight = {};
 
 		const endHeight = Math.min(claimedHeight, lastBlockHeightInRound);
 
 		for (let height = startHeight; height <= endHeight; height++) {
-			if (hisBlocksByHeight[height] === undefined) {
-				if (
-					!(await this.fetchBlocksFromHeight({
-						height,
-						endHeight,
-						blocksByHeight: hisBlocksByHeight,
-						deadline,
-					}))
-				) {
-					return false;
-				}
+			if (
+				hisBlocksByHeight[height] === undefined &&
+				!(await this.fetchBlocksFromHeight({
+					blocksByHeight: hisBlocksByHeight,
+					deadline,
+					endHeight,
+					height,
+				}))
+			) {
+				return false;
 			}
 			assert(hisBlocksByHeight[height] !== undefined);
 
-			if (!this.verifyPeerBlock(hisBlocksByHeight[height], height, delegates)) {
+			if (!this.verifyPeerBlock(hisBlocksByHeight[height], height, validators)) {
 				return false;
 			}
 		}
@@ -327,30 +337,30 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return true;
 	}
 
-	private async getDelegatesByRound(
+	private async getValidatorsByRound(
 		roundInfo: Contracts.Shared.RoundInfo,
 	): Promise<Record<string, Contracts.State.Wallet>> {
-		let delegates = (await this.app
-			.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-			.call("getActiveDelegates", { roundInfo })) as Contracts.State.Wallet[];
+		let validators: any = await this.app
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.call("getActiveValidators", { roundInfo });
 
-		if (delegates.length === 0) {
+		if (validators.length === 0) {
 			// This must be the current round, still not saved into the database (it is saved
-			// only after it has completed). So fetch the list of delegates from the wallet
+			// only after it has completed). So fetch the list of validators from the wallet
 			// manager.
 			// ! looks like DoS attack vector
 			const dposRound = this.dposState.getRoundInfo();
 			assert.strictEqual(dposRound.round, roundInfo.round);
-			assert.strictEqual(dposRound.maxDelegates, roundInfo.maxDelegates);
-			delegates = this.dposState.getRoundDelegates().slice();
+			assert.strictEqual(dposRound.maxValidators, roundInfo.maxValidators);
+			validators = [...this.dposState.getRoundValidators()];
 		}
 
-		const delegatesByPublicKey: Record<string, Contracts.State.Wallet> = {};
-		for (const delegate of delegates) {
-			Utils.assert.defined<string>(delegate.getPublicKey());
-			delegatesByPublicKey[delegate.getPublicKey()!] = delegate;
+		const validatorsByPublicKey: Record<string, Contracts.State.Wallet> = {};
+		for (const validator of validators) {
+			Utils.assert.defined<string>(validator.getPublicKey());
+			validatorsByPublicKey[validator.getPublicKey()!] = validator;
 		}
-		return delegatesByPublicKey;
+		return validatorsByPublicKey;
 	}
 
 	private async fetchBlocksFromHeight({
@@ -371,14 +381,14 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 			// returns blocks from the next one, thus we do -1
 			response = await this.communicator.getPeerBlocks(this.peer, {
-				fromBlockHeight: height - 1,
 				blockLimit: Math.max(Math.min(endHeight - height + 1, 400), 1),
+				fromBlockHeight: height - 1,
 				headersOnly: true,
 			});
-		} catch (err) {
+		} catch (error) {
 			this.log(
 				Severity.DEBUG_EXTRA,
-				`failure: could not get blocks starting from height ${height} from peer: exception: ${err.message}`,
+				`failure: could not get blocks starting from height ${height} from peer: exception: ${error.message}`,
 			);
 			return false;
 		}
@@ -392,23 +402,23 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return false;
 		}
 
-		for (let i = 0; i < response.length; i++) {
-			blocksByHeight[height + i] = response[i];
+		for (const [index, element] of response.entries()) {
+			blocksByHeight[height + index] = element;
 		}
 
 		return true;
 	}
 
-	private verifyPeerBlock(
-		blockData: Interfaces.IBlockData,
+	private async verifyPeerBlock(
+		blockData: Contracts.Crypto.IBlockData,
 		expectedHeight: number,
-		delegatesByPublicKey: Record<string, Contracts.State.Wallet>,
-	): boolean {
-		const block: Interfaces.IBlock | undefined = Blocks.BlockFactory.fromData(blockData);
+		validatorsByPublicKey: Record<string, Contracts.State.Wallet>,
+	): Promise<boolean> {
+		const block: Contracts.Crypto.IBlock | undefined = await this.blockFactory.fromData(blockData);
 
-		Utils.assert.defined<Interfaces.IBlock>(block);
+		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 
-		if (!block.verifySignature()) {
+		if (!(await this.blockVerifier.verifySignature(block))) {
 			this.log(
 				Severity.DEBUG_EXTRA,
 				`failure: peer's block at height ${expectedHeight} does not pass crypto-validation`,
@@ -426,7 +436,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return false;
 		}
 
-		if (delegatesByPublicKey[block.data.generatorPublicKey]) {
+		if (validatorsByPublicKey[block.data.generatorPublicKey]) {
 			this.log(
 				Severity.DEBUG_EXTRA,
 				`successfully verified block at height ${height}, signed by ` + block.data.generatorPublicKey,
@@ -437,16 +447,16 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		this.log(
 			Severity.DEBUG_EXTRA,
-			`failure: block ${this.anyToString(blockData)} is not signed by any of the delegates ` +
+			`failure: block ${this.anyToString(blockData)} is not signed by any of the validators ` +
 				`for the corresponding round: ` +
-				this.anyToString(Object.values(delegatesByPublicKey)),
+				this.anyToString(Object.values(validatorsByPublicKey)),
 		);
 
 		return false;
 	}
 
 	private throwIfPastDeadline(deadline: number): number {
-		const now = new Date().getTime();
+		const now = Date.now();
 
 		if (deadline <= now) {
 			// Throw an exception so that it can cancel everything and break out of peer.ping().
@@ -456,24 +466,23 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		return deadline - now;
 	}
 
-	private anyToString(val: any): string {
-		return inspect(val, { sorted: true, breakLength: Infinity });
+	private anyToString(value: any): string {
+		return inspect(value, { breakLength: Number.POSITIVE_INFINITY, sorted: true });
 	}
 
-	private log(severity: Severity, msg: string): void {
-		const fullMsg = `${this.logPrefix} ${msg}`;
+	private log(severity: Severity, message: string): void {
+		const fullMessage = `${this.logPrefix} ${message}`;
 		switch (severity) {
 			case Severity.DEBUG_EXTRA:
-				/* istanbul ignore else */
 				if (process.env.CORE_P2P_PEER_VERIFIER_DEBUG_EXTRA) {
-					this.logger.debug(fullMsg);
+					this.logger.debug(fullMessage);
 				}
 				break;
 			case Severity.DEBUG:
-				this.logger.debug(fullMsg);
+				this.logger.debug(fullMessage);
 				break;
 			case Severity.INFO:
-				this.logger.info(fullMsg);
+				this.logger.info(fullMessage);
 				break;
 		}
 	}

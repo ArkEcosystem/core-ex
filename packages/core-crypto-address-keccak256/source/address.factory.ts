@@ -1,18 +1,38 @@
-import { Container } from "@arkecosystem/core-container";
-import { AddressFactory as Contract, BINDINGS, IKeyPairFactory } from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { ethers } from "ethers";
 
-@Container.injectable()
-export class AddressFactory implements Contract {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+@injectable()
+export class AddressFactory implements Contracts.Crypto.IAddressFactory {
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
-		return this.fromPublicKey(Buffer.from((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey, "hex"));
+		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
 	}
 
-	public async fromPublicKey(publicKey: Buffer): Promise<string> {
-		return ethers.utils.computeAddress(`0x${publicKey.toString("hex")}`);
+	public async fromPublicKey(publicKey: string): Promise<string> {
+		return ethers.utils.computeAddress(`0x${publicKey}`);
+	}
+
+	public async fromWIF(wif: string): Promise<string> {
+		return "";
+	}
+
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+		return "";
+	}
+
+	public async fromPrivateKey(privateKey: Contracts.Crypto.IKeyPair): Promise<string> {
+		return "";
+	}
+
+	public async fromBuffer(buffer: Buffer): Promise<string> {
+		return "";
+	}
+
+	public async toBuffer(address: string): Promise<Buffer> {
+		return Buffer.alloc(1);
 	}
 
 	public async validate(address: string): Promise<boolean> {

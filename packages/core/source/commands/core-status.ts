@@ -1,14 +1,15 @@
 import { Commands, Container } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "core:status";
 
 	public description = "Display the status of the Core process.";
 
 	public configure(): void {
-		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));
+		this.definition.setFlag("token", "The name of the token.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {

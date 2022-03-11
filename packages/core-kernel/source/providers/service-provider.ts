@@ -1,5 +1,6 @@
-import { Kernel } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
+
 import { JsonObject } from "../types";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";
@@ -7,7 +8,7 @@ import { PluginManifest } from "./plugin-manifest";
 @injectable()
 export abstract class ServiceProvider {
 	@inject(Identifiers.Application)
-	protected readonly app!: Kernel.Application;
+	protected readonly app!: Contracts.Kernel.Application;
 
 	private packageConfiguration!: PluginConfiguration;
 
@@ -69,7 +70,7 @@ export abstract class ServiceProvider {
 		return {};
 	}
 
-	public dependencies(): Kernel.PluginDependency[] {
+	public dependencies(): Contracts.Kernel.PluginDependency[] {
 		if (this.packageManifest) {
 			return this.packageManifest.get("arkecosystem.core.dependencies", []);
 		}

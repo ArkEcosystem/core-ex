@@ -1,0 +1,26 @@
+{
+	"name": "@arkecosystem/core-lmdb",
+	"version": "0.0.1",
+	"description": "Database Interface for ARK Core",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution"
+	},
+	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
+		"lmdb": "^2.2.4"
+	},
+	"engines": {
+		"node": ">=16.x"
+	}
+}

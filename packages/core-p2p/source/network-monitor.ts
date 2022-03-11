@@ -1,57 +1,56 @@
-import { Container, Contracts, Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Enums, Providers, Services, Utils } from "@arkecosystem/core-kernel";
 import delay from "delay";
-import prettyMs from "pretty-ms";
 
 import { NetworkState } from "./network-state";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
-import { checkDNS, checkNTP } from "./utils";
 
 const defaultDownloadChunkSize = 400;
 
-// todo: review the implementation
-@Container.injectable()
+// @TODO review the implementation
+@injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-p2p")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.PeerCommunicator)
+	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: PeerCommunicator;
 
-	@Container.inject(Container.Identifiers.PeerRepository)
+	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@Container.inject(Container.Identifiers.PeerChunkCache)
+	@inject(Identifiers.PeerChunkCache)
 	private readonly chunkCache!: Contracts.P2P.ChunkCache;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots: Contracts.Crypto.Slots;
 
 	public config: any;
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
-	private coldStart: boolean = false;
+	private coldStart = false;
 
 	private downloadChunkSize: number = defaultDownloadChunkSize;
 
 	private initializing = true;
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		this.config = this.configuration.all(); // >_<
 	}
 
 	public async boot(): Promise<void> {
-		await this.checkDNSConnectivity(this.config.dns);
-		await this.checkNTPConnectivity(this.config.ntp);
-
 		await this.populateSeedPeers();
 
 		if (this.config.skipDiscovery) {
@@ -194,26 +193,33 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 				)
 			)
 				.map((peers) =>
-					Utils.shuffle(peers)
-						.slice(0, maxPeersPerPeer)
-						.reduce(
-							// @ts-ignore - rework this so TS stops throwing errors
-							(acc: object, curr: Contracts.P2P.PeerBroadcast) => ({
-								...acc,
-								...{ [curr.ip]: new Peer(curr.ip, curr.port) },
-							}),
-							{},
-						),
+					Object.fromEntries(
+						Utils.shuffle(peers)
+							.slice(0, maxPeersPerPeer)
+							.map(
+								// @ts-ignore - rework this so TS stops throwing errors
+								(current: Contracts.P2P.PeerBroadcast) => [
+									current.ip,
+									new Peer(current.ip, current.port),
+								],
+							),
+					),
 				)
-				.reduce((acc: object, curr: { [ip: string]: Contracts.P2P.Peer }) => ({ ...acc, ...curr }), {}),
+				.reduce(
+					(accumulator: object, current: { [ip: string]: Contracts.P2P.Peer }) => ({
+						...accumulator,
+						...current,
+					}),
+					{},
+				),
 		);
 
 		if (pingAll || !this.hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
 			await Promise.all(
 				theirPeers.map((p) =>
 					this.app
-						.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-						.call("validateAndAcceptPeer", { peer: p, options: { lessVerbose: true } }),
+						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+						.call("validateAndAcceptPeer", { options: { lessVerbose: true }, peer: p }),
 				),
 			);
 			this.pingPeerPorts(pingAll);
@@ -252,7 +258,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async getNetworkState(): Promise<Contracts.P2P.NetworkState> {
 		await this.cleansePeers({ fast: true, forcePing: true });
 
-		return await NetworkState.analyze(this, this.repository);
+		return await NetworkState.analyze(this, this.repository, this.slots);
 	}
 
 	public async refreshPeersAfterFork(): Promise<void> {
@@ -265,14 +271,14 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		await this.discoverPeers(true);
 		await this.cleansePeers({ forcePing: true });
 
-		const lastBlock: Interfaces.IBlock = this.app
-			.get<Contracts.State.StateStore>(Container.Identifiers.StateStore)
+		const lastBlock: Contracts.Crypto.IBlock = this.app
+			.get<Contracts.State.StateStore>(Identifiers.StateStore)
 			.getLastBlock();
 
 		const verificationResults: Contracts.P2P.PeerVerificationResult[] = this.repository
 			.getPeers()
 			.filter((peer) => peer.verificationResult)
-			.map((peer) => peer.verificationResult!);
+			.map((peer) => peer.verificationResult);
 
 		if (verificationResults.length === 0) {
 			this.logger.info("No verified peers available.");
@@ -286,7 +292,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		const forkHeights: number[] = forkVerificationResults
 			.map((verificationResult: Contracts.P2P.PeerVerificationResult) => verificationResult.highestCommonHeight)
-			.filter((forkHeight, i, arr) => arr.indexOf(forkHeight) === i) // unique
+			.filter((forkHeight, index, array) => array.indexOf(forkHeight) === index) // unique
 			.sort()
 			.reverse();
 
@@ -302,13 +308,13 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						`Rolling back 5000/${blocksToRollback} blocks to fork at height ${forkHeight} (${ourPeerCount} vs ${forkPeerCount}).`,
 					);
 
-					return { forked: true, blocksToRollback: 5000 };
+					return { blocksToRollback: 5000, forked: true };
 				} else {
 					this.logger.info(
 						`Rolling back ${blocksToRollback} blocks to fork at height ${forkHeight} (${ourPeerCount} vs ${forkPeerCount}).`,
 					);
 
-					return { forked: true, blocksToRollback };
+					return { blocksToRollback, forked: true };
 				}
 			} else {
 				this.logger.debug(`Ignoring fork at height ${forkHeight} (${ourPeerCount} vs ${forkPeerCount}).`);
@@ -321,7 +327,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public async downloadBlocksFromHeight(
 		fromBlockHeight: number,
 		maxParallelDownloads = 10,
-	): Promise<Interfaces.IBlockData[]> {
+	): Promise<Contracts.Crypto.IBlockData[]> {
 		const peersAll: Contracts.P2P.Peer[] = this.repository.getPeers();
 
 		if (peersAll.length === 0) {
@@ -354,13 +360,13 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		const downloadJobs = [];
 		const downloadResults: any = [];
-		let someJobFailed: boolean = false;
-		let chunksHumanReadable: string = "";
+		let someJobFailed = false;
+		let chunksHumanReadable = "";
 
-		for (let i = 0; i < chunksToDownload; i++) {
-			const height: number = fromBlockHeight + this.downloadChunkSize * i;
-			const isLastChunk: boolean = i === chunksToDownload - 1;
-			const blocksRange: string = `[${(height + 1).toLocaleString()}, ${(isLastChunk
+		for (let index = 0; index < chunksToDownload; index++) {
+			const height: number = fromBlockHeight + this.downloadChunkSize * index;
+			const isLastChunk: boolean = index === chunksToDownload - 1;
+			const blocksRange = `[${(height + 1).toLocaleString()}, ${(isLastChunk
 				? ".."
 				: height + this.downloadChunkSize
 			).toLocaleString()}]`;
@@ -368,7 +374,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			//@ts-ignore
 			downloadJobs.push(async () => {
 				if (this.chunkCache.has(blocksRange)) {
-					downloadResults[i] = this.chunkCache.get(blocksRange);
+					downloadResults[index] = this.chunkCache.get(blocksRange);
 					// Remove it from the cache so that it does not get served many times
 					// from the cache. In case of network reorganization or downloading
 					// flawed chunks we want to re-download from another peer.
@@ -376,26 +382,26 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 					return;
 				}
 
-				let blocks!: Interfaces.IBlockData[];
+				let blocks!: Contracts.Crypto.IBlockData[];
 				let peer: Contracts.P2P.Peer;
 				let peerPrint!: string;
 
 				// As a first peer to try, pick such a peer that different jobs use different peers.
 				// If that peer fails then pick randomly from the remaining peers that have not
 				// been first-attempt for any job.
-				const peersToTry = [peersNotForked[i], ...Utils.shuffle(peersNotForked.slice(chunksToDownload))];
+				const peersToTry = [peersNotForked[index], ...Utils.shuffle(peersNotForked.slice(chunksToDownload))];
 				if (peersToTry.length === 1) {
 					// special case where we don't have "backup peers" (that have not been first-attempt for any job)
 					// so add peers that have been first-attempt as backup peers
-					peersToTry.push(...peersNotForked.filter((p) => p.ip !== peersNotForked[i].ip));
+					peersToTry.push(...peersNotForked.filter((p) => p.ip !== peersNotForked[index].ip));
 				}
 
 				for (peer of peersToTry) {
 					peerPrint = `${peer.ip}:${peer.port}`;
 					try {
 						blocks = await this.communicator.getPeerBlocks(peer, {
-							fromBlockHeight: height,
 							blockLimit: this.downloadChunkSize,
+							fromBlockHeight: height,
 						});
 
 						if (blocks.length > 0 || isLastChunk) {
@@ -403,7 +409,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 							this.logger.debug(
 								`Downloaded blocks ${blocksRange} (${blocks.length}) ` + `from ${peerPrint}`,
 							);
-							downloadResults[i] = blocks;
+							downloadResults[index] = blocks;
 							return;
 						} else {
 							throw new Error("Peer did not return any block");
@@ -445,26 +451,26 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			firstFailureMessage = error.message;
 		}
 
-		let downloadedBlocks: Interfaces.IBlockData[] = [];
+		let downloadedBlocks: Contracts.Crypto.IBlockData[] = [];
 
-		let i;
+		let index;
 
-		for (i = 0; i < chunksToDownload; i++) {
-			if (downloadResults[i] === undefined) {
+		for (index = 0; index < chunksToDownload; index++) {
+			if (downloadResults[index] === undefined) {
 				this.logger.error(firstFailureMessage);
 				break;
 			}
-			downloadedBlocks = [...downloadedBlocks, ...downloadResults[i]];
+			downloadedBlocks = [...downloadedBlocks, ...downloadResults[index]];
 		}
 		// Save any downloaded chunks that are higher than a failed chunk for later reuse.
-		for (i++; i < chunksToDownload; i++) {
-			if (downloadResults[i]) {
-				const height: number = fromBlockHeight + this.downloadChunkSize * i;
-				const blocksRange: string = `[${(height + 1).toLocaleString()}, ${(
+		for (index++; index < chunksToDownload; index++) {
+			if (downloadResults[index]) {
+				const height: number = fromBlockHeight + this.downloadChunkSize * index;
+				const blocksRange = `[${(height + 1).toLocaleString()}, ${(
 					height + this.downloadChunkSize
 				).toLocaleString()}]`;
 
-				this.chunkCache.set(blocksRange, downloadResults[i]);
+				this.chunkCache.set(blocksRange, downloadResults[index]);
 			}
 		}
 
@@ -475,8 +481,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		return downloadedBlocks;
 	}
 
-	public async broadcastBlock(block: Interfaces.IBlock): Promise<void> {
-		const blockchain = this.app.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService);
+	public async broadcastBlock(block: Contracts.Crypto.IBlock): Promise<void> {
+		const blockchain = this.app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService);
 
 		let blockPing = blockchain.getBlockPing();
 		let peers: Contracts.P2P.Peer[] = this.repository.getPeers();
@@ -526,28 +532,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
 	}
 
-	private async checkDNSConnectivity(options): Promise<void> {
-		try {
-			const host = await checkDNS(this.app, options);
-
-			this.logger.info(`Your network connectivity has been verified by ${host}`);
-		} catch (error) {
-			this.logger.error(error.message);
-		}
-	}
-
-	private async checkNTPConnectivity(options): Promise<void> {
-		try {
-			const { host, time } = await checkNTP(this.app, options);
-
-			this.logger.info(`Your NTP connectivity has been verified by ${host}`);
-
-			this.logger.info(`Local clock is off by ${time.t < 0 ? "-" : ""}${prettyMs(Math.abs(time.t))} from NTP`);
-		} catch (error) {
-			this.logger.error(error.message);
-		}
-	}
-
 	private async scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
 		if (this.nextUpdateNetworkStatusScheduled) {
 			return;
@@ -587,7 +571,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			}
 		} catch {}
 
-		if (!peerList || !peerList.length) {
+		if (!peerList || peerList.length === 0) {
 			this.app.terminate("No seed peers defined in peers.json");
 		}
 
@@ -603,8 +587,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 				this.repository.forgetPeer(peer);
 
 				return this.app
-					.get<Services.Triggers.Triggers>(Container.Identifiers.TriggerService)
-					.call("validateAndAcceptPeer", { peer, options: { seed: true, lessVerbose: true } });
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.call("validateAndAcceptPeer", { options: { lessVerbose: true, seed: true }, peer });
 			}),
 		);
 	}

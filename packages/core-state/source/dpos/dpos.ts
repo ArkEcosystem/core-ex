@@ -1,66 +1,68 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Utils } from "@arkecosystem/crypto";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
+import { injectable, inject } from "@arkecosystem/core-container";
 
-@Container.injectable()
+@injectable()
 export class DposState implements Contracts.State.DposState {
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.WalletRepository)
+	@inject(Identifiers.WalletRepository)
 	private walletRepository!: Contracts.State.WalletRepository;
 
 	private roundInfo: Contracts.Shared.RoundInfo | null = null;
 
-	private activeDelegates: Contracts.State.Wallet[] = [];
+	private activeValidators: Contracts.State.Wallet[] = [];
 
-	private roundDelegates: Contracts.State.Wallet[] = [];
+	private roundValidators: Contracts.State.Wallet[] = [];
 
 	public getRoundInfo(): Contracts.Shared.RoundInfo {
 		AppUtils.assert.defined<Contracts.Shared.RoundInfo>(this.roundInfo);
 		return this.roundInfo;
 	}
 
-	public getAllDelegates(): readonly Contracts.State.Wallet[] {
+	public getAllValidators(): readonly Contracts.State.Wallet[] {
 		return this.walletRepository.allByUsername();
 	}
 
-	public getActiveDelegates(): readonly Contracts.State.Wallet[] {
-		return this.activeDelegates;
+	public getActiveValidators(): readonly Contracts.State.Wallet[] {
+		return this.activeValidators;
 	}
 
-	public getRoundDelegates(): readonly Contracts.State.Wallet[] {
-		return this.roundDelegates;
+	public getRoundValidators(): readonly Contracts.State.Wallet[] {
+		return this.roundValidators;
 	}
 
 	// Only called during integrity verification on boot.
-	public buildVoteBalances(): void {
+	public async buildVoteBalances(): Promise<void> {
 		for (const voter of this.walletRepository.allByPublicKey()) {
 			if (voter.hasVoted()) {
-				const delegate: Contracts.State.Wallet = this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
 					voter.getAttribute("vote"),
 				);
 
-				const voteBalance: Utils.BigNumber = delegate.getAttribute("delegate.voteBalance");
+				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance");
 
-				delegate.setAttribute("delegate.voteBalance", voteBalance.plus(voter.getBalance()));
+				validator.setAttribute("validator.voteBalance", voteBalance.plus(voter.getBalance()));
 			}
 		}
 	}
 
-	public buildDelegateRanking(): void {
-		this.activeDelegates = [];
+	public buildValidatorRanking(): void {
+		this.activeValidators = [];
 
-		for (const delegate of this.walletRepository.allByUsername()) {
-			if (delegate.hasAttribute("delegate.resigned")) {
-				delegate.forgetAttribute("delegate.rank");
+		for (const validator of this.walletRepository.allByUsername()) {
+			if (validator.hasAttribute("validator.resigned")) {
+				validator.forgetAttribute("validator.rank");
 			} else {
-				this.activeDelegates.push(delegate);
+				this.activeValidators.push(validator);
 			}
 		}
 
-		this.activeDelegates.sort((a, b) => {
-			const voteBalanceA: Utils.BigNumber = a.getAttribute("delegate.voteBalance");
-			const voteBalanceB: Utils.BigNumber = b.getAttribute("delegate.voteBalance");
+		this.activeValidators.sort((a, b) => {
+			const voteBalanceA: BigNumber = a.getAttribute("validator.voteBalance");
+			const voteBalanceB: BigNumber = b.getAttribute("validator.voteBalance");
 
 			const diff = voteBalanceB.comparedTo(voteBalanceA);
 
@@ -69,10 +71,10 @@ export class DposState implements Contracts.State.DposState {
 				AppUtils.assert.defined<string>(b.getPublicKey());
 
 				if (a.getPublicKey() === b.getPublicKey()) {
-					const username = a.getAttribute("delegate.username");
+					const username = a.getAttribute("validator.username");
 					throw new Error(
-						`The balance and public key of both delegates are identical! ` +
-							`Delegate "${username}" appears twice in the list.`,
+						`The balance and public key of both validators are identical! ` +
+							`Validator "${username}" appears twice in the list.`,
 					);
 				}
 
@@ -82,27 +84,27 @@ export class DposState implements Contracts.State.DposState {
 			return diff;
 		});
 
-		for (let i = 0; i < this.activeDelegates.length; i++) {
-			this.activeDelegates[i].setAttribute("delegate.rank", i + 1);
+		for (let index = 0; index < this.activeValidators.length; index++) {
+			this.activeValidators[index].setAttribute("validator.rank", index + 1);
 		}
 	}
 
-	public setDelegatesRound(roundInfo: Contracts.Shared.RoundInfo): void {
-		if (this.activeDelegates.length < roundInfo.maxDelegates) {
+	public setValidatorsRound(roundInfo: Contracts.Shared.RoundInfo): void {
+		if (this.activeValidators.length < roundInfo.maxValidators) {
 			throw new Error(
-				`Expected to find ${roundInfo.maxDelegates} delegates but only found ${this.activeDelegates.length}.` +
-					`This indicates an issue with the genesis block & delegates.`,
+				`Expected to find ${roundInfo.maxValidators} validators but only found ${this.activeValidators.length}.` +
+					`This indicates an issue with the genesis block & validators.`,
 			);
 		}
 
 		this.roundInfo = roundInfo;
-		this.roundDelegates = [];
-		for (let i = 0; i < roundInfo.maxDelegates; i++) {
-			this.activeDelegates[i].setAttribute("delegate.round", roundInfo.round);
-			this.roundDelegates.push(this.activeDelegates[i]);
+		this.roundValidators = [];
+		for (let index = 0; index < roundInfo.maxValidators; index++) {
+			this.activeValidators[index].setAttribute("validator.round", roundInfo.round);
+			this.roundValidators.push(this.activeValidators[index]);
 		}
 		this.logger.debug(
-			`Loaded ${roundInfo.maxDelegates} active ` + AppUtils.pluralize("delegate", roundInfo.maxDelegates),
+			`Loaded ${roundInfo.maxValidators} active ` + AppUtils.pluralize("validator", roundInfo.maxValidators),
 		);
 	}
 }

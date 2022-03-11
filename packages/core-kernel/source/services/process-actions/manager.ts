@@ -1,9 +1,10 @@
-import { ProcessActionsService } from "../../contracts/kernel/process-actions";
+import { Contracts } from "@arkecosystem/core-contracts";
+
 import { InstanceManager } from "../../support/instance-manager";
 import { Pm2ProcessActionsService } from "./drivers/pm2";
 
-export class ProcessActionsManager extends InstanceManager<ProcessActionsService> {
-	protected createPm2Driver(): ProcessActionsService {
+export class ProcessActionsManager extends InstanceManager<Contracts.Kernel.ProcessActionsService> {
+	protected createPm2Driver(): Contracts.Kernel.ProcessActionsService {
 		return this.app.resolve(Pm2ProcessActionsService);
 	}
 

@@ -1,53 +1,46 @@
-import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import {
-	BINDINGS,
-	ISerializeOptions,
-	ITransaction,
-	ITransactionData,
-	ITransactionSerializer,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { ByteBuffer } from "@arkecosystem/utils";
 
-import { TransactionTypeGroup } from "./enums";
-import { TransactionVersionError } from "./errors";
-import { isSupportedTransactionVersion } from "./helpers";
-import { TransactionTypeFactory } from "./types";
+@injectable()
+export class Serializer implements Contracts.Crypto.ITransactionSerializer {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-@Container.injectable()
-export class Serializer implements ITransactionSerializer {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
-	public getBytes(transaction: ITransactionData, options: ISerializeOptions = {}): Buffer {
+	public async getBytes(
+		transaction: Contracts.Crypto.ITransactionData,
+		options: Contracts.Crypto.ISerializeOptions = {},
+	): Promise<Buffer> {
 		const version: number = transaction.version || 1;
 
-		if (
-			options.acceptLegacyVersion ||
-			options.disableVersionCheck ||
-			isSupportedTransactionVersion(this.configuration, version)
-		) {
-			return this.serialize(TransactionTypeFactory.create(transaction), options);
-		} else {
-			throw new TransactionVersionError(version);
+		if (version) {
+			return this.serialize(this.transactionTypeFactory.create(transaction), options);
 		}
+
+		throw new Exceptions.TransactionVersionError(version);
 	}
 
-	public serialize(transaction: ITransaction, options: ISerializeOptions = {}): Buffer {
-		const buff: ByteBuffer = new ByteBuffer(
-			Buffer.alloc(this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192),
+	public async serialize(
+		transaction: Contracts.Crypto.ITransaction,
+		options: Contracts.Crypto.ISerializeOptions = {},
+	): Promise<Buffer> {
+		const buff: ByteBuffer = ByteBuffer.fromSize(
+			this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192,
 		);
 
 		this.serializeCommon(transaction.data, buff);
 		this.serializeVendorField(transaction, buff);
 
-		const serialized: ByteBuffer | undefined = transaction.serialize(options);
+		const serialized: ByteBuffer | undefined = await transaction.serialize(options);
 
 		if (!serialized) {
 			throw new Error();
 		}
 
-		buff.writeBuffer(serialized.getResult());
+		buff.writeBytes(serialized.getResult());
 
 		this.serializeSignatures(transaction.data, buff, options);
 
@@ -57,63 +50,52 @@ export class Serializer implements ITransactionSerializer {
 		return bufferBuffer;
 	}
 
-	private serializeCommon(transaction: ITransactionData, buff: ByteBuffer): void {
+	private serializeCommon(transaction: Contracts.Crypto.ITransactionData, buff: ByteBuffer): void {
 		transaction.version = transaction.version || 0x01;
 		if (transaction.typeGroup === undefined) {
-			transaction.typeGroup = TransactionTypeGroup.Core;
+			transaction.typeGroup = Contracts.Crypto.TransactionTypeGroup.Core;
 		}
 
-		buff.writeUInt8(0xff);
-		buff.writeUInt8(transaction.version);
-		buff.writeUInt8(transaction.network || this.configuration.get("network.pubKeyHash"));
+		buff.writeUint8(0xff);
+		buff.writeUint8(transaction.version);
+		buff.writeUint8(transaction.network || this.configuration.get("network.pubKeyHash"));
+		buff.writeUint32(transaction.typeGroup);
+		buff.writeUint16(transaction.type);
 
-		if (transaction.version === 1) {
-			buff.writeUInt8(transaction.type);
-			buff.writeUInt32LE(transaction.timestamp);
-		} else {
-			buff.writeUInt32LE(transaction.typeGroup);
-			buff.writeUInt16LE(transaction.type);
-
-			if (transaction.nonce) {
-				buff.writeBigInt64LE(transaction.nonce.toBigInt());
-			}
+		if (transaction.nonce) {
+			buff.writeUint64(transaction.nonce.toBigInt());
 		}
 
 		if (transaction.senderPublicKey) {
-			buff.writeBuffer(Buffer.from(transaction.senderPublicKey, "hex"));
+			buff.writeBytes(Buffer.from(transaction.senderPublicKey, "hex"));
 		}
 
-		buff.writeBigInt64LE(transaction.fee.toBigInt());
+		buff.writeUint64(transaction.fee.toBigInt());
 	}
 
-	private serializeVendorField(transaction: ITransaction, buff: ByteBuffer): void {
-		const { data }: ITransaction = transaction;
+	private serializeVendorField(transaction: Contracts.Crypto.ITransaction, buff: ByteBuffer): void {
+		const { data }: Contracts.Crypto.ITransaction = transaction;
 
 		if (transaction.hasVendorField() && data.vendorField) {
 			const vf: Buffer = Buffer.from(data.vendorField, "utf8");
-			buff.writeUInt8(vf.length);
-			buff.writeBuffer(vf);
+			buff.writeUint8(vf.length);
+			buff.writeBytes(vf);
 		} else {
-			buff.writeUInt8(0x00);
+			buff.writeUint8(0x00);
 		}
 	}
 
 	private serializeSignatures(
-		transaction: ITransactionData,
+		transaction: Contracts.Crypto.ITransactionData,
 		buff: ByteBuffer,
-		options: ISerializeOptions = {},
+		options: Contracts.Crypto.ISerializeOptions = {},
 	): void {
 		if (transaction.signature && !options.excludeSignature) {
-			buff.writeBuffer(Buffer.from(transaction.signature, "hex"));
+			buff.writeBytes(Buffer.from(transaction.signature, "hex"));
 		}
 
-		if (transaction.signatures) {
-			if (transaction.version === 1) {
-				buff.writeUInt8(0xff); // 0xff separator to signal start of multi-signature transactions
-				buff.writeBuffer(Buffer.from(transaction.signatures.join(""), "hex"));
-			} else if (!options.excludeMultiSignature) {
-				buff.writeBuffer(Buffer.from(transaction.signatures.join(""), "hex"));
-			}
+		if (transaction.signatures && !options.excludeMultiSignature) {
+			buff.writeBytes(Buffer.from(transaction.signatures.join(""), "hex"));
 		}
 	}
 }

@@ -1,4 +1,3 @@
-import { envPaths } from "./env-paths";
 import { PackageJson } from "type-fest";
 
 import { ActionFactory } from "./action-factory";
@@ -43,6 +42,7 @@ import {
 	Toggle,
 	Warning,
 } from "./components";
+import { envPaths as environmentPaths } from "./env-paths";
 import { Input, InputValidator } from "./input";
 import { Container, Identifiers, interfaces } from "./ioc";
 import { Output } from "./output";
@@ -50,14 +50,14 @@ import { Config, Environment, Installer, Logger, PluginManager, ProcessManager, 
 import { Process } from "./utils";
 
 export class ApplicationFactory {
-	public static make(container: Container, pkg: PackageJson): Application {
+	public static make(container: Container, package_: PackageJson): Application {
 		const app: Application = new Application(container);
 
 		// Package
-		app.bind(Identifiers.Package).toConstantValue(pkg);
+		app.bind(Identifiers.Package).toConstantValue(package_);
 
 		// Paths
-		app.bind(Identifiers.ConsolePaths).toConstantValue(envPaths.get(pkg.name!));
+		app.bind(Identifiers.ConsolePaths).toConstantValue(environmentPaths.get(package_.name));
 
 		// Factories
 		app.bind(Identifiers.ActionFactory).to(ActionFactory).inSingletonScope();

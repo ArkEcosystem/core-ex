@@ -1,18 +1,17 @@
-import { Application } from "../contracts/kernel";
-import { EventDispatcher } from "../contracts/kernel/events";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+
 import { KernelEvent } from "../enums";
-import { InvalidArgumentException } from "../exceptions/logic";
-import { Identifiers, inject, injectable } from "../ioc";
 import { assert } from "../utils";
 import { ServiceProvider } from "./service-provider";
 
 @injectable()
 export class ServiceProviderRepository {
 	@inject(Identifiers.Application)
-	private readonly app!: Application;
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.EventDispatcherService)
-	private readonly eventDispatcher!: EventDispatcher;
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	private readonly serviceProviders: Map<string, ServiceProvider> = new Map<string, ServiceProvider>();
 
@@ -46,11 +45,11 @@ export class ServiceProviderRepository {
 
 	public alias(name: string, alias: string): void {
 		if (this.aliases.has(alias)) {
-			throw new InvalidArgumentException(`The alias [${alias}] is already in use.`);
+			throw new Exceptions.InvalidArgumentException(`The alias [${alias}] is already in use.`);
 		}
 
 		if (!this.serviceProviders.has(name)) {
-			throw new InvalidArgumentException(`The service provider [${name}] is unknown.`);
+			throw new Exceptions.InvalidArgumentException(`The service provider [${name}] is unknown.`);
 		}
 
 		this.aliases.set(alias, name);

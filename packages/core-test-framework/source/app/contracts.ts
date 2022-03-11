@@ -1,11 +1,12 @@
-import { Application, Container, Types } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { Application, Types } from "@arkecosystem/core-kernel";
 import { Paths } from "env-paths";
+import { interfaces } from "@arkecosystem/core-container";
 
 export interface Wallet {
 	address: string;
 	passphrase: string;
-	keys: Interfaces.IKeyPair;
+	keys: Contracts.Crypto.IKeyPair;
 	username: string | undefined;
 }
 
@@ -20,7 +21,7 @@ export interface CoreOptions {
 		options?: Record<string, Record<string, any>>;
 	};
 	peers?: Types.JsonObject;
-	delegates?: Types.JsonObject;
+	validators?: Types.JsonObject;
 	environment?: Types.JsonObject;
 	app?: Types.JsonObject;
 }
@@ -28,8 +29,8 @@ export interface CoreOptions {
 export interface CryptoFlags {
 	network: string;
 	premine: string;
-	delegates: number;
-	blocktime: number;
+	validators: number;
+	blockTime: number;
 	maxTxPerBlock: number;
 	maxBlockPayload: number;
 	rewardHeight: number;
@@ -44,7 +45,6 @@ export interface CryptoFlags {
 
 export interface CryptoOptions {
 	flags: CryptoFlags;
-	exceptions?: Types.JsonObject;
 	genesisBlock?: Types.JsonObject;
 	milestones?: Types.JsonObject;
 	network?: Types.JsonObject;
@@ -59,16 +59,15 @@ export interface CoreConfigPaths {
 	root: string;
 	env: string;
 	app: string;
-	delegates: string;
+	validators: string;
 	peers: string;
 }
 
 export interface CryptoConfigPaths {
 	root: string;
-	exceptions: string;
 	genesisBlock: string;
 	milestones: string;
 	network: string;
 }
 
-export type SandboxCallback = (context: { app: Application; container: Container.interfaces.Container }) => void;
+export type SandboxCallback = (context: { app: Application; container: interfaces.Container }) => void;

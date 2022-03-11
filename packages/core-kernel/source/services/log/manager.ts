@@ -1,9 +1,10 @@
-import { Logger } from "../../contracts/kernel/log";
+import { Contracts } from "@arkecosystem/core-contracts";
+
 import { InstanceManager } from "../../support/instance-manager";
 import { MemoryLogger } from "./drivers/memory";
 
-export class LogManager extends InstanceManager<Logger> {
-	protected async createMemoryDriver(): Promise<Logger> {
+export class LogManager extends InstanceManager<Contracts.Kernel.Logger> {
+	protected async createMemoryDriver(): Promise<Contracts.Kernel.Logger> {
 		return this.app.resolve(MemoryLogger).make();
 	}
 

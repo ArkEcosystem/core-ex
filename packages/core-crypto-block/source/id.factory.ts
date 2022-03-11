@@ -1,17 +1,15 @@
-import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IBlockData, IHashFactory } from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-import { Serializer } from "./serializer";
-
-@Container.injectable()
+@injectable()
 export class IDFactory {
-	@Container.inject(BINDINGS.HashFactory)
-	private readonly hashFactory: IHashFactory;
+	@inject(Identifiers.Cryptography.HashFactory)
+	private readonly hashFactory: Contracts.Crypto.IHashFactory;
 
-	@Container.inject(BINDINGS.Block.Serializer)
-	private readonly serializer: Serializer; // @TODO: create contract for block serializer
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly serializer: Contracts.Crypto.IBlockSerializer;
 
-	public async make(data: IBlockData): Promise<string> {
-		return (await this.hashFactory.sha256(this.serializer.serialize(data))).toString("hex");
+	public async make(data: Contracts.Crypto.IBlockData): Promise<string> {
+		return (await this.hashFactory.sha256(await this.serializer.serialize(data))).toString("hex");
 	}
 }

@@ -1,16 +1,17 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class CheckLater implements Action {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	public async handle(): Promise<void> {

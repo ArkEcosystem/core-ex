@@ -1,19 +1,19 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Identities, Utils } from "@arkecosystem/crypto";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { inject, injectable, tagged, postConstruct } from "@arkecosystem/core-container";
+import { BigNumber } from "@arkecosystem/utils";
 
-import { WalletIndexNotFoundError } from "./errors";
 import { WalletIndex } from "./wallet-index";
 import { WalletRepository } from "./wallet-repository";
 
-@Container.injectable()
+@injectable()
 export class WalletRepositoryClone extends WalletRepository {
-	@Container.inject(Container.Identifiers.WalletRepository)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.WalletRepository)
+	@tagged("state", "blockchain")
 	private readonly blockchainWalletRepository!: Contracts.State.WalletRepository;
 
 	private readonly forgetIndexes: Record<string, Contracts.State.WalletIndex> = {};
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		super.initialize();
 
@@ -61,9 +61,9 @@ export class WalletRepositoryClone extends WalletRepository {
 		return wallet;
 	}
 
-	public findByPublicKey(publicKey: string): Contracts.State.Wallet {
+	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
-			const wallet = this.findByAddress(Identities.Address.fromPublicKey(publicKey));
+			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			super.index(wallet);
 		}
@@ -109,16 +109,16 @@ export class WalletRepositoryClone extends WalletRepository {
 		);
 	}
 
-	public getNonce(publicKey: string): Utils.BigNumber {
+	public async getNonce(publicKey: string): Promise<BigNumber> {
 		if (this.getIndex(Contracts.State.WalletIndexes.PublicKeys).has(publicKey)) {
-			return this.findByPublicKey(publicKey).getNonce();
+			return (await this.findByPublicKey(publicKey)).getNonce();
 		}
 
 		if (this.blockchainWalletRepository.hasByPublicKey(publicKey)) {
-			return this.blockchainWalletRepository.findByPublicKey(publicKey).getNonce();
+			return (await this.blockchainWalletRepository.findByPublicKey(publicKey)).getNonce();
 		}
 
-		return Utils.BigNumber.ZERO;
+		return BigNumber.ZERO;
 	}
 
 	public forgetOnIndex(index: string, key: string): void {
@@ -159,7 +159,7 @@ export class WalletRepositoryClone extends WalletRepository {
 
 	private getForgetIndex(name: string): Contracts.State.WalletIndex {
 		if (!this.forgetIndexes[name]) {
-			throw new WalletIndexNotFoundError(name);
+			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
 		return this.forgetIndexes[name];
 	}

@@ -1,16 +1,47 @@
-import { join, resolve } from "path";
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { Blocks, Crypto, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts as BaseContracts, Identifiers } from "@arkecosystem/core-contracts";
+import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
+import { ServiceProvider as CoreCryptoBlock } from "@arkecosystem/core-crypto-block";
+import { ServiceProvider as CoreCryptoConfig } from "@arkecosystem/core-crypto-config";
+import { ServiceProvider as CoreCryptoHashBcrypto } from "@arkecosystem/core-crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
+import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoTime } from "@arkecosystem/core-crypto-time";
+import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
+import { ServiceProvider as CoreCryptoTransactionMultiPayment } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { ServiceProvider as CoreCryptoTransactionMultiSignatureRegistration } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
+import {
+	ServiceProvider as CoreCryptoTransactionTransfer,
+	TransferBuilder,
+} from "@arkecosystem/core-crypto-transaction-transfer";
+import {
+	ServiceProvider as CoreCryptoTransactionValidatorRegistration,
+	ValidatorRegistrationBuilder,
+} from "@arkecosystem/core-crypto-transaction-validator-registration";
+import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@arkecosystem/core-crypto-transaction-validator-resignation";
+import { ServiceProvider as CoreCryptoTransactionVote, VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
+import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-crypto-validation";
+import { ServiceProvider as CoreCryptoWif } from "@arkecosystem/core-crypto-wif";
+import { ServiceProvider as CoreDatabase } from "@arkecosystem/core-database";
+import { ServiceProvider as CoreFees } from "@arkecosystem/core-fees";
+import { ServiceProvider as CoreFeesStatic } from "@arkecosystem/core-fees-static";
+import { ServiceProvider as CoreLMDB } from "@arkecosystem/core-lmdb";
+import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
+import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
+import { BigNumber } from "@arkecosystem/utils";
 import { generateMnemonic } from "bip39";
+import dayjs from "dayjs";
 import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import Joi from "joi";
+import { join, resolve } from "path";
 import prompts from "prompts";
 
 interface Wallet {
 	address: string;
 	passphrase: string;
-	keys: Interfaces.IKeyPair;
+	keys: BaseContracts.Crypto.IKeyPair;
 	username: string | undefined;
 }
 
@@ -22,25 +53,11 @@ interface Flag {
 	default?: any;
 }
 
-interface DynamicFees {
-	enabled?: boolean;
-	minFeePool?: number;
-	minFeeBroadcast?: number;
-	addonBytes: {
-		transfer?: number;
-		delegateRegistration?: number;
-		vote?: number;
-		multiSignature?: number;
-		multiPayment?: number;
-		delegateResignation?: number;
-	};
-}
-
 interface Options {
 	network: string;
 	premine: string;
-	delegates: number;
-	blocktime: number;
+	validators: number;
+	blockTime: number;
 	maxTxPerBlock: number;
 	maxBlockPayload: number;
 	rewardHeight: number;
@@ -54,25 +71,6 @@ interface Options {
 	epoch: Date;
 	vendorFieldLength: number;
 
-	// Static Fee
-	feeStaticTransfer: number;
-	feeStaticDelegateRegistration: number;
-	feeStaticVote: number;
-	feeStaticMultiSignature: number;
-	feeStaticMultiPayment: number;
-	feeStaticDelegateResignation: number;
-
-	// Dynamic Fee
-	feeDynamicEnabled?: boolean;
-	feeDynamicMinFeePool?: number;
-	feeDynamicMinFeeBroadcast?: number;
-	feeDynamicBytesTransfer?: number;
-	feeDynamicBytesDelegateRegistration?: number;
-	feeDynamicBytesVote?: number;
-	feeDynamicBytesMultiSignature?: number;
-	feeDynamicBytesMultiPayment?: number;
-	feeDynamicBytesDelegateResignation?: number;
-
 	// Env
 	coreDBHost: string;
 	coreDBPort: number;
@@ -81,7 +79,6 @@ interface Options {
 	coreDBDatabase?: string;
 
 	coreP2PPort: number;
-	coreAPIPort: number;
 	coreWebhooksPort: number;
 	coreMonitorPort: number;
 
@@ -94,9 +91,9 @@ interface Options {
 	force: boolean;
 }
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Logger)
+	@inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
 	public signature = "network:generate";
@@ -107,7 +104,13 @@ export class Command extends Commands.Command {
 
 	/*eslint-disable */
 	private flagSettings: Flag[] = [
-		{ name: "network", description: "The name of the network.", schema: Joi.string(), promptType: "text" },
+		{
+			name: "network",
+			description: "The name of the network.",
+			schema: Joi.string(),
+			promptType: "text",
+			default: "testnet",
+		},
 		{
 			name: "premine",
 			description: "The number of pre-mined tokens.",
@@ -116,15 +119,15 @@ export class Command extends Commands.Command {
 			default: "12500000000000000",
 		},
 		{
-			name: "delegates",
-			description: "The number of delegates to generate.",
+			name: "validators",
+			description: "The number of validators to generate.",
 			schema: Joi.number(),
 			promptType: "number",
 			default: 51,
 		},
 		{
-			name: "blocktime",
-			description: "The network blocktime.",
+			name: "blockTime",
+			description: "The network blockTime.",
 			schema: Joi.number(),
 			promptType: "number",
 			default: 8,
@@ -145,7 +148,7 @@ export class Command extends Commands.Command {
 		},
 		{
 			name: "rewardHeight",
-			description: "The height at which delegate block reward starts.",
+			description: "The height at which validator block reward starts.",
 			schema: Joi.number(),
 			promptType: "number",
 			default: 75600,
@@ -169,28 +172,32 @@ export class Command extends Commands.Command {
 			description: "The WIF (Wallet Import Format) that should be used.",
 			schema: Joi.number(),
 			promptType: "number",
+			default: 186,
 		},
 		{
 			name: "token",
 			description: "The name that is attributed to the token on the network.",
 			schema: Joi.string(),
 			promptType: "text",
+			default: "ARK",
 		},
 		{
 			name: "symbol",
 			description: "The character that is attributed to the token on the network.",
 			schema: Joi.string(),
 			promptType: "text",
+			default: "TѦ",
 		},
 		{
 			name: "explorer",
 			description: "The URL that hosts the network explorer.",
 			schema: Joi.string(),
 			promptType: "text",
+			default: "https://explorer.ark.io",
 		},
 		{
 			name: "distribute",
-			description: "Distribute the premine evenly between all delegates?",
+			description: "Distribute the premine evenly between all validators?",
 			schema: Joi.bool(),
 			promptType: "confirm",
 			default: false,
@@ -209,70 +216,6 @@ export class Command extends Commands.Command {
 			default: 255,
 		},
 
-		// Static fee
-		{
-			name: "feeStaticTransfer",
-			description: "Fee for transfer transactions.",
-			schema: Joi.number(),
-			default: 10000000,
-		},
-		{
-			name: "feeStaticDelegateRegistration",
-			description: "Fee for delegate registration transactions.",
-			schema: Joi.number(),
-			default: 2500000000,
-		},
-		{ name: "feeStaticVote", description: "Fee for vote transactions.", schema: Joi.number(), default: 100000000 },
-		{
-			name: "feeStaticMultiSignature",
-			description: "Fee for multi signature transactions.",
-			schema: Joi.number(),
-			default: 500000000,
-		},
-		{
-			name: "feeStaticMultiPayment",
-			description: "Fee for multi payment transactions.",
-			schema: Joi.number(),
-			default: 10000000,
-		},
-		{
-			name: "feeStaticDelegateResignation",
-			description: "Fee for delegate resignation transactions.",
-			schema: Joi.number(),
-			default: 2500000000,
-		},
-
-		// Dynamic fee
-		{ name: "feeDynamicEnabled", description: "Dynamic fee enabled", schema: Joi.boolean() },
-		{ name: "feeDynamicMinFeePool", description: "Minimum dynamic fee to enter the pool.", schema: Joi.number() },
-		{ name: "feeDynamicMinFeeBroadcast", description: "Minimum dynamic fee to broadcast.", schema: Joi.number() },
-		{
-			name: "feeDynamicBytesTransfer",
-			description: "Dynamic fee for transfer transactions.",
-			schema: Joi.number(),
-		},
-		{
-			name: "feeDynamicBytesDelegateRegistration",
-			description: "Dynamic fee for delegate registration transactions.",
-			schema: Joi.number(),
-		},
-		{ name: "feeDynamicBytesVote", description: "Dynamic fee for vote transactions.", schema: Joi.number() },
-		{
-			name: "feeDynamicBytesMultiSignature",
-			description: "Dynamic fee for multi signature transactions.",
-			schema: Joi.number(),
-		},
-		{
-			name: "feeDynamicBytesMultiPayment",
-			description: "Dynamic fee for multi payment transactions.",
-			schema: Joi.number(),
-		},
-		{
-			name: "feeDynamicBytesDelegateResignation",
-			description: "Dynamic fee for delegate registration transactions.",
-			schema: Joi.number(),
-		},
-
 		// Env
 		{ name: "coreDBHost", description: "Core database host.", schema: Joi.string(), default: "localhost" },
 		{ name: "coreDBPort", description: "Core database port.", schema: Joi.number(), default: 5432 },
@@ -281,7 +224,6 @@ export class Command extends Commands.Command {
 		{ name: "coreDBDatabase", description: "Core database database.", schema: Joi.string() },
 
 		{ name: "coreP2PPort", description: "Core P2P port.", schema: Joi.number(), default: 4000 },
-		{ name: "coreAPIPort", description: "Core API port.", schema: Joi.number(), default: 4003 },
 		{ name: "coreWebhooksPort", description: "Core Webhooks port.", schema: Joi.number(), default: 4004 },
 		{ name: "coreMonitorPort", description: "Core Webhooks port.", schema: Joi.number(), default: 4005 },
 
@@ -317,6 +259,33 @@ export class Command extends Commands.Command {
 
 			this.definition.setFlag(flag.name, flag.description, flag.schema);
 		}
+	}
+
+	public async initialize(): Promise<void> {
+		this.app.bind(Identifiers.LogService).toConstantValue({});
+
+		await this.app.resolve(CoreSerializer).register();
+		await this.app.resolve(CoreValidation).register();
+		await this.app.resolve(CoreCryptoConfig).register();
+		await this.app.resolve(CoreCryptoTime).register();
+		await this.app.resolve(CoreCryptoValidation).register();
+		await this.app.resolve(CoreCryptoHashBcrypto).register();
+		await this.app.resolve(CoreCryptoSignatureSchnorr).register();
+		await this.app.resolve(CoreCryptoKeyPairSchnorr).register();
+		await this.app.resolve(CoreCryptoAddressBech32m).register();
+		await this.app.resolve(CoreCryptoWif).register();
+		await this.app.resolve(CoreCryptoBlock).register();
+		await this.app.resolve(CoreLMDB).register();
+		await this.app.resolve(CoreDatabase).register();
+		await this.app.resolve(CoreFees).register();
+		await this.app.resolve(CoreFeesStatic).register();
+		await this.app.resolve(CoreCryptoTransaction).register();
+		await this.app.resolve(CoreCryptoTransactionValidatorRegistration).register();
+		await this.app.resolve(CoreCryptoTransactionValidatorResignation).register();
+		await this.app.resolve(CoreCryptoTransactionMultiPayment).register();
+		await this.app.resolve(CoreCryptoTransactionMultiSignatureRegistration).register();
+		await this.app.resolve(CoreCryptoTransactionTransfer).register();
+		await this.app.resolve(CoreCryptoTransactionVote).register();
 	}
 
 	public async execute(): Promise<void> {
@@ -390,107 +359,104 @@ export class Command extends Commands.Command {
 	}
 
 	private async generateNetwork(flags: Options): Promise<void> {
-		const paths = envPaths(flags.token, { suffix: "core" });
-		const configPath = flags.configPath ? flags.configPath : paths.config;
+		try {
+			this.app
+				.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+				// @ts-ignore
+				.setConfig({
+					milestones: [{ address: { bech32m: "ark" } }],
+				});
 
-		const coreConfigDestination = join(configPath, flags.network);
-		const cryptoConfigDestination = join(coreConfigDestination, "crypto");
+			const paths = envPaths(flags.token, { suffix: "core" });
+			const configPath = flags.configPath ? flags.configPath : paths.config;
 
-		const delegates: any[] = this.generateCoreDelegates(flags.delegates, flags.pubKeyHash);
+			const coreConfigDestination = join(configPath, flags.network);
 
-		const genesisWallet = this.createWallet(flags.pubKeyHash);
+			const validators: any[] = await this.generateCoreValidators(flags.validators, flags.pubKeyHash);
 
-		await this.components.taskList([
-			{
-				task: async () => {
-					if (!flags.overwriteConfig) {
-						if (existsSync(coreConfigDestination)) {
+			const genesisWallet = await this.createWallet();
+
+			await this.components.taskList([
+				{
+					task: async () => {
+						if (!flags.overwriteConfig && existsSync(coreConfigDestination)) {
 							throw new Error(`${coreConfigDestination} already exists.`);
 						}
 
-						if (existsSync(cryptoConfigDestination)) {
-							throw new Error(`${cryptoConfigDestination} already exists.`);
-						}
-					}
-
-					ensureDirSync(coreConfigDestination);
-					ensureDirSync(cryptoConfigDestination);
+						ensureDirSync(coreConfigDestination);
+					},
+					title: `Prepare directories.`,
 				},
-				title: `Prepare directories.`,
-			},
-			{
-				task: async () => {
-					writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, { spaces: 4 });
-				},
-				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
-			},
-			{
-				task: async () => {
-					const genesisBlock = this.generateCryptoGenesisBlock(genesisWallet, delegates, flags);
-
-					writeJSONSync(
-						resolve(cryptoConfigDestination, "network.json"),
-						this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
-						{ spaces: 4 },
-					);
-
-					writeJSONSync(
-						resolve(cryptoConfigDestination, "milestones.json"),
-						this.generateCryptoMilestones(flags),
-						{
+				{
+					task: async () => {
+						writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, {
 							spaces: 4,
-						},
-					);
-
-					writeJSONSync(resolve(cryptoConfigDestination, "genesisBlock.json"), genesisBlock, { spaces: 4 });
-
-					writeJSONSync(resolve(cryptoConfigDestination, "exceptions.json"), {});
-
-					writeFileSync(
-						resolve(cryptoConfigDestination, "index.ts"),
-						[
-							'import exceptions from "./exceptions.json";',
-							'import genesisBlock from "./genesisBlock.json";',
-							'import milestones from "./milestones.json";',
-							'import network from "./network.json";',
-							"",
-							`export const ${flags.network} = { exceptions, genesisBlock, milestones, network };`,
-							"",
-						].join("\n"),
-					);
+						});
+					},
+					title: "Persist genesis wallet to genesis-wallet.json in core config path.",
 				},
-				title: "Generate crypto network configuration.",
-			},
-			{
-				task: async () => {
-					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), {
-						spaces: 4,
-					});
+				{
+					task: async () => {
+						// Milestones
+						const milestones = this.generateCryptoMilestones(flags);
 
-					writeJSONSync(
-						resolve(coreConfigDestination, "delegates.json"),
-						{ secrets: delegates.map((d) => d.passphrase) },
-						{ spaces: 4 },
-					);
+						this.app
+							.get<BaseContracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+							.setConfig({
+								// @ts-ignore
+								genesisBlock: {},
+								milestones,
+								// @ts-ignore
+								network: {},
+							});
 
-					writeFileSync(resolve(coreConfigDestination, ".env"), this.generateEnvironmentVariables(flags));
+						// Genesis Block
+						const genesisBlock = await this.generateCryptoGenesisBlock(genesisWallet, validators, flags);
 
-					writeJSONSync(resolve(coreConfigDestination, "app.json"), this.generateApp(flags), { spaces: 4 });
+						writeJSONSync(
+							resolve(coreConfigDestination, "crypto.json"),
+							{
+								genesisBlock,
+								milestones,
+								network: this.generateCryptoNetwork(genesisBlock.payloadHash, flags),
+							},
+							{
+								spaces: 4,
+							},
+						);
+					},
+					title: "Generate crypto network configuration.",
 				},
-				title: "Generate Core network configuration.",
-			},
-		]);
+				{
+					task: async () => {
+						writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.generatePeers(flags), {
+							spaces: 4,
+						});
 
-		this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
+						writeJSONSync(
+							resolve(coreConfigDestination, "validators.json"),
+							{ secrets: validators.map((d) => d.passphrase) },
+							{ spaces: 4 },
+						);
+
+						writeFileSync(resolve(coreConfigDestination, ".env"), this.generateEnvironmentVariables(flags));
+
+						writeJSONSync(resolve(coreConfigDestination, "app.json"), this.generateApp(flags), {
+							spaces: 4,
+						});
+					},
+					title: "Generate Core network configuration.",
+				},
+			]);
+
+			this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	private generateCryptoNetwork(nethash: string, options: Options) {
 		return {
-			aip20: 0,
-			bip32: {
-				private: 70_615_956,
-				public: 70_617_039,
-			},
 			client: {
 				explorer: options.explorer,
 				symbol: options.symbol,
@@ -506,33 +472,26 @@ export class Command extends Commands.Command {
 	}
 
 	private generateCryptoMilestones(options: Options) {
-		const epoch = new Date(options.epoch);
-
 		return [
 			{
-				activeDelegates: options.delegates,
-				aip11: true,
+				activeValidators: options.validators,
+				address: {
+					bech32m: "ark",
+				},
 				block: {
-					idFullSha256: true,
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
-					version: 0,
+					version: 1,
 				},
-				blocktime: options.blocktime,
-				epoch: epoch.toISOString(),
-				fees: {
-					staticFees: {
-						delegateRegistration: options.feeStaticDelegateRegistration,
-						delegateResignation: options.feeStaticDelegateResignation,
-						multiPayment: options.feeStaticMultiPayment,
-						multiSignature: options.feeStaticMultiSignature,
-						transfer: options.feeStaticTransfer,
-						vote: options.feeStaticVote,
-					},
-				},
+				blockTime: options.blockTime,
+				epoch: new Date(options.epoch).toISOString(),
 				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
+				satoshi: {
+					decimals: 8,
+					denomination: 1e8,
+				},
 				vendorFieldLength: options.vendorFieldLength,
 			},
 			{
@@ -542,32 +501,36 @@ export class Command extends Commands.Command {
 		];
 	}
 
-	private generateCryptoGenesisBlock(genesisWallet, delegates, options: Options) {
-		// we need to set aip11 and network.pubKeyHash for tx builder to build v2 txs without issue
-		Managers.configManager.getMilestone().aip11 = true;
-		Managers.configManager.set("network.pubKeyHash", options.pubKeyHash);
-		Managers.configManager.getMilestone().block = { idFullSha256: true }; // so that generated block has full sha256 id
-
-		const premineWallet: Wallet = this.createWallet(options.pubKeyHash);
+	private async generateCryptoGenesisBlock(
+		genesisWallet,
+		validators,
+		options: Options,
+	): Promise<BaseContracts.Crypto.IBlockData> {
+		const premineWallet: Wallet = await this.createWallet();
 
 		let transactions = [];
 
 		if (options.distribute) {
 			transactions = transactions.concat(
-				...this.createTransferTransactions(premineWallet, delegates, options.premine, options.pubKeyHash),
+				...(await this.createTransferTransactions(
+					premineWallet,
+					validators,
+					options.premine,
+					options.pubKeyHash,
+				)),
 			);
 		} else {
 			transactions = transactions.concat(
-				this.createTransferTransaction(premineWallet, genesisWallet, options.premine, options.pubKeyHash),
+				await this.createTransferTransaction(premineWallet, genesisWallet, options.premine, options.pubKeyHash),
 			);
 		}
 
 		transactions = transactions.concat(
-			...this.buildDelegateTransactions(delegates, options.pubKeyHash),
-			...this.buildVoteTransactions(delegates, options.pubKeyHash),
+			...(await this.buildValidatorTransactions(validators, options.pubKeyHash)),
+			...(await this.buildVoteTransactions(validators, options.pubKeyHash)),
 		);
 
-		return this.createGenesisBlock(premineWallet.keys, transactions, 0);
+		return this.createGenesisBlock(premineWallet.keys, transactions, options);
 	}
 
 	private generateEnvironmentVariables(options: Options): string {
@@ -584,9 +547,6 @@ export class Command extends Commands.Command {
 
 		result += "CORE_P2P_HOST=0.0.0.0\n";
 		result += `CORE_P2P_PORT=${options.coreP2PPort}\n\n`;
-
-		result += "CORE_API_HOST=0.0.0.0\n";
-		result += `CORE_API_PORT=${options.coreAPIPort}\n\n`;
 
 		result += "CORE_WEBHOOKS_HOST=0.0.0.0\n";
 		result += `CORE_WEBHOOKS_PORT=${options.coreWebhooksPort}\n\n`;
@@ -618,172 +578,150 @@ export class Command extends Commands.Command {
 	}
 
 	private generateApp(options: Options): any {
-		const dynamicFees: DynamicFees = {
-			addonBytes: {},
-			enabled: undefined,
-			minFeeBroadcast: undefined,
-			minFeePool: undefined,
-		};
-
-		let includeDynamicFees = false;
-
-		if (options.feeDynamicEnabled) {
-			dynamicFees.enabled = options.feeDynamicEnabled;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicMinFeePool) {
-			dynamicFees.minFeePool = options.feeDynamicMinFeePool;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicMinFeeBroadcast) {
-			dynamicFees.minFeeBroadcast = options.feeDynamicMinFeeBroadcast;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicBytesTransfer) {
-			dynamicFees.addonBytes.transfer = options.feeDynamicBytesTransfer;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicBytesDelegateRegistration) {
-			dynamicFees.addonBytes.delegateRegistration = options.feeDynamicBytesDelegateRegistration;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicBytesVote) {
-			dynamicFees.addonBytes.vote = options.feeDynamicBytesVote;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicBytesMultiSignature) {
-			dynamicFees.addonBytes.multiSignature = options.feeDynamicBytesMultiSignature;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicBytesMultiPayment) {
-			dynamicFees.addonBytes.multiPayment = options.feeDynamicBytesMultiPayment;
-			includeDynamicFees = true;
-		}
-		if (options.feeDynamicBytesDelegateResignation) {
-			dynamicFees.addonBytes.delegateResignation = options.feeDynamicBytesDelegateResignation;
-			includeDynamicFees = true;
-		}
-
-		if (Object.keys(dynamicFees.addonBytes).length === 0) {
-			// @ts-ignore
-			delete dynamicFees.addonBytes;
-		}
-
-		const app = readJSONSync(resolve(__dirname, "../../bin/config/testnet/app.json"));
-
-		if (includeDynamicFees) {
-			app.core.plugins.find((plugin) => plugin.package === "@arkecosystem/core-transaction-pool").options = {
-				dynamicFees,
-			};
-
-			app.relay.plugins.find((plugin) => plugin.package === "@arkecosystem/core-transaction-pool").options = {
-				dynamicFees,
-			};
-		}
-
-		return app;
+		return readJSONSync(resolve(__dirname, "../../bin/config/testnet/app.json"));
 	}
 
-	private generateCoreDelegates(activeDelegates: number, pubKeyHash: number): Wallet[] {
+	private async generateCoreValidators(activeValidators: number, pubKeyHash: number): Promise<Wallet[]> {
 		const wallets: Wallet[] = [];
-		for (let index = 0; index < activeDelegates; index++) {
-			const delegateWallet: Wallet = this.createWallet(pubKeyHash);
-			delegateWallet.username = `genesis_${index + 1}`;
 
-			wallets.push(delegateWallet);
+		for (let index = 0; index < activeValidators; index++) {
+			const validatorWallet: Wallet = await this.createWallet();
+			validatorWallet.username = `genesis_${index + 1}`;
+
+			wallets.push(validatorWallet);
 		}
 
 		return wallets;
 	}
 
-	private createWallet(pubKeyHash: number): Wallet {
-		const passphrase = generateMnemonic();
+	private async createWallet(): Promise<Wallet> {
+		const passphrase = generateMnemonic(256);
 
-		const keys: Interfaces.IKeyPair = Identities.Keys.fromPassphrase(passphrase);
+		const keys: BaseContracts.Crypto.IKeyPair = await this.app
+			.get<BaseContracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.fromMnemonic(passphrase);
 
 		return {
-			address: Identities.Address.fromPublicKey(keys.publicKey, pubKeyHash),
+			address: await this.app
+				.get<BaseContracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+				.fromPublicKey(keys.publicKey),
 			keys,
 			passphrase,
 			username: undefined,
 		};
 	}
 
-	private createTransferTransaction(
+	private async createTransferTransaction(
 		sender: Wallet,
 		recipient: Wallet,
 		amount: string,
 		pubKeyHash: number,
 		nonce = 1,
-	): any {
+	) {
 		return this.formatGenesisTransaction(
-			Transactions.BuilderFactory.transfer()
-				.network(pubKeyHash)
-				.version(2)
-				.nonce(nonce.toFixed(0))
-				.recipientId(recipient.address)
-				.amount(amount)
-				.sign(sender.passphrase).data,
+			(
+				await this.app
+					.resolve(TransferBuilder)
+					.network(pubKeyHash)
+					.fee("10000000")
+					.nonce(nonce.toFixed(0))
+					.recipientId(recipient.address)
+					.amount(amount)
+					.sign(sender.passphrase)
+			).data,
 			sender,
 		);
 	}
 
-	private createTransferTransactions(
+	private async createTransferTransactions(
 		sender: Wallet,
 		recipients: Wallet[],
 		totalPremine: string,
 		pubKeyHash: number,
-	): any {
-		const amount: string = Utils.BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
+	) {
+		const amount: string = BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
 
-		return recipients.map((recipientWallet: Wallet, index: number) =>
-			this.createTransferTransaction(sender, recipientWallet, amount, pubKeyHash, index + 1),
-		);
+		const result = [];
+
+		for (const [index, recipient] of recipients.entries()) {
+			result.push(await this.createTransferTransaction(sender, recipient, amount, pubKeyHash, index + 1));
+		}
+
+		return result;
 	}
 
-	private buildDelegateTransactions(senders: Wallet[], pubKeyHash: number) {
-		return senders.map((sender: Wallet) =>
-			this.formatGenesisTransaction(
-				Transactions.BuilderFactory.delegateRegistration()
-					.network(pubKeyHash)
-					.version(2)
-					.nonce("1") // delegate registration tx is always the first one from sender
-					.usernameAsset(sender.username)
-					.fee(`${25 * 1e8}`)
-					.sign(sender.passphrase).data,
+	private async buildValidatorTransactions(senders: Wallet[], pubKeyHash: number) {
+		const result = [];
+
+		for (const [index, sender] of senders.entries()) {
+			result[index] = await this.formatGenesisTransaction(
+				(
+					await this.app
+						.resolve(ValidatorRegistrationBuilder)
+						.network(pubKeyHash)
+						.fee("2500000000")
+						.nonce("1") // validator registration tx is always the first one from sender
+						.usernameAsset(sender.username)
+						.fee(`${25 * 1e8}`)
+						.sign(sender.passphrase)
+				).data,
 				sender,
-			),
-		);
+			);
+		}
+
+		return result;
 	}
 
-	private buildVoteTransactions(senders: Wallet[], pubKeyHash: number) {
-		return senders.map((sender: Wallet) =>
-			this.formatGenesisTransaction(
-				Transactions.BuilderFactory.vote()
-					.network(pubKeyHash)
-					.version(2)
-					.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is delegate registration)
-					.votesAsset([`+${sender.keys.publicKey}`])
-					.fee(`${1 * 1e8}`)
-					.sign(sender.passphrase).data,
+	private async buildVoteTransactions(senders: Wallet[], pubKeyHash: number) {
+		const result = [];
+
+		for (const [index, sender] of senders.entries()) {
+			result[index] = await this.formatGenesisTransaction(
+				(
+					await this.app
+						.resolve(VoteBuilder)
+						.network(pubKeyHash)
+						.fee("100000000")
+						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
+						.votesAsset([`+${sender.keys.publicKey}`])
+						.fee(`${1 * 1e8}`)
+						.sign(sender.passphrase)
+				).data,
 				sender,
-			),
-		);
+			);
+		}
+
+		return result;
 	}
 
-	private formatGenesisTransaction(transaction, wallet: Wallet) {
+	private async formatGenesisTransaction(transaction, wallet: Wallet) {
 		Object.assign(transaction, {
-			fee: Utils.BigNumber.ZERO,
+			fee: BigNumber.ZERO,
 			timestamp: 0,
 		});
-		transaction.signature = Transactions.Signer.sign(transaction, wallet.keys);
-		transaction.id = Transactions.Utils.getId(transaction);
+		transaction.signature = await this.app
+			.get<BaseContracts.Crypto.ITransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
+			.sign(transaction, wallet.keys);
+		transaction.id = await this.app
+			.get<BaseContracts.Crypto.ITransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
+			.getId(transaction);
 
 		return transaction;
 	}
 
-	private createGenesisBlock(keys: Interfaces.IKeyPair, transactions, timestamp: number) {
-		transactions = transactions.sort((a, b) => {
+	private async createGenesisBlock(
+		keys: BaseContracts.Crypto.IKeyPair,
+		transactions,
+		options: Options,
+	): Promise<BaseContracts.Crypto.IBlockData> {
+		const totals: { amount: BigNumber; fee: BigNumber } = {
+			amount: BigNumber.ZERO,
+			fee: BigNumber.ZERO,
+		};
+
+		const payloadBuffers: Buffer[] = [];
+
+		const sortedTransactions = transactions.sort((a, b) => {
 			if (a.type === b.type) {
 				return a.amount - b.amount;
 			}
@@ -791,62 +729,38 @@ export class Command extends Commands.Command {
 			return a.type - b.type;
 		});
 
-		let payloadLength = 0;
-		let totalFee: Utils.BigNumber = Utils.BigNumber.ZERO;
-		let totalAmount: Utils.BigNumber = Utils.BigNumber.ZERO;
-		const allBytes: Buffer[] = [];
+		for (const transaction of sortedTransactions) {
+			totals.amount = totals.amount.plus(transaction.amount);
+			totals.fee = totals.fee.plus(transaction.fee);
 
-		for (const transaction of transactions) {
-			const bytes: Buffer = Transactions.Serializer.getBytes(transaction);
-
-			allBytes.push(bytes);
-
-			payloadLength += bytes.length;
-			totalFee = totalFee.plus(transaction.fee);
-			totalAmount = totalAmount.plus(Utils.BigNumber.make(transaction.amount));
+			payloadBuffers.push(Buffer.from(transaction.id, "hex"));
 		}
 
-		const payloadHash: Buffer = Crypto.HashAlgorithms.sha256(Buffer.concat(allBytes));
-
-		const block: any = {
-			blockSignature: undefined,
-
-			// @ts-ignore
-			generatorPublicKey: keys.publicKey.toString("hex"),
-
-			height: 1,
-
-			id: undefined,
-
-			numberOfTransactions: transactions.length,
-
-			payloadHash: payloadHash.toString("hex"),
-
-			payloadLength,
-
-			previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-
-			reward: "0",
-
-			timestamp,
-			totalAmount: totalAmount.toString(),
-			totalFee: totalFee.toString(),
+		return {
+			...(
+				await this.app.get<BaseContracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make(
+					{
+						generatorPublicKey: keys.publicKey,
+						height: 1,
+						numberOfTransactions: transactions.length,
+						payloadHash: (
+							await this.app
+								.get<BaseContracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+								.sha256(payloadBuffers)
+						).toString("hex"),
+						payloadLength: 32 * transactions.length,
+						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+						reward: "0",
+						timestamp: dayjs(options.epoch).unix(),
+						totalAmount: totals.amount.toString(),
+						totalFee: totals.fee.toString(),
+						transactions,
+						version: 1,
+					},
+					keys,
+				)
+			).data,
 			transactions,
-			version: 0,
 		};
-
-		block.id = Blocks.Block.getId(block);
-
-		block.blockSignature = this.signBlock(block, keys);
-
-		return block;
-	}
-
-	private signBlock(block, keys: Interfaces.IKeyPair): string {
-		return Crypto.Hash.signECDSA(this.getHash(block), keys);
-	}
-
-	private getHash(block): Buffer {
-		return Crypto.HashAlgorithms.sha256(Blocks.Serializer.serialize(block, false));
 	}
 }

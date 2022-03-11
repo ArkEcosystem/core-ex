@@ -1,17 +1,18 @@
-import { Kernel } from "../contracts";
-import { Identifiers, inject, injectable } from "../ioc";
-// todo: revisit the implementation of the class and see if it can be removed
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+
+// @TODO revisit the implementation of the class and see if it can be removed
 // import { Class } from "../types";
 import { pascalCase } from "../utils";
 
 @injectable()
 export abstract class ClassManager {
 	@inject(Identifiers.Application)
-	protected readonly app!: Kernel.Application;
+	protected readonly app!: Contracts.Kernel.Application;
 
 	private defaultDriver: string;
 
-	// todo: revisit the implementation of the class and see if it can be removed
+	// @TODO revisit the implementation of the class and see if it can be removed
 	//
 	// private drivers: Map<string, Class> = new Map<string, Class>();
 
@@ -23,7 +24,7 @@ export abstract class ClassManager {
 		return this.createDriver<T>(name || this.defaultDriver);
 	}
 
-	// todo: revisit the implementation of the class and see if it can be removed
+	// @TODO revisit the implementation of the class and see if it can be removed
 	//
 	// public async extend(name: string, driver: Class): Promise<void> {
 	//     this.drivers.set(name, driver);
@@ -33,7 +34,7 @@ export abstract class ClassManager {
 		this.defaultDriver = name;
 	}
 
-	// todo: revisit the implementation of the class and see if it can be removed
+	// @TODO revisit the implementation of the class and see if it can be removed
 	//
 	// public getDrivers(): Class[] {
 	//     return Object.values(this.drivers);

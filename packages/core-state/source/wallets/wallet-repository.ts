@@ -1,25 +1,29 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Identities, Utils } from "@arkecosystem/crypto";
+import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 
-import { WalletIndexAlreadyRegisteredError, WalletIndexNotFoundError } from "./errors";
 import { WalletIndex } from "./wallet-index";
 
-// todo: review the implementation
-@Container.injectable()
+// @TODO review the implementation
+@injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
-	@Container.multiInject(Container.Identifiers.WalletRepositoryIndexerIndex)
+	@multiInject(Identifiers.WalletRepositoryIndexerIndex)
 	protected readonly indexerIndexes!: Contracts.State.WalletIndexerIndex[];
 
-	@Container.inject(Container.Identifiers.WalletFactory)
+	@inject(Identifiers.WalletFactory)
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
+
+	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	protected readonly addressFactory: Contracts.Crypto.IAddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		for (const { name, indexer, autoIndex } of this.indexerIndexes) {
 			if (this.indexes[name]) {
-				throw new WalletIndexAlreadyRegisteredError(name);
+				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
 			}
 			this.indexes[name] = new WalletIndex(indexer, autoIndex);
 		}
@@ -31,7 +35,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public getIndex(name: string): Contracts.State.WalletIndex {
 		if (!this.indexes[name]) {
-			throw new WalletIndexNotFoundError(name);
+			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
 		return this.indexes[name];
 	}
@@ -66,10 +70,10 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return wallet;
 	}
 
-	public findByPublicKey(publicKey: string): Contracts.State.Wallet {
+	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		const index = this.getIndex(Contracts.State.WalletIndexes.PublicKeys);
 		if (publicKey && !index.has(publicKey)) {
-			const wallet = this.findByAddress(Identities.Address.fromPublicKey(publicKey));
+			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			index.set(publicKey, wallet);
 		}
@@ -118,12 +122,12 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.getIndex(indexName).has(key);
 	}
 
-	public getNonce(publicKey: string): Utils.BigNumber {
+	public async getNonce(publicKey: string): Promise<BigNumber> {
 		if (this.hasByPublicKey(publicKey)) {
-			return this.findByPublicKey(publicKey).getNonce();
+			return (await this.findByPublicKey(publicKey)).getNonce();
 		}
 
-		return Utils.BigNumber.ZERO;
+		return BigNumber.ZERO;
 	}
 
 	public index(wallets: Contracts.State.Wallet | Contracts.State.Wallet[]): void {

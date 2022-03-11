@@ -1,31 +1,31 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { DatabaseInteraction } from "@arkecosystem/core-state";
-import { Interfaces } from "@arkecosystem/crypto";
 
 import { BlockHandler, BlockProcessorResult } from "../contracts";
 import { RevertBlockHandler } from "./revert-block-handler";
 
-@Container.injectable()
+@injectable()
 export class AcceptBlockHandler implements BlockHandler {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	protected readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly state!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.DatabaseInteraction)
+	@inject(Identifiers.DatabaseInteraction)
 	private readonly databaseInteraction!: DatabaseInteraction;
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	public async execute(block: Interfaces.IBlock): Promise<BlockProcessorResult> {
+	public async execute(block: Contracts.Crypto.IBlock): Promise<BlockProcessorResult> {
 		try {
 			await this.databaseInteraction.applyBlock(block);
 
@@ -43,7 +43,7 @@ export class AcceptBlockHandler implements BlockHandler {
 			// Reset wake-up timer after chaining a block, since there's no need to
 			// wake up at all if blocks arrive periodically. Only wake up when there are
 			// no new blocks.
-			/* istanbul ignore else */
+
 			if (this.state.isStarted()) {
 				this.blockchain.resetWakeUp();
 			}

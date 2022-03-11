@@ -1,10 +1,10 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.PluginManager)
+	@inject(Container.Identifiers.PluginManager)
 	private readonly pluginManager!: Contracts.PluginManager;
 
 	public signature = "plugin:remove";
@@ -13,8 +13,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setArgument("package", "The name of the package.", Joi.string().required());
 	}
 

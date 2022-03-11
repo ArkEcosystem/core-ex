@@ -1,19 +1,22 @@
-import { Container } from "@arkecosystem/core-container";
-import { BINDINGS, IKeyPair, IKeyPairFactory, IWIFFactory } from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import wif from "wif";
 
-@Container.injectable()
-export class WIFFactory implements IWIFFactory {
-	@Container.inject(BINDINGS.Identity.KeyPairFactory)
-	private readonly keyPairFactory: IKeyPairFactory;
+@injectable()
+export class WIFFactory implements Contracts.Crypto.IWIFFactory {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
 
-	public async fromMnemonic(mnemonic: string, version: number): Promise<string> {
-		const { compressed, privateKey }: IKeyPair = await this.keyPairFactory.fromMnemonic(mnemonic);
+	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	private readonly keyPairFactory: Contracts.Crypto.IKeyPairFactory;
 
-		return wif.encode(version, Buffer.from(privateKey, "hex"), compressed);
+	public async fromMnemonic(mnemonic: string): Promise<string> {
+		const { compressed, privateKey }: Contracts.Crypto.IKeyPair = await this.keyPairFactory.fromMnemonic(mnemonic);
+
+		return wif.encode(this.configuration.get("network.wif"), Buffer.from(privateKey, "hex"), compressed);
 	}
 
-	public async fromKeys(keys: IKeyPair, version: number): Promise<string> {
-		return wif.encode(version, Buffer.from(keys.privateKey, "hex"), keys.compressed);
+	public async fromKeys(keys: Contracts.Crypto.IKeyPair): Promise<string> {
+		return wif.encode(this.configuration.get("network.wif"), Buffer.from(keys.privateKey, "hex"), keys.compressed);
 	}
 }

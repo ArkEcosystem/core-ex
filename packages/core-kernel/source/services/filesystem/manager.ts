@@ -1,9 +1,10 @@
-import { Filesystem } from "../../contracts/kernel/filesystem";
+import { Contracts } from "@arkecosystem/core-contracts";
+
 import { InstanceManager } from "../../support/instance-manager";
 import { LocalFilesystem } from "./drivers/local";
 
-export class FilesystemManager extends InstanceManager<Filesystem> {
-	protected async createLocalDriver(): Promise<Filesystem> {
+export class FilesystemManager extends InstanceManager<Contracts.Kernel.Filesystem> {
+	protected async createLocalDriver(): Promise<Contracts.Kernel.Filesystem> {
 		return this.app.resolve(LocalFilesystem).make();
 	}
 

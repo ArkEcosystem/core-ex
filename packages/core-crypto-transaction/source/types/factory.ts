@@ -1,37 +1,50 @@
-import { ITransaction, ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 
-import { UnkownTransactionError } from "../errors";
-import { InternalTransactionType } from "./internal-transaction-type";
 import { Transaction } from "./transaction";
 
 type TransactionConstructor = typeof Transaction;
 
-export class TransactionTypeFactory {
-	private static transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>>;
+@injectable()
+export class TransactionTypeFactory implements Contracts.Transactions.ITransactionTypeFactory {
+	@inject(Identifiers.Application)
+	public readonly app!: Contracts.Kernel.Application;
 
-	public static initialize(transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>>) {
+	private transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;
+
+	public initialize(
+		transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>,
+	) {
 		this.transactionTypes = transactionTypes;
 	}
 
-	public static create(data: ITransactionData): ITransaction {
-		const instance: ITransaction = new (this.get(data.type, data.typeGroup, data.version) as any)() as ITransaction;
+	public create(data: Contracts.Crypto.ITransactionData): Contracts.Crypto.ITransaction {
+		const instance: Contracts.Crypto.ITransaction = this.app.resolve(
+			this.get(data.type, data.typeGroup, data.version),
+		);
 		instance.data = data;
 		instance.data.version = data.version || 1;
 
 		return instance;
 	}
 
-	public static get(type: number, typeGroup?: number, version?: number): TransactionConstructor | undefined {
-		const internalType: InternalTransactionType = InternalTransactionType.from(type, typeGroup);
+	public get(
+		type: number,
+		typeGroup?: number,
+		version?: number,
+	): Contracts.Crypto.TransactionConstructor | undefined {
+		const internalType: Contracts.Transactions.InternalTransactionType =
+			Contracts.Transactions.InternalTransactionType.from(type, typeGroup);
 
 		if (!this.transactionTypes.has(internalType)) {
-			throw new UnkownTransactionError(internalType.toString());
+			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
 
 		// Either there is a match for the provided version or use the first available constructor as a fallback
-		const constructor: TransactionConstructor | undefined = this.transactionTypes
+		const constructor: Contracts.Crypto.TransactionConstructor | undefined = this.transactionTypes
 			.get(internalType)
 			?.get(version || 1);
+
 		return constructor ?? [...this.transactionTypes.get(internalType)!.values()][0];
 	}
 }

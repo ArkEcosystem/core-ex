@@ -1,23 +1,23 @@
-import { ProcessAction, ProcessActionsService } from "../../../contracts/kernel/process-actions";
-import { injectable } from "../../../ioc";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class Pm2ProcessActionsService implements ProcessActionsService {
+export class Pm2ProcessActionsService implements Contracts.Kernel.ProcessActionsService {
 	private readonly pmx;
 
 	public constructor() {
 		this.pmx = require("@pm2/io");
 	}
 
-	public register(remoteAction: ProcessAction): void {
+	public register(remoteAction: Contracts.Kernel.ProcessAction): void {
 		this.pmx.action(remoteAction.name, (reply) => {
 			remoteAction
 				.handler()
 				.then((response) => {
 					reply({ response: response });
 				})
-				.catch((err) => {
-					reply({ error: err.stack });
+				.catch((error) => {
+					reply({ error: error.stack });
 				});
 		});
 	}

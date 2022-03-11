@@ -1,19 +1,19 @@
-import { Container, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { inject, injectable, multiInject, postConstruct } from "@arkecosystem/core-container";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 
-import { DeactivatedTransactionHandlerError, InvalidTransactionTypeError } from "../errors";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandler } from "./transaction";
 
-@Container.injectable()
-export class TransactionHandlerRegistry {
-	@Container.inject(Container.Identifiers.TransactionHandlerProvider)
+@injectable()
+export class TransactionHandlerRegistry implements Contracts.Transactions.ITransactionHandlerRegistry {
+	@inject(Identifiers.TransactionHandlerProvider)
 	private readonly provider!: TransactionHandlerProvider;
 
-	@Container.multiInject(Container.Identifiers.TransactionHandler)
+	@multiInject(Identifiers.TransactionHandler)
 	private readonly handlers!: TransactionHandler[];
 
-	@Container.postConstruct()
+	@postConstruct()
 	public initialize(): void {
 		if (this.provider.isRegistrationRequired()) {
 			this.provider.registerHandlers();
@@ -25,14 +25,14 @@ export class TransactionHandlerRegistry {
 	}
 
 	public getRegisteredHandlerByType(
-		internalType: Transactions.InternalTransactionType,
+		internalType: Contracts.Transactions.InternalTransactionType,
 		version = 1,
 	): TransactionHandler {
 		for (const handler of this.handlers) {
 			const transactionConstructor = handler.getConstructor();
 			Utils.assert.defined<number>(transactionConstructor.type);
 			Utils.assert.defined<number>(transactionConstructor.typeGroup);
-			const handlerInternalType = Transactions.InternalTransactionType.from(
+			const handlerInternalType = Contracts.Transactions.InternalTransactionType.from(
 				transactionConstructor.type,
 				transactionConstructor.typeGroup,
 			);
@@ -41,7 +41,7 @@ export class TransactionHandlerRegistry {
 			}
 		}
 
-		throw new InvalidTransactionTypeError(internalType);
+		throw new Exceptions.InvalidTransactionTypeError(internalType);
 	}
 
 	public async getActivatedHandlers(): Promise<TransactionHandler[]> {
@@ -54,18 +54,23 @@ export class TransactionHandlerRegistry {
 	}
 
 	public async getActivatedHandlerByType(
-		internalType: Transactions.InternalTransactionType,
+		internalType: Contracts.Transactions.InternalTransactionType,
 		version = 1,
 	): Promise<TransactionHandler> {
 		const handler = this.getRegisteredHandlerByType(internalType, version);
 		if (await handler.isActivated()) {
 			return handler;
 		}
-		throw new DeactivatedTransactionHandlerError(internalType);
+		throw new Exceptions.DeactivatedTransactionHandlerError(internalType);
 	}
 
-	public async getActivatedHandlerForData(transactionData: Interfaces.ITransactionData): Promise<TransactionHandler> {
-		const internalType = Transactions.InternalTransactionType.from(transactionData.type, transactionData.typeGroup);
+	public async getActivatedHandlerForData(
+		transactionData: Contracts.Crypto.ITransactionData,
+	): Promise<TransactionHandler> {
+		const internalType = Contracts.Transactions.InternalTransactionType.from(
+			transactionData.type,
+			transactionData.typeGroup,
+		);
 		return this.getActivatedHandlerByType(internalType, transactionData.version);
 	}
 }

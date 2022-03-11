@@ -1,10 +1,10 @@
-import { Commands, Container } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
+import { Commands } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import { parseFileSync } from "envfile";
 import { existsSync } from "fs-extra";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "env:get";
 
@@ -12,8 +12,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)))
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag(
 				"key",
 				"The name of the environment variable that you wish to get the value of.",
@@ -22,19 +22,19 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const envFile: string = this.app.getCorePath("config", ".env");
+		const environmentFile: string = this.app.getCorePath("config", ".env");
 
-		if (!existsSync(envFile)) {
-			this.components.fatal(`No environment file found at ${envFile}.`);
+		if (!existsSync(environmentFile)) {
+			this.components.fatal(`No environment file found at ${environmentFile}.`);
 		}
 
-		const env: object = parseFileSync(envFile);
+		const environment: object = parseFileSync(environmentFile);
 		const key: string = this.getFlag("key");
 
-		if (!env[key]) {
+		if (!environment[key]) {
 			this.components.fatal(`The "${key}" doesn't exist.`);
 		}
 
-		this.components.log(env[key]);
+		this.components.log(environment[key]);
 	}
 }

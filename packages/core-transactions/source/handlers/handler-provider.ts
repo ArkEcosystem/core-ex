@@ -1,16 +1,19 @@
-import { Container, Services, Utils } from "@arkecosystem/core-kernel";
-import { Enums, Transactions } from "@arkecosystem/crypto";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { Services, Utils } from "@arkecosystem/core-kernel";
 
-import { AlreadyRegisteredError, UnsatisfiedDependencyError } from "../errors";
 import { TransactionHandlerConstructor } from "./transaction";
 
-@Container.injectable()
-export class TransactionHandlerProvider {
-	@Container.inject(Container.Identifiers.WalletAttributes)
-	private readonly attributeSet!: Services.Attributes.AttributeSet;
+@injectable()
+export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
+	@inject(Identifiers.WalletAttributes)
+	private readonly attributeSet: Services.Attributes.AttributeSet;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerConstructors)
-	private readonly handlerConstructors!: TransactionHandlerConstructor[];
+	@inject(Identifiers.TransactionHandlerConstructors)
+	private readonly handlerConstructors: TransactionHandlerConstructor[];
+
+	@inject(Identifiers.Cryptography.Transaction.Registry)
+	private readonly transactionRegistry: Contracts.Crypto.ITransactionRegistry;
 
 	private registered = false;
 
@@ -33,18 +36,18 @@ export class TransactionHandlerProvider {
 		Utils.assert.defined<number>(transactionConstructor.type);
 		Utils.assert.defined<number>(transactionConstructor.typeGroup);
 
-		const internalType = Transactions.InternalTransactionType.from(
+		const internalType = Contracts.Transactions.InternalTransactionType.from(
 			transactionConstructor.type,
 			transactionConstructor.typeGroup,
 		);
 
 		if (this.hasOtherHandlerHandling(handlerConstructor, internalType, transactionConstructor.version)) {
-			throw new AlreadyRegisteredError(internalType);
+			throw new Exceptions.AlreadyRegisteredError(internalType);
 		}
 
 		for (const dependency of handler.dependencies()) {
 			if (this.hasOtherHandler(handlerConstructor, dependency) === false) {
-				throw new UnsatisfiedDependencyError(internalType);
+				throw new Exceptions.UnsatisfiedDependencyError(internalType);
 			}
 		}
 
@@ -54,14 +57,14 @@ export class TransactionHandlerProvider {
 			}
 		}
 
-		if (transactionConstructor.typeGroup !== Enums.TransactionTypeGroup.Core) {
-			Transactions.TransactionRegistry.registerTransactionType(transactionConstructor);
+		if (transactionConstructor.typeGroup !== Contracts.Crypto.TransactionTypeGroup.Core) {
+			this.transactionRegistry.registerTransactionType(transactionConstructor);
 		}
 	}
 
 	private hasOtherHandlerHandling(
 		handlerConstructor: TransactionHandlerConstructor,
-		internalType: Transactions.InternalTransactionType,
+		internalType: Contracts.Transactions.InternalTransactionType,
 		version: number,
 	) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {
@@ -75,7 +78,7 @@ export class TransactionHandlerProvider {
 			Utils.assert.defined<number>(otherTransactionConstructor.type);
 			Utils.assert.defined<number>(otherTransactionConstructor.typeGroup);
 
-			const otherInternalType = Transactions.InternalTransactionType.from(
+			const otherInternalType = Contracts.Transactions.InternalTransactionType.from(
 				otherTransactionConstructor.type,
 				otherTransactionConstructor.typeGroup,
 			);

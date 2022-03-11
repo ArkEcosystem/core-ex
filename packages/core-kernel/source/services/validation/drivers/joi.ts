@@ -1,11 +1,11 @@
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { AnySchema, ValidationErrorItem } from "joi";
 
-import { Validator } from "../../../contracts/kernel/validation";
-import { injectable } from "../../../ioc";
 import { JsonObject } from "../../../types";
 
 @injectable()
-export class JoiValidator implements Validator {
+export class JoiValidator implements Contracts.Kernel.Validator {
 	private data!: JsonObject;
 
 	private resultValue: JsonObject | undefined;
@@ -52,7 +52,6 @@ export class JoiValidator implements Validator {
 		}
 
 		for (const error of this.resultError) {
-			/* istanbul ignore else */
 			if (error.context && error.context.key) {
 				errors[error.context.key] = error.context.value;
 			}
@@ -75,7 +74,6 @@ export class JoiValidator implements Validator {
 		for (const error of this.resultError) {
 			const errorKey: string | number = error.path[0];
 
-			/* istanbul ignore else */
 			if (!Array.isArray(errors[errorKey])) {
 				errors[errorKey] = [];
 			}

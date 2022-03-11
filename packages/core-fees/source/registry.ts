@@ -1,15 +1,16 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { get, set } from "@arkecosystem/utils";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { BigNumber, get, set } from "@arkecosystem/utils";
 
-@Container.injectable()
-export class FeeRegistry {
-	readonly #registry: Record<number, number> = {};
+@injectable()
+export class FeeRegistry implements Contracts.Fee.IFeeRegistry {
+	readonly #registry: Record<number, BigNumber> = {};
 
-	public get(transaction: string, version: number): number {
+	public get(transaction: string, version: number): BigNumber {
 		return get(this.#registry, `${transaction}.${version}`);
 	}
 
-	public set(transaction: string, version: number, fee: number): void {
+	public set(transaction: string, version: number, fee: BigNumber): void {
 		set(this.#registry, `${transaction}.${version}`, fee);
 	}
 }

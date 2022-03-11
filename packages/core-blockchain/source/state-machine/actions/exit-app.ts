@@ -1,10 +1,11 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class ExitApp implements Action {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
 	public async handle(): Promise<void> {

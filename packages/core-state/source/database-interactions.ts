@@ -1,52 +1,57 @@
-import { DatabaseService } from "@arkecosystem/core-database";
-import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
-import { Blocks, Interfaces, Managers } from "@arkecosystem/crypto";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Enums } from "@arkecosystem/core-kernel";
 
 import { RoundState } from "./round-state";
 
-@Container.injectable()
+@injectable()
 export class DatabaseInteraction {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.DatabaseService)
-	private readonly databaseService!: DatabaseService;
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService: Contracts.Database.IDatabaseService;
 
-	@Container.inject(Container.Identifiers.BlockState)
-	@Container.tagged("state", "blockchain")
+	@inject(Identifiers.BlockState)
+	@tagged("state", "blockchain")
 	private readonly blockState!: Contracts.State.BlockState;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.StateTransactionStore)
+	@inject(Identifiers.StateTransactionStore)
 	private readonly stateTransactionStore!: Contracts.State.TransactionStore;
 
-	@Container.inject(Container.Identifiers.StateBlockStore)
+	@inject(Identifiers.StateBlockStore)
 	private readonly stateBlockStore!: Contracts.State.BlockStore;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "blockchain")
-	private readonly handlerRegistry!: Handlers.Registry;
+	@inject(Identifiers.TransactionHandlerRegistry)
+	@tagged("state", "blockchain")
+	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.RoundState)
+	@inject(Identifiers.RoundState)
 	private readonly roundState!: RoundState;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
 
 	public async initialize(): Promise<void> {
 		try {
-			this.events.dispatch(Enums.StateEvent.Starting);
+			await this.events.dispatch(Enums.StateEvent.Starting);
 
-			const genesisBlockJson = Managers.configManager.get("genesisBlock");
-			const genesisBlock = Blocks.BlockFactory.fromJson(genesisBlockJson);
+			const genesisBlockJson = this.configuration.get("genesisBlock");
+			const genesisBlock = await this.blockFactory.fromJson(genesisBlockJson);
 
-			this.stateStore.setGenesisBlock(genesisBlock!);
+			this.stateStore.setGenesisBlock(genesisBlock);
 
 			if (process.env.CORE_RESET_DATABASE) {
 				await this.reset();
@@ -55,11 +60,12 @@ export class DatabaseInteraction {
 			await this.initializeLastBlock();
 		} catch (error) {
 			this.logger.error(error.stack);
-			this.app.terminate("Failed to initialize database service.", error);
+
+			await this.app.terminate("Failed to initialize database service.", error);
 		}
 	}
 
-	public async applyBlock(block: Interfaces.IBlock): Promise<void> {
+	public async applyBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		await this.roundState.detectMissedBlocks(block);
 
 		await this.blockState.applyBlock(block);
@@ -72,12 +78,12 @@ export class DatabaseInteraction {
 		this.events.dispatch(Enums.BlockEvent.Applied, block.data);
 	}
 
-	public async revertBlock(block: Interfaces.IBlock): Promise<void> {
+	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
 		await this.roundState.revertBlock(block);
 		await this.blockState.revertBlock(block);
 
-		for (let i = block.transactions.length - 1; i >= 0; i--) {
-			this.events.dispatch(Enums.TransactionEvent.Reverted, block.transactions[i].data);
+		for (let index = block.transactions.length - 1; index >= 0; index--) {
+			this.events.dispatch(Enums.TransactionEvent.Reverted, block.transactions[index].data);
 		}
 
 		this.events.dispatch(Enums.BlockEvent.Reverted, block.data);
@@ -88,54 +94,29 @@ export class DatabaseInteraction {
 	}
 
 	// TODO: Remove
-	public async getActiveDelegates(
+	public async getActiveValidators(
 		roundInfo?: Contracts.Shared.RoundInfo,
-		delegates?: Contracts.State.Wallet[],
+		validators?: Contracts.State.Wallet[],
 	): Promise<Contracts.State.Wallet[]> {
-		return this.roundState.getActiveDelegates(roundInfo, delegates);
+		return this.roundState.getActiveValidators(roundInfo, validators);
 	}
 
 	private async reset(): Promise<void> {
-		await this.databaseService.reset();
 		await this.createGenesisBlock();
 	}
 
 	private async initializeLastBlock(): Promise<void> {
-		// ? attempt to remove potentially corrupt blocks from database
-
-		let lastBlock: Interfaces.IBlock | undefined;
-		let tries = 5; // ! actually 6, but only 5 will be removed
-
 		// Ensure the config manager is initialized, before attempting to call `fromData`
 		// which otherwise uses potentially wrong milestones.
-		let lastHeight: number = 1;
-		const latest: Interfaces.IBlockData | undefined = await this.databaseService.findLatestBlock();
+		let lastHeight = 1;
+		const latest: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
 		if (latest) {
-			lastHeight = latest.height;
+			lastHeight = latest.data.height;
 		}
 
-		Managers.configManager.setHeight(lastHeight);
+		this.configuration.setHeight(lastHeight);
 
-		const getLastBlock = async (): Promise<Interfaces.IBlock | undefined> => {
-			try {
-				return await this.databaseService.getLastBlock();
-			} catch (error) {
-				this.logger.error(error.message);
-
-				if (tries > 0) {
-					const block: Interfaces.IBlockData = (await this.databaseService.findLatestBlock())!;
-					await this.databaseService.deleteBlocks([block]);
-					tries--;
-				} else {
-					this.app.terminate("Unable to deserialize last block from database.", error);
-					throw new Error("Terminated (unreachable)");
-				}
-
-				return getLastBlock();
-			}
-		};
-
-		lastBlock = await getLastBlock();
+		let lastBlock: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
 
 		if (!lastBlock) {
 			this.logger.warning("No block found in database");
@@ -145,21 +126,23 @@ export class DatabaseInteraction {
 		this.configureState(lastBlock);
 	}
 
-	private async createGenesisBlock(): Promise<Interfaces.IBlock> {
+	private async createGenesisBlock(): Promise<Contracts.Crypto.IBlock> {
 		const genesisBlock = this.stateStore.getGenesisBlock();
+
 		await this.databaseService.saveBlocks([genesisBlock]);
+
 		return genesisBlock;
 	}
 
-	private configureState(lastBlock: Interfaces.IBlock): void {
+	private configureState(lastBlock: Contracts.Crypto.IBlock): void {
 		this.stateStore.setLastBlock(lastBlock);
-		const { blocktime, block } = Managers.configManager.getMilestone();
-		const blocksPerDay: number = Math.ceil(86400 / blocktime);
+		const { blockTime, block } = this.configuration.getMilestone();
+		const blocksPerDay: number = Math.ceil(86_400 / blockTime);
 		this.stateBlockStore.resize(blocksPerDay);
 		this.stateTransactionStore.resize(blocksPerDay * block.maxTransactions);
 	}
 
-	private async emitTransactionEvents(transaction: Interfaces.ITransaction): Promise<void> {
+	private async emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// ! no reason to pass this.emitter

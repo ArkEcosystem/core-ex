@@ -1,4 +1,4 @@
-import { Crypto, Interfaces } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 type BlockChainedDetails = {
 	followsPrevious: boolean;
@@ -9,16 +9,16 @@ type BlockChainedDetails = {
 	isChained: boolean;
 };
 
-const getBlockChainedDetails = (
-	previousBlock: Interfaces.IBlockData,
-	nextBlock: Interfaces.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
-): BlockChainedDetails => {
+const getBlockChainedDetails = async (
+	previousBlock: Contracts.Crypto.IBlockData,
+	nextBlock: Contracts.Crypto.IBlockData,
+	slots: Contracts.Crypto.Slots,
+): Promise<BlockChainedDetails> => {
 	const followsPrevious: boolean = nextBlock.previousBlock === previousBlock.id;
 	const isPlusOne: boolean = nextBlock.height === previousBlock.height + 1;
 
-	const previousSlot: number = Crypto.Slots.getSlotNumber(getTimeStampForBlock, previousBlock.timestamp);
-	const nextSlot: number = Crypto.Slots.getSlotNumber(getTimeStampForBlock, nextBlock.timestamp);
+	const previousSlot: number = await slots.getSlotNumber(previousBlock.timestamp);
+	const nextSlot: number = await slots.getSlotNumber(nextBlock.timestamp);
 	const isAfterPreviousSlot: boolean = previousSlot < nextSlot;
 
 	const isChained: boolean = followsPrevious && isPlusOne && isAfterPreviousSlot;
@@ -26,21 +26,18 @@ const getBlockChainedDetails = (
 	return { followsPrevious, isAfterPreviousSlot, isChained, isPlusOne, nextSlot, previousSlot };
 };
 
-export const isBlockChained = (
-	previousBlock: Interfaces.IBlockData,
-	nextBlock: Interfaces.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
-): boolean => {
-	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock);
-	return details.isChained;
-};
+export const isBlockChained = async (
+	previousBlock: Contracts.Crypto.IBlockData,
+	nextBlock: Contracts.Crypto.IBlockData,
+	slots: Contracts.Crypto.Slots,
+): Promise<boolean> => (await getBlockChainedDetails(previousBlock, nextBlock, slots)).isChained;
 
-export const getBlockNotChainedErrorMessage = (
-	previousBlock: Interfaces.IBlockData,
-	nextBlock: Interfaces.IBlockData,
-	getTimeStampForBlock: (blockheight: number) => number,
-): string => {
-	const details: BlockChainedDetails = getBlockChainedDetails(previousBlock, nextBlock, getTimeStampForBlock);
+export const getBlockNotChainedErrorMessage = async (
+	previousBlock: Contracts.Crypto.IBlockData,
+	nextBlock: Contracts.Crypto.IBlockData,
+	slots: Contracts.Crypto.Slots,
+): Promise<string> => {
+	const details: BlockChainedDetails = await getBlockChainedDetails(previousBlock, nextBlock, slots);
 
 	if (details.isChained) {
 		throw new Error("Block had no chain error");
@@ -53,7 +50,6 @@ export const getBlockNotChainedErrorMessage = (
 
 	let messageDetail: string | undefined;
 
-	/* istanbul ignore else */
 	if (!details.followsPrevious) {
 		messageDetail = `previous block id mismatch`;
 	} else if (!details.isPlusOne) {

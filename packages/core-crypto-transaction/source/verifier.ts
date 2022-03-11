@@ -1,51 +1,31 @@
-import { Container } from "@arkecosystem/core-container";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import {
-	BINDINGS,
-	IMultiSignatureAsset,
-	ISchemaValidationResult,
-	ITransactionData,
-	ITransactionUtils,
-	ITransactionVerifier,
-	IVerifyOptions,
-	Signatory,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Exceptions } from "@arkecosystem/core-contracts";
 
-import { DuplicateParticipantInMultiSignatureError, InvalidMultiSignatureAssetError } from "./errors";
-import { TransactionTypeFactory } from "./types/factory";
+@injectable()
+export class Verifier implements Contracts.Crypto.ITransactionVerifier {
+	@inject(Identifiers.Cryptography.Signature)
+	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
-@Container.injectable()
-export class Verifier implements ITransactionVerifier {
-	@Container.inject(BINDINGS.Configuration)
-	private readonly configuration: Configuration;
-
-	@Container.inject(BINDINGS.SignatureFactory)
-	private readonly signatureFactory: Signatory;
-
-	@Container.inject(BINDINGS.Validator)
+	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator: any;
 
-	@Container.inject(BINDINGS.Transaction.Utils)
-	private readonly utils: ITransactionUtils;
+	@inject(Identifiers.Cryptography.Transaction.Utils)
+	private readonly utils: Contracts.Crypto.ITransactionUtils;
 
-	public async verify(data: ITransactionData, options?: IVerifyOptions): Promise<boolean> {
-		if (this.configuration.getMilestone().aip11 && (!data.version || data.version === 1)) {
-			return false;
-		}
-
-		return this.verifyHash(data, options?.disableVersionCheck);
-	}
+	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
+	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
 	public async verifySignatures(
-		transaction: ITransactionData,
-		multiSignature: IMultiSignatureAsset,
+		transaction: Contracts.Crypto.ITransactionData,
+		multiSignature: Contracts.Crypto.IMultiSignatureAsset,
 	): Promise<boolean> {
 		if (!multiSignature) {
-			throw new InvalidMultiSignatureAssetError();
+			throw new Exceptions.InvalidMultiSignatureAssetError();
 		}
 
-		const { publicKeys, min }: IMultiSignatureAsset = multiSignature;
-		const { signatures }: ITransactionData = transaction;
+		const { publicKeys, min }: Contracts.Crypto.IMultiSignatureAsset = multiSignature;
+		const { signatures }: Contracts.Crypto.ITransactionData = transaction;
 
 		const hash: Buffer = await this.utils.toHash(transaction, {
 			excludeMultiSignature: true,
@@ -64,7 +44,7 @@ export class Verifier implements ITransactionVerifier {
 				if (!publicKeyIndexes[publicKeyIndex]) {
 					publicKeyIndexes[publicKeyIndex] = true;
 				} else {
-					throw new DuplicateParticipantInMultiSignatureError();
+					throw new Exceptions.DuplicateParticipantInMultiSignatureError();
 				}
 
 				const partialSignature: string = signature.slice(2, 130);
@@ -92,7 +72,7 @@ export class Verifier implements ITransactionVerifier {
 		return verified;
 	}
 
-	public async verifyHash(data: ITransactionData, disableVersionCheck = false): Promise<boolean> {
+	public async verifyHash(data: Contracts.Crypto.ITransactionData): Promise<boolean> {
 		const { signature, senderPublicKey } = data;
 
 		if (!signature || !senderPublicKey) {
@@ -100,15 +80,17 @@ export class Verifier implements ITransactionVerifier {
 		}
 
 		const hash: Buffer = await this.utils.toHash(data, {
-			disableVersionCheck,
 			excludeSignature: true,
 		});
 
 		return this.signatureFactory.verify(hash, Buffer.from(signature, "hex"), Buffer.from(senderPublicKey, "hex"));
 	}
 
-	public verifySchema(data: ITransactionData, strict = true): ISchemaValidationResult {
-		const transactionType = TransactionTypeFactory.get(data.type, data.typeGroup, data.version);
+	public verifySchema(
+		data: Contracts.Crypto.ITransactionData,
+		strict: boolean,
+	): Contracts.Crypto.ISchemaValidationResult {
+		const transactionType = this.transactionTypeFactory.get(data.type, data.typeGroup, data.version);
 
 		if (!transactionType) {
 			throw new Error();

@@ -1,18 +1,20 @@
-import { Managers } from "@arkecosystem/crypto";
 import { performance } from "perf_hooks";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-import { EventDispatcher } from "../../contracts/kernel/events";
 import { BlockEvent, ScheduleEvent } from "../../enums";
-import { Identifiers, inject, injectable } from "../../ioc";
 import { Job } from "./interfaces";
 import { ExecuteCallbackWhenReady } from "./listeners";
 
 @injectable()
 export class BlockJob implements Job {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly events!: EventDispatcher;
+	private readonly events: Contracts.Kernel.EventDispatcher;
 
-	protected blockCount: number = 1;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	protected blockCount = 1;
 
 	public execute(callback: Function): void {
 		const onCallback = async () => {
@@ -21,8 +23,8 @@ export class BlockJob implements Job {
 			await callback();
 
 			await this.events.dispatch(ScheduleEvent.BlockJobFinished, {
-				executionTime: performance.now() - start,
 				blockCount: this.blockCount,
+				executionTime: performance.now() - start,
 			});
 		};
 
@@ -56,6 +58,6 @@ export class BlockJob implements Job {
 	}
 
 	public everyRound(): this {
-		return this.cron(Managers.configManager.getMilestone().activeDelegates);
+		return this.cron(this.configuration.getMilestone().activeValidators);
 	}
 }

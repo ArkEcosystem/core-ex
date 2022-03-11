@@ -1,8 +1,8 @@
 import { Commands, Container } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
+import { injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "env:paths";
 
@@ -10,8 +10,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)));
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {

@@ -1,6 +1,5 @@
 export * from "./actions";
 export * from "./collator";
-export * from "./errors";
 export * from "./expiration-service";
 export * from "./mempool";
 export * from "./processor";
@@ -11,5 +10,3 @@ export * from "./service";
 export * from "./service-provider";
 export * from "./storage";
 export * from "./utils";
-export * from "./worker";
-export * from "./worker-pool";

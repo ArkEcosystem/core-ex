@@ -1,82 +1,96 @@
-import { Identities, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { inject } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { BigNumber } from "@arkecosystem/utils";
+
+import { MultiPaymentBuilder } from "../../../core-crypto-transaction-multi-payment";
+import { MultiSignatureBuilder } from "../../../core-crypto-transaction-multi-signature-registration";
+import { TransferBuilder } from "../../../core-crypto-transaction-transfer";
+import { ValidatorRegistrationBuilder } from "../../../core-crypto-transaction-validator-registration";
+import { VoteBuilder } from "../../../core-crypto-transaction-vote";
 
 export class Signer {
-	private nonce: Utils.BigNumber;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	private readonly publicKeyFactory: Contracts.Crypto.IPublicKeyFactory;
+
+	private nonce: BigNumber;
 
 	public constructor(config, nonce: string) {
-		Managers.configManager.setConfig(config);
+		this.configuration.setConfig(config);
 
-		this.nonce = Utils.BigNumber.make(nonce || 0);
+		this.nonce = BigNumber.make(nonce || 0);
 	}
 
-	public makeTransfer(opts: Record<string, any>): any {
-		const transaction = Transactions.BuilderFactory.transfer()
-			.fee(this.toSatoshi(opts.transferFee))
+	public async makeTransfer(options: Record<string, any>) {
+		const transaction = new TransferBuilder()
+			.fee(this.toSatoshi(options.transferFee))
 			.nonce(this.nonce.toString())
-			.recipientId(opts.recipient)
-			.amount(this.toSatoshi(opts.amount));
+			.recipientId(options.recipient)
+			.amount(this.toSatoshi(options.amount));
 
-		if (opts.vendorField) {
-			transaction.vendorField(opts.vendorField);
+		if (options.vendorField) {
+			transaction.vendorField(options.vendorField);
 		}
 
-		transaction.sign(opts.passphrase);
+		await transaction.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();
 	}
 
-	public makeDelegate(opts: Record<string, any>): any {
-		const transaction = Transactions.BuilderFactory.delegateRegistration()
-			.fee(this.toSatoshi(opts.delegateFee))
+	public async makeValidator(options: Record<string, any>) {
+		const transaction = await new ValidatorRegistrationBuilder()
+			.fee(this.toSatoshi(options.validatorFee))
 			.nonce(this.nonce.toString())
-			.usernameAsset(opts.username)
-			.sign(opts.passphrase);
+			.usernameAsset(options.username)
+			.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();
 	}
 
-	public makeVote(opts: Record<string, any>): any {
-		const transaction = Transactions.BuilderFactory.vote()
-			.fee(this.toSatoshi(opts.voteFee))
+	public async makeVote(options: Record<string, any>) {
+		const transaction = await new VoteBuilder()
+			.fee(this.toSatoshi(options.voteFee))
 			.nonce(this.nonce.toString())
-			.votesAsset([`+${opts.delegate}`])
-			.sign(opts.passphrase);
+			.votesAsset([`+${options.validator}`])
+			.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();
 	}
 
-	public makeMultiSignatureRegistration(opts: Record<string, any>): any {
-		const transaction = Transactions.BuilderFactory.multiSignature()
+	public async makeMultiSignatureRegistration(options: Record<string, any>) {
+		const transaction = new MultiSignatureBuilder()
 			.multiSignatureAsset({
-				min: opts.min,
-				publicKeys: opts.participants.split(","),
+				min: options.min,
+				publicKeys: options.participants.split(","),
 			})
-			.senderPublicKey(Identities.PublicKey.fromPassphrase(opts.passphrase))
+			.senderPublicKey(await this.publicKeyFactory.fromMnemonic(options.passphrase))
 			.nonce(this.nonce.toString());
 
-		for (const [index, passphrase] of opts.passphrases.split(",").entries()) {
-			transaction.multiSign(passphrase, index);
+		for (const [index, passphrase] of options.passphrases.split(",").entries()) {
+			await transaction.multiSign(passphrase, index);
 		}
 
-		transaction.sign(opts.passphrase);
+		await transaction.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();
 	}
 
-	public makeMultipayment(opts: Record<string, any>): any {
-		const transaction = Transactions.BuilderFactory.multiPayment()
-			.fee(this.toSatoshi(opts.multipaymentFee))
+	public async makeMultipayment(options: Record<string, any>) {
+		const transaction = new MultiPaymentBuilder()
+			.fee(this.toSatoshi(options.multipaymentFee))
 			.nonce(this.nonce.toString());
 
-		for (const payment of opts.payments) {
+		for (const payment of options.payments) {
 			transaction.addPayment(payment.recipientId, payment.amount);
 		}
 
-		transaction.sign(opts.passphrase);
+		await transaction.sign(options.passphrase);
 
 		this.incrementNonce();
 		return transaction.getStruct();
@@ -87,6 +101,6 @@ export class Signer {
 	}
 
 	private toSatoshi(value): string {
-		return Utils.BigNumber.make(value * 1e8).toFixed();
+		return BigNumber.make(value * 1e8).toFixed();
 	}
 }
