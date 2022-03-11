@@ -8,6 +8,7 @@ import * as networks from "../networks";
 import { NetworkName } from "../types";
 import ByteBuffer from "bytebuffer";
 import { dummyBlock, dummyBlock2, dummyBlockSize } from "../../test/fixtures/block";
+import { NetworkConfig } from "../interfaces";
 
 const data = {
 	id: "187940162505562345",
@@ -35,8 +36,16 @@ const serialize = (object, includeSignature?: any) => {
 	return buffer;
 };
 
-describe("Block", ({ it, assert, beforeEach, stub, each }) => {
-	beforeEach(() => configManager.setFromPreset("devnet"));
+describe<{
+	config: NetworkConfig;
+}>("Block", ({ it, assert, beforeAll, afterAll, stub, each }) => {
+	beforeAll((context) => {
+		context.config = configManager.all();
+
+		configManager.setFromPreset("devnet");
+	});
+
+	afterAll((context) => configManager.setConfig(context.config));
 
 	it("constructor - should store the data", () => {
 		const block = BlockFactory.fromData(dummyBlock);
