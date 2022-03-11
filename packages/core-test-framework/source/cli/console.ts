@@ -1,4 +1,5 @@
-import { Application, ApplicationFactory, Commands, Container, Services, Utils } from "@arkecosystem/core-cli";
+import { Application, ApplicationFactory, Commands, Container as CLI, Services, Utils } from "@arkecosystem/core-cli";
+import { Container } from "@arkecosystem/core-container";
 
 export class Console {
 	public app: Application;
@@ -17,9 +18,9 @@ export class Console {
 		this.app = this.createApplication();
 	}
 
-	public withArgs(args: string[]): this {
+	public withArgs(arguments_: string[]): this {
 		this.args = [""];
-		this.args = this.args.concat(args);
+		this.args = this.args.concat(arguments_);
 
 		return this;
 	}
@@ -32,10 +33,10 @@ export class Console {
 
 	public async execute(command): Promise<void> {
 		this.app
-			.rebind(Container.Identifiers.ApplicationPaths)
+			.rebind(CLI.Identifiers.ApplicationPaths)
 			.toConstantValue(
 				this.app
-					.get<Services.Environment>(Container.Identifiers.Environment)
+					.get<Services.Environment>(CLI.Identifiers.Environment)
 					.getPaths(this.flags.token, this.flags.network),
 			);
 
@@ -59,7 +60,7 @@ export class Console {
 	}
 
 	private createApplication(): Application {
-		const app = ApplicationFactory.make(new Container.Container(), this.pkg);
+		const app = ApplicationFactory.make(new Container(), this.pkg);
 
 		this.flags = this.useDefaultFlags ? { network: "testnet", token: "ark" } : {};
 

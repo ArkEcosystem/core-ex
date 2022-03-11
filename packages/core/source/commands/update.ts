@@ -1,10 +1,11 @@
 import { Commands, Container, Contracts } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Utils } from "@arkecosystem/core-kernel";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Updater)
+	@inject(Container.Identifiers.Updater)
 	private readonly updater!: Contracts.Updater;
 
 	public signature = "update";
@@ -13,7 +14,7 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
+			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("force", "Force an update.", Joi.boolean().default(false))
 			.setFlag("updateProcessManager", "Update process manager.", Joi.boolean().default(false))
 			.setFlag("restart", "Restart all running processes.", Joi.boolean())
@@ -28,7 +29,7 @@ export class Command extends Commands.Command {
 		if (hasNewVersion) {
 			await this.updater.update(this.getFlag("updateProcessManager"), this.getFlag("force"));
 
-			if (this.hasRestartFlag()) {
+			if (this.#hasRestartFlag()) {
 				if (this.hasFlag("restart")) {
 					this.actions.restartRunningProcess(`${this.getFlag("token")}-core`);
 					this.actions.restartRunningProcess(`${this.getFlag("token")}-relay`);
@@ -56,7 +57,7 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	private hasRestartFlag(): boolean {
+	#hasRestartFlag(): boolean {
 		return Utils.hasSomeProperty(this.getFlags(), ["restart", "restartCore", "restartRelay", "restartForger"]);
 	}
 }

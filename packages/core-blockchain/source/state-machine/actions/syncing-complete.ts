@@ -1,16 +1,17 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class SyncingComplete implements Action {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
 	public async handle(): Promise<void> {

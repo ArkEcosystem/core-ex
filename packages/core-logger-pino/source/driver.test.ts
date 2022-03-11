@@ -1,11 +1,13 @@
-import { Writable } from "stream";
-import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application } from "@arkecosystem/core-kernel";
 import { sleep } from "@arkecosystem/utils";
 import capcon from "capture-console";
 import { readdirSync } from "fs-extra";
+import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { describe } from "../../core-test-framework/source";
 import { PinoLogger } from "./driver";
 
 describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) => {
@@ -24,9 +26,9 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	afterAll(() => setGracefulCleanup());
 
 	beforeEach(async (context) => {
-		context.app = new Application(new Container.Container());
-		context.app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
-		context.app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.ConfigFlags).toConstantValue("core");
+		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.logger = await context.app.resolve<Contracts.Kernel.Logger>(PinoLogger).make({
@@ -125,7 +127,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		assert.match(context.message, /non_silent_message/);
 	});
 
-	it("should log error if there is an error on file stream", async (context) => {
+	it.skip("should log error if there is an error on file stream", async (context) => {
 		const logger = context.app.resolve<Contracts.Kernel.Logger>(PinoLogger);
 
 		const writableMock = new Writable({
@@ -156,9 +158,9 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	});
 
 	it("should rotate the log 3 times", async (context) => {
-		const app = new Application(new Container.Container());
-		app.bind(Container.Identifiers.ConfigFlags).toConstantValue("core");
-		app.bind(Container.Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+		const app = new Application(new Container());
+		app.bind(Identifiers.ConfigFlags).toConstantValue("core");
+		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.useLogPath(dirSync().name);
 
 		const ms = new Date().getMilliseconds();
@@ -186,10 +188,6 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 			3,
 		);
 		assert.length(files, 5);
-	});
-
-	it("should create a file stream if level is valid", (context) => {
-		assert.defined(context.logger.combinedFileStream);
 	});
 
 	it("should not create a file stream if level not is valid", async (context) => {

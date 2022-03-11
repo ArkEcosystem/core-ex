@@ -1,17 +1,16 @@
-import { EventDispatcher } from "../../../contracts/kernel";
-import { CacheStore } from "../../../contracts/kernel/cache";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+
 import { CacheEvent } from "../../../enums";
-import { NotImplemented } from "../../../exceptions/runtime";
-import { Identifiers, inject, injectable } from "../../../ioc";
 
 @injectable()
-export class MemoryCacheStore<K, T> implements CacheStore<K, T> {
+export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	@inject(Identifiers.EventDispatcherService)
-	private readonly eventDispatcher!: EventDispatcher;
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	private readonly store: Map<K, T> = new Map<K, T>();
 
-	public async make(): Promise<CacheStore<K, T>> {
+	public async make(): Promise<Contracts.Kernel.CacheStore<K, T>> {
 		return this;
 	}
 
@@ -44,7 +43,7 @@ export class MemoryCacheStore<K, T> implements CacheStore<K, T> {
 	public async put(key: K, value: T, seconds?: number): Promise<boolean> {
 		this.store.set(key, value);
 
-		this.eventDispatcher.dispatch(CacheEvent.Written, { key, value, seconds });
+		this.eventDispatcher.dispatch(CacheEvent.Written, { key, seconds, value });
 
 		return this.has(key);
 	}
@@ -70,11 +69,11 @@ export class MemoryCacheStore<K, T> implements CacheStore<K, T> {
 	}
 
 	public async forever(key: K, value: T): Promise<boolean> {
-		throw new NotImplemented(this.constructor.name, "forever");
+		throw new Exceptions.NotImplemented(this.constructor.name, "forever");
 	}
 
 	public async foreverMany(values: Array<[K, T]>): Promise<boolean[]> {
-		throw new NotImplemented(this.constructor.name, "foreverMany");
+		throw new Exceptions.NotImplemented(this.constructor.name, "foreverMany");
 	}
 
 	public async forget(key: K): Promise<boolean> {
@@ -98,6 +97,6 @@ export class MemoryCacheStore<K, T> implements CacheStore<K, T> {
 	}
 
 	public async getPrefix(): Promise<string> {
-		throw new NotImplemented(this.constructor.name, "getPrefix");
+		throw new Exceptions.NotImplemented(this.constructor.name, "getPrefix");
 	}
 }

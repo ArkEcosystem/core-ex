@@ -1,30 +1,34 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class DownloadBlocks implements Action {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@Container.inject(Container.Identifiers.BlockchainService)
+	@inject(Identifiers.BlockchainService)
 	private readonly blockchain!: Contracts.Blockchain.Blockchain;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.PeerNetworkMonitor)
+	@inject(Identifiers.PeerNetworkMonitor)
 	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
 
+	@inject(Identifiers.Cryptography.Time.Slots)
+	private readonly slots: Contracts.Crypto.Slots;
+
 	public async handle(): Promise<void> {
-		const lastDownloadedBlock: Interfaces.IBlockData =
+		const lastDownloadedBlock: Contracts.Crypto.IBlockData =
 			this.stateStore.getLastDownloadedBlock() || this.stateStore.getLastBlock().data;
 
-		const blocks: Interfaces.IBlockData[] = await this.networkMonitor.downloadBlocksFromHeight(
+		const blocks: Contracts.Crypto.IBlockData[] = await this.networkMonitor.downloadBlocksFromHeight(
 			lastDownloadedBlock.height,
 		);
 
@@ -40,10 +44,7 @@ export class DownloadBlocks implements Action {
 
 		const empty: boolean = !blocks || blocks.length === 0;
 
-		const useLookupHeight = empty ? lastDownloadedBlock.height : blocks[0].height;
-		const blockTimeLookup = await AppUtils.forgingInfoCalculator.getBlockTimeLookup(this.app, useLookupHeight);
-
-		const chained: boolean = !empty && AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], blockTimeLookup);
+		const chained: boolean = !empty && (await AppUtils.isBlockChained(lastDownloadedBlock, blocks[0], this.slots));
 
 		if (chained) {
 			this.logger.info(
@@ -59,9 +60,10 @@ export class DownloadBlocks implements Action {
 
 			try {
 				this.blockchain.enqueueBlocks(blocks);
+				// eslint-disable-next-line unicorn/prefer-at
 				this.stateStore.setLastDownloadedBlock(blocks[blocks.length - 1]);
 				this.blockchain.dispatch("DOWNLOADED");
-			} catch (error) {
+			} catch {
 				this.logger.warning(`Failed to enqueue downloaded block.`);
 
 				this.blockchain.dispatch("NOBLOCK");
@@ -82,7 +84,6 @@ export class DownloadBlocks implements Action {
 				this.blockchain.clearQueue();
 			}
 
-			/* istanbul ignore else */
 			if (this.blockchain.getQueue().size() === 0) {
 				this.stateStore.setNoBlockCounter(this.stateStore.getNoBlockCounter() + 1);
 				this.stateStore.setLastDownloadedBlock(this.stateStore.getLastBlock().data);

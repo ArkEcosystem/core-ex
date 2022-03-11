@@ -1,34 +1,36 @@
-import { Container, Contracts, Types, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Types, Utils } from "@arkecosystem/core-kernel";
 import { badData } from "@hapi/boom";
 import Boom from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { randomBytes } from "crypto";
 
 import { Database } from "../database";
-import { Identifiers } from "../identifiers";
+import { InternalIdentifiers } from "../identifiers";
 import { Webhook } from "../interfaces";
 import { whitelist } from "./plugins/whitelist";
 import { destroy, show, store, update } from "./schema";
 import { respondWithResource } from "./utils";
 
-@Container.injectable()
+@injectable()
 export class Server {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Identifiers.Database)
+	@inject(InternalIdentifiers.Database)
 	private readonly database!: Database;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	private server: HapiServer;
+	#server: HapiServer;
 
 	public async register(optionsServer: Types.JsonObject): Promise<void> {
-		this.server = new HapiServer(this.getServerOptions(optionsServer));
-		this.server.app.database = this.database;
+		this.#server = new HapiServer(this.#getServerOptions(optionsServer));
+		this.#server.app.database = this.database;
 
-		this.server.ext({
+		this.#server.ext({
 			async method(request, h) {
 				request.headers["content-type"] = "application/json";
 
@@ -37,16 +39,16 @@ export class Server {
 			type: "onPreHandler",
 		});
 
-		await this.registerPlugins(optionsServer);
+		await this.#registerPlugins(optionsServer);
 
-		await this.registerRoutes();
+		this.#registerRoutes();
 	}
 
 	public async boot(): Promise<void> {
 		try {
-			await this.server.start();
+			await this.#server.start();
 
-			this.logger.info(`Webhook Server started at ${this.server.info.uri}`);
+			this.logger.info(`Webhook Server started at ${this.#server.info.uri}`);
 		} catch (error) {
 			await this.app.terminate(`Failed to start Webhook Server!`, error);
 		}
@@ -54,19 +56,19 @@ export class Server {
 
 	public async dispose(): Promise<void> {
 		try {
-			await this.server.stop();
+			await this.#server.stop();
 
-			this.logger.info(`Webhook Server stopped at ${this.server.info.uri}`);
+			this.logger.info(`Webhook Server stopped at ${this.#server.info.uri}`);
 		} catch (error) {
 			await this.app.terminate(`Failed to stop Webhook Server!`, error);
 		}
 	}
 
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
-		return this.server.inject(options);
+		return this.#server.inject(options);
 	}
 
-	private getServerOptions(options: Record<string, any>): object {
+	#getServerOptions(options: Record<string, any>): object {
 		options = {
 			...options.http,
 			whitelist: options.whitelist,
@@ -83,14 +85,14 @@ export class Server {
 			routes: {
 				/* c8 ignore next 3 */
 				payload: {
-					async failAction(request, h, err) {
-						return badData(err.message);
+					async failAction(request, h, error) {
+						return badData(error.message);
 					},
 				},
 				/* c8 ignore next 3 */
 				validate: {
-					async failAction(request, h, err) {
-						return badData(err.message);
+					async failAction(request, h, error) {
+						return badData(error.message);
 					},
 				},
 			},
@@ -98,8 +100,8 @@ export class Server {
 		};
 	}
 
-	private async registerPlugins(config: Types.JsonObject): Promise<void> {
-		await this.server.register({
+	async #registerPlugins(config: Types.JsonObject): Promise<void> {
+		await this.#server.register({
 			options: {
 				whitelist: config.whitelist,
 			},
@@ -107,8 +109,8 @@ export class Server {
 		});
 	}
 
-	private registerRoutes(): void {
-		this.server.route({
+	#registerRoutes(): void {
+		this.#server.route({
 			handler() {
 				return { data: "Hello World!" };
 			},
@@ -116,7 +118,7 @@ export class Server {
 			path: "/",
 		});
 
-		this.server.route({
+		this.#server.route({
 			handler: (request) => ({
 				data: request.server.app.database.all().map((webhook) => {
 					webhook = { ...webhook };
@@ -128,7 +130,7 @@ export class Server {
 			path: "/api/webhooks",
 		});
 
-		this.server.route({
+		this.#server.route({
 			handler(request: any, h) {
 				const token: string = randomBytes(32).toString("hex");
 
@@ -137,7 +139,7 @@ export class Server {
 						respondWithResource({
 							...request.server.app.database.create({
 								...request.payload,
-								token: token.substring(0, 32),
+								token: token.slice(0, 32),
 							}),
 							token,
 						}),
@@ -156,7 +158,7 @@ export class Server {
 			path: "/api/webhooks",
 		});
 
-		this.server.route({
+		this.#server.route({
 			async handler(request) {
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -182,7 +184,7 @@ export class Server {
 			path: "/api/webhooks/{id}",
 		});
 
-		this.server.route({
+		this.#server.route({
 			handler: (request, h) => {
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -190,7 +192,7 @@ export class Server {
 
 				request.server.app.database.update(request.params.id, request.payload as Webhook);
 
-				return h.response(undefined).code(204);
+				return h.response().code(204);
 			},
 			method: "PUT",
 			options: {
@@ -199,7 +201,7 @@ export class Server {
 			path: "/api/webhooks/{id}",
 		});
 
-		this.server.route({
+		this.#server.route({
 			handler: (request, h) => {
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
@@ -207,7 +209,7 @@ export class Server {
 
 				request.server.app.database.destroy(request.params.id);
 
-				return h.response(undefined).code(204);
+				return h.response().code(204);
 			},
 			method: "DELETE",
 			options: {

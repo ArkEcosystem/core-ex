@@ -1,5 +1,6 @@
-import { Application, Container, Providers, Services, Types } from "@arkecosystem/core-kernel";
-import { Managers } from "@arkecosystem/crypto";
+import { Container, interfaces } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application, Providers, Services, Types } from "@arkecosystem/core-kernel";
 import { removeSync } from "fs-extra";
 import { setGracefulCleanup } from "tmp";
 
@@ -16,7 +17,7 @@ import { generateCoreConfig, generateCryptoConfig } from "./generators";
 export class Sandbox {
 	public readonly app: Application;
 
-	private readonly container: Container.interfaces.Container;
+	private readonly container: interfaces.Container;
 
 	private paths!: {
 		core: CoreConfigPaths;
@@ -27,11 +28,10 @@ export class Sandbox {
 		core: {},
 		crypto: {
 			flags: {
-				blocktime: 8,
-				delegates: 51,
+				blockTime: 8,
+				distribute: true,
 				explorer: "http://uexplorer.ark.io",
 				maxBlockPayload: 2_097_152,
-				distribute: true,
 				maxTxPerBlock: 150,
 				network: "unitnet",
 				premine: "15300000000000000",
@@ -40,6 +40,7 @@ export class Sandbox {
 				rewardHeight: 75_600,
 				symbol: "UѦ",
 				token: "UARK",
+				validators: 51,
 				wif: 186,
 			},
 		},
@@ -48,7 +49,7 @@ export class Sandbox {
 	public constructor() {
 		setGracefulCleanup();
 
-		this.container = new Container.Container();
+		this.container = new Container();
 
 		this.app = new Application(this.container);
 	}
@@ -73,21 +74,18 @@ export class Sandbox {
 		};
 
 		// Configure Crypto
-		const exceptions = require(this.paths.crypto.exceptions);
 		const genesisBlock = require(this.paths.crypto.genesisBlock);
 		const milestones = require(this.paths.crypto.milestones);
 		const network = require(this.paths.crypto.network);
 
-		Managers.configManager.setConfig({
-			exceptions,
-			genesisBlock,
-			milestones,
-			network,
-		});
+		// this.configuration.setConfig({
+		// 	genesisBlock,
+		// 	milestones,
+		// 	network,
+		// });
 
-		this.app.get<Services.Config.ConfigRepository>(Container.Identifiers.ConfigRepository).merge({
+		this.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).merge({
 			crypto: {
-				exceptions,
 				genesisBlock,
 				milestones,
 				network,
@@ -148,7 +146,7 @@ export class Sandbox {
 		serviceProvider.setConfig(this.app.resolve(Providers.PluginConfiguration).discover(name, path));
 
 		this.app
-			.get<Providers.ServiceProviderRepository>(Container.Identifiers.ServiceProviderRepository)
+			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
 			.set(name, serviceProvider);
 
 		return this;

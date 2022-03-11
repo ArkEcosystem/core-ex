@@ -1,24 +1,20 @@
-import { Container } from "@arkecosystem/core-container";
-import {
-	BINDINGS,
-	IKeyPair,
-	ISerializeOptions,
-	ITransactionData,
-	ITransactionUtils,
-	Signatory,
-} from "@arkecosystem/core-crypto-contracts";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { numberToHex } from "@arkecosystem/utils";
 
-import { numberToHex } from "./helpers";
-
-@Container.injectable()
+@injectable()
 export class Signer {
-	@Container.inject(BINDINGS.SignatureFactory)
-	private readonly signatureFactory: Signatory;
+	@inject(Identifiers.Cryptography.Signature)
+	private readonly signatureFactory: Contracts.Crypto.ISignature;
 
-	@Container.inject(BINDINGS.Transaction.Utils)
-	private readonly utils: ITransactionUtils;
+	@inject(Identifiers.Cryptography.Transaction.Utils)
+	private readonly utils: Contracts.Crypto.ITransactionUtils;
 
-	public async sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): Promise<string> {
+	public async sign(
+		transaction: Contracts.Crypto.ITransactionData,
+		keys: Contracts.Crypto.IKeyPair,
+		options?: Contracts.Crypto.ISerializeOptions,
+	): Promise<string> {
 		if (!options || options.excludeSignature === undefined) {
 			options = { excludeSignature: true, ...options };
 		}
@@ -33,7 +29,11 @@ export class Signer {
 		return signature;
 	}
 
-	public async multiSign(transaction: ITransactionData, keys: IKeyPair, index = -1): Promise<string> {
+	public async multiSign(
+		transaction: Contracts.Crypto.ITransactionData,
+		keys: Contracts.Crypto.IKeyPair,
+		index = -1,
+	): Promise<string> {
 		if (!transaction.signatures) {
 			transaction.signatures = [];
 		}

@@ -1,27 +1,31 @@
-import { EventDispatcher as EventDispatcherContract, EventListener, EventName } from "../../../contracts/kernel/events";
-import { injectable } from "../../../ioc";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class NullEventDispatcher implements EventDispatcherContract {
-	public listen(event: EventName, listener: EventListener): () => void {
+export class NullEventDispatcher implements Contracts.Kernel.EventDispatcher {
+	public listen(event: Contracts.Kernel.EventName, listener: Contracts.Kernel.EventListener): () => void {
 		return () => {};
 	}
 
-	public listenMany(events: Array<[EventName, EventListener]>): Map<EventName, () => void> {
-		const map: Map<EventName, () => void> = new Map<EventName, () => void>();
+	public listenMany(
+		events: Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>,
+	): Map<Contracts.Kernel.EventName, () => void> {
+		const map: Map<Contracts.Kernel.EventName, () => void> = new Map<Contracts.Kernel.EventName, () => void>();
 		for (const [name] of events) {
 			map.set(name, () => {});
 		}
 		return map;
 	}
 
-	public listenOnce(name: EventName, listener: EventListener): void {
+	public listenOnce(name: Contracts.Kernel.EventName, listener: Contracts.Kernel.EventListener): void {
 		//
 	}
 
-	public forget(event: EventName, listener?: EventListener): void {}
+	public forget(event: Contracts.Kernel.EventName, listener?: Contracts.Kernel.EventListener): void {}
 
-	public forgetMany(events: EventName[] | Array<[EventName, EventListener]>): void {
+	public forgetMany(
+		events: Contracts.Kernel.EventName[] | Array<[Contracts.Kernel.EventName, Contracts.Kernel.EventListener]>,
+	): void {
 		//
 	}
 
@@ -29,39 +33,39 @@ export class NullEventDispatcher implements EventDispatcherContract {
 		//
 	}
 
-	public getListeners(event?: EventName): EventListener[] {
+	public getListeners(event?: Contracts.Kernel.EventName): Contracts.Kernel.EventListener[] {
 		return [];
 	}
 
-	public hasListeners(event: EventName): boolean {
+	public hasListeners(event: Contracts.Kernel.EventName): boolean {
 		return false;
 	}
 
-	public countListeners(event?: EventName): number {
+	public countListeners(event?: Contracts.Kernel.EventName): number {
 		return 0;
 	}
 
-	public async dispatch<T = any>(event: EventName, data?: T): Promise<void> {
+	public async dispatch<T = any>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
 		//
 	}
 
-	public async dispatchSeq<T = any>(event: EventName, data?: T): Promise<void> {
+	public async dispatchSeq<T = any>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
 		//
 	}
 
-	public dispatchSync<T = any>(event: EventName, data?: T): void {
+	public dispatchSync<T = any>(event: Contracts.Kernel.EventName, data?: T): void {
 		//
 	}
 
-	public async dispatchMany<T = any>(events: Array<[EventName, T]>): Promise<void> {
+	public async dispatchMany<T = any>(events: Array<[Contracts.Kernel.EventName, T]>): Promise<void> {
 		//
 	}
 
-	public async dispatchManySeq<T = any>(events: Array<[EventName, T]>): Promise<void> {
+	public async dispatchManySeq<T = any>(events: Array<[Contracts.Kernel.EventName, T]>): Promise<void> {
 		//
 	}
 
-	public dispatchManySync<T = any>(events: Array<[EventName, T]>): void {
+	public dispatchManySync<T = any>(events: Array<[Contracts.Kernel.EventName, T]>): void {
 		//
 	}
 }

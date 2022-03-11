@@ -1,16 +1,18 @@
-import { Container, Contracts, Enums } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Enums } from "@arkecosystem/core-kernel";
 
 import { Action } from "../contracts";
 
-@Container.injectable()
+@injectable()
 export class BlockchainReady implements Action {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.StateStore)
+	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	public async handle(): Promise<void> {

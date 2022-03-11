@@ -1,20 +1,9 @@
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { ITransactionData } from "@arkecosystem/core-crypto-contracts";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Ajv } from "ajv";
 import ajvKeywords from "ajv-keywords";
 
-// @TODO: remove this
-export enum TransactionType {
-	Transfer = 0,
-	DelegateRegistration = 2,
-	Vote = 3,
-	MultiSignature = 4,
-	MultiPayment = 6,
-	DelegateResignation = 7,
-}
-
-export const registerKeywords = (configuration: Configuration) => {
+export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
 	const maxBytes = (ajv: Ajv) => {
 		ajv.addKeyword("maxBytes", {
 			compile(schema, parentSchema) {
@@ -39,10 +28,10 @@ export const registerKeywords = (configuration: Configuration) => {
 		ajv.addKeyword("transactionType", {
 			// @ts-ignore
 			compile(schema) {
-				return (data, dataPath, parentObject: ITransactionData) => {
+				return (data, dataPath, parentObject: Contracts.Crypto.ITransactionData) => {
 					// Impose dynamic multipayment limit based on milestone
 					if (
-						data === TransactionType.MultiPayment &&
+						data === Contracts.Crypto.TransactionType.MultiPayment &&
 						parentObject &&
 						(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
 						parentObject.asset &&
@@ -75,6 +64,7 @@ export const registerKeywords = (configuration: Configuration) => {
 		});
 	};
 
+	// @TODO: revisit the need for the genesis check
 	const bignum = (ajv: Ajv) => {
 		const instanceOf = ajvKeywords.get("instanceof").definition;
 		instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
@@ -128,6 +118,7 @@ export const registerKeywords = (configuration: Configuration) => {
 		});
 	};
 
+	// @TODO: plugins should register this rule
 	const blockId = (ajv: Ajv) => {
 		ajv.addKeyword("blockId", {
 			compile(schema) {
@@ -145,18 +136,7 @@ export const registerKeywords = (configuration: Configuration) => {
 						return false;
 					}
 
-					// Partial SHA256 block id (old/legacy), before the switch to full SHA256.
-					// 8 byte integer either decimal without leading zeros or hex with leading zeros.
-					const isPartial = /^\d{1,20}$/.test(data) || /^[\da-f]{16}$/i.test(data);
-					const isFullSha256 = /^[\da-f]{64}$/i.test(data);
-
-					if (parentObject && parentObject.height) {
-						const height = schema.isPreviousBlock ? parentObject.height - 1 : parentObject.height;
-						const constants = configuration.getMilestone(height ?? 1); // if height === 0 set it to 1
-						return constants.block.idFullSha256 ? isFullSha256 : isPartial;
-					}
-
-					return isPartial || isFullSha256;
+					return /^[\da-f]{64}$/i.test(data);
 				};
 			},
 			errors: false,
@@ -171,5 +151,5 @@ export const registerKeywords = (configuration: Configuration) => {
 		});
 	};
 
-	return [bignum, blockId, maxBytes, network, transactionType];
+	return { bignum, blockId, maxBytes, network, transactionType };
 };

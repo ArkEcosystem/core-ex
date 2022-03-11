@@ -1,12 +1,13 @@
 import { Commands, Container, Services } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.Installer)
+	@inject(Container.Identifiers.Installer)
 	private readonly installer!: Services.Installer;
 
-	@Container.inject(Container.Identifiers.ProcessManager)
+	@inject(Container.Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
 	public signature = "reinstall";
@@ -21,18 +22,18 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		if (this.getFlag("force")) {
-			return this.performInstall();
+			return this.#performInstall();
 		}
 
 		if (await this.components.confirm("Are you sure you want to reinstall?")) {
 			//Come back to this
-			return this.performInstall();
+			return this.#performInstall();
 		}
 
 		this.components.fatal("You'll need to confirm the reinstall to continue.");
 	}
 
-	private async performInstall(): Promise<void> {
+	async #performInstall(): Promise<void> {
 		const spinner = this.components.spinner(`Reinstalling ${this.pkg.version}`);
 
 		spinner.start();

@@ -1,10 +1,10 @@
-import { envPaths } from "../env-paths";
 import { PackageJson } from "type-fest";
 
 import { ActionFactory } from "../action-factory";
 import { ComponentFactory } from "../component-factory";
 import { Box } from "../components";
 import { Application, InputValue } from "../contracts";
+import { envPaths as environmentPaths } from "../env-paths";
 import { Input } from "../input";
 import { InputDefinition } from "../input/definition";
 import { Identifiers, inject, injectable, postConstruct } from "../ioc";
@@ -49,9 +49,8 @@ export abstract class Command {
 
 	protected input!: Input;
 
-	/* istanbul ignore next */
 	@postConstruct()
-	// todo: for some reason this isn't recognized in tests for being called
+	// @TODO for some reason this isn't recognized in tests for being called
 	public configure(): void {
 		// Do nothing...
 	}
@@ -81,14 +80,14 @@ export abstract class Command {
 
 	public async run(): Promise<void> {
 		try {
-			await this.detectConfig();
+			await this.#detectConfig();
 
 			if (this.requiresNetwork) {
-				await this.detectNetwork();
+				await this.#detectNetwork();
 			}
 
 			// Check for configuration again after network was chosen
-			await this.detectConfig();
+			await this.#detectConfig();
 
 			if (this.input.hasFlag("token") && this.input.hasFlag("network")) {
 				this.app
@@ -144,7 +143,7 @@ export abstract class Command {
 		return this.input.hasFlag(name);
 	}
 
-	private async detectConfig(): Promise<void> {
+	async #detectConfig(): Promise<void> {
 		const config = await this.app
 			.resolve(DiscoverConfig)
 			.discover(this.input.getFlag("token"), this.input.getFlag("network"));
@@ -155,14 +154,14 @@ export abstract class Command {
 		}
 	}
 
-	private async detectNetwork(): Promise<void> {
+	async #detectNetwork(): Promise<void> {
 		const requiresNetwork: boolean = Object.keys(this.definition.getFlags()).includes("network");
 
 		if (requiresNetwork && !this.input.hasFlag("network")) {
 			this.input.setFlag(
 				"network",
 				await this.app.resolve(DiscoverNetwork).discover(
-					envPaths.get(this.input.getFlag("token"), {
+					environmentPaths.get(this.input.getFlag("token"), {
 						suffix: "core",
 					}).config,
 				),

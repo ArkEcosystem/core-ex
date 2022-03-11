@@ -1,10 +1,12 @@
-import { Application, Container, Contracts } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { Application } from "@arkecosystem/core-kernel";
 
 import { AnyObject } from "../contracts";
 
 export const Builder = {
 	async buildApplication(context?: AnyObject): Promise<Contracts.Kernel.Application> {
-		const app: Contracts.Kernel.Application = new Application(new Container.Container());
+		const app: Contracts.Kernel.Application = new Application(new Container());
 
 		if (context) {
 			await app.bootstrap({

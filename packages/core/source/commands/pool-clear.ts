@@ -1,9 +1,9 @@
-import { Commands, Container } from "@arkecosystem/core-cli";
-import { Networks } from "@arkecosystem/crypto";
+import { Commands } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import { removeSync } from "fs-extra";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
 	public signature = "pool:clear";
 
@@ -11,8 +11,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().default("ark"))
-			.setFlag("network", "The name of the network.", Joi.string().valid(...Object.keys(Networks)));
+			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("network", "The name of the network.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {
@@ -21,7 +21,7 @@ export class Command extends Commands.Command {
 		this.actions.abortRunningProcess(`${this.getFlag("token")}-relay`);
 
 		if (this.getFlag("false")) {
-			return this.removeFiles();
+			return this.#removeFiles();
 		}
 
 		try {
@@ -30,14 +30,14 @@ export class Command extends Commands.Command {
 					"Clearing the transaction pool will remove all queued transactions from your node. Are you sure you want to clear?",
 				)
 			) {
-				this.removeFiles();
+				this.#removeFiles();
 			}
 		} catch (error) {
 			this.components.fatal(error.message);
 		}
 	}
 
-	private removeFiles() {
+	#removeFiles() {
 		removeSync(this.app.getCorePath("data", "transaction-pool"));
 	}
 }

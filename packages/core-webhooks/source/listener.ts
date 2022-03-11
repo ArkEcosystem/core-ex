@@ -1,21 +1,23 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions";
 import { Database } from "./database";
 import { WebhookEvent } from "./events";
-import { Identifiers } from "./identifiers";
+import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 
-@Container.injectable()
+@injectable()
 export class Listener {
-	@Container.inject(Container.Identifiers.Application)
+	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async handle({ name, data }): Promise<void> {
@@ -24,7 +26,7 @@ export class Listener {
 			return;
 		}
 
-		const webhooks: Webhook[] = this.getWebhooks(name, data);
+		const webhooks: Webhook[] = this.#getWebhooks(name, data);
 
 		const promises: Promise<void>[] = [];
 
@@ -35,15 +37,16 @@ export class Listener {
 		await Promise.all(promises);
 	}
 
-	public async broadcast(webhook: Webhook, payload: object, timeout: number = 1500): Promise<void> {
+	public async broadcast(webhook: Webhook, payload: object, timeout = 1500): Promise<void> {
 		const start = performance.now();
 
 		try {
 			const { statusCode } = await Utils.http.post(webhook.target, {
 				body: {
-					timestamp: +new Date(),
-					data: payload as any, // todo: utils currently expects a primitive as data
+					data: payload as any,
+					// @TODO utils currently expects a primitive as data
 					event: webhook.event,
+					timestamp: Date.now(),
 				},
 				headers: {
 					Authorization: webhook.token,
@@ -55,41 +58,41 @@ export class Listener {
 				`Webhooks Job ${webhook.id} completed! Event [${webhook.event}] has been transmitted to [${webhook.target}] with a status of [${statusCode}].`,
 			);
 
-			await this.dispatchWebhookEvent(start, webhook, payload);
+			await this.#dispatchWebhookEvent(start, webhook, payload);
 		} catch (error) {
 			this.logger.error(`Webhooks Job ${webhook.id} failed: ${error.message}`);
 
-			await this.dispatchWebhookEvent(start, webhook, payload, error);
+			await this.#dispatchWebhookEvent(start, webhook, payload, error);
 		}
 	}
 
-	private async dispatchWebhookEvent(start: number, webhook: Webhook, payload: object, err?: Error) {
-		if (err) {
+	async #dispatchWebhookEvent(start: number, webhook: Webhook, payload: object, error?: Error) {
+		if (error) {
 			this.events.dispatch(WebhookEvent.Failed, {
+				error: error,
 				executionTime: performance.now() - start,
-				webhook: webhook,
 				payload: payload,
-				error: err,
+				webhook: webhook,
 			});
 		} else {
 			this.events.dispatch(WebhookEvent.Broadcasted, {
 				executionTime: performance.now() - start,
-				webhook: webhook,
 				payload: payload,
+				webhook: webhook,
 			});
 		}
 	}
 
-	private getWebhooks(event: string, payload: object): Webhook[] {
+	#getWebhooks(event: string, payload: object): Webhook[] {
 		return this.app
-			.get<Database>(Identifiers.Database)
+			.get<Database>(InternalIdentifiers.Database)
 			.findByEvent(event)
 			.filter((webhook: Webhook) => {
 				if (!webhook.enabled) {
 					return false;
 				}
 
-				if (!webhook.conditions || (Array.isArray(webhook.conditions) && !webhook.conditions.length)) {
+				if (!webhook.conditions || (Array.isArray(webhook.conditions) && webhook.conditions.length === 0)) {
 					return true;
 				}
 
@@ -100,7 +103,7 @@ export class Listener {
 						if (satisfies(payload[condition.key], condition.value)) {
 							return true;
 						}
-					} catch (error) {
+					} catch {
 						return false;
 					}
 				}

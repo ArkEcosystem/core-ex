@@ -1,8 +1,10 @@
-import { Application, Container, Services } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application, Services } from "@arkecosystem/core-kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Database } from "../../source/database";
-import { Identifiers as WebhookIdentifiers } from "../../source/identifiers";
+import { InternalIdentifiers as WebhookIdentifiers } from "../../source/identifiers";
 import { Server } from "../../source/server/server";
 
 export type Context = {
@@ -17,12 +19,9 @@ const initApp = (context: Context) => {
 		notice: () => {},
 	};
 
-	context.app = new Application(new Container.Container());
-	context.app
-		.bind(Container.Identifiers.EventDispatcherService)
-		.to(Services.Events.MemoryEventDispatcher)
-		.inSingletonScope();
-	context.app.bind(Container.Identifiers.LogService).toConstantValue(logger);
+	context.app = new Application(new Container());
+	context.app.bind(Identifiers.EventDispatcherService).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
+	context.app.bind(Identifiers.LogService).toConstantValue(logger);
 	context.app.bind("path.cache").toConstantValue(dirSync().name);
 	context.app.bind<Database>(WebhookIdentifiers.Database).to(Database).inSingletonScope();
 	context.app.get<Database>(WebhookIdentifiers.Database).boot();

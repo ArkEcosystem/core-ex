@@ -1,86 +1,71 @@
-import { Container, Contracts, Enums, Providers, Services } from "@arkecosystem/core-kernel";
-import { Handlers } from "@arkecosystem/core-transactions";
-import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
+import { inject, injectable, tagged } from "@arkecosystem/core-container";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Enums, Providers, Services } from "@arkecosystem/core-kernel";
 
-import {
-	RetryTransactionError,
-	TransactionExceedsMaximumByteSizeError,
-	TransactionFailedToApplyError,
-	TransactionFailedToVerifyError,
-	TransactionFromFutureError,
-	TransactionFromWrongNetworkError,
-	TransactionHasExpiredError,
-} from "./errors";
-
-@Container.injectable()
+@injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
-	@Container.inject(Container.Identifiers.PluginConfiguration)
-	@Container.tagged("plugin", "core-transaction-pool")
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "core-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@Container.inject(Container.Identifiers.TransactionHandlerRegistry)
-	@Container.tagged("state", "copy-on-write")
-	private readonly handlerRegistry!: Handlers.Registry;
+	@inject(Identifiers.TransactionHandlerRegistry)
+	@tagged("state", "copy-on-write")
+	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@Container.inject(Container.Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@Container.inject(Container.Identifiers.TriggerService)
+	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@Container.inject(Container.Identifiers.EventDispatcherService)
+	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	private corrupt = false;
 
-	public async apply(transaction: Interfaces.ITransaction): Promise<void> {
+	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {
-			throw new TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
+			throw new Exceptions.TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
 
-		const currentNetwork: number = Managers.configManager.get<number>("network.pubKeyHash");
+		const currentNetwork: number = this.configuration.get<number>("network.pubKeyHash");
 		if (transaction.data.network && transaction.data.network !== currentNetwork) {
-			throw new TransactionFromWrongNetworkError(transaction, currentNetwork);
-		}
-
-		const now: number = Crypto.Slots.getTime();
-		if (transaction.timestamp > now + 3600) {
-			const secondsInFuture: number = transaction.timestamp - now;
-			throw new TransactionFromFutureError(transaction, secondsInFuture);
+			throw new Exceptions.TransactionFromWrongNetworkError(transaction, currentNetwork);
 		}
 
 		if (await this.expirationService.isExpired(transaction)) {
-			this.events.dispatch(Enums.TransactionEvent.Expired, transaction.data);
-			const expirationHeight: number = await this.expirationService.getExpirationHeight(transaction);
-			throw new TransactionHasExpiredError(transaction, expirationHeight);
+			await this.events.dispatch(Enums.TransactionEvent.Expired, transaction.data);
+
+			throw new Exceptions.TransactionHasExpiredError(
+				transaction,
+				await this.expirationService.getExpirationHeight(transaction),
+			);
 		}
 
-		const handler: Handlers.TransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
-			transaction.data,
-		);
+		const handler: Contracts.Transactions.ITransactionHandler =
+			await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		if (await this.triggers.call("verifyTransaction", { handler, transaction })) {
 			if (this.corrupt) {
-				throw new RetryTransactionError(transaction);
+				throw new Exceptions.RetryTransactionError(transaction);
 			}
 
 			try {
 				await this.triggers.call("throwIfCannotEnterPool", { handler, transaction });
 				await this.triggers.call("applyTransaction", { handler, transaction });
 			} catch (error) {
-				throw new TransactionFailedToApplyError(transaction, error);
+				throw new Exceptions.TransactionFailedToApplyError(transaction, error);
 			}
 		} else {
-			throw new TransactionFailedToVerifyError(transaction);
+			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
 	}
 
-	public async revert(transaction: Interfaces.ITransaction): Promise<void> {
+	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		try {
-			const handler: Handlers.TransactionHandler = await this.handlerRegistry.getActivatedHandlerForData(
-				transaction.data,
-			);
+			const handler: Contracts.Transactions.ITransactionHandler =
+				await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 			await this.triggers.call("revertTransaction", { handler, transaction });
 		} catch (error) {

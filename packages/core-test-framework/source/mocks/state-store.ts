@@ -1,10 +1,10 @@
+import { Contracts } from "@arkecosystem/core-contracts";
 import { Stores } from "@arkecosystem/core-state";
-import { Interfaces } from "@arkecosystem/crypto";
 
-let mockBlock: Partial<Interfaces.IBlock> | undefined;
+let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;
 let lastHeight = 0;
 
-export const setBlock = (block: Partial<Interfaces.IBlock> | undefined) => {
+export const setBlock = (block: Partial<Contracts.Crypto.IBlock> | undefined) => {
 	mockBlock = block;
 };
 
@@ -13,12 +13,12 @@ export const setLastHeight = (height: number) => {
 };
 
 class StateStoreMocks implements Partial<Stores.StateStore> {
-	public getLastBlock(): Interfaces.IBlock {
-		return mockBlock as Interfaces.IBlock;
+	public getLastBlock(): Contracts.Crypto.IBlock {
+		return mockBlock as Contracts.Crypto.IBlock;
 	}
 
-	public getGenesisBlock(): Interfaces.IBlock {
-		return mockBlock as Interfaces.IBlock;
+	public getGenesisBlock(): Contracts.Crypto.IBlock {
+		return mockBlock as Contracts.Crypto.IBlock;
 	}
 
 	public getLastHeight(): number {

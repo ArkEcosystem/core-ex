@@ -1,28 +1,29 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import { Interfaces } from "@arkecosystem/crypto";
 import assert from "assert";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 
-// todo: review its implementation and finally integrate it as planned in v2
-@Container.injectable()
+// @TODO review its implementation and finally integrate it as planned in v2
+@injectable()
 export class BlockStore implements Contracts.State.BlockStore {
-	private readonly byId: Utils.CappedMap<string, Interfaces.IBlockData>;
-	private readonly byHeight: Utils.CappedMap<number, Interfaces.IBlockData>;
-	private lastBlock: Interfaces.IBlock | undefined;
+	private readonly byId: Utils.CappedMap<string, Contracts.Crypto.IBlockData>;
+	private readonly byHeight: Utils.CappedMap<number, Contracts.Crypto.IBlockData>;
+	private lastBlock: Contracts.Crypto.IBlock | undefined;
 
 	public constructor(maxSize: number) {
-		this.byId = new Utils.CappedMap<string, Interfaces.IBlockData>(maxSize);
-		this.byHeight = new Utils.CappedMap<number, Interfaces.IBlockData>(maxSize);
+		this.byId = new Utils.CappedMap<string, Contracts.Crypto.IBlockData>(maxSize);
+		this.byHeight = new Utils.CappedMap<number, Contracts.Crypto.IBlockData>(maxSize);
 	}
 
-	public get(key: string | number): Interfaces.IBlockData | undefined {
+	public get(key: string | number): Contracts.Crypto.IBlockData | undefined {
 		return typeof key === "string" ? this.byId.get(key) : this.byHeight.get(key);
 	}
 
-	public set(value: Interfaces.IBlock): void {
-		const lastBlock: Interfaces.IBlock | undefined = this.last();
+	public set(value: Contracts.Crypto.IBlock): void {
+		const lastBlock: Contracts.Crypto.IBlock | undefined = this.last();
 
 		if (value.data.height !== 1) {
-			Utils.assert.defined<Interfaces.IBlock>(lastBlock);
+			Utils.assert.defined<Contracts.Crypto.IBlock>(lastBlock);
 		}
 
 		assert.strictEqual(value.data.height, lastBlock ? lastBlock.data.height + 1 : 1);
@@ -34,13 +35,13 @@ export class BlockStore implements Contracts.State.BlockStore {
 		this.lastBlock = value;
 	}
 
-	public has(value: Interfaces.IBlockData): boolean {
+	public has(value: Contracts.Crypto.IBlockData): boolean {
 		Utils.assert.defined<string>(value.id);
 
 		return this.byId.has(value.id) || this.byHeight.has(value.height);
 	}
 
-	public delete(value: Interfaces.IBlockData): void {
+	public delete(value: Contracts.Crypto.IBlockData): void {
 		Utils.assert.defined<string>(value.id);
 
 		this.byId.delete(value.id);
@@ -57,11 +58,11 @@ export class BlockStore implements Contracts.State.BlockStore {
 		this.byHeight.resize(maxSize);
 	}
 
-	public last(): Interfaces.IBlock | undefined {
+	public last(): Contracts.Crypto.IBlock | undefined {
 		return this.lastBlock;
 	}
 
-	public values(): Interfaces.IBlockData[] {
+	public values(): Contracts.Crypto.IBlockData[] {
 		return this.byId.values();
 	}
 

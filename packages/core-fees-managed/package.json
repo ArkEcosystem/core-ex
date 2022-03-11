@@ -15,10 +15,12 @@
 		"clean": "del distribution"
 	},
 	"dependencies": {
+		"@arkecosystem/core-container": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-fees": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-transactions": "workspace:*",
-		"@arkecosystem/crypto": "workspace:*"
+		"@arkecosystem/utils": "workspace:*",
+		"joi": "17.4.2"
 	},
 	"engines": {
 		"node": ">=16.x"

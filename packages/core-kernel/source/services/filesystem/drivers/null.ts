@@ -1,9 +1,9 @@
-import { Filesystem } from "../../../contracts/kernel/filesystem";
-import { injectable } from "../../../ioc";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 @injectable()
-export class NullFilesystem implements Filesystem {
-	public async make(): Promise<Filesystem> {
+export class NullFilesystem implements Contracts.Kernel.Filesystem {
+	public async make(): Promise<Contracts.Kernel.Filesystem> {
 		return this;
 	}
 

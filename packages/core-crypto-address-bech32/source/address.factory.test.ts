@@ -1,10 +1,11 @@
+import { Crypto, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { BINDINGS, IConfiguration } from "@arkecosystem/core-crypto-contracts";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { Application, Container } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
+import { Application } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
 
+import { describe } from "../../core-test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =
@@ -12,10 +13,10 @@ const mnemonic =
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
-		context.app.bind(BINDINGS.Configuration).to(Configuration).inSingletonScope();
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		context.app.get<IConfiguration>(BINDINGS.Configuration).setConfig({
+		context.app.get<Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
 			milestones: [],
 			network: {
 				// @ts-ignore
@@ -50,7 +51,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
-				.fromPublicKey(Buffer.from("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex")),
+				.fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
 			"mod1apqf8srj4acqqj3cmk27xn00zxwjxjx4ycfzs96aqvh97grsux0s8nsxur",
 		);
 	});
@@ -61,9 +62,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
-				.fromPublicKey(
-					Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
-				),
+				.fromPublicKey("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
 			"mod1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv",
 		);
 	});

@@ -1,11 +1,12 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { prettyBytes, prettyTime } from "@arkecosystem/utils";
 import dayjs from "dayjs";
 import Joi from "joi";
 
-@Container.injectable()
+@injectable()
 export class Command extends Commands.Command {
-	@Container.inject(Container.Identifiers.ProcessManager)
+	@inject(Container.Identifiers.ProcessManager)
 	private readonly processManager!: Services.ProcessManager;
 
 	public signature = "top";
@@ -15,7 +16,7 @@ export class Command extends Commands.Command {
 	public requiresNetwork = false;
 
 	public configure(): void {
-		this.definition.setFlag("token", "The name of the token.", Joi.string().default("ark"));
+		this.definition.setFlag("token", "The name of the token.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {
@@ -23,7 +24,7 @@ export class Command extends Commands.Command {
 			(p: Contracts.ProcessDescription) => p.name.startsWith(this.getFlag("token")),
 		);
 
-		if (!processes || !Object.keys(processes).length) {
+		if (!processes || Object.keys(processes).length === 0) {
 			this.components.fatal("No processes are running.");
 		}
 

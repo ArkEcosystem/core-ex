@@ -1,5 +1,6 @@
-import { CacheStore as Contract } from "../../contracts/kernel";
-import { Identifiers, interfaces } from "../../ioc";
+import { interfaces } from "@arkecosystem/core-container";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+
 import { ServiceProvider as BaseServiceProvider } from "../../providers";
 import { CacheManager } from "./manager";
 
@@ -9,10 +10,15 @@ export class ServiceProvider extends BaseServiceProvider {
 
 		this.app
 			.bind(Identifiers.CacheFactory)
-			.toFactory((context: interfaces.Context) => async <K, T>(name?: string): Promise<Contract<K, T>> => {
-				const cacheManager: CacheManager = context.container.get<CacheManager>(Identifiers.CacheManager);
+			.toFactory(
+				(context: interfaces.Context) =>
+					async <K, T>(name?: string): Promise<Contracts.Kernel.CacheStore<K, T>> => {
+						const cacheManager: CacheManager = context.container.get<CacheManager>(
+							Identifiers.CacheManager,
+						);
 
-				return cacheManager.driver<Contract<K, T>>(name);
-			});
+						return cacheManager.driver<Contracts.Kernel.CacheStore<K, T>>(name);
+					},
+			);
 	}
 }

@@ -16,12 +16,12 @@
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
-		"@arkecosystem/core-crypto-contracts": "workspace:*",
+		"@arkecosystem/core-contracts": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
+		"@arkecosystem/utils": "workspace:*",
 		"bcrypto": "5.4.0"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"uvu": "^0.5.3"
 	}
 }

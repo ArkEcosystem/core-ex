@@ -1,13 +1,13 @@
-import { Container, Contracts, Utils as AppUtils } from "@arkecosystem/core-kernel";
-import { Crypto, Managers, Utils } from "@arkecosystem/crypto";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Utils as AppUtils } from "@arkecosystem/core-kernel";
+import { BigNumber } from "@arkecosystem/utils";
 import cloneDeep from "lodash.clonedeep";
 
 const defaultblockTimestampLookup = (height: number): number => {
-	/* istanbul ignore next */
 	if (height === 1) {
 		return 0;
 	}
-	/* istanbul ignore next */
+
 	throw new Error(`Attempted to lookup block with height ${height}, but no lookup implementation was provided`);
 };
 
@@ -15,26 +15,32 @@ export const snoozeForBlock = async (
 	sleep = 0,
 	height = 1,
 	blockTimestampLookupByHeight = defaultblockTimestampLookup,
+	configuration: Contracts.Crypto.IConfiguration,
+	slots: Contracts.Crypto.Slots,
 ): Promise<void> => {
-	const blockTime: number = Managers.configManager.getMilestone(height).blocktime * 1000;
-	const remainingTimeInSlot: number = Crypto.Slots.getTimeInMsUntilNextSlot(blockTimestampLookupByHeight);
+	const blockTime: number = configuration.getMilestone(height).blockTime * 1000;
+	const remainingTimeInSlot: number = await slots.getTimeInMsUntilNextSlot();
 	const sleepTime: number = sleep * 1000;
 
 	return AppUtils.sleep(blockTime + remainingTimeInSlot + sleepTime);
 };
 
-export const injectMilestone = (index: number, milestone: Record<string, any>): void =>
-	(Managers.configManager as any).milestones.splice(index, 0, {
-		...cloneDeep(Managers.configManager.getMilestone()),
+export const injectMilestone = (
+	index: number,
+	milestone: Record<string, any>,
+	configuration: Contracts.Crypto.IConfiguration,
+): void =>
+	(configuration as any).milestones.splice(index, 0, {
+		...cloneDeep(configuration.getMilestone()),
 		...milestone,
 	});
 
 export const getLastHeight = (app: Contracts.Kernel.Application): number =>
-	app.get<Contracts.State.StateStore>(Container.Identifiers.StateStore).getLastHeight();
+	app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
 
-export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): Utils.BigNumber =>
+export const getSenderNonce = (app: Contracts.Kernel.Application, senderPublicKey: string): Promise<BigNumber> =>
 	app
-		.getTagged<Contracts.State.WalletRepository>(Container.Identifiers.WalletRepository, "state", "blockchain")
+		.getTagged<Contracts.State.WalletRepository>(Identifiers.WalletRepository, "state", "blockchain")
 		.getNonce(senderPublicKey);
 
 export const resetBlockchain = async (app: Contracts.Kernel.Application) => {
@@ -43,23 +49,22 @@ export const resetBlockchain = async (app: Contracts.Kernel.Application) => {
 	// TODO: reset rounds, transactions in db...
 
 	// reset to block height 1
-	const blockchain = app.get<Contracts.Blockchain.Blockchain>(Container.Identifiers.BlockchainService);
+	const blockchain = app.get<Contracts.Blockchain.Blockchain>(Identifiers.BlockchainService);
 	const height: number = blockchain.getLastBlock().data.height;
 
-	/* istanbul ignore else */
 	if (height) {
-		await blockchain.removeBlocks(height - 1);
+		// await blockchain.removeBlocks(height - 1);
 	}
 
-	// app.get<Contracts.TransactionPool.Connection>(Container.Identifiers.TransactionPoolService).flush();
+	// app.get<Contracts.TransactionPool.Connection>(Identifiers.TransactionPoolService).flush();
 };
 
-export const getWalletNonce = (app: Contracts.Kernel.Application, publicKey: string): Utils.BigNumber => {
+export const getWalletNonce = async (app: Contracts.Kernel.Application, publicKey: string): Promise<BigNumber> => {
 	try {
 		return app
-			.getTagged<Contracts.State.WalletRepository>(Container.Identifiers.WalletRepository, "state", "blockchain")
+			.getTagged<Contracts.State.WalletRepository>(Identifiers.WalletRepository, "state", "blockchain")
 			.getNonce(publicKey);
 	} catch {
-		return Utils.BigNumber.ZERO;
+		return BigNumber.ZERO;
 	}
 };

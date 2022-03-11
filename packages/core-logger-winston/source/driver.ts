@@ -1,15 +1,17 @@
-import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
-import winston from "winston";
+import { injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
+import { Utils } from "@arkecosystem/core-kernel";
 import { inspect } from "util";
+import winston from "winston";
 
-@Container.injectable()
+@injectable()
 export class Logger implements Contracts.Kernel.Logger {
 	#logger: winston.Logger;
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#logger = winston.createLogger({
-			level: options.levels.console,
 			format: winston.format.json(),
+			level: options.levels.console,
 			transports: [
 				new winston.transports.Console({
 					format: winston.format.simple(),
@@ -22,35 +24,35 @@ export class Logger implements Contracts.Kernel.Logger {
 	}
 
 	public emergency(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public alert(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public critical(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public error(message: any): void {
-		this.log("error", message);
+		this.#log("error", message);
 	}
 
 	public warning(message: any): void {
-		this.log("warn", message);
+		this.#log("warn", message);
 	}
 
 	public notice(message: any): void {
-		this.log("info", message);
+		this.#log("info", message);
 	}
 
 	public info(message: any): void {
-		this.log("info", message);
+		this.#log("info", message);
 	}
 
 	public debug(message: any): void {
-		this.log("debug", message);
+		this.#log("debug", message);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
@@ -61,7 +63,7 @@ export class Logger implements Contracts.Kernel.Logger {
 		//
 	}
 
-	private log(level: string, message: any): void {
+	#log(level: string, message: any): void {
 		if (Utils.isEmpty(message)) {
 			return;
 		}

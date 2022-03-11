@@ -1,10 +1,10 @@
-import { Interfaces } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 export interface FeeMatcher {
-	throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void>;
-	throwIfCannotBroadcast(transaction: Interfaces.ITransaction): Promise<void>;
+	throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void>;
+	throwIfCannotBroadcast(transaction: Contracts.Crypto.ITransaction): Promise<void>;
 }
 
 export interface ProcessorExtension {
-	throwIfCannotBroadcast(transaction: Interfaces.ITransaction): Promise<void>;
+	throwIfCannotBroadcast(transaction: Contracts.Crypto.ITransaction): Promise<void>;
 }

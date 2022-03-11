@@ -4,9 +4,9 @@ import { describe } from "@arkecosystem/core-test-framework";
 
 describe("BlockStore", ({ it, assert }) => {
 	it("should push and get a block", () => {
-		const block: Interfaces.IBlock = {
+		const block: Crypto.IBlock = {
 			data: { height: 1, id: "1", previousBlock: undefined },
-		} as Interfaces.IBlock;
+		} as Crypto.IBlock;
 
 		const store = new BlockStore(100);
 		store.set(block);
@@ -30,7 +30,7 @@ describe("BlockStore", ({ it, assert }) => {
 
 	it("should fail to push a block if it isn't chained", () => {
 		const store = new BlockStore(2);
-		store.set({ data: { height: 1, id: "1" } } as Interfaces.IBlock);
+		store.set({ data: { height: 1, id: "1" } } as Crypto.IBlock);
 
 		assert.throws(() => store.set({ data: { height: 3, id: "3" } } as Interfaces.IBlock));
 	});
@@ -39,7 +39,7 @@ describe("BlockStore", ({ it, assert }) => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Interfaces.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
 		}
 
 		assert.equal(store.count(), 4);
@@ -51,7 +51,7 @@ describe("BlockStore", ({ it, assert }) => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Interfaces.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
 		}
 
 		assert.true(store.has({ height: 1, id: "1" } as Interfaces.IBlockData));
@@ -62,7 +62,7 @@ describe("BlockStore", ({ it, assert }) => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Interfaces.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
 		}
 
 		store.delete({ height: 4, id: "4" } as Interfaces.IBlockData);
@@ -91,7 +91,7 @@ describe("BlockStore", ({ it, assert }) => {
 		const store = new BlockStore(4);
 
 		for (let i = 1; i < 5; i++) {
-			store.set({ data: { id: i.toString(), height: i } } as Interfaces.IBlock);
+			store.set({ data: { id: i.toString(), height: i } } as Crypto.IBlock);
 		}
 
 		assert.equal(store.count(), 4);

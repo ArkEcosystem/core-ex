@@ -1,9 +1,9 @@
-import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { Ajv } from "ajv";
 
 import { isValidPeer } from "./is-valid-peer";
 
-export const registerFormats = (configuration: Configuration) => {
+export const registerFormats = (configuration: Contracts.Crypto.IConfiguration) => {
 	const vendorField = (ajv: Ajv) => {
 		ajv.addFormat("vendorField", (data) => {
 			try {
@@ -14,6 +14,7 @@ export const registerFormats = (configuration: Configuration) => {
 		});
 	};
 
+	// @TODO: plugins should register this rule
 	const validPeer = (ajv: Ajv) => {
 		ajv.addFormat("peer", (ip: string) => {
 			try {
@@ -24,5 +25,5 @@ export const registerFormats = (configuration: Configuration) => {
 		});
 	};
 
-	return [vendorField, validPeer];
+	return { validPeer, vendorField };
 };

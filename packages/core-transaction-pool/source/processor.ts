@@ -1,26 +1,31 @@
-import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { Interfaces, Transactions, Utils } from "@arkecosystem/crypto";
+import { inject, injectable, multiInject, optional } from "@arkecosystem/core-container";
+import { Contracts, Identifiers, Exceptions } from "@arkecosystem/core-contracts";
+import { ByteBuffer } from "@arkecosystem/utils";
 
-import { InvalidTransactionDataError } from "./errors";
-
-@Container.injectable()
+@injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
-	@Container.multiInject(Container.Identifiers.TransactionPoolProcessorExtension)
-	@Container.optional()
+	@multiInject(Identifiers.TransactionPoolProcessorExtension)
+	@optional()
 	private readonly extensions: Contracts.TransactionPool.ProcessorExtension[] = [];
 
-	@Container.inject(Container.Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@Container.inject(Container.Identifiers.PeerTransactionBroadcaster)
-	@Container.optional()
+	@inject(Identifiers.PeerTransactionBroadcaster)
+	@optional()
 	private readonly transactionBroadcaster!: Contracts.P2P.TransactionBroadcaster | undefined;
 
-	@Container.inject(Container.Identifiers.LogService)
+	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
+
+	@inject(Identifiers.Cryptography.Transaction.Deserializer)
+	private readonly deserializer: Contracts.Crypto.ITransactionDeserializer;
+
 	public async process(
-		data: Interfaces.ITransactionData[] | Buffer[],
+		data: Contracts.Crypto.ITransactionData[] | Buffer[],
 	): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: string[] = [];
 		const broadcast: string[] = [];
@@ -28,7 +33,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		const excess: string[] = [];
 		let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
-		const broadcastTransactions: Interfaces.ITransaction[] = [];
+		const broadcastTransactions: Contracts.Crypto.ITransaction[] = [];
 
 		try {
 			for (const [index, transactionData] of data.entries()) {
@@ -50,7 +55,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				} catch (error) {
 					invalid.push(entryId);
 
-					if (error instanceof Contracts.TransactionPool.PoolError) {
+					if (error instanceof Exceptions.PoolError) {
 						if (error.type === "ERR_EXCEEDS_MAX_COUNT") {
 							excess.push(entryId);
 						}
@@ -84,25 +89,25 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		};
 	}
 
-	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Interfaces.ITransaction> {
+	private async getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.ITransaction> {
 		try {
-			const transactionCommon = {} as Interfaces.ITransactionData;
-			const txByteBuffer = new Utils.ByteBuffer(transactionData);
-			Transactions.Deserializer.deserializeCommon(transactionCommon, txByteBuffer);
+			const transactionCommon = {} as Contracts.Crypto.ITransactionData;
+			const txByteBuffer = ByteBuffer.fromBuffer(transactionData);
+			this.deserializer.deserializeCommon(transactionCommon, txByteBuffer);
 
-			return Transactions.TransactionFactory.fromBytes(transactionData);
+			return this.transactionFactory.fromBytes(transactionData);
 		} catch (error) {
-			throw new InvalidTransactionDataError(error.message);
+			throw new Exceptions.InvalidTransactionDataError(error.message);
 		}
 	}
 
 	private async getTransactionFromData(
-		transactionData: Interfaces.ITransactionData,
-	): Promise<Interfaces.ITransaction> {
+		transactionData: Contracts.Crypto.ITransactionData,
+	): Promise<Contracts.Crypto.ITransaction> {
 		try {
-			return Transactions.TransactionFactory.fromData(transactionData);
+			return this.transactionFactory.fromData(transactionData);
 		} catch (error) {
-			throw new InvalidTransactionDataError(error.message);
+			throw new Exceptions.InvalidTransactionDataError(error.message);
 		}
 	}
 }

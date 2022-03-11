@@ -1,9 +1,10 @@
-import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { Application } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
 
+import { describe } from "../../core-test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =
@@ -11,7 +12,8 @@ const mnemonic =
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
-		context.app = new Application(new Container.Container());
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	});
 
 	it("should derive an address from an mnemonic (schnorr)", async (context) => {
@@ -38,7 +40,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
-				.fromPublicKey(Buffer.from("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex")),
+				.fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
 			"0x4D9AED240463043cFcf5B5Df16b9ad523930A181",
 		);
 	});
@@ -49,9 +51,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
-				.fromPublicKey(
-					Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
-				),
+				.fromPublicKey("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
 			"0xC7C50f33278bDe272ffe23865fF9fBd0155a5175",
 		);
 	});
