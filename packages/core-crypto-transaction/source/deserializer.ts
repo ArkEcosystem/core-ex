@@ -20,7 +20,6 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 
 	public async deserialize(
 		serialized: string | Buffer,
-		options: Contracts.Crypto.IDeserializeOptions = {},
 	): Promise<Contracts.Crypto.ITransaction> {
 		const data = {} as Contracts.Crypto.ITransactionData;
 
