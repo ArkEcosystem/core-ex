@@ -1,102 +1,82 @@
-import { QueueJob } from "@packages/core-kernel/source/contracts/kernel/queue";
-import { NullQueue } from "@packages/core-kernel/source/services/queue/drivers/null";
+import { describe } from "../../../../../core-test-framework";
+
+import { QueueJob } from "../../../contracts/kernel";
+import { NullQueue } from "./null";
 
 class MyQueueJob implements QueueJob {
 	public async handle(): Promise<void> {}
 }
 
-describe("NullQueue.make", () => {
+describe("NullQueue", ({ assert, it }) => {
 	it("should return instance itself", async () => {
 		const driver = new NullQueue();
 		const result = await driver.make();
-		expect(result).toBe(driver);
+		assert.is(result, driver);
 	});
-});
 
-describe("NullQueue.start", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.start();
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.stop", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.stop();
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.pause", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.pause();
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.resume", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.resume();
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.clear", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.clear();
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.push", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.push(new MyQueueJob());
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.later", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.later(10, new MyQueueJob());
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.bulk", () => {
 	it("should return undefined", async () => {
 		const driver = new NullQueue();
 		const result = await driver.bulk([new MyQueueJob(), new MyQueueJob()]);
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullQueue.size", () => {
 	it("should return 0", async () => {
 		const driver = new NullQueue();
 		const result = await driver.size();
-		expect(result).toBe(0);
+		assert.is(result, 0);
 	});
-});
 
-describe("NullQueue.isStarted", () => {
 	it("should return false", async () => {
 		const driver = new NullQueue();
 		const result = await driver.isStarted();
-		expect(result).toBe(false);
+		assert.is(result, false);
 	});
-});
 
-describe("NullQueue.isRunning", () => {
 	it("should return false", async () => {
 		const driver = new NullQueue();
 		const result = await driver.isRunning();
-		expect(result).toBe(false);
+		assert.is(result, false);
 	});
 });
