@@ -1,26 +1,24 @@
-import { NullPipeline } from "../../../../../../packages/core-kernel/source/services/pipeline/drivers/null";
+import { describe } from "../../../../../core-test-framework";
 
-describe("NullPipeline.pipe", () => {
+import { NullPipeline } from "./null";
+
+describe("NullPipeline.pipe", ({ assert, it }) => {
 	it("should return new piped pipeline", () => {
 		const driver = new NullPipeline();
 		const result = driver.pipe(() => {});
-		expect(result).not.toBe(driver);
-		expect(result).toBeInstanceOf(NullPipeline);
+		assert.is.not(result, driver);
+		assert.instance(result, NullPipeline);
 	});
-});
 
-describe("NullPipeline.process", () => {
 	it("should return undefined", async () => {
 		const driver = new NullPipeline();
 		const result = await driver.process("payload");
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullPipeline.processSync", () => {
 	it("should return undefined", () => {
 		const driver = new NullPipeline();
 		const result = driver.processSync("payload");
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
 });
