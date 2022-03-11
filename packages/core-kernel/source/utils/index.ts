@@ -3,8 +3,6 @@ import { calculateRound, isNewRound } from "./round-calculator";
 import { calculate } from "./supply-calculator";
 export * from "./assert";
 export * as IpAddress from "./ip-address";
-export * from "./ipc-handler";
-export * from "./ipc-subprocess";
 export * from "./lock";
 export * from "@arkecosystem/utils";
 
