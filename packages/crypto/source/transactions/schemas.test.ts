@@ -194,6 +194,7 @@ describe<{
 		configManager.setFromPreset("mainnet");
 
 		transfer = context.transaction
+			.version(1)
 			.recipientId("APnDzjtDb1FthuqcLMeL5XMWb1uD1KeMGi")
 			.amount("1")
 			.fee("1")
@@ -203,8 +204,6 @@ describe<{
 
 		assert.equal(transfer.data.network, 23);
 		assert.undefined(Ajv.validate(context.transactionSchema.$id, context.transaction.getStruct()).error);
-
-		configManager.setFromPreset("devnet");
 	});
 
 	it("should be ok and turn uppercase publicKey to lowercase", (context) => {

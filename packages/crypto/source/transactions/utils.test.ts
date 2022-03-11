@@ -115,10 +115,24 @@ describe<{
 					delete transaction.data.nonce;
 				}
 
-				// @ts-ignore
-				transaction.data.amount = BigNumber.make(transaction.data.amount).toFixed();
-				// @ts-ignore
-				transaction.data.fee = BigNumber.make(transaction.data.fee).toFixed();
+                if (transaction.data.version === 2) {
+					delete transaction.data.typeGroup;
+				}
+
+                if (transaction.data.nonce) {
+                    // @ts-ignore
+                    transaction.data.nonce = BigNumber.make(transaction.data.nonce).toFixed();
+                }
+
+                if (transaction.data.amount) {
+                    // @ts-ignore
+                    transaction.data.amount = BigNumber.make(transaction.data.amount).toFixed();
+                }
+
+                if (transaction.data.fee) {
+                    // @ts-ignore
+                    transaction.data.fee = BigNumber.make(transaction.data.fee).toFixed();
+                }
 
 				assert.equal(newTransaction.toJson(), transaction.data);
 				assert.true(newTransaction.verified);
