@@ -2,7 +2,7 @@ import { describe } from "../../../../core-test-framework";
 
 import { Application } from "../../application";
 import { Container, Identifiers } from "../../ioc";
-import { ServiceProvider } from "./index";
+import { ServiceProvider } from "./service-provider";
 import { MemoryQueue } from "./drivers/memory";
 import { QueueFactory } from "../../types";
 

@@ -1,65 +1,53 @@
-import { NullValidator } from "../../../../../../packages/core-kernel/source/services/validation/drivers/null";
+import { describe } from "../../../../../core-test-framework";
 
-describe("NullValidator.validate", () => {
+import { NullValidator } from "./null";
+
+describe("NullValidator.validate", ({ assert, beforeEach, it }) => {
 	it("should return undefined", () => {
 		const driver = new NullValidator();
 		const result = driver.validate({}, {});
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullValidator.passes", () => {
 	it("should return false", () => {
 		const driver = new NullValidator();
 		const result = driver.passes();
-		expect(result).toBe(false);
+		assert.false(result);
 	});
-});
 
-describe("NullValidator.fails", () => {
 	it("should return true", () => {
 		const driver = new NullValidator();
 		const result = driver.fails();
-		expect(result).toBe(true);
+		assert.true(result);
 	});
-});
 
-describe("NullValidator.failed", () => {
 	it("should return empty object", () => {
 		const driver = new NullValidator();
 		const result = driver.failed();
-		expect(result).toStrictEqual({});
+		assert.equal(result, {});
 	});
-});
 
-describe("NullValidator.errors", () => {
 	it("should return empty object", () => {
 		const driver = new NullValidator();
 		const result = driver.errors();
-		expect(result).toStrictEqual({});
+		assert.equal(result, {});
 	});
-});
 
-describe("NullValidator.valid", () => {
 	it("should return undefined", () => {
 		const driver = new NullValidator();
 		const result = driver.valid();
-		expect(result).toBe(undefined);
+		assert.undefined(result);
 	});
-});
 
-describe("NullValidator.invalid", () => {
 	it("should return empty object", () => {
 		const driver = new NullValidator();
 		const result = driver.invalid();
-		expect(result).toStrictEqual({});
+		assert.equal(result, {});
 	});
-});
 
-describe("NullValidator.attributes", () => {
 	it("should return empty object", () => {
 		const driver = new NullValidator();
 		const result = driver.attributes();
-		expect(result).toStrictEqual({});
+		assert.equal(result, {});
 	});
 });
