@@ -13,13 +13,13 @@ const transactionJson = transaction.toJson();
 const transactionSerialized = Serializer.serialize(transaction);
 
 describe<{
-    config: NetworkConfig;
+	config: NetworkConfig;
 	transactionData: ITransactionData;
 	transactionDataJSON: ITransactionJson;
 }>("TransactionFactory", ({ it, assert, beforeAll, beforeEach, afterAll }) => {
-    beforeAll((context) => {
-        context.config = configManager.all();
-    });
+	beforeAll((context) => {
+		context.config = configManager.all();
+	});
 
 	beforeEach((context) => {
 		configManager.setFromPreset("devnet");
@@ -28,25 +28,25 @@ describe<{
 		context.transactionDataJSON = {
 			...context.transactionData,
 			...{
-                amount: context.transactionData.amount.toFixed(), 
-                fee: context.transactionData.fee.toFixed(), 
-                nonce: context.transactionData.nonce?.toFixed(),
-            },
+				amount: context.transactionData.amount.toFixed(),
+				fee: context.transactionData.fee.toFixed(),
+				nonce: context.transactionData.nonce?.toFixed(),
+			},
 		};
 	});
 
-    afterAll((context) => {
-        configManager.setConfig(context.config);
-    });
+	afterAll((context) => {
+		configManager.setConfig(context.config);
+	});
 
 	it("fromHex - should pass to create a transaction from hex", (context) => {
-        const tx = TransactionFactory.fromHex(transactionSerialized.toString("hex")).data;
+		const tx = TransactionFactory.fromHex(transactionSerialized.toString("hex")).data;
 
-        // @ts-ignore
-        tx.amount = BigNumber.make(tx.amount).toFixed();
-        // @ts-ignore
-        tx.fee = BigNumber.make(tx.fee).toFixed();
-        
+		// @ts-ignore
+		tx.amount = BigNumber.make(tx.amount).toFixed();
+		// @ts-ignore
+		tx.fee = BigNumber.make(tx.fee).toFixed();
+
 		assert.equal(tx, transactionFixture);
 	});
 
@@ -58,12 +58,12 @@ describe<{
 	});
 
 	it("fromBytes - should pass to create a transaction from a buffer", (context) => {
-        const tx = TransactionFactory.fromBytes(transactionSerialized).data;
+		const tx = TransactionFactory.fromBytes(transactionSerialized).data;
 
-        // @ts-ignore
-        tx.amount = BigNumber.make(tx.amount).toFixed();
-        // @ts-ignore
-        tx.fee = BigNumber.make(tx.fee).toFixed();
+		// @ts-ignore
+		tx.amount = BigNumber.make(tx.amount).toFixed();
+		// @ts-ignore
+		tx.fee = BigNumber.make(tx.fee).toFixed();
 
 		assert.equal(tx, transactionFixture);
 	});
@@ -76,12 +76,12 @@ describe<{
 	});
 
 	it("fromBytesUnsafe - should pass to create a transaction from a buffer", (context) => {
-        const tx = TransactionFactory.fromBytesUnsafe(transactionSerialized).data;
+		const tx = TransactionFactory.fromBytesUnsafe(transactionSerialized).data;
 
-        // @ts-ignore
-        tx.amount = BigNumber.make(tx.amount).toFixed();
-        // @ts-ignore
-        tx.fee = BigNumber.make(tx.fee).toFixed();
+		// @ts-ignore
+		tx.amount = BigNumber.make(tx.amount).toFixed();
+		// @ts-ignore
+		tx.fee = BigNumber.make(tx.fee).toFixed();
 
 		assert.equal(tx, transactionFixture);
 	});
@@ -105,12 +105,12 @@ describe<{
 	});
 
 	it("fromData - should pass to create a transaction from an object", (context) => {
-        const tx = TransactionFactory.fromData(transaction.data).data;
+		const tx = TransactionFactory.fromData(transaction.data).data;
 
-        // @ts-ignore
-        tx.amount = BigNumber.make(tx.amount).toFixed();
-        // @ts-ignore
-        tx.fee = BigNumber.make(tx.fee).toFixed();
+		// @ts-ignore
+		tx.amount = BigNumber.make(tx.amount).toFixed();
+		// @ts-ignore
+		tx.fee = BigNumber.make(tx.fee).toFixed();
 
 		assert.equal(tx, transactionFixture);
 	});
@@ -150,12 +150,12 @@ describe<{
 	});
 
 	it("fromJson - should pass to create a transaction from JSON", (context) => {
-        const tx = TransactionFactory.fromJson(transactionJson).data;
+		const tx = TransactionFactory.fromJson(transactionJson).data;
 
-        // @ts-ignore
-        tx.amount = BigNumber.make(tx.amount).toFixed();
-        // @ts-ignore
-        tx.fee = BigNumber.make(tx.fee).toFixed();
+		// @ts-ignore
+		tx.amount = BigNumber.make(tx.amount).toFixed();
+		// @ts-ignore
+		tx.fee = BigNumber.make(tx.fee).toFixed();
 
 		assert.equal(tx, transactionFixture);
 	});
