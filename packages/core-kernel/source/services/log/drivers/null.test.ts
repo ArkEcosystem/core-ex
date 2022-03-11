@@ -2,7 +2,7 @@ import { describe } from "../../../../../core-test-framework";
 
 import { NullLogger } from "./null";
 
-describe("NullLogger", ({ assert, it}) => {
+describe("NullLogger", ({ assert, it }) => {
 	it("should return instance itself", async () => {
 		const driver = new NullLogger();
 		const result = await driver.make();
