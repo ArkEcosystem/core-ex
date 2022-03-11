@@ -26,10 +26,7 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 		return this.fromSerialized(hex);
 	}
 
-	public async fromBytes(
-		buff: Buffer,
-		strict = true,
-	): Promise<Contracts.Crypto.ITransaction> {
+	public async fromBytes(buff: Buffer, strict = true): Promise<Contracts.Crypto.ITransaction> {
 		return this.fromSerialized(buff.toString("hex"), strict);
 	}
 
@@ -58,10 +55,7 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 		return this.fromBytes(transaction.serialized, strict);
 	}
 
-	private async fromSerialized(
-		serialized: string,
-		strict = true,
-	): Promise<Contracts.Crypto.ITransaction> {
+	private async fromSerialized(serialized: string, strict = true): Promise<Contracts.Crypto.ITransaction> {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 			transaction.data.id = await this.utils.getId(transaction.data);
