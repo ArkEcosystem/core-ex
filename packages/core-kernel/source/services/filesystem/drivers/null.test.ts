@@ -2,7 +2,7 @@ import { describe } from "../../../../../core-test-framework";
 
 import { NullFilesystem } from "./null";
 
-describe("NullFilesystem.make", ({ assert, it }) => {
+describe("NullFilesystem", ({ assert, it }) => {
 	it("should return instance itself", async () => {
 		const driver = new NullFilesystem();
 		const result = await driver.make();

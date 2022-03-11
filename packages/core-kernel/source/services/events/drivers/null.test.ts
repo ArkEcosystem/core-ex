@@ -7,7 +7,7 @@ class MyEventListener implements EventListener {
 	public handle(payload: { name: EventName; data: any }): void {}
 }
 
-describe("NullEventDispatcher.listen", ({ assert, it }) => {
+describe("NullEventDispatcher", ({ assert, it }) => {
 	it("should return function", () => {
 		const driver = new NullEventDispatcher();
 		const result = driver.listen("event", new MyEventListener());
