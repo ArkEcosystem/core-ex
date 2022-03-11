@@ -1,62 +1,92 @@
 import { describe } from "@arkecosystem/core-test-framework";
-import { Interfaces, Utils } from "../";
 import { InvalidTransactionBytesError, TransactionSchemaError, UnkownTransactionError } from "../errors";
-import { ITransactionData, ITransactionJson } from "../interfaces";
+import { ITransaction, ITransactionData, ITransactionJson, NetworkConfig } from "../interfaces";
 import { configManager } from "../managers";
 import { Serializer, Transaction, TransactionFactory, Utils as TransactionUtils } from "./";
-
 import { transaction as transactionFixture } from "../../test/fixtures/transaction";
 import { transaction as transactionDataFixture } from "../../test/fixtures/transaction";
 import { createRandomTx } from "../../test/support";
+import { BigNumber } from "../utils/bignum";
+
+const transaction = TransactionFactory.fromData(transactionFixture);
+const transactionJson = transaction.toJson();
+const transactionSerialized = Serializer.serialize(transaction);
 
 describe<{
-	transactionData: any;
-	transactionDataJSON: any;
-	transaction: any;
-	transactionJson: any;
-	transactionSerialized: any;
-}>("TransactionFactory", ({ it, assert, beforeEach }) => {
+    config: NetworkConfig;
+	transactionData: ITransactionData;
+	transactionDataJSON: ITransactionJson;
+}>("TransactionFactory", ({ it, assert, beforeAll, beforeEach, afterAll }) => {
+    beforeAll((context) => {
+        context.config = configManager.all();
+    });
+
 	beforeEach((context) => {
 		configManager.setFromPreset("devnet");
 
 		context.transactionData = { ...transactionDataFixture };
 		context.transactionDataJSON = {
 			...context.transactionData,
-			...{ amount: context.transactionData.amount.toFixed(), fee: context.transactionData.fee.toFixed() },
+			...{
+                amount: context.transactionData.amount.toFixed(), 
+                fee: context.transactionData.fee.toFixed(), 
+                nonce: context.transactionData.nonce?.toFixed(),
+            },
 		};
-
-		context.transaction = TransactionFactory.fromData(transactionFixture);
-		context.transactionJson = context.transaction.toJson();
-		context.transactionSerialized = Serializer.serialize(context.transaction);
 	});
+
+    afterAll((context) => {
+        configManager.setConfig(context.config);
+    });
 
 	it("fromHex - should pass to create a transaction from hex", (context) => {
-		assert.equal(TransactionFactory.fromHex(context.transactionSerialized.toString("hex")), transactionFixture);
+        const tx = TransactionFactory.fromHex(transactionSerialized.toString("hex")).data;
+
+        // @ts-ignore
+        tx.amount = BigNumber.make(tx.amount).toFixed();
+        // @ts-ignore
+        tx.fee = BigNumber.make(tx.fee).toFixed();
+        
+		assert.equal(tx, transactionFixture);
 	});
 
-	it("fromHex - should fail to create a transaction from hex that contains malformed bytes", () => {
+	it("fromHex - should fail to create a transaction from hex that contains malformed bytes", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromHex("deadbeef"),
 			(err) => err instanceof InvalidTransactionBytesError,
 		);
 	});
 
-	it("fromBytes - should pass to create a transaction from a buffer", () => {
-		assert.equal(TransactionFactory.fromBytes(transactionSerialized), transactionFixture);
+	it("fromBytes - should pass to create a transaction from a buffer", (context) => {
+        const tx = TransactionFactory.fromBytes(transactionSerialized).data;
+
+        // @ts-ignore
+        tx.amount = BigNumber.make(tx.amount).toFixed();
+        // @ts-ignore
+        tx.fee = BigNumber.make(tx.fee).toFixed();
+
+		assert.equal(tx, transactionFixture);
 	});
 
-	it("fromBytes - should fail to create a transaction from a buffer that contains malformed bytes", () => {
+	it("fromBytes - should fail to create a transaction from a buffer that contains malformed bytes", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromBytes(Buffer.from("deadbeef")),
 			(err) => err instanceof InvalidTransactionBytesError,
 		);
 	});
 
-	it("fromBytesUnsafe - should pass to create a transaction from a buffer", () => {
-		assert.equal(TransactionFactory.fromBytesUnsafe(transactionSerialized), transactionFixture);
+	it("fromBytesUnsafe - should pass to create a transaction from a buffer", (context) => {
+        const tx = TransactionFactory.fromBytesUnsafe(transactionSerialized).data;
+
+        // @ts-ignore
+        tx.amount = BigNumber.make(tx.amount).toFixed();
+        // @ts-ignore
+        tx.fee = BigNumber.make(tx.fee).toFixed();
+
+		assert.equal(tx, transactionFixture);
 	});
 
-	it("fromBytesUnsafe - should fail to create a transaction from a buffer that contains malformed bytes", () => {
+	it("fromBytesUnsafe - should fail to create a transaction from a buffer that contains malformed bytes", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromBytesUnsafe(Buffer.from("deadbeef")),
 			(err) => err instanceof InvalidTransactionBytesError,
@@ -74,23 +104,30 @@ describe<{
 		assert.equal(transaction.toJson(), context.transactionDataJSON);
 	});
 
-	it("fromData - should pass to create a transaction from an object", () => {
-		assert.equal(TransactionFactory.fromData(transaction.data), transactionFixture);
+	it("fromData - should pass to create a transaction from an object", (context) => {
+        const tx = TransactionFactory.fromData(transaction.data).data;
+
+        // @ts-ignore
+        tx.amount = BigNumber.make(tx.amount).toFixed();
+        // @ts-ignore
+        tx.fee = BigNumber.make(tx.fee).toFixed();
+
+		assert.equal(tx, transactionFixture);
 	});
 
-	it("fromData - should fail to create a transaction from an object that contains malformed data", () => {
+	it("fromData - should fail to create a transaction from an object that contains malformed data", (context) => {
 		assert.throws(
 			() =>
 				TransactionFactory.fromData({
 					...transaction.data,
-					...{ fee: Utils.BigNumber.make(0) },
+					...{ fee: BigNumber.make(0) },
 				}),
 			(err) => err instanceof TransactionSchemaError,
 		);
 	});
 
 	// Old tests
-	it("fromData - should match transaction id", () => {
+	it("fromData - should match transaction id", (context) => {
 		configManager.setFromPreset("testnet");
 		[0, 2, 3]
 			.map((type) => createRandomTx(type))
@@ -101,7 +138,7 @@ describe<{
 			});
 	});
 
-	it("fromData - should throw when getting garbage", () => {
+	it("fromData - should throw when getting garbage", (context) => {
 		assert.throws(
 			() => TransactionFactory.fromData({} as ITransactionData),
 			(err) => err instanceof UnkownTransactionError,
@@ -112,11 +149,18 @@ describe<{
 		);
 	});
 
-	it("fromJson - should pass to create a transaction from JSON", () => {
-		assert.equal(TransactionFactory.fromJson(transactionJson), transactionFixture);
+	it("fromJson - should pass to create a transaction from JSON", (context) => {
+        const tx = TransactionFactory.fromJson(transactionJson).data;
+
+        // @ts-ignore
+        tx.amount = BigNumber.make(tx.amount).toFixed();
+        // @ts-ignore
+        tx.fee = BigNumber.make(tx.fee).toFixed();
+
+		assert.equal(tx, transactionFixture);
 	});
 
-	it("fromJson - should fail to create a transaction from JSON that contains malformed data", () => {
+	it("fromJson - should fail to create a transaction from JSON that contains malformed data", (context) => {
 		assert.throws(
 			() =>
 				TransactionFactory.fromJson({
