@@ -57,10 +57,7 @@ export interface IBlockJson {
 }
 
 export interface IBlockDeserializer {
-	deserialize(
-		serialized: Buffer,
-		headerOnly?: boolean,
-	): Promise<{ data: IBlockData; transactions: ITransaction[] }>;
+	deserialize(serialized: Buffer, headerOnly?: boolean): Promise<{ data: IBlockData; transactions: ITransaction[] }>;
 }
 
 export interface IBlockFactory {
