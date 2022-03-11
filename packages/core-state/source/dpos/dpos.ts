@@ -92,8 +92,9 @@ export class DposState implements Contracts.State.DposState {
 	public setValidatorsRound(roundInfo: Contracts.Shared.RoundInfo): void {
 		if (this.#activeValidators.length < roundInfo.maxValidators) {
 			throw new Error(
-				`Expected to find ${roundInfo.maxValidators} validators but only found ${this.#activeValidators.length}.` +
-					`This indicates an issue with the genesis block & validators.`,
+				`Expected to find ${roundInfo.maxValidators} validators but only found ${
+					this.#activeValidators.length
+				}.` + `This indicates an issue with the genesis block & validators.`,
 			);
 		}
 
