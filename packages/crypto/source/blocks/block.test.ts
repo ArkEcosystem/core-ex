@@ -1,5 +1,5 @@
 import { describe, TransactionFactory } from "@arkecosystem/core-test-framework";
-import { BIP39 } from "@arkecosystem/core-forger/source/methods/bip39";
+import { BIP39 } from "../../../core-forger/source/methods/bip39";
 import { Managers, Utils } from "../";
 import { Block, BlockFactory, Deserializer, Serializer } from "../blocks";
 import { Slots } from "../crypto";
