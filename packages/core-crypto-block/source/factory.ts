@@ -69,7 +69,6 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 
 	public async fromData(
 		data: Contracts.Crypto.IBlockData,
-		options: { deserializeTransactionsUnchecked?: boolean } = {},
 	): Promise<Contracts.Crypto.IBlock | undefined> {
 		await this.#applySchema(data);
 
