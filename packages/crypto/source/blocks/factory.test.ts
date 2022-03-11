@@ -5,21 +5,21 @@ import { configManager } from "../managers";
 import { blockWithExceptions, dummyBlock } from "../../test/fixtures/block";
 
 describe<{
-	expectBlock: ({ data }: { data: IBlockData }) => void
+	expectBlock: ({ data }: { data: IBlockData }) => void;
 }>("BlockFactory", ({ it, assert, beforeEach, beforeAll }) => {
 	beforeAll((context) => {
 		context.expectBlock = ({ data }: { data: IBlockData }) => {
 			delete data.idHex;
-		
+
 			const blockWithoutTransactions: IBlockData = { ...dummyBlock };
 			blockWithoutTransactions.reward = blockWithoutTransactions.reward;
 			blockWithoutTransactions.totalAmount = blockWithoutTransactions.totalAmount;
 			blockWithoutTransactions.totalFee = blockWithoutTransactions.totalFee;
 			delete blockWithoutTransactions.transactions;
-		
+
 			assert.equal(data, blockWithoutTransactions);
 		};
-	})
+	});
 
 	beforeEach(() => configManager.setFromPreset("devnet"));
 

@@ -1,5 +1,5 @@
 import { describe } from "@arkecosystem/core-test-framework";
-import { Address, PublicKey, Keys } from "../identities";;
+import { Address, PublicKey, Keys } from "../identities";
 import { ITransaction } from "../interfaces";
 import { configManager } from "../managers";
 import {
@@ -87,7 +87,8 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		Signer.sign(transaction.data, Keys.fromPassphrase("sender passphrase"));
 
 		const serialized = Serializer.serialize(transaction);
-		assert.equal(serialized.toString("hex"),
+		assert.equal(
+			serialized.toString("hex"),
 			"ff" + // Header
 				"02" + // Version
 				"1e" + // Network
@@ -127,7 +128,8 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		Signer.sign(transaction.data, Keys.fromPassphrase("sender passphrase"));
 
 		const serialized = Serializer.serialize(transaction);
-		assert.equal(serialized.toString("hex"),
+		assert.equal(
+			serialized.toString("hex"),
 			"ff" + // Header
 				"02" + // Version
 				"1e" + // Network
@@ -170,7 +172,8 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		Signer.multiSign(transaction.data, Keys.fromPassphrase("passphrase 2"), 2);
 
 		const serialized = Serializer.serialize(transaction);
-		assert.equal(serialized.toString("hex"),
+		assert.equal(
+			serialized.toString("hex"),
 			"ff" + // Header
 				"02" + // Version
 				"1e" + // Network
@@ -213,7 +216,8 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		Signer.sign(transaction.data, Keys.fromPassphrase("sender passphrase"));
 
 		const serialized = Serializer.serialize(transaction);
-		assert.equal(serialized.toString("hex"),
+		assert.equal(
+			serialized.toString("hex"),
 			"ff" + // Header
 				"02" + // Version
 				"1e" + // Network
@@ -256,7 +260,8 @@ describe("Transaction serializer / deserializer", ({ it, assert, beforeAll }) =>
 		Signer.sign(transaction.data, Keys.fromPassphrase("sender passphrase"));
 		const serialized = Serializer.serialize(transaction);
 
-		assert.equal(serialized.toString("hex"),
+		assert.equal(
+			serialized.toString("hex"),
 			"ff011e01000000000316a0b23be3408a4af227280bb005e9a136e0dbdd86860516850e5c29c1829113c800000000000000006400000000000000000000001e66314f1ccb9741d6f1a6f9b26ed563c439fc1a9430450221008067d1beb623f2e7dbcb8580c0036a2d4a59c1a64fc3ba66f05fcea5a0614c6302203e94b41d50ca69498e4970d8a289c431474728e26652db8889bec4d8d0001144",
 		);
 	});
