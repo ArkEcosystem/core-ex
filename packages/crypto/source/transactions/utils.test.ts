@@ -79,21 +79,19 @@ const createRandomTx = (type) => {
 	return transaction;
 };
 
+const transactionData = { ...transactionDataFixture };
+const transactionDataJSON = {
+	...transactionData,
+	...{ amount: transactionData.amount.toFixed(), fee: transactionData.fee.toFixed() },
+};
+
 describe<{
 	config: NetworkConfig;
-	transactionData: ITransactionData;
-	transactionDataJSON: any;
 }>("Transaction", ({ it, assert, beforeAll, afterAll }) => {
 	beforeAll((context) => {
 		context.config = configManager.all();
 
 		configManager.setFromPreset("devnet");
-
-		context.transactionData = { ...transactionDataFixture };
-		context.transactionDataJSON = {
-			...context.transactionData,
-			...{ amount: context.transactionData.amount.toFixed(), fee: context.transactionData.fee.toFixed() },
-		};
 	});
 
 	afterAll((context) => {
@@ -140,11 +138,10 @@ describe<{
 	});
 
 	it("toBytes / fromBytes - should create a transaction", (context) => {
-		const hex = TransactionUtils.toBytes(context.transactionData).toString("hex");
+		const hex = TransactionUtils.toBytes(transactionData).toString("hex");
 		const transaction = TransactionFactory.fromHex(hex);
 		assert.instance(transaction, Transaction);
-		console.log(transaction.toJson(), context.transactionDataJSON);
-		assert.equal(transaction.toJson(), context.transactionDataJSON);
+		assert.equal(transaction.toJson(), transactionDataJSON);
 	});
 
 	it("toBytes / fromBytes - should throw when getting garbage", () => {
