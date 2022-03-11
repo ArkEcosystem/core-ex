@@ -390,12 +390,6 @@ importers:
       reflect-metadata: 0.1.13
       type-fest: 0.21.3
 
-  packages/core-contracts/__tests__/__stubs__/stub-plugin:
-    specifiers: {}
-
-  packages/core-contracts/__tests__/__stubs__/stub-plugin-with-defaults:
-    specifiers: {}
-
   packages/core-crypto-address-base58:
     specifiers:
       '@arkecosystem/core-container': workspace:*
