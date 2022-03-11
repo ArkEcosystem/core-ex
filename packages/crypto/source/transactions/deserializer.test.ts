@@ -366,7 +366,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 				.addPayment("AJWRd23HNEhPLkK1ymMnwnDBX2a7QBZqff", "1555")
 				.sign("dummy passphrase")
 				.build(),
-		, err => err instanceof InvalidTransactionBytesError);
+		err => err instanceof InvalidTransactionBytesError);
 	});
 
 	it("deserialize - others - should throw if type is not supported", () => {
