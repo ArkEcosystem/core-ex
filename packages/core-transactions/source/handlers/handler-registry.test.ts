@@ -239,8 +239,9 @@ describe<{
 		const keys: Contracts.Crypto.IKeyPair = await context.app
 			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
 			.fromMnemonic("secret");
-		const slots: Contracts.Crypto.Slots = await context.app
-			.get<Contracts.Crypto.Slots>(Identifiers.Cryptography.Time.Slots);
+		const slots: Contracts.Crypto.Slots = await context.app.get<Contracts.Crypto.Slots>(
+			Identifiers.Cryptography.Time.Slots,
+		);
 
 		const data: Contracts.Crypto.ITransactionData = {
 			amount: BigNumber.make("200000000"),
