@@ -75,7 +75,7 @@ export class DatabaseInteraction {
 			await this.#emitTransactionEvents(transaction);
 		}
 
-		this.events.dispatch(Enums.BlockEvent.Applied, block.data);
+		await this.events.dispatch(Enums.BlockEvent.Applied, block.data);
 	}
 
 	public async revertBlock(block: Contracts.Crypto.IBlock): Promise<void> {
@@ -83,10 +83,10 @@ export class DatabaseInteraction {
 		await this.blockState.revertBlock(block);
 
 		for (let index = block.transactions.length - 1; index >= 0; index--) {
-			this.events.dispatch(Enums.TransactionEvent.Reverted, block.transactions[index].data);
+			await this.events.dispatch(Enums.TransactionEvent.Reverted, block.transactions[index].data);
 		}
 
-		this.events.dispatch(Enums.BlockEvent.Reverted, block.data);
+		await this.events.dispatch(Enums.BlockEvent.Reverted, block.data);
 	}
 
 	public async restoreCurrentRound(): Promise<void> {
@@ -106,20 +106,15 @@ export class DatabaseInteraction {
 	}
 
 	async #initializeLastBlock(): Promise<void> {
-		// Ensure the config manager is initialized, before attempting to call `fromData`
-		// which otherwise uses potentially wrong milestones.
-		let lastHeight = 1;
-		const latest: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
-		if (latest) {
-			lastHeight = latest.data.height;
-		}
-
-		this.configuration.setHeight(lastHeight);
-
 		let lastBlock: Contracts.Crypto.IBlock | undefined = await this.databaseService.getLastBlock();
 
-		if (!lastBlock) {
+		if (lastBlock) {
+			this.configuration.setHeight(lastBlock.data.height);
+		} else {
+			this.configuration.setHeight(1);
+
 			this.logger.warning("No block found in database");
+
 			lastBlock = await this.#createGenesisBlock();
 		}
 
@@ -143,7 +138,7 @@ export class DatabaseInteraction {
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
-		this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
+		await this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// ! no reason to pass this.emitter
 		handler.emitEvents(transaction, this.events);
