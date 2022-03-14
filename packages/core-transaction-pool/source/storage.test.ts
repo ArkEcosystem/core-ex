@@ -1,9 +1,9 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import fs from "fs-extra";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Storage } from "./";
-import { Stub } from "@arkecosystem/core-test-framework/distribution/uvu/stub";
+import { Stub } from "../../core-test-framework/source/uvu/stub";
 
 const buildTransaction = (nonce: string): Interfaces.ITransaction => {
 	return Transactions.BuilderFactory.transfer()

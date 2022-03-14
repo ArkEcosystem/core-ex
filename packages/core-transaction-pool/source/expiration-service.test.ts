@@ -1,5 +1,5 @@
 import { Container, Utils } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Crypto, Interfaces, Managers } from "@arkecosystem/crypto";
 
 import { ExpirationService } from ".";

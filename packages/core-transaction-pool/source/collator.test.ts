@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Managers } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Collator } from "./";
 
 describe<{

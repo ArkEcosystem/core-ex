@@ -2,7 +2,7 @@ import { Application, Container, Contracts, Services } from "@arkecosystem/core-
 import { ServiceProvider } from "./";
 import child_process from "child_process";
 import { AnySchema } from "joi";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import importFresh from "import-fresh";
 
 const importDefaults = () =>

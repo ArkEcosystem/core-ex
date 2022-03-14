@@ -2,7 +2,7 @@ import { Container, Contracts } from "@arkecosystem/core-kernel";
 import { TransactionFeeToLowError } from "./errors";
 import { Processor } from "./processor";
 import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 const buildTransaction = (nonce: string): Interfaces.ITransaction =>
 	Transactions.BuilderFactory.transfer()

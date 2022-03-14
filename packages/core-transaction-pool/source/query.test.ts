@@ -1,6 +1,6 @@
 import { Container } from "@arkecosystem/core-kernel";
 import { Enums, Identities, Managers, Transactions } from "@arkecosystem/crypto";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Query, QueryIterable } from "./";
 
 describe<{

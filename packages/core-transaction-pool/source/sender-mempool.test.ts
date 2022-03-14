@@ -1,5 +1,5 @@
 import { Container, Contracts } from "@arkecosystem/core-kernel";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Identities, Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import { SenderMempool } from "./";
 
