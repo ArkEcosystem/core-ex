@@ -228,7 +228,7 @@ describe<{
 		spyCall.calledTimes(4);
 	});
 
-	it.only("#checkSlot - should not forge new block if forging is not allowed", async (context) => {
+	it("#checkSlot - should not forge new block if forging is not allowed", async (context) => {
 		const getCurrentRoundResponse = {
 			canForge: true,
 			currentForger: {
