@@ -1,5 +1,5 @@
 import { inject } from "@arkecosystem/core-container";
-import { Contracts, Exceptions,Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { FastifyRequest } from "fastify";
 
 export class GetCommonBlocksController {
