@@ -1624,6 +1624,7 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
@@ -1635,6 +1636,7 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
     devDependencies:
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
       uvu: 0.5.3
 
   packages/core-validation:

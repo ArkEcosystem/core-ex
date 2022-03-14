@@ -24,6 +24,7 @@
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-crypto-config": "workspace:*",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

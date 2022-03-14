@@ -1,6 +1,5 @@
 import { Application, Services } from "@arkecosystem/core-kernel";
 import { Container } from "@arkecosystem/core-container";
-import { Identities, Managers } from "@arkecosystem/crypto";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { describe } from "../../../core-test-framework/source";
@@ -16,6 +15,7 @@ import { TransferTransactionHandler } from "../../../core-crypto-transaction-tra
 import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
 import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
 import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
@@ -29,9 +29,9 @@ abstract class TestTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test";
 
-	deserialize(buf: ByteBuffer): void {}
+	async deserialize(buf: ByteBuffer): Promise<void> {}
 
-	serialize(): ByteBuffer | undefined {
+	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
 	}
 
@@ -47,9 +47,9 @@ abstract class TestWithDependencyTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test_with_dependency";
 
-	deserialize(buf: ByteBuffer): void {}
+	async deserialize(buf: ByteBuffer): Promise<void> {}
 
-	serialize(): ByteBuffer | undefined {
+	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
 	}
 
@@ -124,8 +124,6 @@ describe<{
 		app.bind<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
 			.to(Services.Attributes.AttributeSet)
 			.inSingletonScope();
-		app.bind(Identifiers.DatabaseBlockRepository).toConstantValue({});
-		app.bind(Identifiers.DatabaseTransactionRepository).toConstantValue({});
 		app.bind(Identifiers.WalletRepository).toConstantValue({});
 		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 
@@ -141,17 +139,12 @@ describe<{
 		app.bind(Identifiers.TransactionHandlerConstructors).toDynamicValue(
 			ServiceProvider.getTransactionHandlerConstructorsBinding(),
 		);
+		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+
+		const config = app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		config.getMilestone().aip11 = false;
 
 		context.app = app;
-
-		Managers.configManager.getMilestone().aip11 = false;
-	});
-
-	afterEach(() => {
-		Managers.configManager.getMilestone().aip11 = undefined;
-		try {
-			Transactions.TransactionRegistry.deregisterTransactionType(TestTransaction);
-		} catch {}
 	});
 
 	it("should register core transaction types", async (context) => {
@@ -169,23 +162,9 @@ describe<{
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
 					Contracts.Transactions.InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.Transfer,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.ValidatorRegistration,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.ValidatorRegistration,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-					2,
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
 					Contracts.Transactions.InternalTransactionType.from(
@@ -195,37 +174,21 @@ describe<{
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
 					Contracts.Transactions.InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.Vote,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.MultiSignature,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Contracts.Transactions.InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.MultiSignature,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-					2,
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
 					Contracts.Transactions.InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.MultiPayment,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-					2,
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
 					Contracts.Transactions.InternalTransactionType.from(
 						Contracts.Crypto.TransactionType.ValidatorRegistration,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-					2,
 				),
 			]),
 		);
@@ -273,7 +236,12 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const keys = Identities.Keys.fromPassphrase("secret");
+		const keys: Contracts.Crypto.IKeyPair = await context.app
+			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.fromMnemonic("secret");
+		const slots: Contracts.Crypto.Slots = await context.app
+			.get<Contracts.Crypto.Slots>(Identifiers.Cryptography.Time.Slots);
+
 		const data: Contracts.Crypto.ITransactionData = {
 			amount: BigNumber.make("200000000"),
 			asset: {
@@ -283,7 +251,7 @@ describe<{
 			nonce: BigNumber.ONE,
 			recipientId: "APyFYXxXtUrvZFnEuwLopfst94GMY5Zkeq",
 			senderPublicKey: keys.publicKey,
-			timestamp: Slots.getTime(),
+			timestamp: slots.getTime(),
 			type: TEST_TRANSACTION_TYPE,
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 1,
@@ -328,7 +296,7 @@ describe<{
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE,
 		);
 
-		Managers.configManager.getMilestone().aip11 = true;
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = true;
 		assert.length(
 			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE,
@@ -346,7 +314,7 @@ describe<{
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE + 1,
 		);
 
-		Managers.configManager.getMilestone().aip11 = true;
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = true;
 		assert.length(
 			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE + 1,
@@ -412,13 +380,13 @@ describe<{
 			Contracts.Crypto.TransactionTypeGroup.Core,
 		);
 
-		Managers.configManager.getMilestone().aip11 = false;
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = false;
 		await assert.rejects(
 			() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
 			"DeactivatedTransactionHandlerError",
 		);
 
-		Managers.configManager.getMilestone().aip11 = true;
+		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = true;
 		assert.instance(
 			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
 			ValidatorResignationTransactionHandler,
