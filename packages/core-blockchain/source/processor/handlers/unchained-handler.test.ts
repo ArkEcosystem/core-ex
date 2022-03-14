@@ -1,7 +1,6 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Services } from "@arkecosystem/core-kernel";
-import { Actions } from "@arkecosystem/core-state";
+import { Utils } from "@arkecosystem/core-kernel";
 
 import { describe, Sandbox } from "../../../../core-test-framework";
 import { BlockProcessorResult } from "../contracts";
@@ -15,6 +14,7 @@ describe<{
 	database: any;
 	databaseInteractions: any;
 	roundState: any;
+	triggers: {};
 }>("UnchainedHandler", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		context.logger = {
@@ -48,6 +48,10 @@ describe<{
 			getActiveDelegates: () => [],
 		};
 
+		context.triggers = {
+			call: () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
@@ -58,13 +62,10 @@ describe<{
 		context.sandbox.app.bind(Identifiers.RoundState).toConstantValue(context.roundState);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		context.sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
-		context.sandbox.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
+		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
 	});
 
-	it.skip("when it is a double forging case should return Rollback if block generator is active delegate", async (context) => {
+	it("when it is a double forging case should return Rollback if block generator is active delegate", async (context) => {
 		const unchainedHandler = context.sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 		unchainedHandler.initialize(true);
 
@@ -78,8 +79,9 @@ describe<{
 			},
 		};
 
+		stub(Utils.roundCalculator, "calculateRound").returnValue({});
 		stub(context.blockchain, "getLastBlock").returnValue(lastBlock);
-		stub(context.roundState, "getActiveDelegates").returnValue(
+		stub(context.triggers, "call").resolvedValue(
 			[
 				block.data.generatorPublicKey,
 				"02aea83a44f1d6b073e5bcffb4176bbe3c51dcd0e96a793a88f3a6135600224adf",
@@ -94,7 +96,7 @@ describe<{
 		assert.equal(result, BlockProcessorResult.Rollback);
 	});
 
-	it.skip("when it is a double forging case should return Rejected if block generator is not an active delegate", async (context) => {
+	it("when it is a double forging case should return Rejected if block generator is not an active delegate", async (context) => {
 		const unchainedHandler = context.sandbox.app.resolve<UnchainedHandler>(UnchainedHandler);
 		unchainedHandler.initialize(true);
 
@@ -108,8 +110,9 @@ describe<{
 			},
 		};
 
+		stub(Utils.roundCalculator, "calculateRound").returnValue({});
 		stub(context.blockchain, "getLastBlock").returnValue(lastBlock);
-		stub(context.roundState, "getActiveDelegates").returnValue(
+		stub(context.triggers, "call").resolvedValue(
 			[
 				"02aea83a44f1d6b073e5bcffb4176bbe3c51dcd0e96a793a88f3a6135600224adf",
 				"03a3c6fd74a23fbe1e02f08d9c626ebb255b48de7ba8c283ee27c9303be81a2933",
