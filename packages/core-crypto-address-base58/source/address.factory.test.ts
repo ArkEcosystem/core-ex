@@ -17,11 +17,13 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		context.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
-			milestones: [{
-				address: {
-					base58: 23,
+			milestones: [
+				{
+					address: {
+						base58: 23,
+					},
 				},
-			}],
+			],
 		});
 	});
 
