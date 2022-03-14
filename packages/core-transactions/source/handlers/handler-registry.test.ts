@@ -1,13 +1,16 @@
-import { Application, Container, Services } from "@arkecosystem/core-kernel";
-import { describe } from "../../core-test-framework/source";
-import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
-import { ByteBuffer } from "@arkecosystem/utils";
+import { Application, Services } from "@arkecosystem/core-kernel";
+import { Container } from "@arkecosystem/core-container";
+// import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
+import { Identities, Managers } from "@arkecosystem/crypto";
+import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { describe } from "../../../core-test-framework/source";
 
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
-import { One, TransactionHandler, TransactionHandlerConstructor, Two } from "./index";
-import { InvalidTransactionTypeError } from "@arkecosystem/core-errors";
+import { TransactionHandler, TransactionHandlerConstructor } from "./index";
+import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
@@ -15,11 +18,10 @@ const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE = 9;
 
 const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
-const { schemas } = Transactions;
 
-abstract class TestTransaction extends Transactions.Transaction {
+abstract class TestTransaction extends Transaction {
 	public static type: number = TEST_TRANSACTION_TYPE;
-	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test";
 
 	deserialize(buf: ByteBuffer): void {}
@@ -28,16 +30,16 @@ abstract class TestTransaction extends Transactions.Transaction {
 		return undefined;
 	}
 
-	public static getSchema(): Transactions.schemas.TransactionSchema {
+	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
 			$id: "test",
 		});
 	}
 }
 
-abstract class TestWithDependencyTransaction extends Transactions.Transaction {
+abstract class TestWithDependencyTransaction extends Transaction {
 	public static type: number = DEPENDANT_TEST_TRANSACTION_TYPE;
-	public static typeGroup: number = Enums.TransactionTypeGroup.Test;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test_with_dependency";
 
 	deserialize(buf: ByteBuffer): void {}
@@ -46,7 +48,7 @@ abstract class TestWithDependencyTransaction extends Transactions.Transaction {
 		return undefined;
 	}
 
-	public static getSchema(): Transactions.schemas.TransactionSchema {
+	public static getSchema(): schemas.TransactionSchema {
 		return schemas.extend(schemas.transactionBaseSchema, {
 			$id: "test_with_dependency",
 		});
@@ -62,7 +64,7 @@ class TestTransactionHandler extends TransactionHandler {
 		return [];
 	}
 
-	getConstructor(): Transactions.TransactionConstructor {
+	getConstructor(): Contracts.Crypto.TransactionConstructor {
 		return TestTransaction;
 	}
 
@@ -74,9 +76,9 @@ class TestTransactionHandler extends TransactionHandler {
 		return true;
 	}
 
-	async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
-	async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 }
 
 class TestWithDependencyTransactionHandler extends TransactionHandler {
@@ -88,7 +90,7 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 		return [];
 	}
 
-	getConstructor(): Transactions.TransactionConstructor {
+	getConstructor(): Contracts.Crypto.TransactionConstructor {
 		return TestWithDependencyTransaction;
 	}
 
@@ -100,16 +102,16 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 		return true;
 	}
 
-	async applyToRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
-	async revertForRecipient(transaction: Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 }
 
 describe<{
 	app: Application;
 }>("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach((context) => {
-		const app = new Application(new Container.Container());
+		const app = new Application(new Container());
 		app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.LogService).toConstantValue({});
@@ -122,16 +124,12 @@ describe<{
 		app.bind(Identifiers.WalletRepository).toConstantValue({});
 		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 
-		app.bind(Identifiers.TransactionHandler).to(One.TransferTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.TransferTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(One.DelegateRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.DelegateRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(One.VoteTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.VoteTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(One.MultiSignatureRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.MultiSignatureRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.MultiPaymentTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(Two.DelegateResignationTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(VoteTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(MultiPaymentTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(DelegateResignationTransactionHandler);
 
 		app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
 		app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
@@ -159,68 +157,68 @@ describe<{
 		await assert.resolves(() =>
 			Promise.all([
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Transfer,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.Transfer,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Transfer,
-						Enums.TransactionTypeGroup.Core,
-					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.DelegateRegistration,
-						Enums.TransactionTypeGroup.Core,
-					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.DelegateRegistration,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.Transfer,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 					2,
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Vote,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.ValidatorRegistration,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.Vote,
-						Enums.TransactionTypeGroup.Core,
-					),
-					2,
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.MultiSignature,
-						Enums.TransactionTypeGroup.Core,
-					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.MultiSignature,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.ValidatorRegistration,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 					2,
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.MultiPayment,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.Vote,
+						Contracts.Crypto.TransactionTypeGroup.Core,
+					),
+				),
+				transactionHandlerRegistry.getRegisteredHandlerByType(
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.Vote,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 					2,
 				),
 				transactionHandlerRegistry.getRegisteredHandlerByType(
-					Transactions.InternalTransactionType.from(
-						Enums.TransactionType.DelegateRegistration,
-						Enums.TransactionTypeGroup.Core,
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.MultiSignature,
+						Contracts.Crypto.TransactionTypeGroup.Core,
+					),
+				),
+				transactionHandlerRegistry.getRegisteredHandlerByType(
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.MultiSignature,
+						Contracts.Crypto.TransactionTypeGroup.Core,
+					),
+					2,
+				),
+				transactionHandlerRegistry.getRegisteredHandlerByType(
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.MultiPayment,
+						Contracts.Crypto.TransactionTypeGroup.Core,
+					),
+					2,
+				),
+				transactionHandlerRegistry.getRegisteredHandlerByType(
+					Contracts.Transactions.InternalTransactionType.from(
+						Contracts.Crypto.TransactionType.ValidatorRegistration,
+						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
 					2,
 				),
@@ -271,18 +269,18 @@ describe<{
 		);
 
 		const keys = Identities.Keys.fromPassphrase("secret");
-		const data: Crypto.ITransactionData = {
-			amount: Utils.BigNumber.make("200000000"),
+		const data: Contracts.Crypto.ITransactionData = {
+			amount: BigNumber.make("200000000"),
 			asset: {
 				test: 256,
 			},
-			fee: Utils.BigNumber.make("10000000"),
-			nonce: Utils.BigNumber.ONE,
+			fee: BigNumber.make("10000000"),
+			nonce: BigNumber.ONE,
 			recipientId: "APyFYXxXtUrvZFnEuwLopfst94GMY5Zkeq",
 			senderPublicKey: keys.publicKey,
-			timestamp: Crypto.Slots.getTime(),
+			timestamp: Slots.getTime(),
 			type: TEST_TRANSACTION_TYPE,
-			typeGroup: Enums.TransactionTypeGroup.Test,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 1,
 		};
 
@@ -356,23 +354,23 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const internalTransactionType = Transactions.InternalTransactionType.from(
+		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			TEST_TRANSACTION_TYPE,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 		assert.instance(
 			transactionHandlerRegistry.getRegisteredHandlerByType(internalTransactionType),
 			TestTransactionHandler,
 		);
 
-		const invalidInternalTransactionType = Transactions.InternalTransactionType.from(
+		const invalidInternalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			999,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 
 		await assert.rejects(() => {
 			transactionHandlerRegistry.getRegisteredHandlerByType(invalidInternalTransactionType);
-		}, InvalidTransactionTypeError);
+		}, Exceptions.InvalidTransactionTypeError);
 	});
 
 	it("should return a activated custom handler", async (context) => {
@@ -381,22 +379,22 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const internalTransactionType = Transactions.InternalTransactionType.from(
+		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			TEST_TRANSACTION_TYPE,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 		assert.instance(
 			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType),
 			TestTransactionHandler,
 		);
 
-		const invalidInternalTransactionType = Transactions.InternalTransactionType.from(
+		const invalidInternalTransactionType = Contracts.Transactions.InternalTransactionType.from(
 			999,
-			Enums.TransactionTypeGroup.Test,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 		await assert.rejects(
 			() => transactionHandlerRegistry.getActivatedHandlerByType(invalidInternalTransactionType),
-			InvalidTransactionTypeError,
+			Exceptions.InvalidTransactionTypeError,
 		);
 	});
 
@@ -404,9 +402,9 @@ describe<{
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
-		const internalTransactionType = Transactions.InternalTransactionType.from(
-			Enums.TransactionType.DelegateResignation,
-			Enums.TransactionTypeGroup.Core,
+		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
+			Contracts.Crypto.TransactionType.ValidatorResignation,
+			Contracts.Crypto.TransactionTypeGroup.Core,
 		);
 
 		Managers.configManager.getMilestone().aip11 = false;
@@ -418,7 +416,7 @@ describe<{
 		Managers.configManager.getMilestone().aip11 = true;
 		assert.instance(
 			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
-			Two.DelegateResignationTransactionHandler,
+			ValidatorResignationTransactionHandler,
 		);
 	});
 });
