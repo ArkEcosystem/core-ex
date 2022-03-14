@@ -27,6 +27,7 @@ describe<{
 	databaseInteractions: any;
 	configuration: any;
 	slots: any;
+	queue: any;
 	blockData: Contracts.Crypto.IBlockData;
 	blockHeight1: any;
 	blockHeight2: any;
@@ -117,6 +118,16 @@ describe<{
 			getTime: () => 0,
 		};
 
+		context.queue = {
+			on: () => {},
+			stop: () => {},
+			pause: () => {},
+			drain: () => {},
+			clear: () => {},
+			push: () => {},
+			resume: () => {},
+		};
+
 		context.blockData = { height: 30_122 } as Contracts.Crypto.IBlockData;
 
 		context.blockHeight1 = {
@@ -201,11 +212,9 @@ describe<{
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
 
-		context.sandbox.app.bind(Identifiers.QueueFactory).toFactory(
-			() =>
-				async <K, T>(name?: string): Promise<Contracts.Kernel.Queue> =>
-					context.sandbox.app.resolve<Contracts.Kernel.Queue>(MemoryQueue).make(),
-		);
+		context.sandbox.app.bind(Identifiers.QueueFactory).toFactory(() => () => {
+			return context.queue;
+		});
 
 		const getTimeStampForBlock = (height: number) => {
 			switch (height) {
@@ -246,7 +255,7 @@ describe<{
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 		await blockchain.initialize();
 
-		assert.instance(blockchain.getQueue(), MemoryQueue);
+		assert.equal(blockchain.getQueue(), context.queue);
 	});
 
 	it("dispatch should call transition method on stateMachine with the event provided", (context) => {
@@ -366,13 +375,16 @@ describe<{
 	it("dispose should ignore if already stopped", async (context) => {
 		const blockchain = context.sandbox.app.resolve<Blockchain>(Blockchain);
 		const dispatchSpy = spy(blockchain, "dispatch");
+		const stopQueueSpy = stub(context.queue, "stop");
 
 		// @ts-ignore
 		blockchain.stopped = true;
 
+		await blockchain.initialize();
 		await blockchain.dispose();
 
-		dispatchSpy.neverCalled();
+		dispatchSpy.calledWith("STOP");
+		stopQueueSpy.calledOnce();
 	});
 
 	it("setWakeUp should set wakeUpTimeout on stateStore", (context) => {
@@ -575,7 +587,7 @@ describe<{
 		await blockchain.initialize();
 
 		// @ts-ignore
-		const queuePushSpy = spy(blockchain.queue, "push");
+		const queuePushSpy = spy(context.queue, "push");
 
 		blockchain.enqueueBlocks([]);
 
@@ -590,8 +602,7 @@ describe<{
 		await blockchain.initialize();
 
 		stub(context.stateStore, "getLastDownloadedBlock").returnValue({ height: 23_111 });
-		// @ts-ignore
-		const queuePushSpy = stub(blockchain.queue, "push");
+		const queuePushSpy = stub(context.queue, "push");
 		const setBlocksSpy = stub(ProcessBlocksJob.prototype, "setBlocks");
 
 		blockchain.enqueueBlocks([blockData]);
@@ -608,8 +619,7 @@ describe<{
 		await blockchain.initialize();
 
 		stub(context.stateStore, "getLastDownloadedBlock").returnValue({ height: 23_111 });
-		// @ts-ignore
-		const queuePushSpy = spy(blockchain.queue, "push");
+		const queuePushSpy = spy(context.queue, "push");
 		const setBlocksSpy = spy(ProcessBlocksJob.prototype, "setBlocks");
 
 		const blockWith150Txs = {
@@ -632,8 +642,7 @@ describe<{
 		await blockchain.initialize();
 
 		stub(context.stateStore, "getLastDownloadedBlock").returnValue({ height: 23_111 });
-		// @ts-ignore
-		const queuePushSpy = spy(blockchain.queue, "push");
+		const queuePushSpy = spy(context.queue, "push");
 		const setBlocksSpy = spy(ProcessBlocksJob.prototype, "setBlocks");
 
 		const blocksToEnqueue = [];
@@ -658,8 +667,7 @@ describe<{
 		await blockchain.initialize();
 
 		stub(context.stateStore, "getLastDownloadedBlock").returnValue({ height: 23_111 });
-		// @ts-ignore
-		const queuePushSpy = spy(blockchain.queue, "push");
+		const queuePushSpy = spy(context.queue, "push");
 		const setBlocksSpy = spy(ProcessBlocksJob.prototype, "setBlocks");
 
 		const blockMilestone = { height: 75_600, id: "123" } as Contracts.Crypto.IBlockData;
@@ -924,7 +932,7 @@ describe<{
 
 	it("checkMissingBlocks should skip checkNetworkHealth if last check occurs in past 10 minutes", async (context) => {
 		stub(context.configuration, "getMilestone").returnValue({
-			activeValidators: 51,
+			activeValidators: 9,
 		});
 		const threshold = context.configuration.getMilestone().activeValidators / 3 - 1;
 
