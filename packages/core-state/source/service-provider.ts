@@ -6,7 +6,6 @@ import Joi from "joi";
 import { BuildValidatorRankingAction, GetActiveValidatorsAction } from "./actions";
 import { BlockState } from "./block-state";
 import { DatabaseInteraction } from "./database-interactions";
-import { DatabaseInterceptor } from "./database-interceptor";
 import { DposPreviousRoundState, DposState } from "./dpos";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
@@ -91,11 +90,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionValidatorFactory).toAutoFactory(Identifiers.TransactionValidator);
 
 		this.app.bind(Identifiers.DatabaseInteraction).to(DatabaseInteraction).inSingletonScope();
-		this.app.bind(Identifiers.DatabaseInterceptor).to(DatabaseInterceptor).inSingletonScope();
 
 		this.app.bind(Identifiers.StateBuilder).to(StateBuilder);
 
-		this.registerActions();
+		this.#registerActions();
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
 		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
@@ -121,7 +119,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	private registerActions(): void {
+	#registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("buildValidatorRanking", new BuildValidatorRankingAction());
