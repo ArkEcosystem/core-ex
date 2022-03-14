@@ -1568,6 +1568,7 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/utils': workspace:*
       '@types/better-sqlite3': 5.4.3
@@ -1588,6 +1589,7 @@ importers:
       joi: 17.4.2
     devDependencies:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@types/better-sqlite3': 5.4.3
       '@types/fs-extra': 8.1.2
       import-fresh: 3.3.0
