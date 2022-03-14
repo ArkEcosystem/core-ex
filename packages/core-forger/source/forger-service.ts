@@ -90,7 +90,9 @@ export class ForgerService {
 					const username = this.#usernames[this.#round.nextForger.publicKey];
 
 					this.logger.info(
-						`Next forging validator ${username} (${this.#round.nextForger.publicKey}) is active on this node.`,
+						`Next forging validator ${username} (${
+							this.#round.nextForger.publicKey
+						}) is active on this node.`,
 					);
 
 					await this.blockchain.forceWakeup();
@@ -159,7 +161,9 @@ export class ForgerService {
 	}
 
 	async #loadRound(): Promise<void> {
-		this.#round = await this.app.get<Services.Triggers.Triggers>(Identifiers.TriggerService).call("getCurrentRound");
+		this.#round = await this.app
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.call("getCurrentRound");
 
 		this.#usernames = this.#round.validators.reduce((accumulator, wallet) => {
 			AppUtils.assert.defined<string>(wallet.publicKey);
