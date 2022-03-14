@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe } from "../../../../core-test-framework";
 
+import { describe } from "../../../../core-test-framework";
 import { CheckLater } from "./check-later";
 
 describe<{
@@ -13,13 +13,13 @@ describe<{
 	beforeEach((context) => {
 		context.blockchain = {
 			isStopped: () => false,
-			setWakeUp: () => undefined,
+			setWakeUp: () => {},
 		};
 		context.stateStore = {
 			isWakeUpTimeoutSet: () => false,
 		};
 		context.application = {
-			resolve: () => undefined,
+			resolve: () => {},
 		};
 
 		context.container = new Container();
@@ -28,22 +28,22 @@ describe<{
 		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 	});
 
-	it("should call blockchain.setWakeUp() when !blockchain.isStopped && !stateStore.wakeUpTimeout", (context) => {
+	it("should call blockchain.setWakeUp() when !blockchain.isStopped && !stateStore.wakeUpTimeout", async (context) => {
 		const checkLater = context.container.resolve<CheckLater>(CheckLater);
 
 		const setWakeUpSpy = spy(context.blockchain, "setWakeUp");
-		checkLater.handle();
+		await checkLater.handle();
 
 		setWakeUpSpy.calledOnce();
 	});
 
-	it("should do nothing otherwise", (context) => {
+	it("should do nothing otherwise", async (context) => {
 		const checkLater = context.container.resolve<CheckLater>(CheckLater);
 
 		const setWakeUpSpy = spy(context.blockchain, "setWakeUp");
 
 		stub(context.blockchain, "isStopped").returnValue(true);
-		checkLater.handle();
+		await checkLater.handle();
 
 		setWakeUpSpy.neverCalled();
 	});

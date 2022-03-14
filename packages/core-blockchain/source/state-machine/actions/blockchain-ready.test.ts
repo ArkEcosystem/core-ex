@@ -1,8 +1,8 @@
-import { Enums } from "@arkecosystem/core-kernel";
 import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe } from "../../../../core-test-framework";
+import { Enums } from "@arkecosystem/core-kernel";
 
+import { describe } from "../../../../core-test-framework";
 import { BlockchainReady } from "./blockchain-ready";
 
 describe<{
@@ -14,20 +14,20 @@ describe<{
 }>("BlockchainReady", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.logService = {
-			warning: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
-			debug: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
 		};
 		context.stateStore = {
 			isStarted: () => false,
-			setStarted: () => undefined,
+			setStarted: () => {},
 		};
 		context.eventDispatcher = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 		};
 		context.application = {
-			resolve: () => undefined,
+			resolve: () => {},
 		};
 
 		context.container = new Container();
@@ -37,26 +37,26 @@ describe<{
 		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
 	});
 
-	it("should set stateStore.started = true and dispatch started event", (context) => {
+	it("should set stateStore.started = true and dispatch started event", async (context) => {
 		const blockchainReady = context.container.resolve<BlockchainReady>(BlockchainReady);
 
 		stub(context.stateStore, "isStarted").returnValue(false);
 		const setStartedSpy = spy(context.stateStore, "setStarted");
 		const dispatchSpy = spy(context.eventDispatcher, "dispatch");
-		blockchainReady.handle();
+		await blockchainReady.handle();
 
 		setStartedSpy.calledWith(true);
 		dispatchSpy.calledOnce();
 		dispatchSpy.calledWith(Enums.StateEvent.Started, true);
 	});
 
-	it("should do nothing if stateStore.started is true", (context) => {
+	it("should do nothing if stateStore.started is true", async (context) => {
 		const blockchainReady = context.container.resolve<BlockchainReady>(BlockchainReady);
 
 		const dispatchSpy = spy(context.eventDispatcher, "dispatch");
 
 		stub(context.stateStore, "isStarted").returnValue(true);
-		blockchainReady.handle();
+		await blockchainReady.handle();
 
 		dispatchSpy.neverCalled();
 	});

@@ -25,12 +25,12 @@ describe<{
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 	});
 
-	it("should log 'Blockchain download paused'", (context) => {
+	it("should log 'Blockchain download paused'", async (context) => {
 		const downloadPaused = context.container.resolve<DownloadPaused>(DownloadPaused);
 
 		const infoLoggerSpy = spy(context.logger, "info");
 
-		downloadPaused.handle();
+		await downloadPaused.handle();
 
 		infoLoggerSpy.calledOnce();
 		infoLoggerSpy.calledWith("Blockchain download paused");

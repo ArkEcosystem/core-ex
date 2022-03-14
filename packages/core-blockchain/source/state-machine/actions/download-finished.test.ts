@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe } from "../../../../core-test-framework";
 
+import { describe } from "../../../../core-test-framework";
 import { DownloadFinished } from "./download-finished";
 
 describe<{
@@ -14,25 +14,25 @@ describe<{
 }>("DownloadFinished", ({ beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.queue = {
-			size: () => undefined,
 			isRunning: () => true,
+			size: () => {},
 		};
 		context.blockchain = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 			getQueue: () => context.queue,
 		};
 		context.stateStore = {
 			getNetworkStart: () => false,
-			setNetworkStart: () => undefined,
+			setNetworkStart: () => {},
 		};
 		context.application = {
-			resolve: () => undefined,
+			resolve: () => {},
 		};
 		context.logger = {
-			warn: () => undefined,
-			debug: () => undefined,
-			info: () => undefined,
-			error: () => undefined,
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warn: () => {},
 		};
 
 		context.container = new Container();

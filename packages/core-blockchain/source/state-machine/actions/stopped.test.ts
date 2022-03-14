@@ -25,12 +25,12 @@ describe<{
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 	});
 
-	it("should log 'The blockchain has been stopped'", (context) => {
+	it("should log 'The blockchain has been stopped'", async (context) => {
 		const stopped = context.container.resolve<Stopped>(Stopped);
 
 		const infoLoggerSpy = spy(context.logger, "info");
 
-		stopped.handle();
+		await stopped.handle();
 
 		infoLoggerSpy.calledOnce();
 		infoLoggerSpy.calledWith("The blockchain has been stopped");

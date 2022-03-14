@@ -1,7 +1,7 @@
 import { Container } from "@arkecosystem/core-container";
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe } from "../../../../core-test-framework";
 
+import { describe } from "../../../../core-test-framework";
 import { ExitApp } from "./exit-app";
 
 describe<{
@@ -10,19 +10,19 @@ describe<{
 }>("ExitApp", ({ beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.application = {
-			terminate: () => undefined,
+			terminate: () => {},
 		};
 
 		context.container = new Container();
 		context.container.bind(Identifiers.Application).toConstantValue(context.application);
 	});
 
-	it("should call app.terminate()", (context) => {
+	it("should call app.terminate()", async (context) => {
 		const exitApp = context.container.resolve<ExitApp>(ExitApp);
 
 		const terminateSpy = spy(context.application, "terminate");
 
-		exitApp.handle();
+		await exitApp.handle();
 
 		terminateSpy.calledOnce();
 	});
