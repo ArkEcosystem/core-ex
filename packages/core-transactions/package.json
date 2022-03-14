@@ -24,8 +24,6 @@
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-transaction-validator-registration": "workspace:*",
-		"@arkecosystem/core-crypto-transaction-validator-resignation": "workspace:*",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

@@ -1,6 +1,5 @@
 import { Application, Services } from "@arkecosystem/core-kernel";
 import { Container } from "@arkecosystem/core-container";
-// import { Crypto, Enums, Identities, Interfaces, Managers, Transactions, Utils } from "@arkecosystem/crypto";
 import { Identities, Managers } from "@arkecosystem/crypto";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
@@ -11,6 +10,12 @@ import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { TransactionHandler, TransactionHandlerConstructor } from "./index";
 import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { MultiPaymentTransactionHandler } from "../../../core-crypto-transaction-multi-payment/source/handlers";
+import { MultiSignatureRegistrationTransactionHandler } from "../../../core-crypto-transaction-multi-signature-registration/source/handlers";
+import { TransferTransactionHandler } from "../../../core-crypto-transaction-transfer/source/handlers";
+import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
+import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
+import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
@@ -129,7 +134,7 @@ describe<{
 		app.bind(Identifiers.TransactionHandler).to(VoteTransactionHandler);
 		app.bind(Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransactionHandler);
 		app.bind(Identifiers.TransactionHandler).to(MultiPaymentTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(DelegateResignationTransactionHandler);
+		app.bind(Identifiers.TransactionHandler).to(ValidatorResignationTransactionHandler);
 
 		app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
 		app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
