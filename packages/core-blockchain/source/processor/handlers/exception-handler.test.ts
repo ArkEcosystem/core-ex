@@ -11,7 +11,7 @@ describe<{
 	blockchain: any;
 	application: any;
 	logger: any;
-	databaseInterceptor: any;
+	databaseService: any;
 }>("ExceptionHandler", ({ assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.container = new Container();
@@ -25,7 +25,7 @@ describe<{
 			getLastBlock: () => {},
 			resetLastDownloadedBlock: () => {},
 		};
-		context.databaseInterceptor = {
+		context.databaseService = {
 			getBlock: () => {},
 		};
 		context.application = {
@@ -35,7 +35,7 @@ describe<{
 		context.container.bind(Identifiers.Application).toConstantValue(context.application);
 		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
-		context.container.bind(Identifiers.DatabaseInterceptor).toConstantValue(context.databaseInterceptor);
+		context.container.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
 	});
 
 	const block = { data: { height: 4445, id: "123" } };
@@ -43,7 +43,7 @@ describe<{
 	it("should return Rejected and resetLastDownloadedBlock if block is already forged", async (context) => {
 		const exceptionHandler = context.container.resolve<ExceptionHandler>(ExceptionHandler);
 
-		stub(context.databaseInterceptor, "getBlock").returnValue(block);
+		stub(context.databaseService, "getBlock").returnValue(block);
 		const resetLastDownloadedBlockSpy = spy(context.blockchain, "resetLastDownloadedBlock");
 
 		const result = await exceptionHandler.execute(block as Contracts.Crypto.IBlock);
