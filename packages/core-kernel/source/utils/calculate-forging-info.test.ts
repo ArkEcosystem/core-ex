@@ -26,8 +26,6 @@ describe<{
 			milestones: [{ activeValidators: 4, height: 1 }],
 		});
 
-		console.log(getMilestonesWhichAffectActiveValidatorCount(configuration));
-
 		const milestones = [
 			{ activeValidators: 4, height: 1 },
 			{ activeValidators: 4, height: 5 },

@@ -70,8 +70,6 @@ export const calculateForgingInfo = async (
 		.get<Contracts.Crypto.Slots>(Identifiers.Cryptography.Time.Slots)
 		.getSlotInfo(timestamp, height);
 
-	console.log("SLOT", slotInfo);
-
 	const [currentForger, nextForger] = await findIndex(height, slotInfo.slotNumber, app);
 	const canForge = slotInfo.forgingStatus;
 
