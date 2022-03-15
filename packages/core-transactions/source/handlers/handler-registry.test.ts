@@ -19,12 +19,15 @@ import { MultiSignatureRegistrationTransactionHandler } from "../../../core-cryp
 import { TransferTransactionHandler } from "../../../core-crypto-transaction-transfer/source/handlers";
 import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
 import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
-import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
 import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
+import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
+import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
+import { Signature } from "../../../core-crypto-signature-schnorr/source/signature";
+import { HashFactory } from "../../../core-crypto-hash-bcrypto/source/hash.factory";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { AddressFactory } from "@arkecosystem/core-crypto-address-base58/source/address.factory";
-import { Verifier } from "@arkecosystem/core-crypto-transaction/source";
+import { Serializer, Utils, Verifier } from "@arkecosystem/core-crypto-transaction/source";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
@@ -123,7 +126,7 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 
 describe<{
 	app: Application;
-}>("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
+}>("Registry", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		const app = new Application(new Container());
 
@@ -138,11 +141,16 @@ describe<{
 		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
-		app.bind(Identifiers.Cryptography.Validator).toConstantValue(Validator);
-		app.bind(Identifiers.Cryptography.Transaction.TypeFactory).toConstantValue(TransactionTypeFactory);
-		app.bind(Identifiers.Cryptography.Identity.AddressFactory).toConstantValue(AddressFactory);
-		app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).toConstantValue(PublicKeyFactory);
-		app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue(Verifier);
+		app.bind(Identifiers.Cryptography.Validator).to(Validator);
+		app.bind(Identifiers.Cryptography.Transaction.TypeFactory).to(TransactionTypeFactory);
+		app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
+		app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory);
+		app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory);
+		app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
+		app.bind(Identifiers.Cryptography.Signature).to(Signature);
+		app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
+		app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
+		app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
 
 		app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
 		app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);
@@ -162,8 +170,8 @@ describe<{
 		context.app = app;
 	});
 
-	it.only("should register core transaction types", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+	it("should register core transaction types", async (context) => {
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -214,12 +222,12 @@ describe<{
 			Identifiers.TransactionHandlerProvider,
 		);
 
-		transactionHandlerProvider.isRegistrationRequired = () => false;
-		const stubRegisterHandlers = stub(transactionHandlerProvider, "registerHandlers");
+		stub(transactionHandlerProvider, "isRegistrationRequired").returnValue(false);
+		const registerHandlersSpy = spy(transactionHandlerProvider, "registerHandlers");
 
 		await context.app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
 
-		stubRegisterHandlers.neverCalled();
+		registerHandlersSpy.neverCalled();
 	});
 
 	it("should register a custom type", async (context) => {
@@ -247,7 +255,7 @@ describe<{
 
 	it("should be able to return handler by data", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -286,7 +294,7 @@ describe<{
 	});
 
 	it("should return all registered core handlers", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -295,7 +303,7 @@ describe<{
 
 	it("should return all registered core and custom handlers", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -303,7 +311,7 @@ describe<{
 	});
 
 	it("should return all active core handlers", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -321,7 +329,7 @@ describe<{
 
 	it("should return all active core and custom handlers", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -339,7 +347,7 @@ describe<{
 
 	it("should return a registered custom handler", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -364,7 +372,7 @@ describe<{
 
 	it("should return a activated custom handler", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 
@@ -388,7 +396,7 @@ describe<{
 	});
 
 	it("should not return deactivated custom handler", async (context) => {
-		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
+		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
