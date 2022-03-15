@@ -24,6 +24,9 @@ import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/p
 import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
 import { Signature } from "../../../core-crypto-signature-schnorr/source/signature";
 import { HashFactory } from "../../../core-crypto-hash-bcrypto/source/hash.factory";
+import { Slots } from "../../../core-crypto-time/source/slots";
+import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
+import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { AddressFactory } from "@arkecosystem/core-crypto-address-base58/source/address.factory";
@@ -34,11 +37,30 @@ const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;
 
 const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
+const TEST_DEACTIVATED_TRANSACTION_TYPE = 102;
 
 abstract class TestTransaction extends Transaction {
 	public static type: number = TEST_TRANSACTION_TYPE;
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test";
+
+	async deserialize(buf: ByteBuffer): Promise<void> {}
+
+	async serialize(): Promise<ByteBuffer | undefined> {
+		return undefined;
+	}
+
+	public static getSchema(): schemas.TransactionSchema {
+		return schemas.extend(schemas.transactionBaseSchema, {
+			$id: "test",
+		});
+	}
+}
+
+abstract class TestDeactivatedTransaction extends Transaction {
+	public static type: number = TEST_DEACTIVATED_TRANSACTION_TYPE;
+	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
+	public static key = "deactivated_test";
 
 	async deserialize(buf: ByteBuffer): Promise<void> {}
 
@@ -97,6 +119,32 @@ class TestTransactionHandler extends TransactionHandler {
 	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 }
 
+class TestDeactivatedTransactionHandler extends TransactionHandler {
+	dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
+		return [];
+	}
+
+	walletAttributes(): ReadonlyArray<string> {
+		return [];
+	}
+
+	getConstructor(): Contracts.Crypto.TransactionConstructor {
+		return TestDeactivatedTransaction;
+	}
+
+	async bootstrap(): Promise<void> {
+		return;
+	}
+
+	async isActivated(): Promise<boolean> {
+		return false;
+	}
+
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+}
+
 class TestWithDependencyTransactionHandler extends TransactionHandler {
 	dependencies(): ReadonlyArray<TransactionHandlerConstructor> {
 		return [TestTransactionHandler];
@@ -115,7 +163,7 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 	}
 
 	async isActivated(): Promise<boolean> {
-		return true;
+		return false;
 	}
 
 	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
@@ -163,6 +211,11 @@ describe<{
 		app.bind(Identifiers.TransactionHandlerConstructors).toDynamicValue(
 			ServiceProvider.getTransactionHandlerConstructorsBinding(),
 		);
+
+		app.bind(Identifiers.Cryptography.Time.Slots).to(Slots).inSingletonScope();
+		app.bind(Identifiers.Cryptography.Time.BlockTimeCalculator).to(BlockTimeCalculator).inSingletonScope();
+		app.bind(Identifiers.Cryptography.Time.BlockTimeLookup).to(BlockTimeLookup).inSingletonScope();
+		app.bind(Identifiers.Database.Service).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
@@ -258,10 +311,10 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		const keys: Contracts.Crypto.IKeyPair = await context.app
+		const keys = await context.app
 			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
 			.fromMnemonic("secret");
-		const slots: Contracts.Crypto.Slots = await context.app.get<Contracts.Crypto.Slots>(
+		const slots = await context.app.get<Contracts.Crypto.Slots>(
 			Identifiers.Cryptography.Time.Slots,
 		);
 
@@ -309,7 +362,7 @@ describe<{
 		assert.length(transactionHandlerRegistry.getRegisteredHandlers(), NUMBER_OF_REGISTERED_CORE_HANDLERS + 1);
 	});
 
-	it("should return all active core handlers", async (context) => {
+	it.only("should return all active core handlers", async (context) => {
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
@@ -377,17 +430,19 @@ describe<{
 	});
 
 	it("should not return deactivated custom handler", async (context) => {
+		context.app.bind(Identifiers.TransactionHandler).to(TestDeactivatedTransactionHandler);
+
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
 		const internalTransactionType = Contracts.Transactions.InternalTransactionType.from(
-			Contracts.Crypto.TransactionType.ValidatorResignation,
-			Contracts.Crypto.TransactionTypeGroup.Core,
+			TEST_DEACTIVATED_TRANSACTION_TYPE,
+			Contracts.Crypto.TransactionTypeGroup.Test,
 		);
 
-		assert.instance(
-			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 1),
-			ValidatorResignationTransactionHandler,
+		await assert.rejects(
+			() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 1),
+			"DeactivatedTransactionHandlerError",
 		);
 	});
 });
