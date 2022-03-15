@@ -1,5 +1,5 @@
 import { Container, Contracts, Services } from "@arkecosystem/core-kernel";
-import { describe,Sandbox } from "@arkecosystem/core-test-framework";
+import { describe, Sandbox } from "@arkecosystem/core-test-framework";
 import { Utils } from "@arkecosystem/crypto";
 
 import {

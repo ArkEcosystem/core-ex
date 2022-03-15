@@ -38,16 +38,16 @@ describe<{
 
 	it("fromData - should throw on invalid input data - block property has an unexpected value", () => {
 		const b1 = Object.assign({}, blockWithExceptions, { timestamp: "abcd" });
-		assert.throws(() => BlockFactory.fromData(b1 ));
+		assert.throws(() => BlockFactory.fromData(b1));
 
 		const b2 = Object.assign({}, blockWithExceptions, { totalAmount: "abcd" });
-		assert.throws(() => BlockFactory.fromData(b2 ));
+		assert.throws(() => BlockFactory.fromData(b2));
 	});
 
 	it("fromData - should throw on invalid input data - required block property is missing", () => {
 		const b = Object.assign({}, blockWithExceptions);
 		delete b.generatorPublicKey;
-		assert.throws(() => BlockFactory.fromData(b ));
+		assert.throws(() => BlockFactory.fromData(b));
 	});
 
 	it("fromData - should throw on invalid transaction data", () => {
@@ -56,7 +56,7 @@ describe<{
 
 		delete b.transactions[1].id;
 
-		assert.throws(() => BlockFactory.fromData(b ));
+		assert.throws(() => BlockFactory.fromData(b));
 
 		// Revert changes...
 		b.transactions[1].id = txId;

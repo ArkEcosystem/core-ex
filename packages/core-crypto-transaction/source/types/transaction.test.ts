@@ -5,7 +5,7 @@ import { configManager } from "../managers";
 import { devnet } from "../networks";
 import { Two } from "../transactions/types";
 import { BigNumber } from "../utils/bignum";
-import { BuilderFactory,TransactionFactory } from "./";
+import { BuilderFactory, TransactionFactory } from "./";
 
 const mainnetTxs = [
 	{

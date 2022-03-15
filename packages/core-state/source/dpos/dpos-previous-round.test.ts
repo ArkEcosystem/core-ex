@@ -65,7 +65,7 @@ describe<{
 	it("should get round delegates", async (context) => {
 		const previousRound = await context.dposPreviousRoundStateProv([], context.round);
 
-		assert.containValues(previousRound.getRoundDelegates(), context.walletRepo.allByUsername() );
+		assert.containValues(previousRound.getRoundDelegates(), context.walletRepo.allByUsername());
 	});
 
 	it("should revert blocks", async (context) => {

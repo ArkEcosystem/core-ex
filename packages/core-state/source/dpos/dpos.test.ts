@@ -1,4 +1,4 @@
-import { Contracts,Utils } from "@arkecosystem/core-kernel";
+import { Contracts, Utils } from "@arkecosystem/core-kernel";
 import { describe } from "@arkecosystem/core-test-framework";
 import { Utils as CryptoUtils } from "@arkecosystem/crypto/source";
 import { SATOSHI } from "@arkecosystem/crypto/source/constants";
@@ -136,7 +136,7 @@ describe<{
 
 		assert.equal(context.dposState.getRoundInfo(), context.round);
 		assert.equal(context.dposState.getAllDelegates(), context.walletRepo.allByUsername());
-		assert.containValues(context.dposState.getActiveDelegates(), context.walletRepo.allByUsername() );
-		assert.containValues(context.dposState.getRoundDelegates(), context.walletRepo.allByUsername() );
+		assert.containValues(context.dposState.getActiveDelegates(), context.walletRepo.allByUsername());
+		assert.containValues(context.dposState.getRoundDelegates(), context.walletRepo.allByUsername());
 	});
 });

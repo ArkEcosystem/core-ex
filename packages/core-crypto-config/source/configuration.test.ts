@@ -1,6 +1,6 @@
 import { describe } from "@arkecosystem/core-test-framework";
 
-import { devnet, mainnet,testnet } from "../networks";
+import { devnet, mainnet, testnet } from "../networks";
 import { configManager } from "./";
 
 describe<{

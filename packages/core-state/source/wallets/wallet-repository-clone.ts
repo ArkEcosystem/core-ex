@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct,tagged } from "@arkecosystem/core-container";
+import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
