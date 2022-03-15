@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
 
+import { describe, Sandbox } from "../../core-test-framework";
 import milestones from "../test/fixtures/block-time-milestones.json";
 import { BlockTimeCalculator } from "./block-time-calculator";
 
