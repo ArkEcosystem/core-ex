@@ -29,9 +29,8 @@ import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { AddressFactory } from "@arkecosystem/core-crypto-address-base58/source/address.factory";
 import { Serializer, Utils, Verifier } from "@arkecosystem/core-crypto-transaction/source";
 
-const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
-const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
-const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE = 9;
+const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
+const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;
 
 const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
@@ -317,7 +316,7 @@ describe<{
 
 		assert.length(
 			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE,
+			NUMBER_OF_ACTIVE_CORE_HANDLERS,
 		);
 	});
 
@@ -329,7 +328,7 @@ describe<{
 
 		assert.length(
 			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE + 1,
+			NUMBER_OF_ACTIVE_CORE_HANDLERS + 1,
 		);
 	});
 
