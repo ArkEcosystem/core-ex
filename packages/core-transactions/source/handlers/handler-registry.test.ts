@@ -7,7 +7,7 @@ import { describe } from "../../../core-test-framework/source";
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
-import { TransactionHandler, TransactionHandlerConstructor } from "./index";
+import { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
 import {
 	schemas,
 	Transaction,
@@ -317,12 +317,6 @@ describe<{
 
 		assert.length(
 			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE,
-		);
-
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = true;
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE,
 		);
 	});
@@ -333,12 +327,6 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE + 1,
-		);
-
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = true;
 		assert.length(
 			await transactionHandlerRegistry.getActivatedHandlers(),
 			NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_TRUE + 1,
@@ -370,7 +358,7 @@ describe<{
 		}, Exceptions.InvalidTransactionTypeError);
 	});
 
-	it("should return a activated custom handler", async (context) => {
+	it("should return an activated custom handler", async (context) => {
 		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
@@ -404,15 +392,9 @@ describe<{
 			Contracts.Crypto.TransactionTypeGroup.Core,
 		);
 
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = false;
-		await assert.rejects(
-			() => transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
-			"DeactivatedTransactionHandlerError",
-		);
-
 		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = true;
 		assert.instance(
-			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 2),
+			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 1),
 			ValidatorResignationTransactionHandler,
 		);
 	});
