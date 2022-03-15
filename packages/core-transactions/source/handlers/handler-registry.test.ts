@@ -391,7 +391,6 @@ describe<{
 			Contracts.Crypto.TransactionTypeGroup.Core,
 		);
 
-		context.app.get<Configuration>(Identifiers.Cryptography.Configuration).getMilestone().aip11 = true;
 		assert.instance(
 			await transactionHandlerRegistry.getActivatedHandlerByType(internalTransactionType, 1),
 			ValidatorResignationTransactionHandler,
