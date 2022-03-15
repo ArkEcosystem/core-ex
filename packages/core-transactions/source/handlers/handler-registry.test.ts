@@ -8,14 +8,23 @@ import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { TransactionHandler, TransactionHandlerConstructor } from "./index";
-import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import {
+	schemas,
+	Transaction,
+	TransactionRegistry,
+	TransactionTypeFactory,
+} from "@arkecosystem/core-crypto-transaction";
 import { MultiPaymentTransactionHandler } from "../../../core-crypto-transaction-multi-payment/source/handlers";
 import { MultiSignatureRegistrationTransactionHandler } from "../../../core-crypto-transaction-multi-signature-registration/source/handlers";
 import { TransferTransactionHandler } from "../../../core-crypto-transaction-transfer/source/handlers";
 import { ValidatorResignationTransactionHandler } from "../../../core-crypto-transaction-validator-resignation/source/handlers";
 import { ValidatorRegistrationTransactionHandler } from "../../../core-crypto-transaction-validator-registration/source/handlers";
+import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
 import { VoteTransactionHandler } from "../../../core-crypto-transaction-vote/source/handlers";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Validator } from "@arkecosystem/core-validation/source/validator";
+import { AddressFactory } from "@arkecosystem/core-crypto-address-base58/source/address.factory";
+import { Verifier } from "@arkecosystem/core-crypto-transaction/source";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 10;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS_AIP11_IS_FALSE = 7; // TODO: Check if correct
@@ -117,6 +126,7 @@ describe<{
 }>("Registry", ({ assert, afterEach, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		const app = new Application(new Container());
+
 		app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.LogService).toConstantValue({});
@@ -126,6 +136,13 @@ describe<{
 			.inSingletonScope();
 		app.bind(Identifiers.WalletRepository).toConstantValue({});
 		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
+
+		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
+		app.bind(Identifiers.Cryptography.Validator).toConstantValue(Validator);
+		app.bind(Identifiers.Cryptography.Transaction.TypeFactory).toConstantValue(TransactionTypeFactory);
+		app.bind(Identifiers.Cryptography.Identity.AddressFactory).toConstantValue(AddressFactory);
+		app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).toConstantValue(PublicKeyFactory);
+		app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue(Verifier);
 
 		app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
 		app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);
@@ -139,15 +156,13 @@ describe<{
 		app.bind(Identifiers.TransactionHandlerConstructors).toDynamicValue(
 			ServiceProvider.getTransactionHandlerConstructorsBinding(),
 		);
-		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-		const config = app.get<Configuration>(Identifiers.Cryptography.Configuration);
-		config.getMilestone().aip11 = false;
+		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		context.app = app;
 	});
 
-	it("should register core transaction types", async (context) => {
+	it.only("should register core transaction types", async (context) => {
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
