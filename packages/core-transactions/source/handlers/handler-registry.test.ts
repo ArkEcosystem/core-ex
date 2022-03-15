@@ -27,9 +27,9 @@ import { HashFactory } from "../../../core-crypto-hash-bcrypto/source/hash.facto
 import { Slots } from "../../../core-crypto-time/source/slots";
 import { BlockTimeCalculator } from "../../../core-crypto-time/source/block-time-calculator";
 import { BlockTimeLookup } from "../../../core-crypto-time/source/block-time-lookup";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Validator } from "@arkecosystem/core-validation/source/validator";
-import { AddressFactory } from "@arkecosystem/core-crypto-address-base58/source/address.factory";
+import { Configuration } from "../../../core-crypto-config";
+import { Validator } from "../../../core-validation/source/validator";
+import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
 import { Serializer, Utils, Verifier } from "@arkecosystem/core-crypto-transaction/source";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
