@@ -13,7 +13,8 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"test": "uvu -r tsm source .test.ts"
+		"test": "uvu -r tsm source .test.ts",
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
@@ -23,6 +24,7 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-test-framework": "workspace:*",
 		"uvu": "^0.5.3"
 	},
 	"engines": {

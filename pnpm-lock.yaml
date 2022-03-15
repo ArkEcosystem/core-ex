@@ -813,6 +813,7 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-test-framework': workspace:*
       dayjs: 1.10.7
       uvu: ^0.5.3
     dependencies:
@@ -822,6 +823,7 @@ importers:
       dayjs: 1.10.7
     devDependencies:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-test-framework': link:../core-test-framework
       uvu: 0.5.3
 
   packages/core-crypto-transaction:
