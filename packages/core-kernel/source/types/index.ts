@@ -10,4 +10,4 @@ export type CacheFactory<K, T> = <K, T>() => Promise<Contracts.Kernel.CacheStore
 
 export type PipelineFactory = () => Contracts.Kernel.Pipeline;
 
-export type QueueFactory = () => Contracts.Kernel.Queue;
+export type QueueFactory = () => Promise<Contracts.Kernel.Queue>;

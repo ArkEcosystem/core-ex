@@ -1,11 +1,12 @@
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { sleep } from "@arkecosystem/utils";
-import { describe, Sandbox } from "../../../../../core-test-framework";
-
-import { Container, Contracts, Enums } from "../../../index";
-import { MemoryQueue } from "./memory";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 import sinon from "sinon";
+
+import { describe, Sandbox } from "../../../../../core-test-framework";
+import { QueueEvent } from "../../../enums";
+import { MemoryQueue } from "./memory";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
 
@@ -26,17 +27,17 @@ describe<{
 }>("MemoryQueue", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
 	beforeEach((context) => {
 		context.eventDispatcher = {
-			dispatch: () => undefined,
+			dispatch: () => {},
 		};
 		context.logger = {
-			warning: () => undefined,
+			warning: () => {},
 		};
-		context.jobMethod = () => undefined;
+		context.jobMethod = () => {};
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.driver = context.sandbox.app.resolve<MemoryQueue>(MemoryQueue);
 	});
 
@@ -91,7 +92,10 @@ describe<{
 			methodFinish2 = performance.now();
 		};
 
-		const onDrain = spyFn();
+		let onDrainCount = 0;
+		const onDrain = () => {
+			onDrainCount++;
+		};
 		context.driver.on("drain", onDrain);
 
 		await context.driver.push(new DummyJob(jobMethod1));
@@ -109,7 +113,7 @@ describe<{
 		assert.gt(methodFinish2 - methodFinish1, 4);
 		assert.lt(methodFinish2 - methodFinish1, 6);
 
-		assert.true(onDrain.calledOnce);
+		assert.equal(onDrainCount, 1);
 	});
 
 	it("Clear should clear all jobs when stopped", async (context) => {
@@ -235,8 +239,8 @@ describe<{
 
 		await context.driver.pause();
 
-		assert.true(jobMethod1.calledOnce);
-		assert.true(jobMethod2.notCalled);
+		jobMethod1.calledOnce();
+		jobMethod2.neverCalled();
 
 		assert.is(context.driver.size(), 1);
 		assert.false(context.driver.isRunning());
@@ -525,11 +529,11 @@ describe<{
 		jobMethodStub.calledTimes(2);
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
-			Enums.QueueEvent.Finished,
+			QueueEvent.Finished,
 			sinon.match({
+				data: "dummy_data",
 				driver: "memory",
 				executionTime: sinon.match.number,
-				data: "dummy_data",
 			}),
 		);
 	});
@@ -552,11 +556,11 @@ describe<{
 		warningLoggerSpy.calledTimes(2);
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
-			Enums.QueueEvent.Failed,
+			QueueEvent.Failed,
 			sinon.match({
 				driver: "memory",
-				executionTime: sinon.match.number,
 				error: sinon.match(error),
+				executionTime: sinon.match.number,
 			}),
 		);
 	});
