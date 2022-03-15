@@ -24,9 +24,9 @@
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-crypto-address-base58": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@arkecosystem/core-validation": "workspace:*",
-		"@arkecosystem/core-crypto-address-base58": "workspace:*",
 		"uvu": "^0.5.3"
 	},
 	"engines": {
