@@ -314,10 +314,7 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS,
-		);
+		assert.length(await transactionHandlerRegistry.getActivatedHandlers(), NUMBER_OF_ACTIVE_CORE_HANDLERS);
 	});
 
 	it("should return all active core and custom handlers", async (context) => {
@@ -326,10 +323,7 @@ describe<{
 			Identifiers.TransactionHandlerRegistry,
 		);
 
-		assert.length(
-			await transactionHandlerRegistry.getActivatedHandlers(),
-			NUMBER_OF_ACTIVE_CORE_HANDLERS + 1,
-		);
+		assert.length(await transactionHandlerRegistry.getActivatedHandlers(), NUMBER_OF_ACTIVE_CORE_HANDLERS + 1);
 	});
 
 	it("should return a registered custom handler", async (context) => {
