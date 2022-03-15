@@ -360,7 +360,7 @@ describe<{
 		assert.length(transactionHandlerRegistry.getRegisteredHandlers(), NUMBER_OF_REGISTERED_CORE_HANDLERS + 1);
 	});
 
-	it.only("should return all active core handlers", async (context) => {
+	it("should return all active core handlers", async (context) => {
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
 			Identifiers.TransactionHandlerRegistry,
 		);
