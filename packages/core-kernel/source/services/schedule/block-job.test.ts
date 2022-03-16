@@ -1,6 +1,5 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import sinon from "sinon";
 
 import crypto from "../../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../../core-test-framework";
@@ -8,25 +7,25 @@ import { BlockEvent, ScheduleEvent } from "../../enums";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
 
-const delay = async (timeout) => {
-	await new Promise<void>((resolve) => {
-		setTimeout(() => {
-			resolve();
-		}, timeout);
-	});
-};
-
-const expectFinishedEventData = () =>
-	sinon.match({
-		blockCount: sinon.match.number,
-		executionTime: sinon.match.number,
-	});
-
 describe<{
 	sandbox: Sandbox;
 	job: BlockJob;
 	eventDispatcher: MemoryEventDispatcher;
-}>("BlockJob", ({ assert, beforeEach, it, spy, spyFn, stubFn }) => {
+}>("BlockJob", ({ assert, beforeEach, it, spy, spyFn, match }) => {
+	const expectFinishedEventData = () =>
+		match({
+			blockCount: match.number,
+			executionTime: match.number,
+		});
+
+	const delay = async (timeout) => {
+		await new Promise<void>((resolve) => {
+			setTimeout(() => {
+				resolve();
+			}, timeout);
+		});
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 		context.eventDispatcher = context.sandbox.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher);

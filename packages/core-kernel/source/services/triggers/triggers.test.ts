@@ -1,5 +1,4 @@
 import { Exceptions } from "@arkecosystem/core-contracts";
-import sinon from "sinon";
 
 import { describe } from "../../../../core-test-framework";
 import { ActionArguments } from "../../types";
@@ -213,7 +212,7 @@ describe<{
 
 		assert.undefined(await context.triggers.call<boolean>("count", dummyParameters));
 		before.calledOnce();
-		error.calledWith(dummyParameters, undefined, sinon.match.instanceOf(Error), "before");
+		error.calledWith(dummyParameters, undefined, match.instanceOf(Error), "before");
 	});
 
 	it("should throw error if error is thrown on <before> hook and no error handlers are defined", async (context) => {
@@ -236,7 +235,7 @@ describe<{
 		error.calledWith(
 			dummyParameters,
 			undefined,
-			sinon.match((o) => o instanceof Error && o.message === "Hello World"),
+			match((o) => o instanceof Error && o.message === "Hello World"),
 			"execute",
 		);
 	});

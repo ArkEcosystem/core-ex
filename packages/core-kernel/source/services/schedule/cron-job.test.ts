@@ -1,6 +1,5 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import moment from "moment-timezone";
-import sinon from "sinon";
 
 import { describe, Sandbox } from "../../../../core-test-framework";
 import { Enums } from "../../index";
@@ -20,7 +19,7 @@ describe<{
 	job: CronJob;
 	timeFaker: any;
 	mockEventDispatcher: any;
-}>("CronJob", ({ assert, beforeEach, clock, it, spy, spyFn }) => {
+}>("CronJob", ({ assert, beforeEach, clock, it, spy, spyFn, match }) => {
 	const expectExecutionAfterDelay = (context: any, callback: CronJob, minutes: number): void => {
 		const dispatchSpy = spy(context.mockEventDispatcher, "dispatch");
 
@@ -45,9 +44,9 @@ describe<{
 
 		dispatchSpy.calledWith(
 			Enums.ScheduleEvent.CronJobFinished,
-			sinon.match({
-				executionTime: sinon.match.number,
-				expression: sinon.match.string,
+			match({
+				executionTime: match.number,
+				expression: match.string,
 			}),
 		);
 	};
@@ -75,9 +74,9 @@ describe<{
 
 		dispatchSpy.calledWith(
 			Enums.ScheduleEvent.CronJobFinished,
-			sinon.match({
-				executionTime: sinon.match.number,
-				expression: sinon.match.string,
+			match({
+				executionTime: match.number,
+				expression: match.string,
 			}),
 		);
 	};

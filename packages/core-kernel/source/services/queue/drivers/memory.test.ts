@@ -2,7 +2,6 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { sleep } from "@arkecosystem/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
-import sinon from "sinon";
 
 import { describe, Sandbox } from "../../../../../core-test-framework";
 import { QueueEvent } from "../../../enums";
@@ -24,7 +23,7 @@ describe<{
 	eventDispatcher: any;
 	logger: any;
 	jobMethod: any;
-}>("MemoryQueue", ({ assert, beforeEach, it, spy, spyFn, stub, stubFn }) => {
+}>("MemoryQueue", ({ assert, beforeEach, it, spy, spyFn, stubFn, match }) => {
 	beforeEach((context) => {
 		context.eventDispatcher = {
 			dispatch: () => {},
@@ -530,10 +529,10 @@ describe<{
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
 			QueueEvent.Finished,
-			sinon.match({
+			match({
 				data: "dummy_data",
 				driver: "memory",
-				executionTime: sinon.match.number,
+				executionTime: match.number,
 			}),
 		);
 	});
@@ -557,10 +556,10 @@ describe<{
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
 			QueueEvent.Failed,
-			sinon.match({
+			match({
 				driver: "memory",
-				error: sinon.match(error),
-				executionTime: sinon.match.number,
+				error: match(error),
+				executionTime: match.number,
 			}),
 		);
 	});
