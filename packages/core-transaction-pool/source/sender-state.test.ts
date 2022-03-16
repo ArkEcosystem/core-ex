@@ -45,7 +45,10 @@ describe<{
 		context.container.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
 		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.emitter);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.bind(Identifiers.Cryptography.Time.BlockTimeCalculator).to(BlockTimeCalculator).inSingletonScope();
+		context.container
+			.bind(Identifiers.Cryptography.Time.BlockTimeCalculator)
+			.to(BlockTimeCalculator)
+			.inSingletonScope();
 		context.container.bind(Identifiers.Cryptography.Time.BlockTimeLookup).toConstantValue({
 			getBlockTimeLookup: (height: number) => {
 				switch (height) {
@@ -54,7 +57,7 @@ describe<{
 					default:
 						throw new Error(`Test scenarios should not hit this line`);
 				}
-			}
+			},
 		});
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);

@@ -21,7 +21,9 @@ describe<{
 		context.logger = { debug: () => undefined };
 
 		context.container = new Container();
-		context.container.bind(Identifiers.TransactionPoolSenderMempoolFactory).toConstantValue(context.createSenderMempool);
+		context.container
+			.bind(Identifiers.TransactionPoolSenderMempoolFactory)
+			.toConstantValue(context.createSenderMempool);
 		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
 		context.container.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory);
@@ -31,7 +33,7 @@ describe<{
 		context.config = context.container.get<Configuration>(Identifiers.Cryptography.Configuration);
 
 		const factory = context.container.get<Contracts.Crypto.IPublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKeyFactory
+			Identifiers.Cryptography.Identity.PublicKeyFactory,
 		);
 
 		context.createPublicKey = async (mnemonic: string) => await factory.fromMnemonic(mnemonic);
@@ -54,9 +56,7 @@ describe<{
 			isDisposable: () => false,
 		};
 
-		context.createSenderMempool
-			.returnValueNth(0, senderMempool1)
-			.returnValueNth(1, senderMempool2);
+		context.createSenderMempool.returnValueNth(0, senderMempool1).returnValueNth(1, senderMempool2);
 
 		const transaction1 = {
 			id: "transaction1-id",
@@ -82,8 +82,7 @@ describe<{
 			isDisposable: () => false,
 		};
 
-		context.createSenderMempool
-			.returnValue(senderMempool);
+		context.createSenderMempool.returnValue(senderMempool);
 
 		const transaction = {
 			id: "transaction-id",
@@ -169,9 +168,7 @@ describe<{
 			isDisposable: () => false,
 		};
 
-		context.createSenderMempool
-			.returnValueNth(0, senderMempool1)
-			.returnValueNth(1, senderMempool2);
+		context.createSenderMempool.returnValueNth(0, senderMempool1).returnValueNth(1, senderMempool2);
 
 		const transaction1 = {
 			id: "transaction1-id",
