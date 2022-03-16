@@ -1,30 +1,98 @@
-import { Application, Utils } from "@arkecosystem/core-kernel";
+import { Application, Services, Utils } from "@arkecosystem/core-kernel";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Container, injectable } from "@arkecosystem/core-container";
 import { BigNumber } from "@arkecosystem/utils";
-import { SinonSpy } from "sinon";
 import { describe } from "../../../core-test-framework";
+import { AddressFactory } from "../../../core-crypto-address-base58/source/address.factory";
+import { KeyPairFactory } from "../../../core-crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../../core-crypto-key-pair-schnorr/source/public";
 
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
-import { setUp } from "../../test/setup";
-import { WalletRepository } from "../wallets";
+import { registerIndexers, WalletRepository } from "../wallets";
 import { DposState } from "./dpos";
 import { Configuration } from "../../../core-crypto-config";
+import { walletFactory } from "../wallets/wallet-factory";
+import { spy } from "sinon";
 
 describe<{
 	app: Application;
 	dposState: DposState;
 	walletRepo: WalletRepository;
-	logger: SinonSpy;
 	round: Contracts.Shared.RoundInfo;
-	configuration: Configuration;
+	configuration: Contracts.Crypto.IConfiguration;
+	logger: Contracts.Kernel.Logger;
 }>("dpos", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
-		const env = await setUp();
+		context.logger = {
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
+		} as any;
 
-		context.dposState = env.dPosState;
-		context.walletRepo = env.walletRepo;
-		context.logger = env.spies.logger.debug;
-		context.app = env.sandbox.app;
+		context.app = new Application(new Container());
+		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+
+		context.configuration = context.app.get<Contracts.Crypto.IConfiguration>(
+			Identifiers.Cryptography.Configuration,
+		);
+		context.configuration.setConfig({
+			milestones: [
+				{
+					address: {
+						base58: 23,
+					},
+				},
+			],
+		} as any);
+
+		context.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
+		context.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
+
+		context.app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
+		const attributes = context.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes);
+		attributes.set("validator");
+		attributes.set("validator.username");
+		attributes.set("validator.voteBalance");
+		attributes.set("validator.producedBlocks");
+		attributes.set("validator.forgedTotal");
+		attributes.set("validator.approval");
+		attributes.set("vote");
+		attributes.set("validator.resigned");
+		attributes.set("validator.rank");
+		attributes.set("validator.round");
+
+		@injectable()
+		class MockEventDispatcher {
+			public dispatch(data) {
+				return spy()(data);
+			}
+
+			public dispatchSync(...data) {
+				return spy()(...data);
+			}
+		}
+
+		context.app.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
+		context.app.bind(Identifiers.WalletRepository).to(WalletRepository);
+		context.app
+			.bind(Identifiers.WalletFactory)
+			.toFactory(({ container }) =>
+				walletFactory(
+					container.get(Identifiers.WalletAttributes),
+					container.get(Identifiers.EventDispatcherService),
+				),
+			);
+
+		registerIndexers(context.app);
+
+		context.app.bind(Identifiers.DposState).to(DposState).inSingletonScope();
+
+		context.dposState = context.app.get<DposState>(Identifiers.DposState);
+		context.walletRepo = context.app.get<WalletRepository>(Identifiers.WalletRepository);
+
 
 		await buildValidatorAndVoteWallets(
 			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
@@ -44,7 +112,7 @@ describe<{
 				.times(1000)
 				.times(BigNumber.SATOSHI);
 
-			assert.equal(delegate.getAttribute<BigNumber>("delegate.voteBalance"), total);
+			assert.equal(delegate.getAttribute<BigNumber>("validator.voteBalance"), total);
 		}
 	});
 
@@ -58,8 +126,8 @@ describe<{
 			const delegate = delegates[i];
 			const total = BigNumber.make((5 - i) * 1000).times(BigNumber.SATOSHI);
 
-			assert.equal(delegate.getAttribute<number>("delegate.rank"), i + 1);
-			assert.equal(delegate.getAttribute<BigNumber>("delegate.voteBalance"), total);
+			assert.equal(delegate.getAttribute<number>("validator.rank"), i + 1);
+			assert.equal(delegate.getAttribute<BigNumber>("validator.voteBalance"), total);
 		}
 	});
 
