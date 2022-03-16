@@ -116,9 +116,7 @@ describe<{
 
 		sandbox.app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
 		sandbox.app.bind(Identifiers.DposState).toConstantValue(context.dposState);
-		sandbox.app
-			.bind(Identifiers.DposPreviousRoundStateProvider)
-			.toConstantValue(context.getDposPreviousRoundState);
+		sandbox.app.bind(Identifiers.DposPreviousRoundStateProvider).toConstantValue(context.getDposPreviousRoundState);
 		sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 		sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 		sandbox.app.bind(Identifiers.TriggerService).toConstantValue(context.triggerService);

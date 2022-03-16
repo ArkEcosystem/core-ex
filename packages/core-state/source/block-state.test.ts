@@ -682,7 +682,9 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.applyTransaction(transaction as Contracts.Crypto.ITransaction));
+			await assert.resolves(() =>
+				context.blockState.applyTransaction(transaction as Contracts.Crypto.ITransaction),
+			);
 		}
 	});
 
@@ -695,7 +697,9 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.revertTransaction(transaction as Contracts.Crypto.ITransaction));
+			await assert.resolves(() =>
+				context.blockState.revertTransaction(transaction as Contracts.Crypto.ITransaction),
+			);
 		}
 	});
 
@@ -714,6 +718,8 @@ describe<{
 		// @ts-ignore
 		delete voteTransaction.data.asset;
 
-		await assert.rejects(() => context.blockState.applyTransaction(voteTransaction as Contracts.Crypto.ITransaction));
+		await assert.rejects(() =>
+			context.blockState.applyTransaction(voteTransaction as Contracts.Crypto.ITransaction),
+		);
 	});
 });
