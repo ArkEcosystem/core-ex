@@ -1,5 +1,5 @@
-import { Contracts, Exceptions } from '@arkecosystem/core-contracts';
-import { BigNumber } from '@arkecosystem/utils';
+import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 import { describe } from "../../core-test-framework";
 
 describe<{

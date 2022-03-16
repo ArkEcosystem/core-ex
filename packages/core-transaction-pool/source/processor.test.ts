@@ -1,9 +1,9 @@
-import { Contracts } from '@arkecosystem/core-contracts';
-import { BigNumber } from '@arkecosystem/utils';
+import { Contracts } from "@arkecosystem/core-contracts";
+import { BigNumber } from "@arkecosystem/utils";
 import { Processor } from "./processor";
 import { describe } from "../../core-test-framework";
-import { Container } from '@arkecosystem/core-container';
-import { Identifiers } from '@arkecosystem/core-contracts';
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Exceptions } from "@arkecosystem/core-contracts";
 
 describe<{
