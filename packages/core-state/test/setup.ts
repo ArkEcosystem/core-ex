@@ -313,7 +313,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	if (!skipBoot) {
 		try {
-		await sandbox.boot();
+			await sandbox.boot();
 		} catch (error) {
 			console.error(error);
 			throw error;

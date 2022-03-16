@@ -34,8 +34,8 @@ describe<{
 	});
 
 	// afterEach((context) => {
-		// context.walletRepo.reset();
-		// context.logger.resetHistory();
+	// context.walletRepo.reset();
+	// context.logger.resetHistory();
 	// });
 
 	it.skip("should update delegate votes of htlc locked balances", async (context) => {
