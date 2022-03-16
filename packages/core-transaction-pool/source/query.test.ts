@@ -37,7 +37,7 @@ describe<{
 				amount: BigNumber.make(100),
 				senderPublicKey: "sender-public-key",
 			},
-			serialized: Buffer.from("dummy")
+			serialized: Buffer.from("dummy"),
 		};
 
 		context.sender1Transaction200 = {
@@ -53,7 +53,7 @@ describe<{
 				amount: BigNumber.make(100),
 				senderPublicKey: "sender-public-key",
 			},
-			serialized: Buffer.from("dummy-2")
+			serialized: Buffer.from("dummy-2"),
 		};
 
 		context.sender2Transaction100 = {
@@ -69,7 +69,7 @@ describe<{
 				amount: BigNumber.make(100),
 				senderPublicKey: "sender-public-key",
 			},
-			serialized: Buffer.from("dummy-3")
+			serialized: Buffer.from("dummy-3"),
 		};
 
 		context.sender2Transaction200 = {
@@ -85,7 +85,7 @@ describe<{
 				amount: BigNumber.make(100),
 				senderPublicKey: "sender-public-key",
 			},
-			serialized: Buffer.from("dummy-4")
+			serialized: Buffer.from("dummy-4"),
 		};
 	});
 
@@ -193,7 +193,10 @@ describe<{
 		]);
 		const result = Array.from(queryIterable.whereKind(context.sender1Transaction200));
 
-		assert.equal(result.map(t => t.id), [context.sender1Transaction200.id, context.sender2Transaction200.id]);
+		assert.equal(
+			result.map((t) => t.id),
+			[context.sender1Transaction200.id, context.sender2Transaction200.id],
+		);
 	});
 
 	it("has - should return true when there are matching transactions", (context) => {
