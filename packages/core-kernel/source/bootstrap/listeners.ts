@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import { BlockEvent, KernelEvent } from "../enums";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
@@ -25,8 +25,8 @@ export class ChangeServiceProviderState implements Contracts.Kernel.EventListene
 			return this.#changeState();
 		}
 
-		if (name === KernelEvent.ServiceProviderBooted && data.#name !== this.#name) {
-			return this.#changeState(data.#name);
+		if (name === KernelEvent.ServiceProviderBooted && data.name !== this.#name) {
+			return this.#changeState(data.name);
 		}
 	}
 
