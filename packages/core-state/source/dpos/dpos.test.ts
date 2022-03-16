@@ -17,7 +17,7 @@ describe<{
 	logger: SinonSpy;
 	round: Contracts.Shared.RoundInfo;
 	configuration: Configuration;
-}>("dpos", ({ it, beforeAll, beforeEach, afterEach, assert }) => {
+}>("dpos", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		const env = await setUp();
 
@@ -32,11 +32,6 @@ describe<{
 			context.walletRepo,
 		);
 	});
-
-	// afterEach((context) => {
-	// context.walletRepo.reset();
-	// context.logger.resetHistory();
-	// });
 
 	it.skip("should update delegate votes of htlc locked balances", async (context) => {
 		await context.dposState.buildVoteBalances();
