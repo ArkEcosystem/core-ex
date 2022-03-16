@@ -398,7 +398,7 @@ describe<{
 		}
 	});
 
-	it.only("should calculate forgingInfo correctly for dynamic block times and changing max delegate numbers", async ({
+	it("should calculate forgingInfo correctly for dynamic block times and changing max delegate numbers", async ({
 		sandbox,
 		configuration,
 	}) => {

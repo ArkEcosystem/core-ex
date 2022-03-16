@@ -47,7 +47,7 @@ describe<{
 		delete process.env.CORE_PATH_CONFIG;
 	});
 
-	it.skip("should bootstrap the application", async (context) => {
+	it("should bootstrap the application", async (context) => {
 		console.error(resolve(__dirname, "../test/stubs/config"));
 		await context.app.bootstrap({
 			flags: {
@@ -60,7 +60,7 @@ describe<{
 		assert.equal(context.app.dirPrefix(), "ark/testnet");
 	});
 
-	it.skip("should bootstrap the application with a config path from process.env", async (context) => {
+	it("should bootstrap the application with a config path from process.env", async (context) => {
 		process.env.CORE_PATH_CONFIG = resolve(__dirname, "../test/stubs/config");
 
 		await context.app.bootstrap({
@@ -70,7 +70,7 @@ describe<{
 		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);
 	});
 
-	it.skip("should fail to bootstrap the application if no token is provided", async (context) => {
+	it("should fail to bootstrap the application if no token is provided", async (context) => {
 		await assert.rejects(
 			() =>
 				context.app.bootstrap({
@@ -80,7 +80,7 @@ describe<{
 		);
 	});
 
-	it.skip("should fail to bootstrap the application if no network is provided", async (context) => {
+	it("should fail to bootstrap the application if no network is provided", async (context) => {
 		await assert.rejects(
 			() =>
 				context.app.bootstrap({
@@ -90,7 +90,7 @@ describe<{
 		);
 	});
 
-	it.skip("should boot the application", async (context) => {
+	it("should boot the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
@@ -392,7 +392,7 @@ describe<{
 		assert.false(context.app.isDownForMaintenance());
 	});
 
-	it.skip("should terminate the application", async (context) => {
+	it("should terminate the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
@@ -441,7 +441,7 @@ describe<{
 		assert.false(context.app.isBooted());
 	});
 
-	it.skip("should terminate the application with an error", async (context) => {
+	it("should terminate the application with an error", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
