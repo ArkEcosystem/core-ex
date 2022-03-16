@@ -1236,8 +1236,6 @@ importers:
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@arkecosystem/utils': link:../utils
       '@pm2/io': 4.3.5
       chalk: 4.1.2
@@ -1259,6 +1257,8 @@ importers:
       semver: 6.3.0
       type-fest: 0.21.3
     devDependencies:
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-time': link:../core-crypto-time
       '@types/cron': 1.7.3
       '@types/fs-extra': 8.1.2
       '@types/functional-red-black-tree': 1.0.1
