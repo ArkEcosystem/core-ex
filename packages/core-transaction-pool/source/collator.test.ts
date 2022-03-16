@@ -25,7 +25,9 @@ describe<{
 		context.logger = { warning: () => undefined, error: () => undefined };
 
 		context.container = new Container();
-		context.container.bind(Identifiers.TransactionValidatorFactory).toConstantValue(context.createTransactionValidator);
+		context.container
+			.bind(Identifiers.TransactionValidatorFactory)
+			.toConstantValue(context.createTransactionValidator);
 		context.container.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
 		context.container.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);

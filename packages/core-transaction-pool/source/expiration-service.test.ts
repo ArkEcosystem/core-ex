@@ -32,10 +32,13 @@ describe<{
 					default:
 						throw new Error(`Test scenarios should not hit this line`);
 				}
-			}
+			},
 		});
 
-		context.container.bind(Identifiers.Cryptography.Time.BlockTimeCalculator).to(BlockTimeCalculator).inSingletonScope();
+		context.container
+			.bind(Identifiers.Cryptography.Time.BlockTimeCalculator)
+			.to(BlockTimeCalculator)
+			.inSingletonScope();
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
 		context.slots = context.container.resolve(Slots);
