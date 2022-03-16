@@ -77,7 +77,7 @@ describe<{
 		context.roundState = {
 			applyBlock: () => undefined,
 			revertBlock: () => undefined,
-			getActiveDelegates: () => undefined,
+			getActiveValidators: () => undefined,
 			restore: () => undefined,
 			detectMissedBlocks: () => undefined,
 		};
@@ -110,9 +110,9 @@ describe<{
 		});
 		container.bind(Container.Identifiers.BlockState).toConstantValue(context.blockState);
 		container.bind(Container.Identifiers.DposState).toConstantValue({
-			buildDelegateRanking: () => undefined,
-			setDelegatesRound: () => undefined,
-			getRoundDelegates: () => undefined,
+			buildValidatorRanking: () => undefined,
+			setValidatorsRound: () => undefined,
+			getRoundValidators: () => undefined,
 		});
 		container.bind(Container.Identifiers.DposPreviousRoundStateProvider).toConstantValue(() => undefined);
 		container.bind(Container.Identifiers.TriggerService).toConstantValue({

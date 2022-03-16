@@ -1,13 +1,15 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Enums } from "@arkecosystem/core-kernel";
-import { RoundState } from "./round-state";
-// import { Blocks, Identities } from "@arkecosystem/crypto";
-import { Sandbox, describe } from "../../core-test-framework";
-import block1760000 from "../test/fixtures/block1760000";
 import Utils from "@arkecosystem/utils";
+import { describe, Sandbox } from "../../core-test-framework";
+import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
+import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
 import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
 
-const dummyBlock = Blocks.BlockFactory.fromData(block1760000);
+import { RoundState } from "./round-state";
+import block1760000 from "../test/fixtures/block1760000";
+
+const dummyBlock = { ...block1760000 };
 
 const generateBlocks = (count: number): any[] => {
 	const blocks: any[] = [];
@@ -60,6 +62,7 @@ describe<{
 	stateStore: any;
 	triggerService: any;
 	walletRepository: any;
+	blockFactory: any;
 }>("Round State", ({ it, assert, beforeAll, beforeEach, spy, stub, stubFn }) => {
 	beforeAll((context) => {
 		context.databaseService = {
@@ -71,9 +74,9 @@ describe<{
 		};
 
 		context.dposState = {
-			buildDelegateRanking: () => undefined,
-			setDelegatesRound: () => undefined,
-			getRoundDelegates: () => undefined,
+			buildValidatorRanking: () => undefined,
+			setValidatorsRound: () => undefined,
+			getRoundValidators: () => undefined,
 		};
 
 		context.getDposPreviousRoundState = () => undefined;
@@ -110,9 +113,17 @@ describe<{
 			debug: () => undefined,
 		};
 
+		context.blockFactory = {
+			fromData: () => undefined,
+		};
+
 		const sandbox = new Sandbox();
 
 		context.app = sandbox.app;
+
+		sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
+		sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
+		sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
 
 		sandbox.app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
 		sandbox.app.bind(Identifiers.DposState).toConstantValue(context.dposState);
@@ -123,7 +134,7 @@ describe<{
 		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
 		sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 
-		sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
+		sandbox.app.bind(Identifiers.Cryptography.Block.Factory).to(context.blockFactory).inSingletonScope();
 
 		context.roundState = sandbox.app.resolve<RoundState>(RoundState);
 	});
@@ -132,13 +143,13 @@ describe<{
 		context.blocks = generateBlocks(3);
 	});
 
-	it("getBlocksForRound - should return array of blocks when all requested blocks are in stateStore", async (context) => {
+	it.only("getBlocksForRound - should return array of blocks when all requested blocks are in stateStore", async (context) => {
 		const lastBlock = context.blocks[2];
 
 		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(context.blocks);
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => {
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -156,7 +167,7 @@ describe<{
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue([lastBlock]);
 		const databaseServiceStub = stub(context.databaseService, "getBlocks").returnValue(context.blocks.slice(0, 2));
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => {
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -168,7 +179,7 @@ describe<{
 		spyOnFromData.calledTimes(3);
 	});
 
-	it("getActiveDelegates - should return shuffled round delegates", async (context) => {
+	it("getActiveValidators - should return shuffled round delegates", async (context) => {
 		const lastBlock = dummyBlock;
 
 		const stateStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
@@ -201,7 +212,7 @@ describe<{
 
 		const spyOnShuffleDelegates = spy(context.roundState, "shuffleDelegates");
 
-		await context.roundState.getActiveDelegates();
+		await context.roundState.getActiveValidators();
 
 		walletRepoStub2.calledWith(delegatePublicKey);
 		walletRepoStub1.calledWith(Identities.Address.fromPublicKey(delegatePublicKey));
@@ -217,7 +228,7 @@ describe<{
 		spyOnShuffleDelegates.called();
 	});
 
-	it("getActiveDelegates - should return cached forgingDelegates when round is the same", async (context) => {
+	it("getActiveValidators - should return cached forgingDelegates when round is the same", async (context) => {
 		const forgingDelegate = { getAttribute: () => undefined };
 		const forgingDelegateRound = 2;
 
@@ -227,25 +238,25 @@ describe<{
 		context.roundState.forgingDelegates = [forgingDelegate] as any;
 
 		const roundInfo = { round: 2 };
-		const result = await context.roundState.getActiveDelegates(roundInfo as any);
+		const result = await context.roundState.getActiveValidators(roundInfo as any);
 
 		getAttributeStub.calledWith("delegate.round");
 		// @ts-ignore
 		assert.equal(result, context.roundState.forgingDelegates);
 	});
 
-	it("setForgingDelegatesOfRound - should call getActiveDelegates and set forgingDelegatesOfRound", async (context) => {
+	it("setForgingDelegatesOfRound - should call getActiveValidators and set forgingDelegatesOfRound", async (context) => {
 		const delegate = {
 			username: "dummy_delegate",
 		};
 
 		const triggerStub = stub(context.triggerService, "call").returnValue([delegate]);
 
-		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxDelegates: 51 };
+		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxValidators: 51 };
 		// @ts-ignore
 		await context.roundState.setForgingDelegatesOfRound(roundInfo, [delegate]);
 
-		triggerStub.calledWith("getActiveDelegates", {
+		triggerStub.calledWith("getActiveValidators", {
 			delegates: [delegate],
 			roundInfo,
 		});
@@ -254,17 +265,17 @@ describe<{
 		assert.equal(context.roundState.forgingDelegates, [delegate]);
 	});
 
-	it("setForgingDelegatesOfRound - should call getActiveDelegates and set forgingDelegatesOfRound to [] if undefined is returned", async (context) => {
+	it("setForgingDelegatesOfRound - should call getActiveValidators and set forgingDelegatesOfRound to [] if undefined is returned", async (context) => {
 		const delegate = {
 			username: "dummy_delegate",
 		};
 		const triggerStub = stub(context.triggerService, "call").returnValue(undefined);
 
-		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxDelegates: 51 };
+		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxValidators: 51 };
 		// @ts-ignore
 		await context.roundState.setForgingDelegatesOfRound(roundInfo, [delegate]);
 
-		triggerStub.calledWith("getActiveDelegates", {
+		triggerStub.calledWith("getActiveValidators", {
 			delegates: [delegate],
 			roundInfo,
 		});
@@ -276,8 +287,8 @@ describe<{
 	it("applyRound - should build delegates, save round, dispatch events when height is 1", async (context) => {
 		const eventStub = spy(context.eventDispatcher, "dispatch");
 		const databaseServiceSpy = spy(context.databaseService, "saveRound");
-		const dposStateBuildSpy = spy(context.dposState, "buildDelegateRanking");
-		const dposStateSetSpy = spy(context.dposState, "setDelegatesRound");
+		const dposStateBuildSpy = spy(context.dposState, "buildValidatorRanking");
+		const dposStateSetSpy = spy(context.dposState, "setValidatorsRound");
 
 		const forgingDelegate = {
 			getAttribute: () => undefined,
@@ -301,7 +312,7 @@ describe<{
 		};
 
 		const dposStateRoundDelegates = [delegateWallet];
-		const dposGetStub = stub(context.dposState, "getRoundDelegates");
+		const dposGetStub = stub(context.dposState, "getRoundValidators");
 
 		dposGetStub.returnValue(dposStateRoundDelegates);
 
@@ -322,7 +333,7 @@ describe<{
 			round: 1,
 			nextRound: 1,
 			roundHeight: 1,
-			maxDelegates: 51,
+			maxValidators: 51,
 		});
 		databaseServiceSpy.calledWith(dposStateRoundDelegates);
 		eventStub.calledWith("round.applied");
@@ -331,8 +342,8 @@ describe<{
 	it("applyRound - should build delegates, save round, dispatch events, and skip missing round checks when first round has genesis block only", async (context) => {
 		const eventStub = spy(context.eventDispatcher, "dispatch");
 		const databaseServiceSpy = spy(context.databaseService, "saveRound");
-		const dposStateBuildSpy = spy(context.dposState, "buildDelegateRanking");
-		const dposStateSetSpy = spy(context.dposState, "setDelegatesRound");
+		const dposStateBuildSpy = spy(context.dposState, "buildValidatorRanking");
+		const dposStateSetSpy = spy(context.dposState, "setValidatorsRound");
 
 		const forgingDelegateRound = 1;
 
@@ -354,7 +365,7 @@ describe<{
 		const delegateWallet = { publicKey: "delegate public key", getAttribute: getAttributeStub2 };
 		const dposStateRoundDelegates = [delegateWallet];
 
-		const dposGetStub = stub(context.dposState, "getRoundDelegates");
+		const dposGetStub = stub(context.dposState, "getRoundValidators");
 
 		dposGetStub.returnValue(dposStateRoundDelegates);
 
@@ -376,7 +387,7 @@ describe<{
 			round: 2,
 			nextRound: 2,
 			roundHeight: 52,
-			maxDelegates: 51,
+			maxValidators: 51,
 		});
 		databaseServiceSpy.calledWith(dposStateRoundDelegates);
 		eventStub.calledWith("round.applied");
@@ -414,7 +425,7 @@ describe<{
 		const blocksInPreviousRound: any[] = generateBlocks(51);
 		const delegates: any[] = generateDelegates(51);
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => {
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -426,9 +437,9 @@ describe<{
 		const stateStub2 = stub(context.stateStore, "getLastBlock").returnValue(block);
 
 		context.getDposPreviousRoundState = stubFn().returns({
-			getAllDelegates: () => delegates,
-			getActiveDelegates: () => delegates,
-			getRoundDelegates: () => delegates,
+			getAllValidators: () => delegates,
+			getActiveValidators: () => delegates,
+			getRoundValidators: () => delegates,
 		});
 
 		const spyOnCalcPreviousActiveDelegates = stub(context.roundState, "calcPreviousActiveDelegates").returnValue(
@@ -451,7 +462,7 @@ describe<{
 		const blocksInPreviousRound: any[] = generateBlocks(51);
 		const delegates: any[] = generateDelegates(51);
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => {
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -461,9 +472,9 @@ describe<{
 		const stateStub2 = stub(context.stateStore, "getLastBlock").returnValue(block);
 
 		context.getDposPreviousRoundState = stubFn().returns({
-			getAllDelegates: () => delegates,
-			getActiveDelegates: () => delegates,
-			getRoundDelegates: () => delegates,
+			getAllValidators: () => delegates,
+			getActiveValidators: () => delegates,
+			getRoundValidators: () => delegates,
 		});
 
 		const spyOnCalcPreviousActiveDelegates = stub(context.roundState, "calcPreviousActiveDelegates").returnValue(
@@ -517,7 +528,7 @@ describe<{
 		const getLastBlocksByHeightHeight = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
 		const databaseServiceSpy = spy(context.databaseService, "deleteRound");
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => {
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -543,10 +554,10 @@ describe<{
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
-		const dposStub = stub(context.dposState, "getRoundDelegates").returnValue(delegates);
+		const dposStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
 		const triggerStub = stub(context.triggerService, "call").returnValue(delegates);
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => {
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -575,10 +586,10 @@ describe<{
 
 		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
-		const dposStub = stub(context.dposState, "getRoundDelegates").returnValue(delegates);
+		const dposStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
 		const triggerStub = stub(context.triggerService, "call").returnValue(delegates);
 
-		const spyOnFromData = stub(Blocks.BlockFactory, "fromData").callsFake((block) => {
+		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -596,9 +607,9 @@ describe<{
 		const blocks = generateBlocks(51);
 
 		const stubbedRoundState = stub(context.roundState, "getDposPreviousRoundState").returnValue({
-			getAllDelegates: () => delegates,
-			getActiveDelegates: () => delegates,
-			getRoundDelegates: () => delegates,
+			getAllValidators: () => delegates,
+			getActiveValidators: () => delegates,
+			getRoundValidators: () => delegates,
 		});
 
 		const setAttributeSpy = spy(delegates[0], "setAttribute");
@@ -817,9 +828,9 @@ describe<{
 		const databaseServiceSpy = spy(context.databaseService, "saveRound");
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
-		const dposGetStub = stub(context.dposState, "getRoundDelegates").returnValue(delegates);
+		const dposGetStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
 		const triggerStub = stub(context.triggerService, "call").callsFake((name, args) => {
-			return context.roundState.getActiveDelegates(args.roundInfo, args.delegates);
+			return context.roundState.getActiveValidators(args.roundInfo, args.delegates);
 		});
 
 		const spyOnShuffleDelegates = spy(context.roundState, "shuffleDelegates");
@@ -858,9 +869,9 @@ describe<{
 
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
-		const dposGetStub = stub(context.dposState, "getRoundDelegates").returnValue(delegates);
+		const dposGetStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
 		const triggerStub = stub(context.triggerService, "call").callsFake((name, args) => {
-			return context.roundState.getActiveDelegates(args.roundInfo, args.delegates);
+			return context.roundState.getActiveValidators(args.roundInfo, args.delegates);
 		});
 
 		const spyOnShuffleDelegates = spy(context.roundState, "shuffleDelegates");

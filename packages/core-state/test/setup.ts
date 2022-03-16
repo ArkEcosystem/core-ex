@@ -20,6 +20,22 @@ import {
 	WalletRepositoryClone,
 	WalletRepositoryCopyOnWrite,
 } from "../source/wallets";
+import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
+import { PublicKeySerializer } from "../../core-crypto-key-pair-schnorr/source/serializer";
+import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
+import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
+import {
+	Deserializer as TransactionDeserializer,
+	Serializer,
+	TransactionFactory,
+	TransactionRegistry,
+	TransactionTypeFactory,
+	Utils,
+	Verifier,
+} from "../../core-crypto-transaction";
+import { Validator } from "../../core-validation/source/validator";
+import { Signature } from "../../core-crypto-signature-schnorr/source/signature";
+import { HashFactory } from "../../core-crypto-hash-bcrypto/source/hash.factory";
 
 export interface Spies {
 	applySpy: SinonSpy;
@@ -112,6 +128,26 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.bind("buildDelegateRanking", new BuildValidatorRankingAction());
 
 	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
+
+	sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeySerializer).to(PublicKeySerializer).inSingletonScope();
+
+	sandbox.app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
+	sandbox.app.bind(Identifiers.Cryptography.Validator).to(Validator);
+	sandbox.app.bind(Identifiers.Cryptography.Transaction.TypeFactory).to(TransactionTypeFactory);
+	sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
+	sandbox.app.bind(Identifiers.Cryptography.Signature).to(Signature);
+	sandbox.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
+	sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
+	sandbox.app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
+	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
+	sandbox.app.bind(Identifiers.Database.BlockStorage).toConstantValue({
+		deleteBlocks: () => {},
+		deleteTopBlocks: () => {},
+		saveBlocks: () => {},
+	});
 
 	const stateStore: StateStore = sandbox.app.get(Identifiers.StateStore);
 
@@ -245,9 +281,25 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.bind<Contracts.State.DposPreviousRoundStateProvider>(Identifiers.DposPreviousRoundStateProvider)
 		.toProvider(dposPreviousRoundStateProvider);
 
+	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
+	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
+	const blockFactory = {
+		fromData: () => undefined,
+	};
+
+	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);
+
 	const dposPreviousRound = sandbox.app.get<Contracts.State.DposPreviousRoundStateProvider>(
 		Identifiers.DposPreviousRoundStateProvider,
 	);
+
+	@injectable()
+	class MockValidatorMutator implements Contracts.State.ValidatorMutator {
+		public apply = spy();
+		public revert = spy();
+	}
+
+	sandbox.app.bind(Identifiers.State.ValidatorMutator).to(MockValidatorMutator).inSingletonScope();
 
 	const blockState = sandbox.app.getTagged<BlockState>(Identifiers.BlockState, "state", "blockchain");
 
@@ -255,12 +307,17 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
 
-	const transactionValidator: TransactionValidator = sandbox.app.get(Identifiers.TransactionValidator);
+	const transactionValidator = sandbox.app.get<TransactionValidator>(Identifiers.TransactionValidator);
 
 	const stateBuilder = sandbox.app.resolve<StateBuilder>(StateBuilder);
 
 	if (!skipBoot) {
+		try {
 		await sandbox.boot();
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
 
 		// todo: get rid of the need for this, requires an instance based crypto package
 

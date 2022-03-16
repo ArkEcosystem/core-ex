@@ -10,7 +10,7 @@ export class CoreGenerator extends Generator {
 	private destination!: string;
 
 	public generate(): CoreConfigPaths {
-		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.network}`);
+		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.flags.network}`);
 
 		if (existsSync(this.destination)) {
 			throw new Error(`${this.destination} already exists.`);
