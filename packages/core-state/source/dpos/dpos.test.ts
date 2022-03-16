@@ -93,7 +93,6 @@ describe<{
 		context.dposState = context.app.get<DposState>(Identifiers.DposState);
 		context.walletRepo = context.app.get<WalletRepository>(Identifiers.WalletRepository);
 
-
 		await buildValidatorAndVoteWallets(
 			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
 			5,
