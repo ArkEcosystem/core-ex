@@ -1,5 +1,5 @@
-import { Identifiers } from '@arkecosystem/core-contracts';
-import { Container } from '@arkecosystem/core-container';
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Container } from "@arkecosystem/core-container";
 import { Application, Services } from "@arkecosystem/core-kernel";
 import { ServiceProvider } from "./";
 import { AnySchema } from "joi";
