@@ -28,23 +28,23 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	}
 
 	public whereId(id: string): QueryIterable {
-		return this.wherePredicate(async (t) => t.id === id);
+		return this.wherePredicate((t) => t.id === id);
 	}
 
 	public whereType(type: Contracts.Crypto.TransactionType | number): QueryIterable {
-		return this.wherePredicate(async (t) => t.type === type);
+		return this.wherePredicate((t) => t.type === type);
 	}
 
 	public whereTypeGroup(typeGroup: Contracts.Crypto.TransactionTypeGroup | number): QueryIterable {
-		return this.wherePredicate(async (t) => t.typeGroup === typeGroup);
+		return this.wherePredicate((t) => t.typeGroup === typeGroup);
 	}
 
 	public whereVersion(version: number): QueryIterable {
-		return this.wherePredicate(async (t) => t.data.version === version);
+		return this.wherePredicate((t) => t.data.version === version);
 	}
 
 	public whereKind(transaction: Contracts.Crypto.ITransaction): QueryIterable {
-		return this.wherePredicate(async (t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
+		return this.wherePredicate((t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
 	}
 
 	public has(): boolean {

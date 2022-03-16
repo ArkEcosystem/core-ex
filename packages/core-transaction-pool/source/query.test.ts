@@ -1,17 +1,17 @@
-import { Container } from "@arkecosystem/core-kernel";
-import { Enums, Identities, Managers, Transactions } from "@arkecosystem/crypto";
+import { BigNumber } from "../../utils";
+import { Container } from "@arkecosystem/core-container";
+import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
 import { describe } from "../../core-test-framework";
 import { Query, QueryIterable } from "./";
 
 describe<{
-	aip: Boolean;
-	container: Container.Container;
+	container: Container;
 	mempool: any;
 	sender1Transaction100: any;
 	sender1Transaction200: any;
 	sender2Transaction100: any;
 	sender2Transaction200: any;
-}>("Query", ({ it, assert, beforeAll, afterAll, stub }) => {
+}>("Query", ({ it, assert, beforeAll, beforeEach, stub }) => {
 	beforeAll((context) => {
 		context.mempool = {
 			getSenderMempools: () => undefined,
@@ -19,46 +19,74 @@ describe<{
 			getSenderMempool: () => undefined,
 		};
 
-		context.container = new Container.Container();
-		context.container.bind(Container.Identifiers.TransactionPoolMempool).toConstantValue(context.mempool);
-
-		context.aip = Managers.configManager.getMilestone().aip11;
-		Managers.configManager.getMilestone().aip11 = true;
-
-		context.sender1Transaction100 = Transactions.BuilderFactory.transfer()
-			.version(2)
-			.amount("100")
-			.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
-			.nonce("1")
-			.fee("100")
-			.sign("sender1 secret")
-			.build();
-		context.sender1Transaction200 = Transactions.BuilderFactory.delegateRegistration()
-			.usernameAsset("sender1")
-			.version(2)
-			.nonce("1")
-			.fee("200")
-			.sign("sender1 secret")
-			.build();
-		context.sender2Transaction100 = Transactions.BuilderFactory.transfer()
-			.version(2)
-			.amount("100")
-			.recipientId(Identities.Address.fromPassphrase("recipient's secret"))
-			.nonce("1")
-			.fee("100")
-			.sign("sender2 secret")
-			.build();
-		context.sender2Transaction200 = Transactions.BuilderFactory.delegateRegistration()
-			.usernameAsset("sender2")
-			.version(2)
-			.nonce("1")
-			.fee("200")
-			.sign("sender2 secret")
-			.build();
+		context.container = new Container();
+		context.container.bind(Identifiers.TransactionPoolMempool).toConstantValue(context.mempool);
 	});
 
-	afterAll((context) => {
-		Managers.configManager.getMilestone().aip11 = context.aip;
+	beforeEach((context) => {
+		context.sender1Transaction100 = {
+			id: "dummy-tx-id",
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+			type: Contracts.Crypto.TransactionType.Transfer,
+			key: "some-key",
+			data: {
+				type: 1,
+				version: 2,
+				nonce: BigNumber.make(1),
+				fee: BigNumber.make(100),
+				amount: BigNumber.make(100),
+				senderPublicKey: "sender-public-key",
+			},
+			serialized: Buffer.from("dummy")
+		};
+
+		context.sender1Transaction200 = {
+			id: "dummy-tx-id-2",
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			key: "some-key-2",
+			data: {
+				type: 1,
+				version: 2,
+				nonce: BigNumber.make(2),
+				fee: BigNumber.make(200),
+				amount: BigNumber.make(100),
+				senderPublicKey: "sender-public-key",
+			},
+			serialized: Buffer.from("dummy-2")
+		};
+
+		context.sender2Transaction100 = {
+			id: "dummy-tx-id-3",
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+			type: Contracts.Crypto.TransactionType.Transfer,
+			key: "some-key-3",
+			data: {
+				type: 1,
+				version: 2,
+				nonce: BigNumber.make(3),
+				fee: BigNumber.make(100),
+				amount: BigNumber.make(100),
+				senderPublicKey: "sender-public-key",
+			},
+			serialized: Buffer.from("dummy-3")
+		};
+
+		context.sender2Transaction200 = {
+			id: "dummy-tx-id-4",
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			key: "some-key-3",
+			data: {
+				type: 1,
+				version: 2,
+				nonce: BigNumber.make(4),
+				fee: BigNumber.make(200),
+				amount: BigNumber.make(100),
+				senderPublicKey: "sender-public-key",
+			},
+			serialized: Buffer.from("dummy-4")
+		};
 	});
 
 	it("getAll - should return transactions from all sender states", (context) => {
@@ -130,19 +158,21 @@ describe<{
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
 		const result = Array.from(queryIterable.whereId(context.sender1Transaction200.id));
 
-		assert.equal(result, [context.sender1Transaction200]);
+		assert.length(result, 1);
+		assert.equal(result[0].id, context.sender1Transaction200.id);
 	});
 
 	it("whereType - should filter transactions by type", (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = Array.from(queryIterable.whereType(Enums.TransactionType.DelegateRegistration));
+		const result = Array.from(queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration));
 
-		assert.equal(result, [context.sender1Transaction200]);
+		assert.length(result, 1);
+		assert.equal(result[0].id, context.sender1Transaction200.id);
 	});
 
 	it("whereTypeGroup - should filter transactions by typeGroup", (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = Array.from(queryIterable.whereTypeGroup(Enums.TransactionTypeGroup.Core));
+		const result = Array.from(queryIterable.whereTypeGroup(Contracts.Crypto.TransactionTypeGroup.Core));
 
 		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
 	});
@@ -163,19 +193,19 @@ describe<{
 		]);
 		const result = Array.from(queryIterable.whereKind(context.sender1Transaction200));
 
-		assert.equal(result, [context.sender1Transaction200, context.sender2Transaction200]);
+		assert.equal(result.map(t => t.id), [context.sender1Transaction200.id, context.sender2Transaction200.id]);
 	});
 
 	it("has - should return true when there are matching transactions", (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = queryIterable.whereType(Enums.TransactionType.DelegateRegistration).has();
+		const result = queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).has();
 
 		assert.true(result);
 	});
 
 	it("has - should return false when there are no matching transactions", (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = queryIterable.whereType(Enums.TransactionType.Vote).has();
+		const result = queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).has();
 
 		assert.false(result);
 	});
@@ -187,14 +217,14 @@ describe<{
 			context.sender2Transaction100,
 			context.sender2Transaction200,
 		]);
-		const result = queryIterable.whereType(Enums.TransactionType.DelegateRegistration).first();
+		const result = queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).first();
 
-		assert.equal(result, context.sender1Transaction200);
+		assert.equal(result.id, context.sender1Transaction200.id);
 	});
 
 	it("first - should throw where there are no matching transactions", (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const check = () => queryIterable.whereType(Enums.TransactionType.Vote).first();
+		const check = () => queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).first();
 
 		assert.throws(check);
 	});
