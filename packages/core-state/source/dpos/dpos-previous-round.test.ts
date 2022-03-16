@@ -98,7 +98,9 @@ describe<{
 		const voteBuilder = context.app.resolve<VoteBuilder>(VoteBuilder);
 
 		addTransactionsToBlock(
-			makeVoteTransactions(voteBuilder, 3, [`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`]),
+			makeVoteTransactions(voteBuilder, 3, [
+				`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`,
+			]),
 			context.blocks[0],
 		);
 		context.blocks[0].data.height = 2;
