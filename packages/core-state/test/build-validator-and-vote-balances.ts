@@ -1,8 +1,9 @@
 import { Wallet, WalletRepository } from "../source/wallets";
 import { Identities } from "@arkecosystem/crypto";
 import { BigNumber } from "@arkecosystem/utils";
+import { VoteBuilder } from "../../core-crypto-transaction-vote";
 
-export const buildDelegateAndVoteWallets = (numberDelegates: number, walletRepo: WalletRepository): Wallet[] => {
+export const buildValidatorAndVoteWallets = (numberDelegates: number, walletRepo: WalletRepository): Wallet[] => {
 	const delegates: Wallet[] = [];
 	const delegateKeys: string[] = [
 		"02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34",

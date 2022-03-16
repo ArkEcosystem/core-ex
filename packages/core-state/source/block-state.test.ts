@@ -6,7 +6,7 @@ import { makeChainedBlocks } from "../test/make-chained-block";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { addTransactionsToBlock } from "../test/transactions";
 import { setUp } from "../test/setup";
-import { describe, Factories } from "../../core-test-framework";
+import { describe, Factories, Sandbox } from "../../core-test-framework";
 import { SinonSpy } from "sinon";
 import { Spy } from "../../core-test-framework/source/uvu/spy";
 import Utils from "@arkecosystem/utils";
@@ -61,6 +61,7 @@ const buildMultipaymentTransaction = (context) => {
 };
 
 describe<{
+	sandbox: Sandbox;
 	walletRepo: WalletRepository;
 	blockState: BlockState;
 	stateStore: StateStore;

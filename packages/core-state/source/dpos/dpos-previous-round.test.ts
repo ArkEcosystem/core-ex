@@ -1,10 +1,11 @@
 import { Application, Container, Utils } from "@arkecosystem/core-kernel";
 import { RoundInfo } from "@arkecosystem/core-kernel/source/contracts/shared";
 import { DposPreviousRoundStateProvider } from "@arkecosystem/core-kernel/source/contracts/state";
-import { describe, Factories } from "@arkecosystem/core-test-framework";
+import { describe, Factories } from "../../../core-test-framework";
 import { Interfaces } from "@arkecosystem/crypto";
+import { VoteBuilder } from "../../../core-crypto-transaction-vote";
 
-import { buildDelegateAndVoteWallets } from "../../test/build-delegate-and-vote-balances";
+import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { makeVoteTransactions } from "../../test/make-vote-transactions";
 import { setUp } from "../../test/setup";
@@ -42,7 +43,7 @@ describe<{
 
 		context.round = Utils.roundCalculator.calculateRound(1);
 
-		buildDelegateAndVoteWallets(5, context.walletRepo);
+		buildValidatorAndVoteWallets(5, context.walletRepo);
 
 		context.dposState.buildVoteBalances();
 		context.dposState.buildDelegateRanking();
@@ -94,8 +95,10 @@ describe<{
 
 		context.walletRepo.index(generatorWallet);
 
+		const voteBuilder = context.app.resolve<VoteBuilder>(VoteBuilder);
+
 		addTransactionsToBlock(
-			makeVoteTransactions(3, [`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`]),
+			makeVoteTransactions(voteBuilder, 3, [`+${"03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37"}`]),
 			context.blocks[0],
 		);
 		context.blocks[0].data.height = 2;

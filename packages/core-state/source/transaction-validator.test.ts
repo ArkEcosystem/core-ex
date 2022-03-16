@@ -4,7 +4,7 @@ import { AssertionError } from "assert";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { setUp } from "../test/setup";
 import { SinonSpy } from "sinon";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../..//core-test-framework";
 
 describe<{
 	transactionValidator: TransactionValidator;
