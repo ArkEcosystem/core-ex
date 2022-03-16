@@ -16,11 +16,22 @@ import { Signature } from "../../core-crypto-signature-schnorr/source/signature"
 import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
 import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Serializer, Deserializer, Utils, Verifier, TransactionFactory, TransactionTypeFactory } from "@arkecosystem/core-crypto-transaction/source";
+import {
+	Serializer,
+	Deserializer,
+	Utils,
+	Verifier,
+	TransactionFactory,
+	TransactionTypeFactory,
+} from "@arkecosystem/core-crypto-transaction/source";
 import { Application } from "@arkecosystem/core-kernel";
 import { Validator } from "../../core-validation/source/validator";
 
-const buildTransaction = async (builder: TransferBuilder, nonce: string, recipient: string): Promise<Contracts.Crypto.ITransaction> => {
+const buildTransaction = async (
+	builder: TransferBuilder,
+	nonce: string,
+	recipient: string,
+): Promise<Contracts.Crypto.ITransaction> => {
 	const pendingTx = await builder
 		.version(2)
 		.amount("100")
@@ -30,7 +41,7 @@ const buildTransaction = async (builder: TransferBuilder, nonce: string, recipie
 		.sign("sender's secret");
 
 	return pendingTx.build();
-}
+};
 
 describe<{
 	configuration: any;
@@ -68,9 +79,9 @@ describe<{
 		context.config = context.app.get(Identifiers.Cryptography.Configuration);
 		stub(context.config, "getMilestone").returnValue({ address: { base58: "ark" } });
 
-		const recipient = await context.app.get<Contracts.Crypto.IAddressFactory>(
-			Identifiers.Cryptography.Identity.AddressFactory
-		).fromMnemonic("recipient's secret");
+		const recipient = await context.app
+			.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+			.fromMnemonic("recipient's secret");
 
 		const builder = context.app.resolve<TransferBuilder>(TransferBuilder);
 
