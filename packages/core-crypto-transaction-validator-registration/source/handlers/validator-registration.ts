@@ -98,7 +98,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		const hasUsername: boolean = this.poolQuery
 			.getAll()
 			.whereKind(transaction)
-			.wherePredicate(async (t) => t.data.asset?.validator?.username === username)
+			.wherePredicate((t) => t.data.asset?.validator?.username === username)
 			.has();
 
 		if (hasUsername) {
