@@ -25,8 +25,8 @@
 		"joi": "17.4.2"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-config": "workspace:^0.0.1",
-		"@arkecosystem/core-crypto-time": "workspace:^0.0.1",
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-crypto-time": "workspace:*",
 		"@types/better-sqlite3": "5.4.3",
 		"@types/fs-extra": "8.1.2",
 		"import-fresh": "3.3.0",
