@@ -8,6 +8,7 @@ import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vot
 import { setUp } from "../../test/setup";
 import { WalletRepository } from "../wallets";
 import { DposState } from "./dpos";
+import { Identifiers } from "@arkecosystem/core-contracts/source";
 
 describe<{
 	dposState: DposState;
@@ -23,10 +24,14 @@ describe<{
 		context.logger = env.spies.logger.debug;
 	});
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.walletRepo.reset();
 
-		buildValidatorAndVoteWallets(5, context.walletRepo);
+		await buildValidatorAndVoteWallets(
+			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
+			5,
+			context.walletRepo,
+		);
 	});
 
 	afterEach((context) => {
@@ -64,8 +69,12 @@ describe<{
 		}
 	});
 
-	it("buildDelegateRanking - should throw if two wallets have the same public key", (context) => {
-		const delegates = buildValidatorAndVoteWallets(5, context.walletRepo);
+	it("buildDelegateRanking - should throw if two wallets have the same public key",async (context) => {
+		const delegates = await buildValidatorAndVoteWallets(
+			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
+			5,
+			context.walletRepo,
+		);
 		delegates[0].setAttribute("delegate.resigned", true);
 
 		delegates[1].setAttribute("delegate.voteBalance", Utils.BigNumber.make(5467));
@@ -80,8 +89,12 @@ describe<{
 		);
 	});
 
-	it("buildDelegateRanking - should not throw if public keys are different and balances are the same", (context) => {
-		const delegates = buildValidatorAndVoteWallets(5, context.walletRepo);
+	it("buildDelegateRanking - should not throw if public keys are different and balances are the same", async (context) => {
+		const delegates = await buildValidatorAndVoteWallets(
+			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
+			5,
+			context.walletRepo,
+		);
 
 		delegates[1].setAttribute("delegate.voteBalance", Utils.BigNumber.make(5467));
 		delegates[2].setAttribute("delegate.voteBalance", Utils.BigNumber.make(5467));

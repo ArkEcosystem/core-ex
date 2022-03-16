@@ -14,6 +14,7 @@ import { BlockState } from "../block-state";
 import { StateStore } from "../stores";
 import { WalletRepository } from "../wallets";
 import { DposState } from "./dpos";
+import { Identifiers } from "@arkecosystem/core-contracts/source";
 
 describe<{
 	app: Application;
@@ -43,7 +44,11 @@ describe<{
 
 		context.round = Utils.roundCalculator.calculateRound(1);
 
-		buildValidatorAndVoteWallets(5, context.walletRepo);
+		await buildValidatorAndVoteWallets(
+			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
+			5,
+			context.walletRepo,
+		);
 
 		context.dposState.buildVoteBalances();
 		context.dposState.buildDelegateRanking();

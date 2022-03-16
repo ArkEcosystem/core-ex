@@ -1,9 +1,8 @@
 import { Wallet, WalletRepository } from "../source/wallets";
-import { Identities } from "@arkecosystem/crypto";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { VoteBuilder } from "../../core-crypto-transaction-vote";
 
-export const buildValidatorAndVoteWallets = (numberDelegates: number, walletRepo: WalletRepository): Wallet[] => {
+export const buildValidatorAndVoteWallets = async (addressFactory: Contracts.Crypto.IAddressFactory, numberDelegates: number, walletRepo: WalletRepository): Promise<Wallet[]> => {
 	const delegates: Wallet[] = [];
 	const delegateKeys: string[] = [
 		"02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34",
@@ -27,7 +26,7 @@ export const buildValidatorAndVoteWallets = (numberDelegates: number, walletRepo
 
 	for (let i = 0; i < numberDelegates; i++) {
 		const delegateKey = delegateKeys[i];
-		const delegate = walletRepo.createWallet(Identities.Address.fromPublicKey(delegateKey));
+		const delegate = walletRepo.createWallet(await addressFactory.fromPublicKey(delegateKey));
 		delegate.setPublicKey(delegateKey);
 		delegate.setAttribute("delegate.username", `delegate${i}`);
 		delegate.setAttribute("delegate.voteBalance", BigNumber.ZERO);
@@ -35,7 +34,7 @@ export const buildValidatorAndVoteWallets = (numberDelegates: number, walletRepo
 		// @ts-ignore
 		delegate.events = undefined;
 
-		const voter = walletRepo.createWallet(Identities.Address.fromPublicKey(voterKeys[i]));
+		const voter = walletRepo.createWallet(await addressFactory.fromPublicKey(voterKeys[i]));
 		const totalBalance = BigNumber.make(i + 1)
 			.times(1000)
 			.times(BigNumber.SATOSHI);
