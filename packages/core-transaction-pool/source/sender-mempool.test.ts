@@ -1,4 +1,4 @@
-import { BigNumber } from './../../utils/source/big-number';
+import { BigNumber } from "./../../utils/source/big-number";
 import { describe } from "../../core-test-framework";
 import { SenderMempool } from "./";
 import { Container } from "@arkecosystem/core-container";
@@ -37,7 +37,7 @@ describe<{
 				amount: BigNumber.make(100),
 				senderPublicKey: "dummy-sender-key",
 			},
-			serialized: Buffer.from("dummy")
+			serialized: Buffer.from("dummy"),
 		};
 
 		const tx2 = {
@@ -52,7 +52,7 @@ describe<{
 				amount: BigNumber.make(100),
 				senderPublicKey: "dummy-sender-key",
 			},
-			serialized: Buffer.from("dummy-2")
+			serialized: Buffer.from("dummy-2"),
 		};
 
 		const tx3 = {
@@ -67,7 +67,7 @@ describe<{
 				amount: BigNumber.make(100),
 				senderPublicKey: "dummy-sender-key",
 			},
-			serialized: Buffer.from("dummy-3")
+			serialized: Buffer.from("dummy-3"),
 		};
 
 		// @ts-ignore
