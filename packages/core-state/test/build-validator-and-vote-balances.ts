@@ -2,7 +2,11 @@ import { Wallet, WalletRepository } from "../source/wallets";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-export const buildValidatorAndVoteWallets = async (addressFactory: Contracts.Crypto.IAddressFactory, numberDelegates: number, walletRepo: WalletRepository): Promise<Wallet[]> => {
+export const buildValidatorAndVoteWallets = async (
+	addressFactory: Contracts.Crypto.IAddressFactory,
+	numberDelegates: number,
+	walletRepo: WalletRepository,
+): Promise<Wallet[]> => {
 	const delegates: Wallet[] = [];
 	const delegateKeys: string[] = [
 		"02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34",

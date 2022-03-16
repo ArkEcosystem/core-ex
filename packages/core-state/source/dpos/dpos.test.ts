@@ -69,7 +69,7 @@ describe<{
 		}
 	});
 
-	it("buildDelegateRanking - should throw if two wallets have the same public key",async (context) => {
+	it("buildDelegateRanking - should throw if two wallets have the same public key", async (context) => {
 		const delegates = await buildValidatorAndVoteWallets(
 			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
 			5,
