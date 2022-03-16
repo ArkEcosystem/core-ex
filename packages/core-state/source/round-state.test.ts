@@ -1,8 +1,11 @@
-import { Application, Container, Enums } from "@arkecosystem/core-kernel";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application, Enums } from "@arkecosystem/core-kernel";
 import { RoundState } from "./round-state";
-import { Blocks, Identities, Utils } from "@arkecosystem/crypto";
-import { Sandbox, describe } from "@arkecosystem/core-test-framework";
+// import { Blocks, Identities } from "@arkecosystem/crypto";
+import { Sandbox, describe } from "../../core-test-framework";
 import block1760000 from "../test/fixtures/block1760000";
+import Utils from "@arkecosystem/utils";
+import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
 
 const dummyBlock = Blocks.BlockFactory.fromData(block1760000);
 
@@ -111,16 +114,18 @@ describe<{
 
 		context.app = sandbox.app;
 
-		sandbox.app.bind(Container.Identifiers.DatabaseService).toConstantValue(context.databaseService);
-		sandbox.app.bind(Container.Identifiers.DposState).toConstantValue(context.dposState);
+		sandbox.app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
+		sandbox.app.bind(Identifiers.DposState).toConstantValue(context.dposState);
 		sandbox.app
-			.bind(Container.Identifiers.DposPreviousRoundStateProvider)
+			.bind(Identifiers.DposPreviousRoundStateProvider)
 			.toConstantValue(context.getDposPreviousRoundState);
-		sandbox.app.bind(Container.Identifiers.StateStore).toConstantValue(context.stateStore);
-		sandbox.app.bind(Container.Identifiers.WalletRepository).toConstantValue(context.walletRepository);
-		sandbox.app.bind(Container.Identifiers.TriggerService).toConstantValue(context.triggerService);
-		sandbox.app.bind(Container.Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
-		sandbox.app.bind(Container.Identifiers.LogService).toConstantValue(context.logger);
+		sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+		sandbox.app.bind(Identifiers.TriggerService).toConstantValue(context.triggerService);
+		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+
+		sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
 
 		context.roundState = sandbox.app.resolve<RoundState>(RoundState);
 	});

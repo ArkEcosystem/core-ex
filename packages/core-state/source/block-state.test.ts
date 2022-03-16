@@ -1,15 +1,15 @@
-import { Contracts } from "@arkecosystem/core-kernel";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { BlockState } from "./block-state";
-import { StateStore } from "./stores/state";
+import { StateStore } from "./stores";
 import { Wallet, WalletRepository } from "./wallets";
-import { Interfaces, Utils } from "@arkecosystem/crypto";
 import { makeChainedBlocks } from "../test/make-chained-block";
 import { makeVoteTransactions } from "../test/make-vote-transactions";
 import { addTransactionsToBlock } from "../test/transactions";
 import { setUp } from "../test/setup";
-import { describe, Factories } from "@arkecosystem/core-test-framework";
+import { describe, Factories } from "../../core-test-framework";
 import { SinonSpy } from "sinon";
-import { Spy } from "@arkecosystem/core-test-framework/source/uvu/spy";
+import { Spy } from "../../core-test-framework/source/uvu/spy";
+import Utils from "@arkecosystem/utils";
 
 const buildMultipaymentTransaction = (context) => {
 	const sendersDelegate = context.forgingWallet.clone();
@@ -67,7 +67,7 @@ describe<{
 	factory: Factories.FactoryBuilder;
 	applySpy: SinonSpy;
 	revertSpy: SinonSpy;
-	blocks: Interfaces.IBlock[];
+	blocks: Contracts.Crypto.IBlock[];
 	spyIncreaseWalletDelegateVoteBalance: Spy;
 	spyInitGenesisForgerWallet: Spy;
 	spyApplyBlockToForger: Spy;
@@ -657,7 +657,7 @@ describe<{
 		const transactions = context.generateTransactions();
 
 		for (const transaction of transactions.transactions) {
-			await context.blockState.applyTransaction(transaction as Interfaces.ITransaction);
+			await context.blockState.applyTransaction(transaction as Contracts.Crypto.ITransaction);
 
 			context.applySpy.calledWith(transaction);
 		}
@@ -667,7 +667,7 @@ describe<{
 		const transactions = context.generateTransactions();
 
 		for (const transaction of transactions.transactions) {
-			await context.blockState.revertTransaction(transaction as Interfaces.ITransaction);
+			await context.blockState.revertTransaction(transaction as Contracts.Crypto.ITransaction);
 
 			context.revertSpy.calledWith(transaction);
 		}
@@ -682,7 +682,7 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.applyTransaction(transaction as Interfaces.ITransaction));
+			await assert.resolves(() => context.blockState.applyTransaction(transaction as Contracts.Crypto.ITransaction));
 		}
 	});
 
@@ -695,7 +695,7 @@ describe<{
 
 			context.forgetWallet(transactions.recipientWallet);
 
-			await assert.resolves(() => context.blockState.revertTransaction(transaction as Interfaces.ITransaction));
+			await assert.resolves(() => context.blockState.revertTransaction(transaction as Contracts.Crypto.ITransaction));
 		}
 	});
 
@@ -714,6 +714,6 @@ describe<{
 		// @ts-ignore
 		delete voteTransaction.data.asset;
 
-		await assert.rejects(() => context.blockState.applyTransaction(voteTransaction as Interfaces.ITransaction));
+		await assert.rejects(() => context.blockState.applyTransaction(voteTransaction as Contracts.Crypto.ITransaction));
 	});
 });

@@ -1,5 +1,6 @@
 import { Wallet, WalletRepository } from "../source/wallets";
-import { Constants, Identities, Utils as CryptoUtils } from "@arkecosystem/crypto";
+import { Identities } from "@arkecosystem/crypto";
+import { BigNumber } from "@arkecosystem/utils";
 
 export const buildDelegateAndVoteWallets = (numberDelegates: number, walletRepo: WalletRepository): Wallet[] => {
 	const delegates: Wallet[] = [];
@@ -28,15 +29,15 @@ export const buildDelegateAndVoteWallets = (numberDelegates: number, walletRepo:
 		const delegate = walletRepo.createWallet(Identities.Address.fromPublicKey(delegateKey));
 		delegate.setPublicKey(delegateKey);
 		delegate.setAttribute("delegate.username", `delegate${i}`);
-		delegate.setAttribute("delegate.voteBalance", CryptoBigNumber.ZERO);
+		delegate.setAttribute("delegate.voteBalance", BigNumber.ZERO);
 
 		// @ts-ignore
 		delegate.events = undefined;
 
 		const voter = walletRepo.createWallet(Identities.Address.fromPublicKey(voterKeys[i]));
-		const totalBalance = CryptoBigNumber.make(i + 1)
+		const totalBalance = BigNumber.make(i + 1)
 			.times(1000)
-			.times(Constants.SATOSHI);
+			.times(BigNumber.SATOSHI);
 		voter.setBalance(totalBalance);
 		voter.setPublicKey(`v${delegateKey}`);
 		voter.setAttribute("vote", delegateKey);
