@@ -74,7 +74,7 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		}
 
 		for (const predicate of this.predicates) {
-			if (! await predicate(transaction)) {
+			if (!(await predicate(transaction))) {
 				return false;
 			}
 		}
@@ -89,43 +89,41 @@ export class Query implements Contracts.TransactionPool.Query {
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
 	public getAll(): QueryIterable {
-		return new QueryIterable(Array.from(
-			this.mempool.getSenderMempools()
-		).flatMap(senderMempool => Array.from(senderMempool.getFromLatest())));
+		return new QueryIterable(
+			Array.from(this.mempool.getSenderMempools()).flatMap((senderMempool) =>
+				Array.from(senderMempool.getFromLatest()),
+			),
+		);
 	}
 
 	public getAllBySender(senderPublicKey: string): QueryIterable {
-		if (! this.mempool.hasSenderMempool(senderPublicKey)) {
+		if (!this.mempool.hasSenderMempool(senderPublicKey)) {
 			return new QueryIterable([]);
 		}
 
-		return new QueryIterable(Array.from(
-			this.mempool.getSenderMempool(senderPublicKey).getFromEarliest()
-		));
+		return new QueryIterable(Array.from(this.mempool.getSenderMempool(senderPublicKey).getFromEarliest()));
 	}
 
 	public getFromLowestPriority(): QueryIterable {
-		const transactions = Array.from(
-			this.mempool.getSenderMempools()
-		).flatMap(senderMempool => Array.from(senderMempool.getFromLatest()));
+		const transactions = Array.from(this.mempool.getSenderMempools()).flatMap((senderMempool) =>
+			Array.from(senderMempool.getFromLatest()),
+		);
 
-		transactions.sort((
-			a: Contracts.Crypto.ITransaction,
-			b: Contracts.Crypto.ITransaction,
-		) => a.data.fee.comparedTo(b.data.fee));
+		transactions.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+			a.data.fee.comparedTo(b.data.fee),
+		);
 
 		return new QueryIterable(transactions);
 	}
 
 	public getFromHighestPriority(): QueryIterable {
-		const transactions = Array.from(
-			this.mempool.getSenderMempools()
-		).flatMap(senderMempool => Array.from(senderMempool.getFromEarliest()));
+		const transactions = Array.from(this.mempool.getSenderMempools()).flatMap((senderMempool) =>
+			Array.from(senderMempool.getFromEarliest()),
+		);
 
-		transactions.sort((
-			a: Contracts.Crypto.ITransaction,
-			b: Contracts.Crypto.ITransaction,
-		) => b.data.fee.comparedTo(a.data.fee));
+		transactions.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+			b.data.fee.comparedTo(a.data.fee),
+		);
 
 		return new QueryIterable(transactions);
 	}
