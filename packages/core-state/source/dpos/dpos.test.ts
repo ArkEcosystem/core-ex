@@ -76,7 +76,7 @@ describe<{
 		}
 
 		context.app.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
-		context.app.bind(Identifiers.WalletRepository).to(WalletRepository);
+		context.app.bind(Identifiers.WalletRepository).to(WalletRepository).inSingletonScope();
 		context.app
 			.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) =>
@@ -100,106 +100,106 @@ describe<{
 		);
 	});
 
-	it.skip("should update delegate votes of htlc locked balances", async (context) => {
+	it.skip("should update validator votes of htlc locked balances", async (context) => {
 		await context.dposState.buildVoteBalances();
 
-		const delegates = context.walletRepo.allByUsername();
+		const validators = context.walletRepo.allByUsername();
 
 		for (let i = 0; i < 5; i++) {
-			const delegate = delegates[4 - i];
+			const validator = validators[4 - i];
 			const total = BigNumber.make(5 - i)
 				.times(1000)
 				.times(BigNumber.SATOSHI);
 
-			assert.equal(delegate.getAttribute<BigNumber>("validator.voteBalance"), total);
+			assert.equal(validator.getAttribute<BigNumber>("validator.voteBalance"), total);
 		}
 	});
 
-	it.only("buildValidatorRanking - should build ranking and sort delegates by vote balance", async (context) => {
+	it("buildValidatorRanking - should build ranking and sort validators by vote balance", async (context) => {
 		await context.dposState.buildVoteBalances();
 		context.dposState.buildValidatorRanking();
 
-		const delegates = context.dposState.getActiveValidators();
-		assert.is(delegates.length, 5);
+		const validators = context.dposState.getActiveValidators();
+		assert.is(validators.length, 5);
 
 		for (let i = 0; i < 5; i++) {
-			const delegate = delegates[i];
+			const validator = validators[i];
 			const total = BigNumber.make((5 - i) * 1000).times(BigNumber.SATOSHI);
 
-			assert.equal(delegate.getAttribute<number>("validator.rank"), i + 1);
-			assert.equal(delegate.getAttribute<BigNumber>("validator.voteBalance"), total);
+			assert.equal(validator.getAttribute<number>("validator.rank"), i + 1);
+			assert.equal(validator.getAttribute<BigNumber>("validator.voteBalance"), total);
 		}
 	});
 
 	it("buildValidatorRanking - should throw if two wallets have the same public key", async (context) => {
-		const delegates = await buildValidatorAndVoteWallets(
+		const validators = await buildValidatorAndVoteWallets(
 			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
 			5,
 			context.walletRepo,
 		);
-		delegates[0].setAttribute("delegate.resigned", true);
+		validators[0].setAttribute("validator.resigned", true);
 
-		delegates[1].setAttribute("delegate.voteBalance", Utils.BigNumber.make(5467));
-		delegates[2].setAttribute("delegate.voteBalance", Utils.BigNumber.make(5467));
-		delegates[1].setPublicKey("03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece");
-		delegates[2].setPublicKey("03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece");
-		context.walletRepo.index(delegates[2]);
+		validators[1].setAttribute("validator.voteBalance", Utils.BigNumber.make(5467));
+		validators[2].setAttribute("validator.voteBalance", Utils.BigNumber.make(5467));
+		validators[1].setPublicKey("03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece");
+		validators[2].setPublicKey("03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece");
+		context.walletRepo.index(validators[2]);
 
-		assert.throws(
+		assert.rejects(
 			() => context.dposState.buildValidatorRanking(),
-			'The balance and public key of both delegates are identical! Delegate "delegate2" appears twice in the list.',
+			'The balance and public key of both validators are identical! Validator "validator2" appears twice in the list.',
 		);
 	});
 
 	it("buildValidatorRanking - should not throw if public keys are different and balances are the same", async (context) => {
-		const delegates = await buildValidatorAndVoteWallets(
+		const validators = await buildValidatorAndVoteWallets(
 			context.app.get(Identifiers.Cryptography.Identity.AddressFactory),
 			5,
 			context.walletRepo,
 		);
 
-		delegates[1].setAttribute("delegate.voteBalance", Utils.BigNumber.make(5467));
-		delegates[2].setAttribute("delegate.voteBalance", Utils.BigNumber.make(5467));
+		validators[1].setAttribute("validator.voteBalance", Utils.BigNumber.make(5467));
+		validators[2].setAttribute("validator.voteBalance", Utils.BigNumber.make(5467));
 
 		assert.not.throws(() => context.dposState.buildValidatorRanking());
-		assert.equal(delegates[1].getAttribute("delegate.rank"), 1);
-		assert.equal(delegates[2].getAttribute("delegate.rank"), 2);
-		assert.equal(delegates[0].getAttribute("delegate.rank"), 3);
+		assert.equal(validators[1].getAttribute("validator.rank"), 1);
+		assert.equal(validators[2].getAttribute("validator.rank"), 2);
+		assert.equal(validators[0].getAttribute("validator.rank"), 3);
 	});
 
-	it("setValidatorsRound - should throw if there are not enough delegates", (context) => {
+	it("setValidatorsRound - should throw if there are not enough validators", (context) => {
 		context.dposState.buildVoteBalances();
 		context.dposState.buildValidatorRanking();
 		const round = Utils.roundCalculator.calculateRound(1, context.configuration);
 
-		assert.throws(
+		assert.rejects(
 			() => context.dposState.setValidatorsRound(round),
-			`Expected to find 51 delegates but only found 5.This indicates an issue with the genesis block & delegates`,
+			`Expected to find 51 validators but only found 5.This indicates an issue with the genesis block & validators`,
 		);
 	});
 
-	it("setValidatorsRound - should set the delegates of a round", async (context) => {
+	it("setValidatorsRound - should set the validators of a round", async (context) => {
 		await context.dposState.buildVoteBalances();
 		context.dposState.buildValidatorRanking();
 		const round = Utils.roundCalculator.calculateRound(1, context.configuration);
 		round.maxValidators = 4;
 		context.dposState.setValidatorsRound(round);
-		const delegates = context.dposState.getActiveValidators();
-		const roundDelegates = context.dposState.getRoundValidators();
+		const validators = context.dposState.getActiveValidators();
+		const roundValidators = context.dposState.getRoundValidators();
 
 		assert.equal(context.dposState.getRoundInfo(), round);
-		assert.equal(roundDelegates, delegates.slice(0, 4));
+		assert.equal(roundValidators, validators.slice(0, 4));
 
 		for (let i = 0; i < round.maxValidators; i++) {
-			const delegate = await context.walletRepo.findByPublicKey(roundDelegates[i].getPublicKey()!);
+			const validator = await context.walletRepo.findByPublicKey(roundValidators[i].getPublicKey()!);
 
-			assert.equal(delegate.getAttribute("delegate.round"), round.round);
+			assert.equal(validator.getAttribute("validator.round"), round.round);
 		}
 
 		// TODO: when we remove Assertion checks, this won't throw
 		// instead it should not.toEqual(round)
-		assert.throws(() => delegates[4].getAttribute("delegate.round"));
-		assert.true(context.logger.calledWith("Loaded 4 active delegates"));
+		assert.throws(() => validators[4].getAttribute("validator.round"));
+		assert.true(context.logger.calledWith("Loaded 4 active validators"));
 	});
 
 	it("should run all getters", async (context) => {
