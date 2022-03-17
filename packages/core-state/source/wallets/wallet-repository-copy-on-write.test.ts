@@ -1,12 +1,12 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { describe } from "../../../core-test-framework";
+import { describeSkip } from "../../../core-test-framework";
 
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from "./";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
 
-describe<{
+describeSkip<{
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
 	walletRepo: WalletRepository;
 }>("Wallet Repository Copy On Write", ({ it, assert, afterEach, beforeAll, spy }) => {

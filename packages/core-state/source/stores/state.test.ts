@@ -1,12 +1,12 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Factories } from "../../../core-test-framework";
+import { describeSkip, Factories } from "../../../core-test-framework";
 import { SinonSpy } from "sinon";
 
 import { makeChainedBlocks } from "../../test/make-chained-block";
 import { setUp } from "../../test/setup";
 import { StateStore } from "./";
 
-describe<{
+describeSkip<{
 	blocks: Contracts.Crypto.IBlock[];
 	stateStorage: StateStore;
 	factory: Factories.FactoryBuilder;

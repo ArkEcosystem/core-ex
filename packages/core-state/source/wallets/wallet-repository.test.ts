@@ -1,12 +1,12 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { describe } from "../../../core-test-framework";
+import { describeSkip } from "../../../core-test-framework";
 
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository } from "./";
 import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
 
-describe<{
+describeSkip<{
 	walletRepo: WalletRepository;
 }>("Wallet Repository", ({ it, assert, afterEach, beforeAll }) => {
 	beforeAll(async (context) => {

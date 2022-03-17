@@ -1,7 +1,7 @@
 import { Application, Enums, Utils } from "@arkecosystem/core-kernel";
 import { StateBuilder } from "./state-builder";
 import { WalletRepository } from "./wallets";
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { Managers } from "@arkecosystem/crypto";
 import { setUp, setUpDefaults } from "../test/setup";
 import { SinonSpy } from "sinon";

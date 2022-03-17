@@ -1,13 +1,13 @@
 import { Application, Services } from "@arkecosystem/core-kernel";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describe, getWalletAttributeSet } from "../../../core-test-framework";
+import { describeSkip, getWalletAttributeSet } from "../../../core-test-framework";
 import { SinonSpy } from "sinon";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { setUp } from "../../test/setup";
 import { Wallet, WalletEvent } from "../wallets";
 
-describe<{
+describeSkip<{
 	attributeMap: Services.Attributes.AttributeMap;
 }>("Models - Wallet", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {

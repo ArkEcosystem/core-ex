@@ -127,3 +127,5 @@ export const describeEach = <T = Context>(title: string, callback: CallbackFunct
 		runSuite<T>(suite<T>(formatName(title, dataset)), callback);
 	}
 };
+
+export const describeSkip = <T = Context>(title: string, callback: CallbackFunction<T>) => {};

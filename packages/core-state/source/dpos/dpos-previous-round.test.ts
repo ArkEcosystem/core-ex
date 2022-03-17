@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Utils } from "@arkecosystem/core-kernel";
-import { describe, Factories } from "../../../core-test-framework";
+import { describeSkip, Factories } from "../../../core-test-framework";
 import { VoteBuilder } from "../../../core-crypto-transaction-vote";
 
 import { buildValidatorAndVoteWallets } from "../../test/build-validator-and-vote-balances";
@@ -14,7 +14,7 @@ import { WalletRepository } from "../wallets";
 import { DposState } from "./dpos";
 import { Configuration } from "../../../core-crypto-config";
 
-describe<{
+describeSkip<{
 	app: Application;
 	dposState: DposState;
 	dposPreviousRoundStateProv: Contracts.State.DposPreviousRoundStateProvider;
