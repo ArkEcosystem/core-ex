@@ -2,6 +2,7 @@ import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts
 import { ValidatorRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-validator-registration";
 import { describe, Sandbox } from "@arkecosystem/core-test-framework";
 
+import { Enums as AppEnums } from "@arkecosystem/core-kernel";
 import { VoteTransaction } from "../versions";
 import { VoteTransactionHandler } from "./index";
 import { Handlers } from "@arkecosystem/core-transactions";
@@ -327,5 +328,55 @@ describe<{
 		spySuper.neverCalled();
 		spyHasAttribute.calledWith("vote");
 		spyGetAttribute.calledWith("vote");
+	});
+
+	it("emitEvents - should dispatch", ({ handler }) => {
+		const emitter: Partial<Contracts.Kernel.EventDispatcher> = {
+			dispatch: async () => {},
+		};
+		const spyDispatch = stub(emitter, "dispatch");
+
+		const voteTransaction = getTransaction(["+validatorPublicKey"]);
+
+		handler.emitEvents(
+			voteTransaction as Contracts.Crypto.ITransaction,
+			emitter as Contracts.Kernel.EventDispatcher,
+		);
+
+		spyDispatch.calledOnce();
+		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+			transaction: voteTransaction.data,
+			validator: "+validatorPublicKey",
+		});
+
+		spyDispatch.reset();
+		const unvoteTransaction = getTransaction(["-validatorPublicKey"]);
+		handler.emitEvents(
+			unvoteTransaction as Contracts.Crypto.ITransaction,
+			emitter as Contracts.Kernel.EventDispatcher,
+		);
+
+		spyDispatch.calledOnce();
+		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+			transaction: unvoteTransaction.data,
+			validator: "-validatorPublicKey",
+		});
+
+		spyDispatch.reset();
+		const unvoteVoteTransaction = getTransaction(["-validatorPublicKey", "+validatorPublicKey"]);
+		handler.emitEvents(
+			unvoteVoteTransaction as Contracts.Crypto.ITransaction,
+			emitter as Contracts.Kernel.EventDispatcher,
+		);
+
+		spyDispatch.calledTimes(2);
+		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+			transaction: unvoteVoteTransaction.data,
+			validator: "-validatorPublicKey",
+		});
+		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+			transaction: unvoteVoteTransaction.data,
+			validator: "+validatorPublicKey",
+		});
 	});
 });
