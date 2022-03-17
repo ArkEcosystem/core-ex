@@ -154,7 +154,6 @@ describe<{
 		]);
 	});
 
-	it("whereId - should filter transactions by id", (context) => {
 	it("whereId - should filter transactions by id", async (context) => {
 		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
 		const result = await queryIterable.whereId(context.sender1Transaction200.id).all();
