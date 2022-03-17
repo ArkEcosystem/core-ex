@@ -20,8 +20,9 @@
 		"clean": "del distribution",
 		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run ark core:run -- --networkStart --env=test --token=ark --network=testnet",
 		"test": "uvu -r tsm source .test.ts",
-		"test:coverage": "c8 -r html pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "uvu -r tsm source",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test"
 	},
 	"dependencies": {
 		"@arkecosystem/core-blockchain": "workspace:*",
