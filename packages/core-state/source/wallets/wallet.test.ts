@@ -1,13 +1,13 @@
 import { Application, Services } from "@arkecosystem/core-kernel";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describeSkip, getWalletAttributeSet } from "../../../core-test-framework";
+import { describe, describeSkip, getWalletAttributeSet } from "../../../core-test-framework";
 import { SinonSpy } from "sinon";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { setUp } from "../../test/setup";
 import { Wallet, WalletEvent } from "../wallets";
 
-describeSkip<{
+describe<{
 	attributeMap: Services.Attributes.AttributeMap;
 }>("Models - Wallet", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
@@ -160,7 +160,7 @@ describeSkip<{
 	});
 });
 
-describe<{
+describeSkip<{
 	app: Application;
 	wallet: Wallet;
 	dispatchSyncSpy: SinonSpy;
@@ -327,7 +327,7 @@ describe<{
 	});
 });
 
-describe<{
+describeSkip<{
 	app: Application;
 	clone: Contracts.State.Wallet;
 	dispatchSyncSpy: SinonSpy;
