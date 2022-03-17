@@ -21,9 +21,11 @@ describe<{
 		context.blockchain = { getLastBlock: () => undefined };
 		context.pool = { removeTransaction: () => undefined };
 		context.expirationService = { isExpired: () => undefined };
-		context.poolQuery = { getFromHighestPriority: () => {
-			all: () => undefined;
-		} };
+		context.poolQuery = {
+			getFromHighestPriority: () => {
+				all: () => undefined;
+			},
+		};
 		context.logger = { warning: () => undefined, error: () => undefined };
 
 		context.container = new Container();

@@ -308,7 +308,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	async #removeExpiredTransactions(): Promise<void> {
-		for (const transaction of (await this.poolQuery.getAll().all())) {
+		for (const transaction of await this.poolQuery.getAll().all()) {
 			AppUtils.assert.defined<string>(transaction.id);
 			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
