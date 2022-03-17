@@ -61,7 +61,7 @@ export class Stub extends Fake<SinonStub> {
 		return this;
 	}
 
-	public rejectValueSequence(sequence: unknown[]): Stub {
+	public rejectedValueSequence(sequence: unknown[]): Stub {
 		for (const [nth, value] of sequence.entries()) {
 			this.rejectedValueNth(nth, value);
 		}
