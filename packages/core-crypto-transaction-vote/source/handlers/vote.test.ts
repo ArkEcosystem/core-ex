@@ -10,17 +10,31 @@ describe<{
 	walletRepository: any;
 	handler: VoteTransactionHandler;
 }>("VoteHandler", ({ beforeEach, it, assert, stub }) => {
-	const wallet = {
-		forgetAttribute: () => {},
-		getAttribute: () => {},
-		hasAttribute: () => {},
-		setAttribute: () => {},
+	const wallet: Partial<Contracts.State.Wallet> = {
+		forgetAttribute: () => false,
+		getAttribute: <T>() => "" as unknown as T,
+		hasAttribute: () => false,
+		setAttribute: () => false,
+	};
+
+	const validatorWallet: Partial<Contracts.State.Wallet> = {
+		forgetAttribute: () => false,
+		getAttribute: <T>() => "" as unknown as T,
+		hasAttribute: () => false,
+		setAttribute: () => false,
+		isValidator: () => false,
 	};
 
 	let spyForgetAttribute;
 	let spyGetAttribute;
 	let spyHasAttribute;
 	let spySetAttribute;
+
+	let spyValidatorForgetAttribute;
+	let spyValidatorGetAttribute;
+	let spyValidatorHasAttribute;
+	let spyValidatorSetAttribute;
+	let spyValidatorIsValidator;
 
 	const getTransaction = (votes: string[]): Partial<Contracts.Crypto.ITransaction> => {
 		const transactionData: Partial<Contracts.Crypto.ITransactionData> = {
@@ -57,7 +71,11 @@ describe<{
 		spySetAttribute = stub(wallet, "setAttribute");
 		spyForgetAttribute = stub(wallet, "forgetAttribute");
 
-		stub(context.walletRepository, "findByPublicKey").resolvedValue(wallet);
+		spyValidatorHasAttribute = stub(validatorWallet, "hasAttribute");
+		spyValidatorGetAttribute = stub(validatorWallet, "getAttribute");
+		spyValidatorSetAttribute = stub(validatorWallet, "setAttribute");
+		spyValidatorForgetAttribute = stub(validatorWallet, "forgetAttribute");
+		// spyValidatorIsValidator = stub(validatorWallet, "isValidator");
 	});
 
 	it("#dependencies -  shoudl depend on ValidatorRegistrationTransaction", ({ handler }) => {
@@ -78,6 +96,7 @@ describe<{
 
 	it("#bootstrap -  shoudl set wallet vote attribute", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(false);
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
 		const transactions = [getTransaction(["+validatorPublicKey"])];
 
@@ -92,6 +111,7 @@ describe<{
 
 	it("#bootstrap -  shoudl throw if wallet already voted", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(true);
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
 		const transactions = [getTransaction(["+validatorPublicKey"])];
 
@@ -111,6 +131,7 @@ describe<{
 	it("#bootstrap -  shoudl forget wallet vote attribute", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(true);
 		spyGetAttribute.returnValue("validatorPublicKey");
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
 		const transactions = [getTransaction(["-validatorPublicKey"])];
 
@@ -129,6 +150,7 @@ describe<{
 	it("#bootstrap -  shoudl throw if walled didn't vote", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(false);
 		spyGetAttribute.returnValue("validatorPublicKey");
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
 		const transactions = [getTransaction(["-validatorPublicKey"])];
 
@@ -148,6 +170,7 @@ describe<{
 	it("#bootstrap -  shoudl throw on vote missmatch", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(true);
 		spyGetAttribute.returnValue("invalidPublicKey");
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
 		const transactions = [getTransaction(["-validatorPublicKey"])];
 
@@ -164,4 +187,16 @@ describe<{
 		spyForgetAttribute.neverCalled();
 		spySetAttribute.neverCalled();
 	});
+
+	// it("throwIfCannotBeApplied - should pass", async ({ handler, walletRepository }) => {
+	// 	spyHasAttribute.returnValue(false);
+	// 	spyValidatorHasAttribute.returnValue(false);
+	// 	spyValidatorIsValidator.returnValue(true);
+	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+
+	// 	await handler.throwIfCannotBeApplied(
+	// 		getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+	// 		wallet as Contracts.State.Wallet,
+	// 	);
+	// });
 });
