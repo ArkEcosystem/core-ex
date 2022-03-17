@@ -1,15 +1,16 @@
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { ValidatorRegistrationTransactionHandler } from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
-
 import { Enums as AppEnums } from "@arkecosystem/core-kernel";
+import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { Handlers } from "@arkecosystem/core-transactions";
+
 import { VoteTransaction } from "../versions";
 import { VoteTransactionHandler } from "./index";
-import { Handlers } from "@arkecosystem/core-transactions";
 
 describe<{
 	sandbox: Sandbox;
 	walletRepository: any;
+	poolQuery: any;
 	handler: VoteTransactionHandler;
 }>("VoteHandler", ({ beforeEach, it, assert, stub }) => {
 	const wallet: Partial<Contracts.State.Wallet> = {
@@ -23,8 +24,8 @@ describe<{
 		forgetAttribute: () => false,
 		getAttribute: <T>() => "" as unknown as T,
 		hasAttribute: () => false,
-		setAttribute: () => false,
 		isValidator: () => false,
+		setAttribute: () => false,
 	};
 
 	let spyForgetAttribute;
@@ -58,13 +59,19 @@ describe<{
 			findByPublicKey: () => {},
 		};
 
+		context.poolQuery = {
+			getAllBySender: () => context.poolQuery,
+			has: () => false,
+			whereKind: () => context.poolQuery,
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
 
 		context.handler = context.sandbox.app.resolve(VoteTransactionHandler);
 
@@ -378,5 +385,29 @@ describe<{
 			transaction: unvoteVoteTransaction.data,
 			validator: "+validatorPublicKey",
 		});
+	});
+
+	it("throwIfCannotEnterPool - should pass", async ({ handler, poolQuery }) => {
+		const spyHas = stub(poolQuery, "has").returnValue(false);
+
+		await assert.resolves(() =>
+			handler.throwIfCannotEnterPool(getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
+
+		spyHas.calledOnce();
+	});
+
+	it("throwIfCannotEnterPool - should throw", async ({ handler, poolQuery }) => {
+		const spyHas = stub(poolQuery, "has").returnValue(true);
+
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotEnterPool(
+					getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+				),
+			Exceptions.PoolError,
+		);
+
+		spyHas.calledOnce();
 	});
 });
