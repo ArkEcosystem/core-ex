@@ -120,6 +120,7 @@ describe<{
 		context.dposState.buildValidatorRanking();
 
 		const delegates = context.dposState.getActiveValidators();
+		assert.is(delegates.length, 5);
 
 		for (let i = 0; i < 5; i++) {
 			const delegate = delegates[i];
