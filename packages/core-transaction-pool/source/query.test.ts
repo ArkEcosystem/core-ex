@@ -106,14 +106,14 @@ describe<{
 		]);
 	});
 
-	it("getAllBySender - should return transaction from specific sender state", (context) => {
+	it("getAllBySender - should return transaction from specific sender state", async (context) => {
 		const hasSenderStub = stub(context.mempool, "hasSenderMempool").returnValueOnce(true);
 		const getSenderStub = stub(context.mempool, "getSenderMempool").returnValueOnce({
 			getFromEarliest: () => [context.sender1Transaction100, context.sender1Transaction200],
 		});
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getAllBySender("sender public key"));
+		const result = await query.getAllBySender("sender public key").all();
 
 		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
 		hasSenderStub.calledWith("sender public key");

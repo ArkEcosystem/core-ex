@@ -101,16 +101,13 @@ export class Query implements Contracts.TransactionPool.Query {
 	}
 
 	public getAllBySender(senderPublicKey: string): QueryIterable {
-		const iterable: Iterable<Contracts.Crypto.ITransaction> = function* (this: Query) {
-			if (this.mempool.hasSenderMempool(senderPublicKey)) {
-				const transactions = this.mempool.getSenderMempool(senderPublicKey).getFromEarliest();
-				for (const transaction of transactions) {
-					yield transaction;
-				}
-			}
-		}.bind(this)();
+		if (! this.mempool.hasSenderMempool(senderPublicKey)) {
+			return new QueryIterable([]);
+		}
 
-		return new QueryIterable(iterable);
+		return new QueryIterable(Array.from(
+			this.mempool.getSenderMempool(senderPublicKey).getFromEarliest()
+		));
 	}
 
 	public getFromLowestPriority(): QueryIterable {
