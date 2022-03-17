@@ -4,61 +4,82 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Comparator, IteratorMany } from "./utils";
 
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
-	public transactions: Iterable<Contracts.Crypto.ITransaction>;
-	public predicate?: Contracts.TransactionPool.QueryPredicate;
+	public transactions: Contracts.Crypto.ITransaction[];
+	public predicates: Contracts.TransactionPool.QueryPredicate[] = [];
 
 	public constructor(
-		transactions: Iterable<Contracts.Crypto.ITransaction>,
+		transactions: Contracts.Crypto.ITransaction[],
 		predicate?: Contracts.TransactionPool.QueryPredicate,
 	) {
 		this.transactions = transactions;
-		this.predicate = predicate;
-	}
 
-	public *[Symbol.iterator](): Iterator<Contracts.Crypto.ITransaction> {
-		for (const transaction of this.transactions) {
-			if (!this.predicate || this.predicate(transaction)) {
-				yield transaction;
-			}
+		if (predicate) {
+			this.predicates.push(predicate);
 		}
 	}
 
 	public wherePredicate(predicate: Contracts.TransactionPool.QueryPredicate): QueryIterable {
-		return new QueryIterable(this, predicate);
+		this.predicates.push(predicate);
+
+		return this;
 	}
 
 	public whereId(id: string): QueryIterable {
-		return this.wherePredicate((t) => t.id === id);
+		return this.wherePredicate(async (t) => t.id === id);
 	}
 
 	public whereType(type: Contracts.Crypto.TransactionType | number): QueryIterable {
-		return this.wherePredicate((t) => t.type === type);
+		return this.wherePredicate(async (t) => t.type === type);
 	}
 
 	public whereTypeGroup(typeGroup: Contracts.Crypto.TransactionTypeGroup | number): QueryIterable {
-		return this.wherePredicate((t) => t.typeGroup === typeGroup);
+		return this.wherePredicate(async (t) => t.typeGroup === typeGroup);
 	}
 
 	public whereVersion(version: number): QueryIterable {
-		return this.wherePredicate((t) => t.data.version === version);
+		return this.wherePredicate(async (t) => t.data.version === version);
 	}
 
 	public whereKind(transaction: Contracts.Crypto.ITransaction): QueryIterable {
-		return this.wherePredicate((t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
+		return this.wherePredicate(async (t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
 	}
 
-	public has(): boolean {
-		for (const _ of this) {
-			return true;
-		}
-		return false;
+	public async has(): Promise<boolean> {
+		return (await this.all()).length > 0;
 	}
 
-	public first(): Contracts.Crypto.ITransaction {
-		for (const transaction of this) {
+	public async first(): Promise<Contracts.Crypto.ITransaction> {
+		for (const transaction of await this.all()) {
 			return transaction;
 		}
+
 		throw new Error("Transaction not found");
+	}
+
+	public async all(): Promise<Contracts.Crypto.ITransaction[]> {
+		const transactions = [];
+
+		for (const transaction of this.transactions) {
+			if (await this.#satisfiesPredicates(transaction)) {
+				transactions.push(transaction);
+			}
+		}
+
+		return transactions;
+	}
+
+	async #satisfiesPredicates(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
+		if (this.predicates.length === 0) {
+			return true;
+		}
+
+		for (const predicate of this.predicates) {
+			if (! await predicate(transaction)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
 
