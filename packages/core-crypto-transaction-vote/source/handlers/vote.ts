@@ -61,8 +61,6 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		transaction: Contracts.Crypto.ITransaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		console.log("TEST");
-
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 
 		let walletVote: string | undefined;
