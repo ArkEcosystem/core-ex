@@ -9,6 +9,7 @@ import { loader } from "./loader";
 import { nock } from "./nock";
 import { Spy } from "./spy";
 import { Stub } from "./stub";
+import kleur from "kleur";
 
 type ContextFunction<T> = () => T;
 type ContextCallback<T> = (context: T) => Promise<void> | void;
@@ -128,4 +129,5 @@ export const describeEach = <T = Context>(title: string, callback: CallbackFunct
 	}
 };
 
-export const describeSkip = <T = Context>(title: string, callback: CallbackFunction<T>) => {};
+export const describeSkip = <T = Context>(title: string, callback: CallbackFunction<T>) =>
+	console.log(`${kleur.bold(kleur.bgYellow(kleur.black("Ignored test suite")))}: ${kleur.yellow(title)}`);

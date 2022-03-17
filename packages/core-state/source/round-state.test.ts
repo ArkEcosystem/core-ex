@@ -27,27 +27,27 @@ const generateBlocks = (count: number): any[] => {
 	return blocks;
 };
 
-const generateDelegates = (count: number): any[] => {
-	const delegates: any[] = [];
+const generateValidators = (count: number): any[] => {
+	const validators: any[] = [];
 
 	for (let i = 1; i <= count; i++) {
-		const delegate: any = {
+		const validator: any = {
 			getPublicKey: () => {
 				return "public_key_" + i;
 			},
 			username: "username_" + i,
 			getAttribute: (key: string) => {
-				return key === "delegate.username" ? "username_" + i : i;
+				return key === "validator.username" ? "username_" + i : i;
 			},
 			setAttribute: () => undefined,
 		};
-		delegate.clone = () => {
-			return delegate;
+		validator.clone = () => {
+			return validator;
 		};
-		delegates.push(delegate);
+		validators.push(validator);
 	}
 
-	return delegates;
+	return validators;
 };
 
 describeSkip<{
@@ -179,32 +179,32 @@ describeSkip<{
 		spyOnFromData.calledTimes(3);
 	});
 
-	it("getActiveValidators - should return shuffled round delegates", async (context) => {
+	it("getActiveValidators - should return shuffled round validators", async (context) => {
 		const lastBlock = dummyBlock;
 
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 
-		const delegatePublicKey = "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37";
-		const delegateVoteBalance = Utils.BigNumber.make("100");
-		const roundDelegateModel = { publicKey: delegatePublicKey, balance: delegateVoteBalance };
+		const validatorPublicKey = "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37";
+		const validatorVoteBalance = Utils.BigNumber.make("100");
+		const roundValidatorModel = { publicKey: validatorPublicKey, balance: validatorVoteBalance };
 
-		stub(context.databaseService, "getRound").returnValueOnce([roundDelegateModel]);
+		stub(context.databaseService, "getRound").returnValueOnce([roundValidatorModel]);
 		const cloneStub = stubFn();
 		const setAttributeStub = stubFn();
 
-		const newDelegateWallet = {
+		const newValidatorWallet = {
 			setAttribute: setAttributeStub,
 			clone: cloneStub,
 			setPublicKey: () => {},
 		};
-		const walletRepoStub1 = stub(context.walletRepository, "createWallet").returnValue(newDelegateWallet);
+		const walletRepoStub1 = stub(context.walletRepository, "createWallet").returnValue(newValidatorWallet);
 
 		const getAttributeStub = stubFn();
-		const oldDelegateWallet = { getAttribute: getAttributeStub };
-		const walletRepoStub2 = stub(context.walletRepository, "findByPublicKey").returnValue(oldDelegateWallet);
+		const oldValidatorWallet = { getAttribute: getAttributeStub };
+		const walletRepoStub2 = stub(context.walletRepository, "findByPublicKey").returnValue(oldValidatorWallet);
 
-		const delegateUsername = "test_delegate";
-		getAttributeStub.onFirstCall().returns(delegateUsername);
+		const validatorUsername = "test_validator";
+		getAttributeStub.onFirstCall().returns(validatorUsername);
 
 		const cloneDelegateWallet = {};
 		cloneStub.onFirstCall().returns(cloneDelegateWallet);
@@ -213,13 +213,13 @@ describeSkip<{
 
 		await context.roundState.getActiveValidators();
 
-		walletRepoStub2.calledWith(delegatePublicKey);
-		walletRepoStub1.calledWith(Identities.Address.fromPublicKey(delegatePublicKey));
-		assert.true(oldDelegateWallet.getAttribute.calledWith("delegate.username"));
+		walletRepoStub2.calledWith(validatorPublicKey);
+		walletRepoStub1.calledWith(Identities.Address.fromPublicKey(validatorPublicKey));
+		assert.true(oldValidatorWallet.getAttribute.calledWith("validator.username"));
 		assert.true(
-			newDelegateWallet.setAttribute.calledWith("delegate", {
-				voteBalance: delegateVoteBalance,
-				username: delegateUsername,
+			newValidatorWallet.setAttribute.calledWith("validator", {
+				voteBalance: validatorVoteBalance,
+				username: validatorUsername,
 				round: 34510,
 			}),
 		);
@@ -239,43 +239,43 @@ describeSkip<{
 		const roundInfo = { round: 2 };
 		const result = await context.roundState.getActiveValidators(roundInfo as any);
 
-		getAttributeStub.calledWith("delegate.round");
+		getAttributeStub.calledWith("validator.round");
 		// @ts-ignore
 		assert.equal(result, context.roundState.forgingValidators);
 	});
 
 	it("setForgingDelegatesOfRound - should call getActiveValidators and set #forgingDelegatValidators", async (context) => {
-		const delegate = {
-			username: "dummy_delegate",
+		const validator = {
+			username: "dummy_validator",
 		};
 
-		const triggerStub = stub(context.triggerService, "call").returnValue([delegate]);
+		const triggerStub = stub(context.triggerService, "call").returnValue([validator]);
 
 		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxValidators: 51 };
 		// @ts-ignore
-		await context.roundState.setForgingDelegatesOfRound(roundInfo, [delegate]);
+		await context.roundState.setForgingDelegatesOfRound(roundInfo, [validator]);
 
 		triggerStub.calledWith("getActiveValidators", {
-			delegates: [delegate],
+			validators: [validator],
 			roundInfo,
 		});
 
 		// @ts-ignore
-		assert.equal(context.roundState.forgingValidators, [delegate]);
+		assert.equal(context.roundState.forgingValidators, [validator]);
 	});
 
 	it("setForgingDelegatesOfRound - should call getActiveValidators and set #forgingDelegatValidators to [] if undefined is returned", async (context) => {
-		const delegate = {
-			username: "dummy_delegate",
+		const validator = {
+			username: "dummy_validator",
 		};
 		const triggerStub = stub(context.triggerService, "call").returnValue(undefined);
 
 		const roundInfo = { round: 2, roundHeight: 2, nextRound: 3, maxValidators: 51 };
 		// @ts-ignore
-		await context.roundState.setForgingDelegatesOfRound(roundInfo, [delegate]);
+		await context.roundState.setForgingDelegatesOfRound(roundInfo, [validator]);
 
 		triggerStub.calledWith("getActiveValidators", {
-			delegates: [delegate],
+			validators: [validator],
 			roundInfo,
 		});
 
@@ -302,12 +302,12 @@ describeSkip<{
 
 		const getAttributeStub2 = stubFn();
 
-		const delegateWallet = {
+		const validatorWallet = {
 			getPublicKey: () => "delegate public key",
 			getAttribute: getAttributeStub2,
 		};
 
-		const dposStateRoundDelegates = [delegateWallet];
+		const dposStateRoundDelegates = [validatorWallet];
 		const dposGetStub = stub(context.dposState, "getRoundValidators");
 
 		dposGetStub.returnValue(dposStateRoundDelegates);
@@ -315,7 +315,7 @@ describeSkip<{
 		const delegateWalletRound = 1;
 		getAttributeStub2.onFirstCall().returns(delegateWalletRound);
 
-		stub(context.walletRepository, "findByPublicKey").returnValueOnce(delegateWallet);
+		stub(context.walletRepository, "findByPublicKey").returnValueOnce(validatorWallet);
 
 		const delegateUsername = "test_delegate";
 		getAttributeStub2.onSecondCall().returns(delegateUsername);
@@ -420,7 +420,7 @@ describeSkip<{
 
 	it("revertBlock - should restore previous round, load previousRoundBlocks and delegates, remove last round from DB and remove last block from blocksInCurrentRound if block is last in round", async (context) => {
 		const blocksInPreviousRound: any[] = generateBlocks(51);
-		const delegates: any[] = generateDelegates(51);
+		const delegates: any[] = generateValidators(51);
 
 		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
@@ -457,7 +457,7 @@ describeSkip<{
 
 	it("revertBlock - should throw error if databaseService throws error", async (context) => {
 		const blocksInPreviousRound: any[] = generateBlocks(51);
-		const delegates: any[] = generateDelegates(51);
+		const delegates: any[] = generateValidators(51);
 
 		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
@@ -516,7 +516,7 @@ describeSkip<{
 	});
 
 	it("restore - should restore blocksInCurrentRound and #forgingValidators when last block in middle of round", async (context) => {
-		const delegates: any[] = generateDelegates(51);
+		const delegates: any[] = generateValidators(51);
 		const blocks: any[] = generateBlocks(3);
 
 		const lastBlock = blocks[2];
@@ -543,7 +543,7 @@ describeSkip<{
 	});
 
 	it("restore - should restore blocksInCurrentRound and #forgingValidators when last block is lastBlock of round", async (context) => {
-		const delegates: any[] = generateDelegates(51);
+		const delegates: any[] = generateValidators(51);
 		const blocks: any[] = generateBlocks(51);
 
 		const lastBlock = blocks[50];
@@ -576,7 +576,7 @@ describeSkip<{
 	});
 
 	it("restore - should throw if databaseService throws error", async (context) => {
-		const delegates: any[] = generateDelegates(51);
+		const delegates: any[] = generateValidators(51);
 		const blocks: any[] = generateBlocks(51);
 
 		const lastBlock = blocks[50];
@@ -600,7 +600,7 @@ describeSkip<{
 	});
 
 	it("calcPreviousActiveDelegates - should return previous active delegates && set ranks", async (context) => {
-		const delegates = generateDelegates(51);
+		const delegates = generateValidators(51);
 		const blocks = generateBlocks(51);
 
 		stub(context.roundState, "getDposPreviousRoundState").returnValue({
@@ -626,7 +626,7 @@ describeSkip<{
 
 	it("detectMissedBlocks - should not detect missed round when stateStore.lastBlock is genesis block", async (context) => {
 		// @ts-ignore
-		context.roundState.forgingValidators = generateDelegates(51);
+		context.roundState.forgingValidators = generateValidators(51);
 
 		const block = {
 			data: {
@@ -650,7 +650,7 @@ describeSkip<{
 
 	it("detectMissedBlocks - should not detect missed block if slots are sequential", async (context) => {
 		// @ts-ignore
-		context.roundState.forgingValidators = generateDelegates(51);
+		context.roundState.forgingValidators = generateValidators(51);
 
 		const block1 = {
 			data: {
@@ -676,7 +676,7 @@ describeSkip<{
 	});
 
 	it("detectMissedBlocks - should detect missed block if slots are not sequential", async (context) => {
-		const delegates = generateDelegates(51);
+		const delegates = generateValidators(51);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 
@@ -708,7 +708,7 @@ describeSkip<{
 
 	it("detectMissedBlocks - should detect only one round if multiple rounds are missing", async (context) => {
 		// @ts-ignore
-		context.roundState.forgingValidators = generateDelegates(51);
+		context.roundState.forgingValidators = generateValidators(51);
 
 		const block1 = {
 			data: {
@@ -734,7 +734,7 @@ describeSkip<{
 	});
 
 	it("detectMissedRound - should not detect missed round if all delegates forged blocks", (context) => {
-		let delegates = generateDelegates(3);
+		let delegates = generateValidators(3);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 		let blocksInCurrentRound = generateBlocks(3);
@@ -757,7 +757,7 @@ describeSkip<{
 	});
 
 	it("detectMissedRound - should detect missed round", (context) => {
-		let delegates = generateDelegates(3);
+		let delegates = generateValidators(3);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 		let blocksInCurrentRound = generateBlocks(3);
@@ -782,7 +782,7 @@ describeSkip<{
 	});
 
 	it("applyBlock - should push block to blocksInCurrentRound and skip applyRound when block is not last block in round", async (context) => {
-		let delegates = generateDelegates(51);
+		let delegates = generateValidators(51);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 
@@ -808,7 +808,7 @@ describeSkip<{
 	});
 
 	it("applyBlock - should push block to blocksInCurrentRound, applyRound, check missing round, calculate delegates, and clear blocksInCurrentRound when block is last in round", async (context) => {
-		let delegates = generateDelegates(51);
+		let delegates = generateValidators(51);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 
@@ -850,7 +850,7 @@ describeSkip<{
 
 	// TODO: Check how we can restore
 	it("applyBlock - should throw error if databaseService.saveRound throws error", async (context) => {
-		let delegates = generateDelegates(51);
+		let delegates = generateValidators(51);
 		// @ts-ignore
 		context.roundState.forgingValidators = delegates;
 
