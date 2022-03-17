@@ -410,4 +410,30 @@ describe<{
 
 		spyHas.calledOnce();
 	});
+
+	it("applyToSender - should set attribute on vote", async ({ handler, walletRepository }) => {
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
+
+		await assert.resolves(() =>
+			handler.applyToSender(getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
+
+		spySuper.calledOnce();
+		spySetAttribute.calledOnce();
+		spySetAttribute.calledWith("vote", "validatorPublicKey");
+	});
+
+	it("applyToSender - should forget attribute on unvote", async ({ handler, walletRepository }) => {
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
+
+		await assert.resolves(() =>
+			handler.applyToSender(getTransaction(["-validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
+
+		spySuper.calledOnce();
+		spyForgetAttribute.calledOnce();
+		spyForgetAttribute.calledWith("vote");
+	});
 });
