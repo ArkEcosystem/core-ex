@@ -436,4 +436,42 @@ describe<{
 		spyForgetAttribute.calledOnce();
 		spyForgetAttribute.calledWith("vote");
 	});
+
+	it("revertForSender - should forget attribute on vote", async ({ handler, walletRepository }) => {
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "revertForSender");
+
+		await assert.resolves(() =>
+			handler.revertForSender(getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
+
+		spySuper.calledOnce();
+		spyForgetAttribute.calledOnce();
+		spyForgetAttribute.calledWith("vote");
+	});
+
+	it("revertForSender - should set attribute on unvote", async ({ handler, walletRepository }) => {
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "revertForSender");
+
+		await assert.resolves(() =>
+			handler.revertForSender(getTransaction(["-validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
+
+		spySuper.calledOnce();
+		spySetAttribute.calledOnce();
+		spySetAttribute.calledWith("vote", "validatorPublicKey");
+	});
+
+	it("applyToRecipient - should pass", async ({ handler }) => {
+		await assert.resolves(() =>
+			handler.applyToRecipient(getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
+	});
+
+	it("revertForRecipient - should pass", async ({ handler }) => {
+		await assert.resolves(() =>
+			handler.revertForRecipient(getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
+	});
 });
