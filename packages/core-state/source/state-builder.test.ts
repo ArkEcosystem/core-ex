@@ -40,7 +40,7 @@ describe<{
 		context.app = env.sandbox.app;
 
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.configuration = context.app.get(Identifiers.Cryptography.Configuration)
+		context.configuration = context.app.get(Identifiers.Cryptography.Configuration);
 		context.getBlockRewardsSpy = env.spies.getBlockRewardsSpy;
 		context.getSentTransactionSpy = env.spies.getSentTransactionSpy;
 		context.getRegisteredHandlersSpy = env.spies.getRegisteredHandlersSpy;

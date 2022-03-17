@@ -308,9 +308,8 @@ describe<{
 
 		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
 
-
 		const handler = { emitEvents: () => undefined };
-		const spied = spy(handler, 'emitEvents');
+		const spied = spy(handler, "emitEvents");
 		stub(context.handlerRegistry, "getActivatedHandlerForData").returnValueOnce(handler);
 		const transaction = { data: { id: "dummy_id" } };
 		const block = { data: { height: 54, timestamp: 35 }, transactions: [transaction] };
