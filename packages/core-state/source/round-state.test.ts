@@ -350,6 +350,7 @@ describe<{
 			getPublicKey: () => undefined,
 		};
 
+
 		// @ts-ignore
 		context.roundState.forgingValidators = [forgingDelegate] as any;
 
