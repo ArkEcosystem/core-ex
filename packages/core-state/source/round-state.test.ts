@@ -294,9 +294,6 @@ describe<{
 			getPublicKey: () => undefined,
 		};
 
-		const forgingDelegateRound = 1;
-		stubFn().onFirstCall().returns(forgingDelegateRound);
-
 		// @ts-ignore
 		context.roundState.forgingValidators = [forgingDelegate] as any;
 
