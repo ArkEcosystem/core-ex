@@ -1002,6 +1002,7 @@ importers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-test-framework': workspace:*
       '@arkecosystem/core-transactions': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
       uvu: 0.5.3
@@ -1016,6 +1017,7 @@ importers:
       '@arkecosystem/utils': link:../utils
     devDependencies:
       '@arkecosystem/core-test-framework': link:../core-test-framework
+      '@arkecosystem/core-validation': link:../core-validation
       uvu: 0.5.3
 
   packages/core-crypto-validation:

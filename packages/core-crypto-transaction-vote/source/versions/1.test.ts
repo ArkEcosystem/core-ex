@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { describe, Sandbox } from "@arkecosystem/core-test-framework";
+import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 import { VoteTransaction } from "./index";
@@ -51,5 +52,16 @@ describe<{
 
 			assert.equal(transaction.data, data);
 		}
+	});
+
+	it.skip("schema - shoudl pass", async ({ sanbox }) => {
+		const validator = sanbox.app.resolve(Validator);
+		const schema = VoteTransaction.getSchema();
+
+		validator.addSchema(schema);
+		const result = await validator.validate("vote", {});
+
+		console.log(result);
+		// assert.undefined(result.value);
 	});
 });

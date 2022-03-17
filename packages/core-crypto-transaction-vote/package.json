@@ -30,6 +30,7 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-test-framework": "workspace:*",
+		"@arkecosystem/core-validation": "workspace:*",
 		"uvu": "0.5.3"
 	},
 	"engines": {
