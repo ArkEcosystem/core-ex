@@ -21,7 +21,9 @@ describe<{
 		context.blockchain = { getLastBlock: () => undefined };
 		context.pool = { removeTransaction: () => undefined };
 		context.expirationService = { isExpired: () => undefined };
-		context.poolQuery = { getFromHighestPriority: () => undefined };
+		context.poolQuery = { getFromHighestPriority: () => {
+			all: () => undefined;
+		} };
 		context.logger = { warning: () => undefined, error: () => undefined };
 
 		context.container = new Container();
@@ -53,7 +55,7 @@ describe<{
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValue(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValue({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
 		const validatorSpy = spy(context.validator, "validate");
@@ -81,7 +83,7 @@ describe<{
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
 		const validatorSpy = spy(context.validator, "validate");
@@ -109,7 +111,7 @@ describe<{
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 
 		const expiredStub = stub(context.expirationService, "isExpired");
 
@@ -143,7 +145,7 @@ describe<{
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
 		stub(context.blockchain, "getLastBlock").returnValueOnce(lastBlock);
-		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce(poolTransactions);
+		stub(context.poolQuery, "getFromHighestPriority").returnValueOnce({ all: () => poolTransactions });
 		stub(context.expirationService, "isExpired").resolvedValue(false);
 
 		const validatorStub = stub(context.validator, "validate").rejectedValueNth(0, new Error("Some error"));

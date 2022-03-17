@@ -9,7 +9,7 @@ export interface Query {
 	getFromHighestPriority(): QueryIterable;
 }
 
-export interface QueryIterable extends Iterable<ITransaction> {
+export interface QueryIterable {
 	wherePredicate(predicate: QueryPredicate): QueryIterable;
 	whereId(id: string): QueryIterable;
 	whereType(type: TransactionType | number): QueryIterable;
@@ -19,4 +19,5 @@ export interface QueryIterable extends Iterable<ITransaction> {
 
 	has(): Promise<boolean>;
 	first(): Promise<ITransaction>;
+	all(): Promise<ITransaction[]>;
 }
