@@ -1,6 +1,6 @@
 import { ITransaction, TransactionType, TransactionTypeGroup } from "../crypto";
 
-export type QueryPredicate = (transaction: ITransaction) => boolean;
+export type QueryPredicate = (transaction: ITransaction) => Promise<boolean>;
 
 export interface Query {
 	getAll(): QueryIterable;
@@ -17,6 +17,6 @@ export interface QueryIterable extends Iterable<ITransaction> {
 	whereVersion(version: number): QueryIterable;
 	whereKind(transaction: ITransaction): QueryIterable;
 
-	has(): boolean;
-	first(): ITransaction;
+	has(): Promise<boolean>;
+	first(): Promise<ITransaction>;
 }

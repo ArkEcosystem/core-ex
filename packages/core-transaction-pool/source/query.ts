@@ -1,8 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
-import { Comparator, IteratorMany } from "./utils";
-
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	public transactions: Contracts.Crypto.ITransaction[];
 	public predicates: Contracts.TransactionPool.QueryPredicate[] = [];
