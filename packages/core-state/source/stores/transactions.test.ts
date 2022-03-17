@@ -1,5 +1,5 @@
-import { describe, Factories } from "@arkecosystem/core-test-framework";
-import { Interfaces } from "@arkecosystem/crypto";
+import { describe, Factories } from "../../../core-test-framework";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import { TransactionStore } from "./transactions";
 
@@ -13,7 +13,7 @@ describe<{
 	});
 
 	it("should push and get a transaction", (context) => {
-		const transaction: Interfaces.ITransaction = context.factory.get("Transfer").make();
+		const transaction: Contracts.Crypto.ITransaction = context.factory.get("Transfer").make();
 
 		// TODO: set id using factory
 		transaction.data.id = "1";

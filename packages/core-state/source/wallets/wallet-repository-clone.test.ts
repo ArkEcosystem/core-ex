@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Container, Selectors } from "@arkecosystem/core-container";
+import { Selectors } from "@arkecosystem/core-container";
 import { Services } from "@arkecosystem/core-kernel";
 import { describe, Sandbox } from "../../../core-test-framework";
 import { BigNumber } from "@arkecosystem/utils";
@@ -62,7 +62,7 @@ describe<{
 			.toFactory(({ container }) => {
 				return walletFactory(container.get(Identifiers.WalletAttributes));
 			})
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 		app.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) => {
@@ -73,12 +73,12 @@ describe<{
 		app.bind(Identifiers.WalletRepository)
 			.to(WalletRepository)
 			.inSingletonScope()
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 		app.bind(Identifiers.WalletRepository)
 			.to(WalletRepositoryClone)
 			.inSingletonScope()
-			.when(Container.Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 		context.walletRepositoryBlockchain = app.getTagged<WalletRepositoryClone>(
 			Identifiers.WalletRepository,
@@ -615,7 +615,7 @@ describe<{
 	});
 
 	it("getNonce - should return nonce if wallet exists on copy wallet repository", async (context) => {
-		const blockchainWallet = context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
+		const blockchainWallet = await context.walletRepositoryBlockchain.findByPublicKey(context.publicKey);
 		blockchainWallet.setNonce(BigNumber.make("10"));
 
 		const wallet = await context.walletRepositoryClone.findByPublicKey(context.publicKey);
@@ -733,8 +733,8 @@ describe<{
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).values().length,
 			1,
 		);
-		// @ts-ignore
 		assert.equal(
+			// @ts-ignore
 			context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].values().length,
 			1,
 		);
@@ -745,8 +745,8 @@ describe<{
 			context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).values().length,
 			0,
 		);
-		// @ts-ignore
 		assert.equal(
+			// @ts-ignore
 			context.walletRepositoryClone.forgetIndexes[Contracts.State.WalletIndexes.Usernames].values().length,
 			0,
 		);

@@ -146,7 +146,7 @@ describe<{
 	it.only("getBlocksForRound - should return array of blocks when all requested blocks are in stateStore", async (context) => {
 		const lastBlock = context.blocks[2];
 
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(context.blocks);
 
 		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
@@ -163,7 +163,7 @@ describe<{
 	it("getBlocksForRound - should return array of blocks when only last block is in stateStore", async (context) => {
 		const lastBlock = context.blocks[2];
 
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue([lastBlock]);
 		const databaseServiceStub = stub(context.databaseService, "getBlocks").returnValue(context.blocks.slice(0, 2));
 
@@ -182,14 +182,13 @@ describe<{
 	it("getActiveValidators - should return shuffled round delegates", async (context) => {
 		const lastBlock = dummyBlock;
 
-		const stateStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
 
 		const delegatePublicKey = "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37";
 		const delegateVoteBalance = Utils.BigNumber.make("100");
 		const roundDelegateModel = { publicKey: delegatePublicKey, balance: delegateVoteBalance };
 
-		const dbStub = stub(context.databaseService, "getRound").returnValueOnce([roundDelegateModel]);
-
+		stub(context.databaseService, "getRound").returnValueOnce([roundDelegateModel]);
 		const cloneStub = stubFn();
 		const setAttributeStub = stubFn();
 
@@ -228,24 +227,24 @@ describe<{
 		spyOnShuffleDelegates.called();
 	});
 
-	it("getActiveValidators - should return cached forgingDelegates when round is the same", async (context) => {
+	it("getActiveValidators - should return cached #forgingValidators when round is the same", async (context) => {
 		const forgingDelegate = { getAttribute: () => undefined };
 		const forgingDelegateRound = 2;
 
 		const getAttributeStub = stub(forgingDelegate, "getAttribute").returnValueOnce(forgingDelegateRound);
 
 		// @ts-ignore
-		context.roundState.forgingDelegates = [forgingDelegate] as any;
+		context.roundState.forgingValidators = [forgingDelegate] as any;
 
 		const roundInfo = { round: 2 };
 		const result = await context.roundState.getActiveValidators(roundInfo as any);
 
 		getAttributeStub.calledWith("delegate.round");
 		// @ts-ignore
-		assert.equal(result, context.roundState.forgingDelegates);
+		assert.equal(result, context.roundState.forgingValidators);
 	});
 
-	it("setForgingDelegatesOfRound - should call getActiveValidators and set forgingDelegatesOfRound", async (context) => {
+	it("setForgingDelegatesOfRound - should call getActiveValidators and set #forgingDelegatValidators", async (context) => {
 		const delegate = {
 			username: "dummy_delegate",
 		};
@@ -262,10 +261,10 @@ describe<{
 		});
 
 		// @ts-ignore
-		assert.equal(context.roundState.forgingDelegates, [delegate]);
+		assert.equal(context.roundState.forgingValidators, [delegate]);
 	});
 
-	it("setForgingDelegatesOfRound - should call getActiveValidators and set forgingDelegatesOfRound to [] if undefined is returned", async (context) => {
+	it("setForgingDelegatesOfRound - should call getActiveValidators and set #forgingDelegatValidators to [] if undefined is returned", async (context) => {
 		const delegate = {
 			username: "dummy_delegate",
 		};
@@ -281,7 +280,7 @@ describe<{
 		});
 
 		// @ts-ignore
-		assert.equal(context.roundState.forgingDelegates, []);
+		assert.equal(context.roundState.forgingValidators, []);
 	});
 
 	it("applyRound - should build delegates, save round, dispatch events when height is 1", async (context) => {
@@ -296,10 +295,10 @@ describe<{
 		};
 
 		const forgingDelegateRound = 1;
+		stubFn().onFirstCall().returns(forgingDelegateRound);
 
-		const getAttributeStub = stubFn().onFirstCall().returns(forgingDelegateRound);
 		// @ts-ignore
-		context.roundState.forgingDelegates = [forgingDelegate] as any;
+		context.roundState.forgingValidators = [forgingDelegate] as any;
 
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = [];
@@ -319,7 +318,7 @@ describe<{
 		const delegateWalletRound = 1;
 		getAttributeStub2.onFirstCall().returns(delegateWalletRound);
 
-		const walletRepoStub = stub(context.walletRepository, "findByPublicKey").returnValueOnce(delegateWallet);
+		stub(context.walletRepository, "findByPublicKey").returnValueOnce(delegateWallet);
 
 		const delegateUsername = "test_delegate";
 		getAttributeStub2.onSecondCall().returns(delegateUsername);
@@ -355,7 +354,7 @@ describe<{
 		};
 
 		// @ts-ignore
-		context.roundState.forgingDelegates = [forgingDelegate] as any;
+		context.roundState.forgingValidators = [forgingDelegate] as any;
 
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = [{ data: { height: 1 } }] as any;
@@ -373,7 +372,7 @@ describe<{
 
 		getAttributeStub2.onFirstCall().returns(delegateWalletRound);
 
-		const walletRepoStub = stub(context.walletRepository, "findByPublicKey").returnValueOnce(delegateWallet);
+		stub(context.walletRepository, "findByPublicKey").returnValueOnce(delegateWallet);
 
 		const delegateUsername = "test_delegate";
 		getAttributeStub2.onSecondCall().returns(delegateUsername);
@@ -433,8 +432,8 @@ describe<{
 
 		const block = blocksInPreviousRound[50];
 
-		const stateStub1 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocksInPreviousRound);
-		const stateStub2 = stub(context.stateStore, "getLastBlock").returnValue(block);
+		stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocksInPreviousRound);
+		stub(context.stateStore, "getLastBlock").returnValue(block);
 
 		context.getDposPreviousRoundState = stubFn().returns({
 			getAllValidators: () => delegates,
@@ -468,8 +467,8 @@ describe<{
 
 		const block = blocksInPreviousRound[50];
 
-		const stateStub1 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocksInPreviousRound);
-		const stateStub2 = stub(context.stateStore, "getLastBlock").returnValue(block);
+		stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocksInPreviousRound);
+		stub(context.stateStore, "getLastBlock").returnValue(block);
 
 		context.getDposPreviousRoundState = stubFn().returns({
 			getAllValidators: () => delegates,
@@ -518,21 +517,21 @@ describe<{
 		stateSpy.neverCalled();
 	});
 
-	it("restore - should restore blocksInCurrentRound and forgingDelegates when last block in middle of round", async (context) => {
+	it("restore - should restore blocksInCurrentRound and #forgingValidators when last block in middle of round", async (context) => {
 		const delegates: any[] = generateDelegates(51);
 		const blocks: any[] = generateBlocks(3);
 
 		const lastBlock = blocks[2];
 
-		const getLastBlockStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
-		const getLastBlocksByHeightHeight = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
+		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
 		const databaseServiceSpy = spy(context.databaseService, "deleteRound");
 
 		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
-		const triggerStub = stub(context.triggerService, "call").returnValue(delegates);
+		stub(context.triggerService, "call").returnValue(delegates);
 
 		await context.roundState.restore();
 
@@ -542,20 +541,20 @@ describe<{
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, blocks);
 		// @ts-ignore
-		assert.equal(context.roundState.forgingDelegates, delegates);
+		assert.equal(context.roundState.forgingValidators, delegates);
 	});
 
-	it("restore - should restore blocksInCurrentRound and forgingDelegates when last block is lastBlock of round", async (context) => {
+	it("restore - should restore blocksInCurrentRound and #forgingValidators when last block is lastBlock of round", async (context) => {
 		const delegates: any[] = generateDelegates(51);
 		const blocks: any[] = generateBlocks(51);
 
 		const lastBlock = blocks[50];
 
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
-		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
-		const dposStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		const triggerStub = stub(context.triggerService, "call").returnValue(delegates);
+		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
+		stub(context.dposState, "getRoundValidators").returnValue(delegates);
+		stub(context.triggerService, "call").returnValue(delegates);
 
 		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
@@ -575,7 +574,7 @@ describe<{
 		// @ts-ignore
 		assert.equal(context.roundState.blocksInCurrentRound, []);
 		// @ts-ignore
-		assert.equal(context.roundState.forgingDelegates, delegates);
+		assert.equal(context.roundState.forgingValidators, delegates);
 	});
 
 	it("restore - should throw if databaseService throws error", async (context) => {
@@ -584,12 +583,12 @@ describe<{
 
 		const lastBlock = blocks[50];
 
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
-		const stateStoreStub2 = stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
-		const dposStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		const triggerStub = stub(context.triggerService, "call").returnValue(delegates);
+		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(context.stateStore, "getLastBlocksByHeight").returnValue(blocks);
+		stub(context.dposState, "getRoundValidators").returnValue(delegates);
+		stub(context.triggerService, "call").returnValue(delegates);
 
-		const spyOnFromData = stub(context.blockFactory, "fromData").callsFake((block) => {
+		stub(context.blockFactory, "fromData").callsFake((block) => {
 			return block;
 		});
 
@@ -606,7 +605,7 @@ describe<{
 		const delegates = generateDelegates(51);
 		const blocks = generateBlocks(51);
 
-		const stubbedRoundState = stub(context.roundState, "getDposPreviousRoundState").returnValue({
+		stub(context.roundState, "getDposPreviousRoundState").returnValue({
 			getAllValidators: () => delegates,
 			getActiveValidators: () => delegates,
 			getRoundValidators: () => delegates,
@@ -629,7 +628,7 @@ describe<{
 
 	it("detectMissedBlocks - should not detect missed round when stateStore.lastBlock is genesis block", async (context) => {
 		// @ts-ignore
-		context.roundState.forgingDelegates = generateDelegates(51);
+		context.roundState.forgingValidators = generateDelegates(51);
 
 		const block = {
 			data: {
@@ -637,7 +636,7 @@ describe<{
 			},
 		};
 
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue({
+		stub(context.stateStore, "getLastBlock").returnValue({
 			data: {
 				height: 1,
 			},
@@ -653,7 +652,7 @@ describe<{
 
 	it("detectMissedBlocks - should not detect missed block if slots are sequential", async (context) => {
 		// @ts-ignore
-		context.roundState.forgingDelegates = generateDelegates(51);
+		context.roundState.forgingValidators = generateDelegates(51);
 
 		const block1 = {
 			data: {
@@ -662,7 +661,7 @@ describe<{
 			},
 		};
 
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(block1);
+		stub(context.stateStore, "getLastBlock").returnValue(block1);
 		const loggerSpy = spy(context.logger, "debug");
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
@@ -681,7 +680,7 @@ describe<{
 	it("detectMissedBlocks - should detect missed block if slots are not sequential", async (context) => {
 		const delegates = generateDelegates(51);
 		// @ts-ignore
-		context.roundState.forgingDelegates = delegates;
+		context.roundState.forgingValidators = delegates;
 
 		const block1 = {
 			data: {
@@ -690,7 +689,7 @@ describe<{
 			},
 		};
 
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(block1);
+		stub(context.stateStore, "getLastBlock").returnValue(block1);
 		const loggerSpy = spy(context.logger, "debug");
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
@@ -711,7 +710,7 @@ describe<{
 
 	it("detectMissedBlocks - should detect only one round if multiple rounds are missing", async (context) => {
 		// @ts-ignore
-		context.roundState.forgingDelegates = generateDelegates(51);
+		context.roundState.forgingValidators = generateDelegates(51);
 
 		const block1 = {
 			data: {
@@ -720,7 +719,7 @@ describe<{
 			},
 		};
 
-		const stateStoreStub = stub(context.stateStore, "getLastBlock").returnValue(block1);
+		stub(context.stateStore, "getLastBlock").returnValue(block1);
 		const loggerSpy = spy(context.logger, "debug");
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
@@ -739,7 +738,7 @@ describe<{
 	it("detectMissedRound - should not detect missed round if all delegates forged blocks", (context) => {
 		let delegates = generateDelegates(3);
 		// @ts-ignore
-		context.roundState.forgingDelegates = delegates;
+		context.roundState.forgingValidators = delegates;
 		let blocksInCurrentRound = generateBlocks(3);
 
 		context.walletRepository.findByPublicKey = (publicKey) => {
@@ -762,7 +761,7 @@ describe<{
 	it("detectMissedRound - should detect missed round", (context) => {
 		let delegates = generateDelegates(3);
 		// @ts-ignore
-		context.roundState.forgingDelegates = delegates;
+		context.roundState.forgingValidators = delegates;
 		let blocksInCurrentRound = generateBlocks(3);
 
 		context.walletRepository.findByPublicKey = (publicKey) => {
@@ -787,7 +786,7 @@ describe<{
 	it("applyBlock - should push block to blocksInCurrentRound and skip applyRound when block is not last block in round", async (context) => {
 		let delegates = generateDelegates(51);
 		// @ts-ignore
-		context.roundState.forgingDelegates = delegates;
+		context.roundState.forgingValidators = delegates;
 
 		const block = {
 			data: {
@@ -813,7 +812,7 @@ describe<{
 	it("applyBlock - should push block to blocksInCurrentRound, applyRound, check missing round, calculate delegates, and clear blocksInCurrentRound when block is last in round", async (context) => {
 		let delegates = generateDelegates(51);
 		// @ts-ignore
-		context.roundState.forgingDelegates = delegates;
+		context.roundState.forgingValidators = delegates;
 
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = generateBlocks(50);
@@ -828,8 +827,8 @@ describe<{
 		const databaseServiceSpy = spy(context.databaseService, "saveRound");
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
-		const dposGetStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		const triggerStub = stub(context.triggerService, "call").callsFake((name, args) => {
+		stub(context.dposState, "getRoundValidators").returnValue(delegates);
+		stub(context.triggerService, "call").callsFake((name, args) => {
 			return context.roundState.getActiveValidators(args.roundInfo, args.delegates);
 		});
 
@@ -855,7 +854,7 @@ describe<{
 	it("applyBlock - should throw error if databaseService.saveRound throws error", async (context) => {
 		let delegates = generateDelegates(51);
 		// @ts-ignore
-		context.roundState.forgingDelegates = delegates;
+		context.roundState.forgingValidators = delegates;
 
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = generateBlocks(50);
@@ -869,8 +868,8 @@ describe<{
 
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
-		const dposGetStub = stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		const triggerStub = stub(context.triggerService, "call").callsFake((name, args) => {
+		stub(context.dposState, "getRoundValidators").returnValue(delegates);
+		stub(context.triggerService, "call").callsFake((name, args) => {
 			return context.roundState.getActiveValidators(args.roundInfo, args.delegates);
 		});
 

@@ -8,7 +8,6 @@ import { addTransactionsToBlock } from "../test/transactions";
 import { setUp } from "../test/setup";
 import { describe, Factories, Sandbox } from "../../core-test-framework";
 import { SinonSpy } from "sinon";
-import { Spy } from "../../core-test-framework/source/uvu/spy";
 import Utils from "@arkecosystem/utils";
 
 const buildMultipaymentTransaction = (context) => {
@@ -69,12 +68,12 @@ describe<{
 	applySpy: SinonSpy;
 	revertSpy: SinonSpy;
 	blocks: Contracts.Crypto.IBlock[];
-	spyIncreaseWalletDelegateVoteBalance: Spy;
-	spyInitGenesisForgerWallet: Spy;
-	spyApplyBlockToForger: Spy;
-	spyDecreaseWalletDelegateVoteBalance: Spy;
-	spyApplyVoteBalances: Spy;
-	spyRevertBlockFromForger: Spy;
+	spyIncreaseWalletDelegateVoteBalance: any;
+	spyInitGenesisForgerWallet: any;
+	spyApplyBlockToForger: any;
+	spyDecreaseWalletDelegateVoteBalance: any;
+	spyApplyVoteBalances: any;
+	spyRevertBlockFromForger: any;
 	forgingWallet: Contracts.State.Wallet;
 	votingWallet: Contracts.State.Wallet;
 	sendingWallet: Contracts.State.Wallet;
@@ -164,7 +163,7 @@ describe<{
 		};
 	});
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.blocks = makeChainedBlocks(101, context.factory.get("Block"));
 
 		context.spyIncreaseWalletDelegateVoteBalance = spy(context.blockState, "increaseWalletDelegateVoteBalance");
@@ -174,7 +173,7 @@ describe<{
 		context.spyApplyVoteBalances = spy(context.blockState, "applyVoteBalances");
 		context.spyRevertBlockFromForger = spy(context.blockState, "revertBlockFromForger");
 
-		context.forgingWallet = context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
+		context.forgingWallet = await context.walletRepo.findByPublicKey(context.blocks[0].data.generatorPublicKey);
 
 		context.forgingWallet.setAttribute("delegate", {
 			username: "test",
@@ -307,7 +306,7 @@ describe<{
 
 		context.spyIncreaseWalletDelegateVoteBalance.calledWith(context.forgingWallet, balanceIncrease);
 
-		const delegateAfter = context.forgingWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
+		const delegateAfter = context.forgingWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("delegate");
 		const productsBlocks = 1;
 
 		assert.equal(delegateAfter.producedBlocks, productsBlocks);
@@ -338,7 +337,7 @@ describe<{
 		context.spyIncreaseWalletDelegateVoteBalance.calledWith(context.forgingWallet, balanceIncrease);
 		context.spyDecreaseWalletDelegateVoteBalance.calledWith(context.forgingWallet, balanceIncrease);
 
-		const delegate = context.forgingWallet.getAttribute<Contracts.State.WalletDelegateAttributes>("delegate");
+		const delegate = context.forgingWallet.getAttribute<Contracts.State.WalletValidatorAttributes>("delegate");
 
 		assert.equal(delegate.producedBlocks, 0);
 		assert.equal(delegate.forgedFees, Utils.BigNumber.ZERO);
@@ -510,7 +509,7 @@ describe<{
 		const sender = context.walletRepo.findByPublicKey(testTransaction.data.senderPublicKey);
 		sender.setBalance(sendersBalance);
 
-		const votedForDelegate: Contracts.State.Wallet = context.walletRepo.findByPublicKey(voteAddress);
+		const votedForDelegate: Contracts.State.Wallet = await context.walletRepo.findByPublicKey(voteAddress);
 		const delegateBalanceBefore = Utils.BigNumber.make(4918);
 		votedForDelegate.setAttribute("delegate.voteBalance", delegateBalanceBefore);
 
