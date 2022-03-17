@@ -1,7 +1,7 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Enums } from "@arkecosystem/core-kernel";
 import Utils from "@arkecosystem/utils";
-import { describe, Sandbox } from "../../core-test-framework";
+import { describeSkip, Sandbox } from "../../core-test-framework";
 import { PublicKeyFactory } from "../../core-crypto-key-pair-schnorr/source/public";
 import { KeyPairFactory } from "../../core-crypto-key-pair-schnorr/source/pair";
 import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
@@ -50,7 +50,7 @@ const generateDelegates = (count: number): any[] => {
 	return delegates;
 };
 
-describe<{
+describeSkip<{
 	app: Application;
 	databaseService: any;
 	blocks: any[];
@@ -143,7 +143,7 @@ describe<{
 		context.blocks = generateBlocks(3);
 	});
 
-	it.only("getBlocksForRound - should return array of blocks when all requested blocks are in stateStore", async (context) => {
+	it("getBlocksForRound - should return array of blocks when all requested blocks are in stateStore", async (context) => {
 		const lastBlock = context.blocks[2];
 
 		stub(context.stateStore, "getLastBlock").returnValue(lastBlock);
