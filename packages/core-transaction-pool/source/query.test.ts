@@ -120,14 +120,14 @@ describe<{
 		getSenderStub.calledWith("sender public key");
 	});
 
-	it("getFromLowestPriority - should return transactions reverse ordered by fee", (context) => {
+	it("getFromLowestPriority - should return transactions reverse ordered by fee", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
 			{ getFromLatest: () => [context.sender1Transaction200, context.sender1Transaction100] },
 			{ getFromLatest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getFromLowestPriority());
+		const result = await query.getFromLowestPriority().all();
 
 		assert.equal(result, [
 			context.sender2Transaction100,
@@ -137,14 +137,14 @@ describe<{
 		]);
 	});
 
-	it("getFromHighestPriority - should return transactions order by fee", (context) => {
+	it("getFromHighestPriority - should return transactions order by fee", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
 			{ getFromEarliest: () => [context.sender1Transaction200, context.sender1Transaction100] },
 			{ getFromEarliest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getFromHighestPriority());
+		const result = await query.getFromHighestPriority().all();
 
 		assert.equal(result, [
 			context.sender1Transaction200,

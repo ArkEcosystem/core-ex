@@ -105,40 +105,28 @@ export class Query implements Contracts.TransactionPool.Query {
 	}
 
 	public getFromLowestPriority(): QueryIterable {
-		const iterable = {
-			[Symbol.iterator]: () => {
-				const comparator: Comparator<Contracts.Crypto.ITransaction> = (
-					a: Contracts.Crypto.ITransaction,
-					b: Contracts.Crypto.ITransaction,
-				) => a.data.fee.comparedTo(b.data.fee);
+		const transactions = Array.from(
+			this.mempool.getSenderMempools()
+		).flatMap(senderMempool => Array.from(senderMempool.getFromLatest()));
 
-				const iterators: Iterator<Contracts.Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
-					.map((p) => p.getFromLatest())
-					.map((index) => index[Symbol.iterator]());
+		transactions.sort((
+			a: Contracts.Crypto.ITransaction,
+			b: Contracts.Crypto.ITransaction,
+		) => a.data.fee.comparedTo(b.data.fee));
 
-				return new IteratorMany<Contracts.Crypto.ITransaction>(iterators, comparator);
-			},
-		};
-
-		return new QueryIterable(iterable);
+		return new QueryIterable(transactions);
 	}
 
 	public getFromHighestPriority(): QueryIterable {
-		const iterable = {
-			[Symbol.iterator]: () => {
-				const comparator: Comparator<Contracts.Crypto.ITransaction> = (
-					a: Contracts.Crypto.ITransaction,
-					b: Contracts.Crypto.ITransaction,
-				) => b.data.fee.comparedTo(a.data.fee);
+		const transactions = Array.from(
+			this.mempool.getSenderMempools()
+		).flatMap(senderMempool => Array.from(senderMempool.getFromEarliest()));
 
-				const iterators: Iterator<Contracts.Crypto.ITransaction>[] = [...this.mempool.getSenderMempools()]
-					.map((p) => p.getFromEarliest())
-					.map((index) => index[Symbol.iterator]());
+		transactions.sort((
+			a: Contracts.Crypto.ITransaction,
+			b: Contracts.Crypto.ITransaction,
+		) => b.data.fee.comparedTo(a.data.fee));
 
-				return new IteratorMany<Contracts.Crypto.ITransaction>(iterators, comparator);
-			},
-		};
-
-		return new QueryIterable(iterable);
+		return new QueryIterable(transactions);
 	}
 }
