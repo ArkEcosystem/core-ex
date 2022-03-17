@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { describe } from "../../../core-test-framework";
 import { BigNumber } from "@arkecosystem/utils";
+import { describe } from "../../../core-test-framework";
 
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository } from "./";
