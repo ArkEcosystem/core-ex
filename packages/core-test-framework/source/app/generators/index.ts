@@ -4,7 +4,8 @@ import { CryptoGenerator } from "./crypto";
 
 export const generateCoreConfig = (options?: SandboxOptions): CoreConfigPaths => new CoreGenerator(options).generate();
 
-export const generateCryptoConfig = (options?: SandboxOptions): CryptoConfigPaths => new CryptoGenerator(options).generate();
+export const generateCryptoConfig = (options?: SandboxOptions): CryptoConfigPaths =>
+	new CryptoGenerator(options).generate();
 
 export const generateCryptoConfigRaw = (options?: SandboxOptions) => {
 	const { crypto } = generateCryptoConfig(options);
