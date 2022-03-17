@@ -89,15 +89,9 @@ export class Query implements Contracts.TransactionPool.Query {
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
 	public getAll(): QueryIterable {
-		const iterable: Iterable<Contracts.Crypto.ITransaction> = function* (this: Query) {
-			for (const senderMempool of this.mempool.getSenderMempools()) {
-				for (const transaction of senderMempool.getFromLatest()) {
-					yield transaction;
-				}
-			}
-		}.bind(this)();
-
-		return new QueryIterable(iterable);
+		return new QueryIterable(Array.from(
+			this.mempool.getSenderMempools()
+		).flatMap(senderMempool => Array.from(senderMempool.getFromLatest())));
 	}
 
 	public getAllBySender(senderPublicKey: string): QueryIterable {

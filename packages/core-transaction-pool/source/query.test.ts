@@ -89,14 +89,14 @@ describe<{
 		};
 	});
 
-	it("getAll - should return transactions from all sender states", (context) => {
+	it("getAll - should return transactions from all sender states", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
 			{ getFromLatest: () => [context.sender1Transaction100, context.sender1Transaction200] },
 			{ getFromLatest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
 		const query = context.container.resolve(Query);
-		const result = Array.from(query.getAll());
+		const result = await query.getAll().all();
 
 		assert.equal(result, [
 			context.sender1Transaction100,

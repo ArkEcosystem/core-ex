@@ -95,7 +95,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 		const username: string = transaction.data.asset.validator.username;
-		const hasUsername: boolean = this.poolQuery
+		const hasUsername: boolean = await this.poolQuery
 			.getAll()
 			.whereKind(transaction)
 			.wherePredicate(async (t) => t.data.asset?.validator?.username === username)

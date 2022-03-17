@@ -105,7 +105,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		}
 
 		const address = await this.addressFactory.fromMultiSignatureAsset(transaction.data.asset.multiSignature);
-		const hasAddress: boolean = this.poolQuery
+		const hasAddress: boolean = await this.poolQuery
 			.getAll()
 			.whereKind(transaction)
 			.wherePredicate(
