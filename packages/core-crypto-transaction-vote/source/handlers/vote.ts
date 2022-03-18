@@ -38,6 +38,10 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 				throw new Exceptions.MaxUnvotesExceeededError();
 			}
 
+			if (transaction.asset.votes.length + transaction.asset.unvotes.length === 0) {
+				throw new Exceptions.EmptyVoteError();
+			}
+
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 
 			for (const unvote of transaction.asset.unvotes) {

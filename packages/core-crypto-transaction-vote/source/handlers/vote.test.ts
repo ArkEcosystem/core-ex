@@ -198,6 +198,18 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
+	it("#bootstrap -  shoudl throw if transaction contains 0 votes and unvotes", async ({ handler }) => {
+		const transactions = [getTransaction([], [])];
+
+		await assert.rejects(
+			() => handler.bootstrap(transactions as Contracts.Crypto.ITransaction[]),
+			Exceptions.EmptyVoteError,
+		);
+
+		spyForgetAttribute.neverCalled();
+		spySetAttribute.neverCalled();
+	});
+
 	it("#bootstrap -  shoudl throw on max votes exceeded", async ({ handler }) => {
 		const transactions = [getTransaction(["validatorPublicKey", "secondValidatorPublicKey"], [])];
 
