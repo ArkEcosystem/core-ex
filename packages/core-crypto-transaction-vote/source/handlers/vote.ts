@@ -156,13 +156,14 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		);
 
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
+		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
+
+		for (const unvotes of transaction.data.asset.unvotes) {
+			sender.forgetAttribute("vote");
+		}
 
 		for (const vote of transaction.data.asset.votes) {
-			if (vote.startsWith("+")) {
-				sender.setAttribute("vote", vote.slice(1));
-			} else {
-				sender.forgetAttribute("vote");
-			}
+			sender.setAttribute("vote", vote);
 		}
 	}
 

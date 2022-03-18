@@ -565,31 +565,31 @@ describe<{
 		spyHas.calledOnce();
 	});
 
-	// it("applyToSender - should set attribute on vote", async ({ handler, walletRepository }) => {
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
+	it("applyToSender - should set attribute on vote", async ({ handler, walletRepository }) => {
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
 
-	// 	await assert.resolves(() =>
-	// 		handler.applyToSender(getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction),
-	// 	);
+		await assert.resolves(() =>
+			handler.applyToSender(getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction),
+		);
 
-	// 	spySuper.calledOnce();
-	// 	spySetAttribute.calledOnce();
-	// 	spySetAttribute.calledWith("vote", "validatorPublicKey");
-	// });
+		spySuper.calledOnce();
+		spySetAttribute.calledOnce();
+		spySetAttribute.calledWith("vote", "validatorPublicKey");
+	});
 
-	// it("applyToSender - should forget attribute on unvote", async ({ handler, walletRepository }) => {
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
+	it("applyToSender - should forget attribute on unvote", async ({ handler, walletRepository }) => {
+		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "applyToSender");
 
-	// 	await assert.resolves(() =>
-	// 		handler.applyToSender(getTransaction(["-validatorPublicKey"]) as Contracts.Crypto.ITransaction),
-	// 	);
+		await assert.resolves(() =>
+			handler.applyToSender(getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction),
+		);
 
-	// 	spySuper.calledOnce();
-	// 	spyForgetAttribute.calledOnce();
-	// 	spyForgetAttribute.calledWith("vote");
-	// });
+		spySuper.calledOnce();
+		spyForgetAttribute.calledOnce();
+		spyForgetAttribute.calledWith("vote");
+	});
 
 	// it("revertForSender - should forget attribute on vote", async ({ handler, walletRepository }) => {
 	// 	stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
