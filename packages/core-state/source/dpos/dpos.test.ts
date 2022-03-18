@@ -13,6 +13,7 @@ import { DposState } from "./dpos";
 import { Configuration } from "../../../core-crypto-config";
 import { walletFactory } from "../wallets/wallet-factory";
 import { spy } from "sinon";
+import { AssertionException } from "@arkecosystem/core-contracts/distribution/exceptions";
 
 describe<{
 	app: Application;
@@ -171,6 +172,7 @@ describe<{
 		context.dposState.buildVoteBalances();
 		context.dposState.buildValidatorRanking();
 		const round = Utils.roundCalculator.calculateRound(1, context.configuration);
+		round.maxValidators = 51;
 
 		assert.rejects(
 			() => context.dposState.setValidatorsRound(round),
@@ -179,6 +181,8 @@ describe<{
 	});
 
 	it("setValidatorsRound - should set the validators of a round", async (context) => {
+		const debugLogger = spy(context.logger, "debug");
+
 		await context.dposState.buildVoteBalances();
 		context.dposState.buildValidatorRanking();
 		const round = Utils.roundCalculator.calculateRound(1, context.configuration);
@@ -198,8 +202,9 @@ describe<{
 
 		// TODO: when we remove Assertion checks, this won't throw
 		// instead it should not.toEqual(round)
-		assert.throws(() => validators[4].getAttribute("validator.round"));
-		assert.true(context.logger.calledWith("Loaded 4 active validators"));
+		// assert.not.equal(validators[4].getAttribute("validator.round"), round)
+		assert.rejects(() => validators[4].getAttribute("validator.round"), AssertionException);
+		debugLogger.calledWith("Loaded 4 active validators");
 	});
 
 	it("should run all getters", async (context) => {
