@@ -88,9 +88,7 @@ export class Query implements Contracts.TransactionPool.Query {
 
 	public getAll(): QueryIterable {
 		return new QueryIterable(
-			[...this.mempool.getSenderMempools()].flatMap((senderMempool) =>
-				[...senderMempool.getFromLatest()],
-			),
+			[...this.mempool.getSenderMempools()].flatMap((senderMempool) => [...senderMempool.getFromLatest()]),
 		);
 	}
 
@@ -104,21 +102,21 @@ export class Query implements Contracts.TransactionPool.Query {
 
 	public getFromLowestPriority(): QueryIterable {
 		return new QueryIterable(
-			[...this.mempool.getSenderMempools()].flatMap((senderMempool) =>
-				[...senderMempool.getFromLatest()],
-			).sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
-				a.data.fee.comparedTo(b.data.fee),
-			),
+			[...this.mempool.getSenderMempools()]
+				.flatMap((senderMempool) => [...senderMempool.getFromLatest()])
+				.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+					a.data.fee.comparedTo(b.data.fee),
+				),
 		);
 	}
 
 	public getFromHighestPriority(): QueryIterable {
 		return new QueryIterable(
-			[...this.mempool.getSenderMempools()].flatMap((senderMempool) =>
-				[...senderMempool.getFromEarliest()],
-			).sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
-				b.data.fee.comparedTo(a.data.fee),
-			),
+			[...this.mempool.getSenderMempools()]
+				.flatMap((senderMempool) => [...senderMempool.getFromEarliest()])
+				.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+					b.data.fee.comparedTo(a.data.fee),
+				),
 		);
 	}
 }
