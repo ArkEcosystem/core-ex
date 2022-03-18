@@ -158,7 +158,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
 
-		for (const unvotes of transaction.data.asset.unvotes) {
+		for (const unvote of transaction.data.asset.unvotes) {
 			sender.forgetAttribute("vote");
 		}
 
@@ -177,13 +177,14 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		);
 
 		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.votes);
+		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.unvotes);
 
-		for (const vote of [...transaction.data.asset.votes].reverse()) {
-			if (vote.startsWith("+")) {
-				sender.forgetAttribute("vote");
-			} else {
-				sender.setAttribute("vote", vote.slice(1));
-			}
+		for (const vote of transaction.data.asset.votes) {
+			sender.forgetAttribute("vote");
+		}
+
+		for (const unvote of transaction.data.asset.unvotes) {
+			sender.setAttribute("vote", unvote);
 		}
 	}
 
