@@ -16,6 +16,30 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		}
 	}
 
+	public async all(): Promise<Contracts.Crypto.ITransaction[]> {
+		const transactions = [];
+
+		for (const transaction of this.transactions) {
+			if (await this.#satisfiesPredicates(transaction)) {
+				transactions.push(transaction);
+			}
+		}
+
+		return transactions;
+	}
+
+	public async first(): Promise<Contracts.Crypto.ITransaction> {
+		for (const transaction of await this.all()) {
+			return transaction;
+		}
+
+		throw new Error("Transaction not found");
+	}
+
+	public async has(): Promise<boolean> {
+		return (await this.all()).length > 0;
+	}
+
 	public wherePredicate(predicate: Contracts.TransactionPool.QueryPredicate): QueryIterable {
 		this.predicates.push(predicate);
 
@@ -42,30 +66,6 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return this.wherePredicate(async (t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
 	}
 
-	public async has(): Promise<boolean> {
-		return (await this.all()).length > 0;
-	}
-
-	public async first(): Promise<Contracts.Crypto.ITransaction> {
-		for (const transaction of await this.all()) {
-			return transaction;
-		}
-
-		throw new Error("Transaction not found");
-	}
-
-	public async all(): Promise<Contracts.Crypto.ITransaction[]> {
-		const transactions = [];
-
-		for (const transaction of this.transactions) {
-			if (await this.#satisfiesPredicates(transaction)) {
-				transactions.push(transaction);
-			}
-		}
-
-		return transactions;
-	}
-
 	async #satisfiesPredicates(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
 		if (this.predicates.length === 0) {
 			return true;
@@ -88,8 +88,8 @@ export class Query implements Contracts.TransactionPool.Query {
 
 	public getAll(): QueryIterable {
 		return new QueryIterable(
-			Array.from(this.mempool.getSenderMempools()).flatMap((senderMempool) =>
-				Array.from(senderMempool.getFromLatest()),
+			[...this.mempool.getSenderMempools()].flatMap((senderMempool) =>
+				[...senderMempool.getFromLatest()],
 			),
 		);
 	}
@@ -99,30 +99,26 @@ export class Query implements Contracts.TransactionPool.Query {
 			return new QueryIterable([]);
 		}
 
-		return new QueryIterable(Array.from(this.mempool.getSenderMempool(senderPublicKey).getFromEarliest()));
+		return new QueryIterable([...this.mempool.getSenderMempool(senderPublicKey).getFromEarliest()]);
 	}
 
 	public getFromLowestPriority(): QueryIterable {
-		const transactions = Array.from(this.mempool.getSenderMempools()).flatMap((senderMempool) =>
-			Array.from(senderMempool.getFromLatest()),
+		return new QueryIterable(
+			[...this.mempool.getSenderMempools()].flatMap((senderMempool) =>
+				[...senderMempool.getFromLatest()],
+			).sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+				a.data.fee.comparedTo(b.data.fee),
+			),
 		);
-
-		transactions.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
-			a.data.fee.comparedTo(b.data.fee),
-		);
-
-		return new QueryIterable(transactions);
 	}
 
 	public getFromHighestPriority(): QueryIterable {
-		const transactions = Array.from(this.mempool.getSenderMempools()).flatMap((senderMempool) =>
-			Array.from(senderMempool.getFromEarliest()),
+		return new QueryIterable(
+			[...this.mempool.getSenderMempools()].flatMap((senderMempool) =>
+				[...senderMempool.getFromEarliest()],
+			).sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+				b.data.fee.comparedTo(a.data.fee),
+			),
 		);
-
-		transactions.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
-			b.data.fee.comparedTo(a.data.fee),
-		);
-
-		return new QueryIterable(transactions);
 	}
 }

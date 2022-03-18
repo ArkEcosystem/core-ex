@@ -1,8 +1,9 @@
-import { BigNumber } from "../../utils";
 import { Container } from "@arkecosystem/core-container";
-import { Identifiers, Contracts } from "@arkecosystem/core-contracts";
+import { Contracts,Identifiers } from "@arkecosystem/core-contracts";
+
 import { describe } from "../../core-test-framework";
-import { Query, QueryIterable } from "./";
+import { BigNumber } from "../../utils";
+import { Query, QueryIterable } from ".";
 
 describe<{
 	container: Container;
@@ -14,9 +15,9 @@ describe<{
 }>("Query", ({ it, assert, beforeAll, beforeEach, stub }) => {
 	beforeAll((context) => {
 		context.mempool = {
-			getSenderMempools: () => undefined,
-			hasSenderMempool: () => undefined,
-			getSenderMempool: () => undefined,
+			getSenderMempool: () => {},
+			getSenderMempools: () => {},
+			hasSenderMempool: () => {},
 		};
 
 		context.container = new Container();
@@ -25,67 +26,67 @@ describe<{
 
 	beforeEach((context) => {
 		context.sender1Transaction100 = {
-			id: "dummy-tx-id",
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.Transfer,
-			key: "some-key",
 			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(100),
+				nonce: BigNumber.make(1),
+				senderPublicKey: "sender-public-key",
 				type: 1,
 				version: 2,
-				nonce: BigNumber.make(1),
-				fee: BigNumber.make(100),
-				amount: BigNumber.make(100),
-				senderPublicKey: "sender-public-key",
 			},
+			id: "dummy-tx-id",
+			key: "some-key",
 			serialized: Buffer.from("dummy"),
+			type: Contracts.Crypto.TransactionType.Transfer,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.sender1Transaction200 = {
-			id: "dummy-tx-id-2",
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
-			key: "some-key-2",
 			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(200),
+				nonce: BigNumber.make(2),
+				senderPublicKey: "sender-public-key",
 				type: 1,
 				version: 2,
-				nonce: BigNumber.make(2),
-				fee: BigNumber.make(200),
-				amount: BigNumber.make(100),
-				senderPublicKey: "sender-public-key",
 			},
+			id: "dummy-tx-id-2",
+			key: "some-key-2",
 			serialized: Buffer.from("dummy-2"),
+			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.sender2Transaction100 = {
-			id: "dummy-tx-id-3",
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.Transfer,
-			key: "some-key-3",
 			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(300),
+				nonce: BigNumber.make(3),
+				senderPublicKey: "sender-public-key",
 				type: 1,
 				version: 2,
-				nonce: BigNumber.make(3),
-				fee: BigNumber.make(100),
-				amount: BigNumber.make(100),
-				senderPublicKey: "sender-public-key",
 			},
+			id: "dummy-tx-id-3",
+			key: "some-key-3",
 			serialized: Buffer.from("dummy-3"),
+			type: Contracts.Crypto.TransactionType.Transfer,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 
 		context.sender2Transaction200 = {
-			id: "dummy-tx-id-4",
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
-			key: "some-key-3",
 			data: {
+				amount: BigNumber.make(100),
+				fee: BigNumber.make(400),
+				nonce: BigNumber.make(4),
+				senderPublicKey: "sender-public-key",
 				type: 1,
 				version: 2,
-				nonce: BigNumber.make(4),
-				fee: BigNumber.make(200),
-				amount: BigNumber.make(100),
-				senderPublicKey: "sender-public-key",
 			},
+			id: "dummy-tx-id-4",
+			key: "some-key-3",
 			serialized: Buffer.from("dummy-4"),
+			type: Contracts.Crypto.TransactionType.ValidatorRegistration,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		};
 	});
 
@@ -130,9 +131,9 @@ describe<{
 		const result = await query.getFromLowestPriority().all();
 
 		assert.equal(result, [
-			context.sender2Transaction100,
-			context.sender1Transaction200,
 			context.sender1Transaction100,
+			context.sender1Transaction200,
+			context.sender2Transaction100,
 			context.sender2Transaction200,
 		]);
 	});
@@ -147,10 +148,10 @@ describe<{
 		const result = await query.getFromHighestPriority().all();
 
 		assert.equal(result, [
+			context.sender2Transaction200,
+			context.sender2Transaction100,
 			context.sender1Transaction200,
 			context.sender1Transaction100,
-			context.sender2Transaction100,
-			context.sender2Transaction200,
 		]);
 	});
 
