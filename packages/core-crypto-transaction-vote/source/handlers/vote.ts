@@ -28,27 +28,38 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		for (const transaction of this.allTransactions(transactions)) {
 			Utils.assert.defined<string>(transaction.senderPublicKey);
 			Utils.assert.defined<string[]>(transaction.asset?.votes);
+			Utils.assert.defined<string[]>(transaction.asset?.unvotes);
+
+			if (transaction.asset.votes.length > 1) {
+				throw new Exceptions.MaxVotesExceeededError();
+			}
+
+			if (transaction.asset.unvotes.length > 1) {
+				throw new Exceptions.MaxUnvotesExceeededError();
+			}
 
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+
+			for (const unvote of transaction.asset.unvotes) {
+				const hasVoted: boolean = wallet.hasAttribute("vote");
+
+				if (!hasVoted) {
+					throw new Exceptions.NoVoteError();
+				} else if (wallet.getAttribute("vote") !== unvote) {
+					throw new Exceptions.UnvoteMismatchError();
+				}
+
+				wallet.forgetAttribute("vote");
+			}
 
 			for (const vote of transaction.asset.votes) {
 				const hasVoted: boolean = wallet.hasAttribute("vote");
 
-				if (vote.startsWith("+")) {
-					if (hasVoted) {
-						throw new Exceptions.AlreadyVotedError();
-					}
-
-					wallet.setAttribute("vote", vote.slice(1));
-				} else {
-					if (!hasVoted) {
-						throw new Exceptions.NoVoteError();
-					} else if (wallet.getAttribute("vote") !== vote.slice(1)) {
-						throw new Exceptions.UnvoteMismatchError();
-					}
-
-					wallet.forgetAttribute("vote");
+				if (hasVoted) {
+					throw new Exceptions.AlreadyVotedError();
 				}
+
+				wallet.setAttribute("vote", vote.slice(1));
 			}
 		}
 	}
