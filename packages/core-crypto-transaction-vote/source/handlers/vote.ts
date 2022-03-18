@@ -59,7 +59,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 					throw new Exceptions.AlreadyVotedError();
 				}
 
-				wallet.setAttribute("vote", vote.slice(1));
+				wallet.setAttribute("vote", vote);
 			}
 		}
 	}
