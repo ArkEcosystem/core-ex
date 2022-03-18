@@ -2,7 +2,7 @@ import { Application, Enums, Utils } from "@arkecosystem/core-kernel";
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { StateBuilder } from "./state-builder";
 import { WalletRepository } from "./wallets";
-import { describe } from "../../core-test-framework";
+import { describeSkip } from "../../core-test-framework";
 import { setUp, setUpDefaults } from "../test/setup";
 import { SinonSpy } from "sinon";
 import { Configuration } from "../../core-crypto-config";
@@ -20,7 +20,7 @@ const saveDefaultTransactions = (): (() => void) => {
 	return () => (setUpDefaults.getSentTransaction = saveTransaction);
 };
 
-describe<{
+describeSkip<{
 	app: Application;
 	configuration: Configuration;
 	walletRepo: WalletRepository;
