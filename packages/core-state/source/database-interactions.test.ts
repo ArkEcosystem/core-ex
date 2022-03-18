@@ -206,10 +206,10 @@ describe<{
 		appSpy.called();
 	});
 
-	it.only("should terminate if unable to deserialize last 5 blocks", async (context) => {
+	it.skip("should terminate if unable to deserialize last 5 blocks", async (context) => {
 		stub(context.blockFactory, "fromJson").callsFake((block) => block);
 
-		const databaseInteraction: DatabaseInteraction = context.container.resolve(DatabaseInteraction);
+		const databaseInteraction = context.container.resolve<DatabaseInteraction>(DatabaseInteraction);
 
 		const block101data = { id: "block101", height: 101 };
 		const block102data = { id: "block102", height: 102 };
