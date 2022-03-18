@@ -104,7 +104,7 @@ describe<{
 		assert.true(await handler.isActivated());
 	});
 
-	it.only("#bootstrap -  shoudl set wallet vote attribute", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  shoudl set wallet vote attribute", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(false);
 		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
@@ -277,6 +277,7 @@ describe<{
 	it("throwIfCannotBeApplied - should throw if validator is resigned", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(false);
 		spyValidatorHasAttribute.returnValue(true);
+		spyValidatorIsValidator.returnValue(true);
 		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
 		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
@@ -296,7 +297,6 @@ describe<{
 
 	it("throwIfCannotBeApplied - should throw if voted is not validator", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(false);
-		spyValidatorHasAttribute.returnValue(false);
 		spyValidatorIsValidator.returnValue(false);
 		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
 		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
@@ -312,8 +312,8 @@ describe<{
 
 		spySuper.neverCalled();
 		spyHasAttribute.calledWith("vote");
-		spyValidatorHasAttribute.calledWith("validator.resigned");
 		spyValidatorIsValidator.calledOnce();
+		spyValidatorHasAttribute.neverCalled();
 	});
 
 	it("throwIfCannotBeApplied - unvote should pass", async ({ handler, walletRepository }) => {
@@ -434,13 +434,10 @@ describe<{
 			),
 		);
 
-		spySuper.neverCalled();
+		spySuper.calledOnce();
 		spyHasAttribute.calledWith("vote");
 		spyGetAttribute.calledWith("vote");
-		spyForgetAttribute.calledOnce();
-		spySetAttribute.calledOnce();
-		spySetAttribute.calledWith("vote", "secondValidatorPublicKey");
-		spyValidatorIsValidator.calledOnce();
+		spyValidatorIsValidator.calledTimes(2);
 	});
 
 	it("throwIfCannotBeApplied - should throw on empty vote", async ({ handler, walletRepository }) => {
@@ -483,8 +480,8 @@ describe<{
 			() =>
 				handler.throwIfCannotBeApplied(
 					getTransaction(
-						["ValidatorPublicKey", "secondValidatorPublicKey"],
 						[],
+						["ValidatorPublicKey", "secondValidatorPublicKey"],
 					) as Contracts.Crypto.ITransaction,
 					wallet as Contracts.State.Wallet,
 				),
