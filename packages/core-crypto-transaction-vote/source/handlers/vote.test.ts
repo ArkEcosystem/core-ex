@@ -541,29 +541,29 @@ describe<{
 		});
 	});
 
-	// it("throwIfCannotEnterPool - should pass", async ({ handler, poolQuery }) => {
-	// 	const spyHas = stub(poolQuery, "has").returnValue(false);
+	it("throwIfCannotEnterPool - should pass", async ({ handler, poolQuery }) => {
+		const spyHas = stub(poolQuery, "has").returnValue(false);
 
-	// 	await assert.resolves(() =>
-	// 		handler.throwIfCannotEnterPool(getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction),
-	// 	);
+		await assert.resolves(() =>
+			handler.throwIfCannotEnterPool(getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction),
+		);
 
-	// 	spyHas.calledOnce();
-	// });
+		spyHas.calledOnce();
+	});
 
-	// it("throwIfCannotEnterPool - should throw", async ({ handler, poolQuery }) => {
-	// 	const spyHas = stub(poolQuery, "has").returnValue(true);
+	it("throwIfCannotEnterPool - should throw", async ({ handler, poolQuery }) => {
+		const spyHas = stub(poolQuery, "has").returnValue(true);
 
-	// 	await assert.rejects(
-	// 		() =>
-	// 			handler.throwIfCannotEnterPool(
-	// 				getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 			),
-	// 		Exceptions.PoolError,
-	// 	);
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotEnterPool(
+					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+				),
+			Exceptions.PoolError,
+		);
 
-	// 	spyHas.calledOnce();
-	// });
+		spyHas.calledOnce();
+	});
 
 	// it("applyToSender - should set attribute on vote", async ({ handler, walletRepository }) => {
 	// 	stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
