@@ -30,17 +30,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 			Utils.assert.defined<string[]>(transaction.asset?.votes);
 			Utils.assert.defined<string[]>(transaction.asset?.unvotes);
 
-			if (transaction.asset.votes.length > 1) {
-				throw new Exceptions.MaxVotesExceeededError();
-			}
-
-			if (transaction.asset.unvotes.length > 1) {
-				throw new Exceptions.MaxUnvotesExceeededError();
-			}
-
-			if (transaction.asset.votes.length + transaction.asset.unvotes.length === 0) {
-				throw new Exceptions.EmptyVoteError();
-			}
+			this.#checkAsset(transaction);
 
 			const wallet = await this.walletRepository.findByPublicKey(transaction.senderPublicKey);
 
@@ -79,18 +69,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
 
-		// TODO: Extract
-		if (transaction.data.asset.votes.length > 1) {
-			throw new Exceptions.MaxVotesExceeededError();
-		}
-
-		if (transaction.data.asset.unvotes.length > 1) {
-			throw new Exceptions.MaxUnvotesExceeededError();
-		}
-
-		if (transaction.data.asset.votes.length + transaction.data.asset.unvotes.length === 0) {
-			throw new Exceptions.EmptyVoteError();
-		}
+		this.#checkAsset(transaction.data);
 
 		let walletVote: string | undefined;
 		if (wallet.hasAttribute("vote")) {
@@ -202,4 +181,18 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	public async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
 
 	public async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+
+	#checkAsset(data: Contracts.Crypto.ITransactionData) {
+		if (data.asset.votes.length > 1) {
+			throw new Exceptions.MaxVotesExceeededError();
+		}
+
+		if (data.asset.unvotes.length > 1) {
+			throw new Exceptions.MaxUnvotesExceeededError();
+		}
+
+		if (data.asset.votes.length + data.asset.unvotes.length === 0) {
+			throw new Exceptions.EmptyVoteError();
+		}
+	}
 }
