@@ -113,9 +113,17 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
+		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
+
+		for (const unvote of transaction.data.asset.unvotes) {
+			emitter.dispatch(AppEnums.VoteEvent.Unvote, {
+				transaction: transaction.data,
+				validator: unvote,
+			});
+		}
 
 		for (const vote of transaction.data.asset.votes) {
-			emitter.dispatch(vote.startsWith("+") ? AppEnums.VoteEvent.Vote : AppEnums.VoteEvent.Unvote, {
+			emitter.dispatch(AppEnums.VoteEvent.Vote, {
 				transaction: transaction.data,
 				validator: vote,
 			});

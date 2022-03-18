@@ -491,55 +491,55 @@ describe<{
 		spySuper.neverCalled();
 	});
 
-	// it("emitEvents - should dispatch", ({ handler }) => {
-	// 	const emitter: Partial<Contracts.Kernel.EventDispatcher> = {
-	// 		dispatch: async () => {},
-	// 	};
-	// 	const spyDispatch = stub(emitter, "dispatch");
+	it("emitEvents - should dispatch", ({ handler }) => {
+		const emitter: Partial<Contracts.Kernel.EventDispatcher> = {
+			dispatch: async () => {},
+		};
+		const spyDispatch = stub(emitter, "dispatch");
 
-	// 	const voteTransaction = getTransaction(["+validatorPublicKey"]);
+		const voteTransaction = getTransaction(["validatorPublicKey"], []);
 
-	// 	handler.emitEvents(
-	// 		voteTransaction as Contracts.Crypto.ITransaction,
-	// 		emitter as Contracts.Kernel.EventDispatcher,
-	// 	);
+		handler.emitEvents(
+			voteTransaction as Contracts.Crypto.ITransaction,
+			emitter as Contracts.Kernel.EventDispatcher,
+		);
 
-	// 	spyDispatch.calledOnce();
-	// 	spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
-	// 		transaction: voteTransaction.data,
-	// 		validator: "+validatorPublicKey",
-	// 	});
+		spyDispatch.calledOnce();
+		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+			transaction: voteTransaction.data,
+			validator: "validatorPublicKey",
+		});
 
-	// 	spyDispatch.reset();
-	// 	const unvoteTransaction = getTransaction(["-validatorPublicKey"]);
-	// 	handler.emitEvents(
-	// 		unvoteTransaction as Contracts.Crypto.ITransaction,
-	// 		emitter as Contracts.Kernel.EventDispatcher,
-	// 	);
+		spyDispatch.reset();
+		const unvoteTransaction = getTransaction([], ["validatorPublicKey"]);
+		handler.emitEvents(
+			unvoteTransaction as Contracts.Crypto.ITransaction,
+			emitter as Contracts.Kernel.EventDispatcher,
+		);
 
-	// 	spyDispatch.calledOnce();
-	// 	spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
-	// 		transaction: unvoteTransaction.data,
-	// 		validator: "-validatorPublicKey",
-	// 	});
+		spyDispatch.calledOnce();
+		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+			transaction: unvoteTransaction.data,
+			validator: "validatorPublicKey",
+		});
 
-	// 	spyDispatch.reset();
-	// 	const unvoteVoteTransaction = getTransaction(["-validatorPublicKey", "+validatorPublicKey"]);
-	// 	handler.emitEvents(
-	// 		unvoteVoteTransaction as Contracts.Crypto.ITransaction,
-	// 		emitter as Contracts.Kernel.EventDispatcher,
-	// 	);
+		spyDispatch.reset();
+		const unvoteVoteTransaction = getTransaction(["voteValidatorPublicKey"], ["unvoteValidatorPublicKey"]);
+		handler.emitEvents(
+			unvoteVoteTransaction as Contracts.Crypto.ITransaction,
+			emitter as Contracts.Kernel.EventDispatcher,
+		);
 
-	// 	spyDispatch.calledTimes(2);
-	// 	spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
-	// 		transaction: unvoteVoteTransaction.data,
-	// 		validator: "-validatorPublicKey",
-	// 	});
-	// 	spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
-	// 		transaction: unvoteVoteTransaction.data,
-	// 		validator: "+validatorPublicKey",
-	// 	});
-	// });
+		spyDispatch.calledTimes(2);
+		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+			transaction: unvoteVoteTransaction.data,
+			validator: "unvoteValidatorPublicKey",
+		});
+		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+			transaction: unvoteVoteTransaction.data,
+			validator: "voteValidatorPublicKey",
+		});
+	});
 
 	// it("throwIfCannotEnterPool - should pass", async ({ handler, poolQuery }) => {
 	// 	const spyHas = stub(poolQuery, "has").returnValue(false);
