@@ -234,145 +234,265 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	// it("throwIfCannotBeApplied - vote should pass", async ({ handler, walletRepository }) => {
-	// 	spyHasAttribute.returnValue(false);
-	// 	spyValidatorHasAttribute.returnValue(false);
-	// 	spyValidatorIsValidator.returnValue(true);
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied - vote should pass", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(false);
+		spyValidatorHasAttribute.returnValue(false);
+		spyValidatorIsValidator.returnValue(true);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-	// 	await assert.resolves(() =>
-	// 		handler.throwIfCannotBeApplied(
-	// 			getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 			wallet as Contracts.State.Wallet,
-	// 		),
-	// 	);
+		await assert.resolves(() =>
+			handler.throwIfCannotBeApplied(
+				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+				wallet as Contracts.State.Wallet,
+			),
+		);
 
-	// 	spySuper.calledOnce();
-	// 	spyHasAttribute.calledWith("vote");
-	// 	spyValidatorHasAttribute.calledWith("validator.resigned");
-	// 	spyValidatorIsValidator.calledOnce();
-	// });
+		spySuper.calledOnce();
+		spyHasAttribute.calledWith("vote");
+		spyValidatorHasAttribute.calledWith("validator.resigned");
+		spyValidatorIsValidator.calledOnce();
+	});
 
-	// it("throwIfCannotBeApplied - should throw if already voted", async ({ handler, walletRepository }) => {
-	// 	spyHasAttribute.returnValue(true);
-	// 	spyGetAttribute.returnValue("validatorPublicKey");
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied - should throw if already voted", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(true);
+		spyGetAttribute.returnValue("validatorPublicKey");
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-	// 	await assert.rejects(
-	// 		() =>
-	// 			handler.throwIfCannotBeApplied(
-	// 				getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 				wallet as Contracts.State.Wallet,
-	// 			),
-	// 		Exceptions.AlreadyVotedError,
-	// 	);
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.AlreadyVotedError,
+		);
 
-	// 	spySuper.neverCalled();
-	// 	spyHasAttribute.calledWith("vote");
-	// 	spyGetAttribute.calledWith("vote");
-	// });
+		spySuper.neverCalled();
+		spyHasAttribute.calledWith("vote");
+		spyGetAttribute.calledWith("vote");
+	});
 
-	// it("throwIfCannotBeApplied - should throw if validator is resigned", async ({ handler, walletRepository }) => {
-	// 	spyHasAttribute.returnValue(false);
-	// 	spyValidatorHasAttribute.returnValue(true);
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied - should throw if validator is resigned", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(false);
+		spyValidatorHasAttribute.returnValue(true);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-	// 	await assert.rejects(
-	// 		() =>
-	// 			handler.throwIfCannotBeApplied(
-	// 				getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 				wallet as Contracts.State.Wallet,
-	// 			),
-	// 		Exceptions.VotedForResignedValidatorError,
-	// 	);
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.VotedForResignedValidatorError,
+		);
 
-	// 	spySuper.neverCalled();
-	// 	spyHasAttribute.calledWith("vote");
-	// 	spyValidatorHasAttribute.calledWith("validator.resigned");
-	// });
+		spySuper.neverCalled();
+		spyHasAttribute.calledWith("vote");
+		spyValidatorHasAttribute.calledWith("validator.resigned");
+	});
 
-	// it("throwIfCannotBeApplied - should throw if voted is not validator", async ({ handler, walletRepository }) => {
-	// 	spyHasAttribute.returnValue(false);
-	// 	spyValidatorHasAttribute.returnValue(false);
-	// 	spyValidatorIsValidator.returnValue(false);
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied - should throw if voted is not validator", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(false);
+		spyValidatorHasAttribute.returnValue(false);
+		spyValidatorIsValidator.returnValue(false);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-	// 	await assert.rejects(
-	// 		() =>
-	// 			handler.throwIfCannotBeApplied(
-	// 				getTransaction(["+validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 				wallet as Contracts.State.Wallet,
-	// 			),
-	// 		Exceptions.VotedForNonValidatorError,
-	// 	);
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.VotedForNonValidatorError,
+		);
 
-	// 	spySuper.neverCalled();
-	// 	spyHasAttribute.calledWith("vote");
-	// 	spyValidatorHasAttribute.calledWith("validator.resigned");
-	// 	spyValidatorIsValidator.calledOnce();
-	// });
+		spySuper.neverCalled();
+		spyHasAttribute.calledWith("vote");
+		spyValidatorHasAttribute.calledWith("validator.resigned");
+		spyValidatorIsValidator.calledOnce();
+	});
 
-	// it("throwIfCannotBeApplied - unvote should pass", async ({ handler, walletRepository }) => {
-	// 	spyHasAttribute.returnValue(true);
-	// 	spyGetAttribute.returnValue("validatorPublicKey");
-	// 	spyValidatorIsValidator.returnValue(true);
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied - unvote should pass", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(true);
+		spyGetAttribute.returnValue("validatorPublicKey");
+		spyValidatorIsValidator.returnValue(true);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-	// 	await assert.resolves(() =>
-	// 		handler.throwIfCannotBeApplied(
-	// 			getTransaction(["-validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 			wallet as Contracts.State.Wallet,
-	// 		),
-	// 	);
+		await assert.resolves(() =>
+			handler.throwIfCannotBeApplied(
+				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+				wallet as Contracts.State.Wallet,
+			),
+		);
 
-	// 	spySuper.calledOnce();
-	// 	spyHasAttribute.calledWith("vote");
-	// 	spyValidatorHasAttribute.neverCalled();
-	// 	spyValidatorIsValidator.calledOnce();
-	// });
+		spySuper.calledOnce();
+		spyHasAttribute.calledWith("vote");
+		spyValidatorHasAttribute.neverCalled();
+		spyValidatorIsValidator.calledOnce();
+	});
 
-	// it("throwIfCannotBeApplied - should throw if wallet have no vote", async ({ handler, walletRepository }) => {
-	// 	spyHasAttribute.returnValue(false);
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied - unvote should pass if validator is resigned", async ({
+		handler,
+		walletRepository,
+	}) => {
+		spyHasAttribute.returnValue(true);
+		spyGetAttribute.returnValue("validatorPublicKey");
+		spyValidatorIsValidator.returnValue(true);
+		spyValidatorHasAttribute.returnValue(true);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-	// 	await assert.rejects(
-	// 		() =>
-	// 			handler.throwIfCannotBeApplied(
-	// 				getTransaction(["-validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 				wallet as Contracts.State.Wallet,
-	// 			),
-	// 		Exceptions.NoVoteError,
-	// 	);
+		await assert.resolves(() =>
+			handler.throwIfCannotBeApplied(
+				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+				wallet as Contracts.State.Wallet,
+			),
+		);
 
-	// 	spySuper.neverCalled();
-	// 	spyHasAttribute.calledWith("vote");
-	// });
+		spySuper.calledOnce();
+		spyHasAttribute.calledWith("vote");
+		spyValidatorHasAttribute.neverCalled();
+		spyValidatorIsValidator.calledOnce();
+	});
 
-	// it("throwIfCannotBeApplied - should throw on unvote mismatch", async ({ handler, walletRepository }) => {
-	// 	spyHasAttribute.returnValue(true);
-	// 	spyGetAttribute.returnValue("invalidPublicKey");
-	// 	stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
-	// 	const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+	it("throwIfCannotBeApplied - should throw if wallet have no vote", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(false);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
 
-	// 	await assert.rejects(
-	// 		() =>
-	// 			handler.throwIfCannotBeApplied(
-	// 				getTransaction(["-validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-	// 				wallet as Contracts.State.Wallet,
-	// 			),
-	// 		Exceptions.UnvoteMismatchError,
-	// 	);
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.NoVoteError,
+		);
 
-	// 	spySuper.neverCalled();
-	// 	spyHasAttribute.calledWith("vote");
-	// 	spyGetAttribute.calledWith("vote");
-	// });
+		spySuper.neverCalled();
+		spyHasAttribute.calledWith("vote");
+	});
+
+	it("throwIfCannotBeApplied - should throw on unvote mismatch", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(true);
+		spyGetAttribute.returnValue("invalidPublicKey");
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.UnvoteMismatchError,
+		);
+
+		spySuper.neverCalled();
+		spyHasAttribute.calledWith("vote");
+		spyGetAttribute.calledWith("vote");
+	});
+
+	it("throwIfCannotBeApplied - should throw if unvoted is not validator", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(true);
+		spyGetAttribute.returnValue("validatorPublicKey");
+		spyValidatorIsValidator.returnValue(false);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.VotedForNonValidatorError,
+		);
+
+		spySuper.neverCalled();
+		spyHasAttribute.calledWith("vote");
+		spyGetAttribute.calledWith("vote");
+		spyValidatorIsValidator.calledOnce();
+	});
+
+	it("throwIfCannotBeApplied - should pass on unvote and vote", async ({ handler, walletRepository }) => {
+		spyHasAttribute.returnValue(true);
+		spyGetAttribute.returnValue("validatorPublicKey");
+		spyValidatorIsValidator.returnValue(true);
+		stub(walletRepository, "findByPublicKey").resolvedValue(validatorWallet);
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+
+		await assert.resolves(() =>
+			handler.throwIfCannotBeApplied(
+				getTransaction(["secondValidatorPublicKey"], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
+				wallet as Contracts.State.Wallet,
+			),
+		);
+
+		spySuper.neverCalled();
+		spyHasAttribute.calledWith("vote");
+		spyGetAttribute.calledWith("vote");
+		spyForgetAttribute.calledOnce();
+		spySetAttribute.calledOnce();
+		spySetAttribute.calledWith("vote", "secondValidatorPublicKey");
+		spyValidatorIsValidator.calledOnce();
+	});
+
+	it("throwIfCannotBeApplied - should throw on empty vote", async ({ handler, walletRepository }) => {
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction([], []) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.EmptyVoteError,
+		);
+
+		spySuper.neverCalled();
+	});
+
+	it("throwIfCannotBeApplied - should throw on max votes exceedeed", async ({ handler, walletRepository }) => {
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction(
+						["ValidatorPublicKey", "secondValidatorPublicKey"],
+						[],
+					) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.MaxVotesExceeededError,
+		);
+
+		spySuper.neverCalled();
+	});
+
+	it("throwIfCannotBeApplied - should throw on max unvotes exceedeed", async ({ handler, walletRepository }) => {
+		const spySuper = stub(Handlers.TransactionHandler.prototype, "throwIfCannotBeApplied");
+
+		await assert.rejects(
+			() =>
+				handler.throwIfCannotBeApplied(
+					getTransaction(
+						["ValidatorPublicKey", "secondValidatorPublicKey"],
+						[],
+					) as Contracts.Crypto.ITransaction,
+					wallet as Contracts.State.Wallet,
+				),
+			Exceptions.MaxUnvotesExceeededError,
+		);
+
+		spySuper.neverCalled();
+	});
 
 	// it("emitEvents - should dispatch", ({ handler }) => {
 	// 	const emitter: Partial<Contracts.Kernel.EventDispatcher> = {

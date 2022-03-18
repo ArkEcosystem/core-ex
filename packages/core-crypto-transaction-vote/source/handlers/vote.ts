@@ -77,40 +77,55 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
+		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
+
+		// TODO: Extract
+		if (transaction.data.asset.votes.length > 1) {
+			throw new Exceptions.MaxVotesExceeededError();
+		}
+
+		if (transaction.data.asset.unvotes.length > 1) {
+			throw new Exceptions.MaxUnvotesExceeededError();
+		}
+
+		if (transaction.data.asset.votes.length + transaction.data.asset.unvotes.length === 0) {
+			throw new Exceptions.EmptyVoteError();
+		}
 
 		let walletVote: string | undefined;
 		if (wallet.hasAttribute("vote")) {
 			walletVote = wallet.getAttribute("vote");
 		}
 
+		for (const unvote of transaction.data.asset.unvotes) {
+			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(unvote);
+
+			if (!walletVote) {
+				throw new Exceptions.NoVoteError();
+			} else if (walletVote !== unvote) {
+				throw new Exceptions.UnvoteMismatchError();
+			}
+
+			if (!validatorWallet.isValidator()) {
+				throw new Exceptions.VotedForNonValidatorError(unvote);
+			}
+
+			walletVote = undefined;
+		}
+
 		for (const vote of transaction.data.asset.votes) {
-			const validatorPublicKey: string = vote.slice(1);
-			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-				validatorPublicKey,
-			);
+			const validatorWallet: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote);
 
-			if (vote.startsWith("+")) {
-				if (walletVote) {
-					throw new Exceptions.AlreadyVotedError();
-				}
-
-				if (validatorWallet.hasAttribute("validator.resigned")) {
-					throw new Exceptions.VotedForResignedValidatorError(vote);
-				}
-
-				walletVote = vote.slice(1);
-			} else {
-				if (!walletVote) {
-					throw new Exceptions.NoVoteError();
-				} else if (walletVote !== vote.slice(1)) {
-					throw new Exceptions.UnvoteMismatchError();
-				}
-
-				walletVote = undefined;
+			if (walletVote) {
+				throw new Exceptions.AlreadyVotedError();
 			}
 
 			if (!validatorWallet.isValidator()) {
 				throw new Exceptions.VotedForNonValidatorError(vote);
+			}
+
+			if (validatorWallet.hasAttribute("validator.resigned")) {
+				throw new Exceptions.VotedForResignedValidatorError(vote);
 			}
 		}
 
