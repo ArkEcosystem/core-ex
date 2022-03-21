@@ -19,15 +19,22 @@ export class VoteTransaction extends Transaction {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
+						unvotes: {
+							additionalItems: false,
+							items: { $ref: "publicKey" },
+							maxItems: 1,
+							minItems: 0,
+							type: "array",
+						},
 						votes: {
 							additionalItems: false,
-							items: { $ref: "walletVote" },
-							maxItems: 2,
-							minItems: 1,
+							items: { $ref: "publicKey" },
+							maxItems: 1,
+							minItems: 0,
 							type: "array",
 						},
 					},
-					required: ["votes"],
+					required: ["unvotes", "votes"],
 					type: "object",
 				},
 				fee: { bignumber: { minimum: 1 } },
