@@ -182,9 +182,9 @@ export class BlockState implements Contracts.State.BlockState {
 				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(unvote);
 
 				// unvote also changes vote balance by fee
-				const senderVoteValidatordAmount = senderValidatordAmount.plus(transaction.fee);
-
-				const voteBalanceChange: BigNumber = senderVoteValidatordAmount.times(-1).times(revert ? -1 : 1);
+				const voteBalanceChange: BigNumber = senderValidatordAmount
+					.plus(transaction.fee)
+					.times(revert ? 1 : -1);
 
 				const voteBalance: BigNumber = validator
 					.getAttribute("validator.voteBalance", BigNumber.ZERO)
@@ -205,27 +205,6 @@ export class BlockState implements Contracts.State.BlockState {
 
 				validator.setAttribute("validator.voteBalance", voteBalance);
 			}
-
-			// for (let index = 0; index < transaction.asset.votes.length; index++) {
-			// 	const vote: string = transaction.asset.votes[index];
-			// 	const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(vote.slice(1));
-
-			// 	// first unvote also changes vote balance by fee
-			// 	const senderVoteValidatordAmount =
-			// 		index === 0 && vote.startsWith("-")
-			// 			? senderValidatordAmount.plus(transaction.fee)
-			// 			: senderValidatordAmount;
-
-			// 	const voteBalanceChange: BigNumber = senderVoteValidatordAmount
-			// 		.times(vote.startsWith("-") ? -1 : 1)
-			// 		.times(revert ? -1 : 1);
-
-			// 	const voteBalance: BigNumber = validator
-			// 		.getAttribute("validator.voteBalance", BigNumber.ZERO)
-			// 		.plus(voteBalanceChange);
-
-			// 	validator.setAttribute("validator.voteBalance", voteBalance);
-			// }
 		} else {
 			// Update vote balance of the sender's validator
 			if (sender.hasVoted()) {
