@@ -49,7 +49,7 @@ export class VoteTransaction extends Transaction {
 		const { data } = this;
 		const publicKeySize = this.app.get<number>(Identifiers.Cryptography.Size.PublicKey);
 		const buff: ByteBuffer = ByteBuffer.fromSize(
-			4 + 4 + publicKeySize * data.asset.votes.length + publicKeySize * data.asset.unvotes.length,
+			1 + 1 + publicKeySize * data.asset.votes.length + publicKeySize * data.asset.unvotes.length,
 		);
 
 		// TODO: Check asset
