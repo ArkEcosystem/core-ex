@@ -26,7 +26,7 @@
 		"@arkecosystem/core-p2p": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
-		"@arkecosystem/core-crypto-address-bech32": "workspace:*",
+		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
 		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
 		"bip39": "3.0.4",

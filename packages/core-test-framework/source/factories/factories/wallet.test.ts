@@ -15,9 +15,9 @@ type ServiceProvider = {
 };
 
 const addressBech32m: ServiceProvider = {
-	klass: require("@arkecosystem/core-crypto-address-bech32").ServiceProvider,
-	name: "@arkecosystem/core-crypto-address-bech32",
-	path: "@arkecosystem/core-crypto-address-bech32",
+	klass: require("@arkecosystem/core-crypto-address-bech32m").ServiceProvider,
+	name: "@arkecosystem/core-crypto-address-bech32m",
+	path: "@arkecosystem/core-crypto-address-bech32m",
 };
 
 const keyPairSchnorr: ServiceProvider = {
