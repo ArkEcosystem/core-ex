@@ -10,8 +10,6 @@ export const registerWalletFactory = (factoryBuilder: FactoryBuilder, app: Appli
 	factoryBuilder.set("Wallet", async ({ options }) => {
 		const passphrase: string = options.passphrase || generateMnemonic();
 
-		console.log("PASSPHRASE", passphrase);
-
 		const wallet: Wallets.Wallet = new Wallets.Wallet(
 			await app
 				.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
