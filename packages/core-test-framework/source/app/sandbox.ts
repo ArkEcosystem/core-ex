@@ -132,7 +132,7 @@ export class Sandbox {
 		}
 	}
 
-	public registerServiceProvider({
+	public async registerServiceProvider({
 		name,
 		path,
 		klass,
@@ -140,7 +140,7 @@ export class Sandbox {
 		name: string;
 		path: string;
 		klass: Types.Class<any>;
-	}): this {
+	}): Promise<this> {
 		const serviceProvider: Providers.ServiceProvider = this.app.resolve<any>(klass);
 		serviceProvider.setManifest(this.app.resolve(Providers.PluginManifest).discover(path));
 		serviceProvider.setConfig(this.app.resolve(Providers.PluginConfiguration).discover(name, path));
@@ -148,6 +148,8 @@ export class Sandbox {
 		this.app
 			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
 			.set(name, serviceProvider);
+
+		await serviceProvider.register();
 
 		return this;
 	}

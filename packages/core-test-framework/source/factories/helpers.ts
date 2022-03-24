@@ -1,32 +1,33 @@
+import { Application } from "@arkecosystem/core-kernel";
 import memoize from "fast-memoize";
 
 import {
-	registerBlockFactory,
-	registerIdentityFactory,
-	registerPeerFactory,
-	registerRoundFactory,
-	registerTransactionFactory,
+	// registerBlockFactory,
+	// registerIdentityFactory,
+	// registerPeerFactory,
+	// registerRoundFactory,
+	// registerTransactionFactory,
 	registerWalletFactory,
 } from "./factories";
 import { Factory } from "./factory";
 import { FactoryBuilder } from "./factory-builder";
 
-const createFactory = memoize((): FactoryBuilder => {
+const createFactory = memoize((app: Application): FactoryBuilder => {
 	const factory: FactoryBuilder = new FactoryBuilder();
 
-	registerBlockFactory(factory);
+	// registerBlockFactory(factory);
 
-	registerIdentityFactory(factory);
+	// registerIdentityFactory(factory);
 
-	registerPeerFactory(factory);
+	// registerPeerFactory(factory);
 
-	registerRoundFactory(factory);
+	// registerRoundFactory(factory);
 
-	registerTransactionFactory(factory);
+	// registerTransactionFactory(factory);
 
-	registerWalletFactory(factory);
+	registerWalletFactory(factory, app);
 
 	return factory;
 });
 
-export const factory = (name: string): Factory => createFactory().get(name);
+export const factory = (name: string, app: Application): Factory => createFactory(app).get(name);

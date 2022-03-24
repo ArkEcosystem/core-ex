@@ -1514,6 +1514,9 @@ importers:
       '@arkecosystem/core-cli': workspace:*
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-address-bech32': workspace:*
+      '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -1545,6 +1548,9 @@ importers:
       '@arkecosystem/core-cli': link:../core-cli
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-crypto-address-bech32': link:../core-crypto-address-bech32
+      '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-state': link:../core-state
