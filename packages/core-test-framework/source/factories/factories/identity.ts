@@ -1,19 +1,25 @@
-// import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-// import { generateMnemonic } from "bip39";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { generateMnemonic } from "bip39";
 
 import { FactoryBuilder } from "../factory-builder";
 
-export const registerIdentityFactory = (factory: FactoryBuilder): void => {
-	// factory.set("Identity", ({ options }) => {
-	// 	const passphrase: string = options.passphrase || generateMnemonic();
-	// 	const keys: Contracts.Crypto.IKeyPair = Identities.Keys.fromMnemonic(passphrase);
-	// 	return {
-	// 		address: this.addressFactory.fromMnemonic(passphrase, options.network?.pubKeyHash),
-	// 		keys,
-	// 		passphrase,
-	// 		privateKey: keys.privateKey,
-	// 		publicKey: keys.publicKey,
-	// 		wif: Identities.WIF.fromMnemonic(passphrase, options.network),
-	// 	};
-	// });
+export const registerIdentityFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+	factory.set("Identity", async ({ options }) => {
+		const passphrase: string = options.passphrase || generateMnemonic();
+		const keys = await app
+			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.fromMnemonic(passphrase);
+		return {
+			address: await app
+				.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+				.fromMnemonic(passphrase),
+			keys,
+			passphrase,
+			privateKey: keys.privateKey,
+			publicKey: keys.publicKey,
+			wif: await app
+				.get<Contracts.Crypto.IWIFFactory>(Identifiers.Cryptography.Identity.WifFactory)
+				.fromMnemonic(passphrase),
+		};
+	});
 };

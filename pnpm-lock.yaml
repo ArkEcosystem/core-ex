@@ -1526,6 +1526,7 @@ importers:
       '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
       '@arkecosystem/core-crypto-transaction-validator-resignation': workspace:*
       '@arkecosystem/core-crypto-transaction-vote': workspace:*
+      '@arkecosystem/core-crypto-wif': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -1570,6 +1571,7 @@ importers:
       '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
       '@arkecosystem/core-crypto-transaction-validator-resignation': link:../core-crypto-transaction-validator-resignation
       '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
+      '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-state': link:../core-state

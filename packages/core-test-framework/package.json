@@ -34,6 +34,7 @@
 		"@arkecosystem/core-crypto-transaction-validator-resignation": "workspace:*",
 		"@arkecosystem/core-crypto-transaction-vote": "workspace:*",
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
+		"@arkecosystem/core-crypto-wif": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
