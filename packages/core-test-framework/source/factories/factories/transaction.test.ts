@@ -1,5 +1,12 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
+import { MultiPaymentTransaction } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { MultiSignatureRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
+import { TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
+import { ValidatorRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-validator-registration";
+import { ValidatorResignationTransaction } from "@arkecosystem/core-crypto-transaction-validator-resignation";
+import { VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
 import { Types } from "@arkecosystem/core-kernel";
 
 import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json"; // TODO: Generate
@@ -74,6 +81,25 @@ describe<{
 		await context.sandbox.registerServiceProvider(cryptoValidation);
 		await context.sandbox.registerServiceProvider(cryptoTransaction);
 
+		context.sandbox.app
+			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+			.registerTransactionType(TransferTransaction);
+		context.sandbox.app
+			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+			.registerTransactionType(ValidatorRegistrationTransaction);
+		context.sandbox.app
+			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+			.registerTransactionType(ValidatorResignationTransaction);
+		context.sandbox.app
+			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+			.registerTransactionType(VoteTransaction);
+		context.sandbox.app
+			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+			.registerTransactionType(MultiSignatureRegistrationTransaction);
+		context.sandbox.app
+			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+			.registerTransactionType(MultiPaymentTransaction);
+
 		context.factoryBuilder = new FactoryBuilder();
 		registerTransactionFactory(context.factoryBuilder, context.sandbox.app);
 	});
@@ -121,26 +147,25 @@ describe<{
 		assert.defined(transaction.data.vendorField);
 	});
 
-	// it("Transfer - should sign it with a single passphrase", async ({ factoryBuilder }) => {
-	// 	const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
-	// 		.get("Transfer")
-	// 		.withStates("sign")
-	// 		.make();
+	it("Transfer - should sign it with a single passphrase", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("Transfer")
+			.withStates("sign")
+			.make();
 
-	// 	assert.undefined(transaction.data.signature);
-	// 	assert.undefined(transaction.data.signatures);
-	// 	// assert.true(transaction.verify());
-	// });
+		assert.defined(transaction.data.signature);
+		assert.undefined(transaction.data.signatures);
+	});
 
-	// it("Transfer - should sign it with multiple passphrases", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("Transfer").withStates("sign", "multiSign").make();
+	it("Transfer - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("Transfer")
+			.withStates("sign", "multiSign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).not.toBeUndefined();
-	//     // todo: verify multi signatures
-	//     // expect(transaction.verify()).toBeTrue();
-	// });
+		assert.defined(transaction.data.signature);
+		assert.defined(transaction.data.signatures);
+	});
 
 	it("ValidatorRegistration - should create a signature builder", async ({ factoryBuilder }) => {
 		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("ValidatorRegistration").make();
@@ -149,26 +174,15 @@ describe<{
 		assert.undefined(transaction.data.signatures);
 	});
 
-	// it("ValidatorRegistration - should sign it with a single passphrase", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("DelegateRegistration").withStates("sign").make();
+	it("ValidatorRegistration - should sign it with a single passphrase", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("ValidatorRegistration")
+			.withStates("sign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
-
-	// it("ValidatorRegistration - should sign it with a second passphrase", () => {
-	//     const transaction: Interfaces.ITransaction = factory
-	//         .get("DelegateRegistration")
-	//         .withStates("sign", "secondSign")
-	//         .make();
-
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).not.toBeUndefined();
-	//     expect(transaction.data.signatures).toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
+		assert.defined(transaction.data.signature);
+		assert.undefined(transaction.data.signatures);
+	});
 
 	it("ValidatorResignation - should create a signature builder", async ({ factoryBuilder }) => {
 		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("ValidatorResignation").make();
@@ -177,26 +191,15 @@ describe<{
 		assert.undefined(transaction.data.signatures);
 	});
 
-	// it("ValidatorResignation - should sign it with a single passphrase", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("DelegateResignation").withStates("sign").make();
+	it("ValidatorResignation - should sign it with a single passphrase", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("ValidatorResignation")
+			.withStates("sign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
-
-	// it("ValidatorResignation - should sign it with a second passphrase", () => {
-	//     const transaction: Interfaces.ITransaction = factory
-	//         .get("DelegateResignation")
-	//         .withStates("sign", "secondSign")
-	//         .make();
-
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).not.toBeUndefined();
-	//     expect(transaction.data.signatures).toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
+		assert.defined(transaction.data.signature);
+		assert.undefined(transaction.data.signatures);
+	});
 
 	it("Vote - should create a builder", async ({ factoryBuilder }) => {
 		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Vote").make();
@@ -205,22 +208,22 @@ describe<{
 		assert.undefined(transaction.data.signatures);
 	});
 
-	// it("Vote - should sign it with a single passphrase", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign").make();
+	it("Vote - should sign it with a single passphrase", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Vote").withStates("sign").make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
+		assert.defined(transaction.data.signature);
+		assert.undefined(transaction.data.signatures);
+	});
 
-	// it("Vote - should sign it with multiple passphrases", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("Vote").withStates("sign", "multiSign").make();
+	it("Vote - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("Vote")
+			.withStates("multiSign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).not.toBeUndefined();
-	// });
+		assert.undefined(transaction.data.signature);
+		assert.defined(transaction.data.signatures);
+	});
 
 	it("Unvote - should create a builder", async ({ factoryBuilder }) => {
 		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Unvote").make();
@@ -229,22 +232,22 @@ describe<{
 		assert.undefined(transaction.data.signatures);
 	});
 
-	// it("Unvote - should sign it with a single passphrase", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign").make();
+	it("Unvote - should sign it with a single passphrase", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Unvote").withStates("sign").make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
+		assert.defined(transaction.data.signature);
+		assert.undefined(transaction.data.signatures);
+	});
 
-	// it("Unvote - should sign it with multiple passphrases", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("Unvote").withStates("sign", "multiSign").make();
+	it("Unvote - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("Unvote")
+			.withStates("multiSign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).not.toBeUndefined();
-	// });
+		assert.undefined(transaction.data.signature);
+		assert.defined(transaction.data.signatures);
+	});
 
 	it("MultiSignature - should create a builder", async ({ factoryBuilder }) => {
 		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("MultiSignature").make();
@@ -253,17 +256,25 @@ describe<{
 		assert.undefined(transaction.data.signatures);
 	});
 
-	// it("MultiSignature - should sign it with multiple passphrases", () => {
-	//     const transaction: Interfaces.ITransaction = factory
-	//         .get("MultiSignature")
-	//         .withStates("multiSign", "sign")
-	//         .make();
+	it("MultiSignature - should sign it with single passphrase", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("MultiSignature")
+			.withStates("sign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).not.toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
+		assert.defined(transaction.data.signature);
+		assert.undefined(transaction.data.signatures);
+	});
+
+	it("MultiSignature - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("MultiSignature")
+			.withStates("multiSign")
+			.make();
+
+		assert.undefined(transaction.data.signature);
+		assert.defined(transaction.data.signatures);
+	});
 
 	it("MultiPayment - should create a builder", async ({ factoryBuilder }) => {
 		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("MultiPayment").make();
@@ -272,23 +283,23 @@ describe<{
 		assert.undefined(transaction.data.signatures);
 	});
 
-	// it("MultiPayment - should sign it with a single passphrase", () => {
-	//     const transaction: Interfaces.ITransaction = factory.get("MultiPayment").withStates("sign").make();
+	it("MultiPayment - should sign it with a single passphrase", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("MultiPayment")
+			.withStates("sign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).toBeUndefined();
-	//     expect(transaction.verify()).toBeTrue();
-	// });
+		assert.defined(transaction.data.signature);
+		assert.undefined(transaction.data.signatures);
+	});
 
-	// it("MultiPayment - should sign it with multiple passphrases", () => {
-	//     const transaction: Interfaces.ITransaction = factory
-	//         .get("MultiPayment")
-	//         .withStates("sign", "multiSign")
-	//         .make();
+	it("MultiPayment - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
+		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+			.get("MultiPayment")
+			.withStates("multiSign")
+			.make();
 
-	//     expect(transaction.data.signature).not.toBeUndefined();
-	//     expect(transaction.data.secondSignature).toBeUndefined();
-	//     expect(transaction.data.signatures).not.toBeUndefined();
-	// });
+		assert.undefined(transaction.data.signature);
+		assert.defined(transaction.data.signatures);
+	});
 });

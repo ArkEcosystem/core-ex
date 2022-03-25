@@ -7,22 +7,20 @@ import { ValidatorResignationBuilder } from "@arkecosystem/core-crypto-transacti
 import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { BigNumber } from "@arkecosystem/utils";
 
-// import { MultiPaymentBuilder } from "packages/core-crypto-transaction-multi-payment/distribution";
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder";
 import { FactoryFunctionOptions } from "../types";
 
-const sign = ({ entity, options }: FactoryFunctionOptions) => {
-	entity.sign(options.passphrase || secrets[0]);
+const AMOUNT = 1;
+const FEE = 1;
 
-	return entity;
-};
+const sign = ({ entity, options }: FactoryFunctionOptions) => entity.sign(options.passphrase || secrets[0]);
 
-const multiSign = ({ entity, options }: FactoryFunctionOptions) => {
+const multiSign = async ({ entity, options }: FactoryFunctionOptions) => {
 	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
 	for (const [index, passphrase] of passphrases.entries()) {
-		entity.multiSign(passphrase, index);
+		await entity.multiSign(passphrase, index);
 	}
 
 	return entity;
@@ -36,10 +34,6 @@ const applyModifiers = (entity, options) => {
 
 	if (entity.data.version > 1 && options.nonce) {
 		entity.nonce(options.nonce);
-	}
-
-	if (options.fee) {
-		entity.fee(options.fee.toFixed());
 	}
 
 	if (options.timestamp) {
@@ -62,7 +56,8 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 		const transferBuilder = app.resolve(TransferBuilder);
 
 		return transferBuilder
-			.amount(BigNumber.make(options.amount || 1).toFixed())
+			.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
+			.fee(BigNumber.make(options.fee || FEE).toFixed())
 			.recipientId(
 				options.recipientId ||
 					(await app
@@ -96,6 +91,7 @@ export const registerValidatorRegistrationFactory = (
 	factory.set("ValidatorRegistration", async ({ options }) =>
 		app
 			.resolve(ValidatorRegistrationBuilder)
+			.fee(BigNumber.make(options.fee || FEE).toFixed())
 			.usernameAsset(options.username || Math.random().toString(36).slice(8)),
 	);
 
@@ -106,7 +102,9 @@ export const registerValidatorResignationFactory = (
 	factory: FactoryBuilder,
 	app: Contracts.Kernel.Application,
 ): void => {
-	factory.set("ValidatorResignation", async () => app.resolve(ValidatorResignationBuilder));
+	factory.set("ValidatorResignation", async ({ options }) =>
+		app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(options.fee || 1).toFixed()),
+	);
 	factory.get("ValidatorResignation").state("sign", sign);
 };
 
@@ -116,6 +114,7 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 		async ({ options }) =>
 			app
 				.resolve(VoteBuilder)
+				.fee(BigNumber.make(options.fee || FEE).toFixed())
 				.votesAsset([
 					options.publicKey ||
 						(await app
@@ -140,6 +139,7 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 		async ({ options }) =>
 			app
 				.resolve(VoteBuilder)
+				.fee(BigNumber.make(options.fee || FEE).toFixed())
 				.unvotesAsset([
 					options.publicKey ||
 						(await app
@@ -191,12 +191,13 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contra
 		async ({ options }) =>
 			app
 				.resolve(MultiPaymentBuilder)
+				.fee(BigNumber.make(options.fee || FEE).toFixed())
 				.addPayment(
 					options.recipientId ||
 						(await app
 							.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
 							.fromMnemonic(secrets[0])),
-					BigNumber.make(options.amount || 1).toFixed(),
+					BigNumber.make(options.amount || AMOUNT).toFixed(),
 				),
 		// applyModifiers(
 		// 	new MultiPaymentBuilder().addPayment(
