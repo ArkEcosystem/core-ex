@@ -1,4 +1,5 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { MultiPaymentBuilder } from "@arkecosystem/core-crypto-transaction-multi-payment";
 import { MultiSignatureBuilder } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
@@ -14,9 +15,20 @@ import { FactoryFunctionOptions } from "../types";
 const AMOUNT = 1;
 const FEE = 1;
 
-const sign = ({ entity, options }: FactoryFunctionOptions) => entity.sign(options.passphrase || secrets[0]);
+interface EntityOptions<T extends TransactionBuilder<T>> {
+	entity: TransactionBuilder<T>;
+	options: FactoryFunctionOptions;
+}
 
-const multiSign = async ({ entity, options }: FactoryFunctionOptions) => {
+const sign = async <T extends TransactionBuilder<T>>({
+	entity,
+	options,
+}: EntityOptions<T>): Promise<TransactionBuilder<T>> => entity.sign(options.passphrase || secrets[0]);
+
+const multiSign = async <T extends TransactionBuilder<T>>({
+	entity,
+	options,
+}: EntityOptions<T>): Promise<TransactionBuilder<T>> => {
 	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
 	for (const [index, passphrase] of passphrases.entries()) {
@@ -26,8 +38,10 @@ const multiSign = async ({ entity, options }: FactoryFunctionOptions) => {
 	return entity;
 };
 
-// @ts-ignore
-const applyModifiers = (entity, options) => {
+const applyModifiers = <T extends TransactionBuilder<T>>(
+	entity: TransactionBuilder<T>,
+	options: FactoryFunctionOptions,
+): TransactionBuilder<T> => {
 	if (options.version) {
 		entity.version(options.version);
 	}
@@ -44,10 +58,6 @@ const applyModifiers = (entity, options) => {
 		entity.senderPublicKey(options.senderPublicKey);
 	}
 
-	if (options.expiration) {
-		entity.expiration(options.expiration);
-	}
-
 	return entity;
 };
 
@@ -55,25 +65,18 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 	factory.set("Transfer", async ({ options }) => {
 		const transferBuilder = app.resolve(TransferBuilder);
 
-		return transferBuilder
-			.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
-			.fee(BigNumber.make(options.fee || FEE).toFixed())
-			.recipientId(
-				options.recipientId ||
-					(await app
-						.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
-						.fromMnemonic(secrets[0])),
-			);
-
-		// return applyModifiers(
-		// 	transferBuilder
-		// 		.amount(BigNumber.make(options.amount || 1).toFixed())
-		// 		.recipientId(options.recipientId || app.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory).fromMnemonic(secrets[0]))
-		// 	// Transactions.BuilderFactory.transfer()
-		// 	// 	.amount(BigNumber.make(options.amount || 1).toFixed())
-		// 	// 	.recipientId(options.recipientId || this.addressFactory.fromMnemonic(secrets[0])),
-		// 	options,
-		// );
+		return applyModifiers(
+			transferBuilder
+				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
+				.fee(BigNumber.make(options.fee || FEE).toFixed())
+				.recipientId(
+					options.recipientId ||
+						(await app
+							.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+							.fromMnemonic(secrets[0])),
+				),
+			options,
+		);
 	});
 
 	factory
@@ -89,10 +92,13 @@ export const registerValidatorRegistrationFactory = (
 	app: Contracts.Kernel.Application,
 ): void => {
 	factory.set("ValidatorRegistration", async ({ options }) =>
-		app
-			.resolve(ValidatorRegistrationBuilder)
-			.fee(BigNumber.make(options.fee || FEE).toFixed())
-			.usernameAsset(options.username || Math.random().toString(36).slice(8)),
+		applyModifiers(
+			app
+				.resolve(ValidatorRegistrationBuilder)
+				.fee(BigNumber.make(options.fee || FEE).toFixed())
+				.usernameAsset(options.username || Math.random().toString(36).slice(8)),
+			options,
+		),
 	);
 
 	factory.get("ValidatorRegistration").state("sign", sign);
@@ -103,15 +109,17 @@ export const registerValidatorResignationFactory = (
 	app: Contracts.Kernel.Application,
 ): void => {
 	factory.set("ValidatorResignation", async ({ options }) =>
-		app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(options.fee || 1).toFixed()),
+		applyModifiers(
+			app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(options.fee || 1).toFixed()),
+			options,
+		),
 	);
 	factory.get("ValidatorResignation").state("sign", sign);
 };
 
 export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set(
-		"Vote",
-		async ({ options }) =>
+	factory.set("Vote", async ({ options }) =>
+		applyModifiers(
 			app
 				.resolve(VoteBuilder)
 				.fee(BigNumber.make(options.fee || FEE).toFixed())
@@ -121,12 +129,8 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 							.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
 							.fromMnemonic(secrets[1])),
 				]),
-		// applyModifiers(
-		// 	Transactions.BuilderFactory.vote().votesAsset([
-		// 		`+${options.publicKey || this.publicKeyFactory.fromMnemonic(secrets[1])}`,
-		// 	]),
-		// 	options,
-		// ),
+			options,
+		),
 	);
 
 	factory.get("Vote").state("sign", sign);
@@ -134,9 +138,8 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 };
 
 export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set(
-		"Unvote",
-		async ({ options }) =>
+	factory.set("Unvote", async ({ options }) =>
+		applyModifiers(
 			app
 				.resolve(VoteBuilder)
 				.fee(BigNumber.make(options.fee || FEE).toFixed())
@@ -146,12 +149,8 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 							.get<Contracts.Crypto.IPublicKeyFactory>(Identifiers.Cryptography.Identity.PublicKeyFactory)
 							.fromMnemonic(secrets[1])),
 				]),
-		// applyModifiers(
-		// 	Transactions.BuilderFactory.vote().votesAsset([
-		// 		`-${options.publicKey || this.publicKeyFactory.fromMnemonic(secrets[1])}`,
-		// 	]),
-		// 	options,
-		// ),
+			options,
+		),
 	);
 
 	factory.get("Unvote").state("sign", sign);
@@ -160,8 +159,6 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 
 export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("MultiSignature", async ({ options }) => {
-		// const builder = applyModifiers(Transactions.BuilderFactory.multiSignature(), options);
-
 		const publicKeyFactory = app.get<Contracts.Crypto.IPublicKeyFactory>(
 			Identifiers.Cryptography.Identity.PublicKeyFactory,
 		);
@@ -172,13 +169,16 @@ export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.K
 			await publicKeyFactory.fromMnemonic(secrets[2]),
 		];
 
-		return app
-			.resolve(MultiSignatureBuilder)
-			.multiSignatureAsset({
-				min: options.min || 2,
-				publicKeys,
-			})
-			.senderPublicKey(publicKeys[0]);
+		return applyModifiers(
+			app
+				.resolve(MultiSignatureBuilder)
+				.multiSignatureAsset({
+					min: options.min || 2,
+					publicKeys,
+				})
+				.senderPublicKey(publicKeys[0]),
+			options,
+		);
 	});
 
 	factory.get("MultiSignature").state("sign", sign);
@@ -186,9 +186,8 @@ export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.K
 };
 
 export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application) => {
-	factory.set(
-		"MultiPayment",
-		async ({ options }) =>
+	factory.set("MultiPayment", async ({ options }) =>
+		applyModifiers(
 			app
 				.resolve(MultiPaymentBuilder)
 				.fee(BigNumber.make(options.fee || FEE).toFixed())
@@ -199,13 +198,8 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contra
 							.fromMnemonic(secrets[0])),
 					BigNumber.make(options.amount || AMOUNT).toFixed(),
 				),
-		// applyModifiers(
-		// 	new MultiPaymentBuilder().addPayment(
-		// 		options.recipientId || (await this.addressFactory.fromMnemonic(secrets[0])),
-		// 		BigNumber.make(options.amount || 1).toFixed(),
-		// 	),
-		// 	options,
-		// ),
+			options,
+		),
 	);
 
 	factory.get("MultiPayment").state("sign", sign);
