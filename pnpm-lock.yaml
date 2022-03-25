@@ -1515,6 +1515,7 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-address-bech32m': workspace:*
+      '@arkecosystem/core-crypto-block': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-crypto-hash-bcrypto': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
@@ -1529,6 +1530,7 @@ importers:
       '@arkecosystem/core-crypto-wif': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
+      '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
@@ -1539,6 +1541,7 @@ importers:
       bs58: 4.0.1
       chance: 1.1.8
       concordance: ~5.0.4
+      dayjs: 1.10.7
       env-paths: 2.2.0
       fast-memoize: 2.5.2
       fs-extra: 8.1.0
@@ -1560,6 +1563,7 @@ importers:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
+      '@arkecosystem/core-crypto-block': link:../core-crypto-block
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-crypto-hash-bcrypto': link:../core-crypto-hash-bcrypto
       '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
@@ -1574,6 +1578,7 @@ importers:
       '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
+      '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
       '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/utils': link:../utils
@@ -1581,6 +1586,7 @@ importers:
       bs58: 4.0.1
       chance: 1.1.8
       concordance: 5.0.4
+      dayjs: 1.10.7
       env-paths: 2.2.0
       fast-memoize: 2.5.2
       fs-extra: 8.1.0

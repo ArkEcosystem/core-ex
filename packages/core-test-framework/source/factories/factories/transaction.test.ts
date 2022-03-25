@@ -51,12 +51,6 @@ const cryptoValidation: ServiceProvider = {
 	path: "@arkecosystem/core-validation",
 };
 
-const transferTransaction: ServiceProvider = {
-	klass: require("@arkecosystem/core-crypto-transaction-transfer").ServiceProvider,
-	name: "@arkecosystem/core-crypto-transaction-transfer",
-	path: "@arkecosystem/core-crypto-transaction-transfer",
-};
-
 const cryptoTransaction: ServiceProvider = {
 	klass: require("@arkecosystem/core-crypto-transaction").ServiceProvider,
 	name: "@arkecosystem/core-crypto-transaction",
