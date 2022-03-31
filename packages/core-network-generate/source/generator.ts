@@ -97,7 +97,7 @@ export class NetworkGenerator {
 		this.#app = new Application(new Container());
 	}
 
-	public async generateNetwork(options: Options): Promise<void> {
+	public async generate(options: Options): Promise<void> {
 		const internalOptions: InternalOptions = {
 			blockTime: 8,
 			coreDBHost: "localhost",

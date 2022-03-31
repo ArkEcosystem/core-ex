@@ -23,7 +23,7 @@ describe<{
 		const writeJSONSync = stub(fs, "writeJSONSync");
 		const writeFileSync = stub(fs, "writeFileSync");
 
-		await context.networkGenerator.generateNetwork({
+		await context.networkGenerator.generate({
 			network: "testnet",
 			symbol: "my",
 			token: "myn",
@@ -100,7 +100,7 @@ describe<{
 
 		await assert.rejects(
 			() =>
-				context.networkGenerator.generateNetwork({
+				context.networkGenerator.generate({
 					network: "testnet",
 					symbol: "my",
 					token: "myn",
@@ -115,7 +115,7 @@ describe<{
 		const writeJSONSync = stub(fs, "writeJSONSync");
 		const writeFileSync = stub(fs, "writeFileSync");
 
-		await context.networkGenerator.generateNetwork({
+		await context.networkGenerator.generate({
 			blockTime: 9,
 			coreDBDatabase: "database",
 			coreDBHost: "localhost",
