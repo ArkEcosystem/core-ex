@@ -4,7 +4,7 @@ import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";
 
-import { describe, Sandbox } from "../../core-test-framework";
+import { describe } from "../../core-test-framework";
 import { NetworkGenerator } from "./generator";
 
 describe<{
@@ -96,16 +96,12 @@ describe<{
 		);
 	});
 
-	it("should log if app is provided", async (context) => {
-		const sandbox = new Sandbox();
-
+	it("should log if logger is provided", async (context) => {
 		const logger = {
 			info: () => {},
 		};
 
-		sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
-
-		context.networkGenerator = new NetworkGenerator(sandbox.app);
+		context.networkGenerator = new NetworkGenerator(logger);
 
 		const log = stub(logger, "info");
 		const existsSync = stub(fs, "existsSync");

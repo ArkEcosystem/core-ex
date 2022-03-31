@@ -87,16 +87,15 @@ type Options = Partial<InternalOptions> & {
 	symbol: string;
 };
 
+type Logger = { info: (message: string) => void };
 export class NetworkGenerator {
 	#app: Application;
-	#logger?: Contracts.Kernel.Logger;
+	#logger?: Logger;
 
-	public constructor(app?: Contracts.Kernel.Application) {
+	public constructor(logger?: Logger) {
+		this.#logger = logger;
+
 		this.#app = new Application(new Container());
-
-		if (app) {
-			this.#logger = app.get(Identifiers.LogService);
-		}
 	}
 
 	public async generate(options: Options): Promise<void> {
