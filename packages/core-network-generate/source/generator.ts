@@ -124,7 +124,7 @@ export class NetworkGenerator {
 			...options,
 		};
 
-		await this.#initialize(internalOptions);
+		await this.#initialize();
 
 		this.#app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
@@ -230,13 +230,8 @@ export class NetworkGenerator {
 		// this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
 	}
 
-	async #initialize(options: InternalOptions): Promise<void> {
+	async #initialize(): Promise<void> {
 		this.#app.bind(Identifiers.LogService).toConstantValue({});
-
-		const paths = envPaths(options.token, { suffix: "core" });
-		for (const [type, path] of Object.entries(paths)) {
-			this.#app.bind(`path.${type}`).toConstantValue(path);
-		}
 
 		await this.#app.resolve(CoreSerializer).register();
 		await this.#app.resolve(CoreValidation).register();
