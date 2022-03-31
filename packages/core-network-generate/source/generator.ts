@@ -43,50 +43,6 @@ type Task = {
 	title: string;
 };
 
-type InternalOptions = {
-	network: string;
-	premine: string;
-	validators: number;
-	blockTime: number;
-	maxTxPerBlock: number;
-	maxBlockPayload: number;
-	rewardHeight: number;
-	rewardAmount: string | number;
-	pubKeyHash: number;
-	wif: number;
-	token: string;
-	symbol: string;
-	explorer: string;
-	distribute: boolean;
-	epoch: Date;
-	vendorFieldLength: number;
-
-	// Env
-	coreDBHost: string;
-	coreDBPort: number;
-	coreDBUsername?: string;
-	coreDBPassword?: string;
-	coreDBDatabase?: string;
-
-	coreP2PPort: number;
-	coreWebhooksPort: number;
-	coreMonitorPort: number;
-
-	// Peers
-	peers: string[];
-
-	// General
-	configPath?: string;
-	overwriteConfig: boolean;
-	force: boolean;
-};
-
-type Options = Partial<InternalOptions> & {
-	network: string;
-	token: string;
-	symbol: string;
-};
-
 type Logger = { info: (message: string) => void };
 export class NetworkGenerator {
 	#app: Application;
@@ -98,8 +54,8 @@ export class NetworkGenerator {
 		this.#app = new Application(new Container());
 	}
 
-	public async generate(options: Options): Promise<void> {
-		const internalOptions: InternalOptions = {
+	public async generate(options: Contracts.NetworkGenerator.Options): Promise<void> {
+		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
 			blockTime: 8,
 			coreDBHost: "localhost",
 			coreDBPort: 5432,
@@ -254,7 +210,7 @@ export class NetworkGenerator {
 		await this.#app.resolve(CoreCryptoTransactionVote).register();
 	}
 
-	#generateCryptoNetwork(nethash: string, options: InternalOptions) {
+	#generateCryptoNetwork(nethash: string, options: Contracts.NetworkGenerator.InternalOptions) {
 		return {
 			client: {
 				explorer: options.explorer,
@@ -270,7 +226,7 @@ export class NetworkGenerator {
 		};
 	}
 
-	#generateCryptoMilestones(options: InternalOptions) {
+	#generateCryptoMilestones(options: Contracts.NetworkGenerator.InternalOptions) {
 		return [
 			{
 				activeValidators: options.validators,
@@ -303,7 +259,7 @@ export class NetworkGenerator {
 	async #generateCryptoGenesisBlock(
 		genesisWallet,
 		validators,
-		options: InternalOptions,
+		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.IBlockData> {
 		const premineWallet: Wallet = await this.#createWallet();
 
@@ -337,7 +293,7 @@ export class NetworkGenerator {
 		return this.#createGenesisBlock(premineWallet.keys, transactions, options);
 	}
 
-	#generateEnvironmentVariables(options: InternalOptions): string {
+	#generateEnvironmentVariables(options: Contracts.NetworkGenerator.InternalOptions): string {
 		let result = "";
 
 		result += "CORE_LOG_LEVEL=info\n";
@@ -361,7 +317,7 @@ export class NetworkGenerator {
 		return result;
 	}
 
-	#generateApp(options: InternalOptions): any {
+	#generateApp(options: Contracts.NetworkGenerator.InternalOptions): any {
 		return readJSONSync(resolve(__dirname, "../../core/bin/config/testnet/app.json"));
 	}
 
@@ -485,7 +441,7 @@ export class NetworkGenerator {
 	async #createGenesisBlock(
 		keys: Contracts.Crypto.IKeyPair,
 		transactions,
-		options: InternalOptions,
+		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.IBlockData> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
