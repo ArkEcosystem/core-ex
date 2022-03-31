@@ -1,35 +1,6 @@
-import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
-import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts as BaseContracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Commands, Contracts } from "@arkecosystem/core-cli";
+import { injectable } from "@arkecosystem/core-container";
 import { NetworkGenerator } from "@arkecosystem/core-network-generate";
-// import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
-// import { ServiceProvider as CoreCryptoBlock } from "@arkecosystem/core-crypto-block";
-// import { ServiceProvider as CoreCryptoConfig } from "@arkecosystem/core-crypto-config";
-// import { ServiceProvider as CoreCryptoHashBcrypto } from "@arkecosystem/core-crypto-hash-bcrypto";
-// import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
-// import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
-// import { ServiceProvider as CoreCryptoTime } from "@arkecosystem/core-crypto-time";
-// import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
-// import { ServiceProvider as CoreCryptoTransactionMultiPayment } from "@arkecosystem/core-crypto-transaction-multi-payment";
-// import { ServiceProvider as CoreCryptoTransactionMultiSignatureRegistration } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
-// import {
-// 	ServiceProvider as CoreCryptoTransactionTransfer,
-// 	TransferBuilder,
-// } from "@arkecosystem/core-crypto-transaction-transfer";
-// import {
-// 	ServiceProvider as CoreCryptoTransactionValidatorRegistration,
-// 	ValidatorRegistrationBuilder,
-// } from "@arkecosystem/core-crypto-transaction-validator-registration";
-// import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@arkecosystem/core-crypto-transaction-validator-resignation";
-// import { ServiceProvider as CoreCryptoTransactionVote, VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
-// import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-crypto-validation";
-// import { ServiceProvider as CoreCryptoWif } from "@arkecosystem/core-crypto-wif";
-// import { ServiceProvider as CoreDatabase } from "@arkecosystem/core-database";
-// import { ServiceProvider as CoreFees } from "@arkecosystem/core-fees";
-// import { ServiceProvider as CoreFeesStatic } from "@arkecosystem/core-fees-static";
-// import { ServiceProvider as CoreLMDB } from "@arkecosystem/core-lmdb";
-// import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
-// import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 import Joi from "joi";
 import prompts from "prompts";
 
@@ -43,9 +14,6 @@ interface Flag {
 
 @injectable()
 export class Command extends Commands.Command {
-	@inject(Container.Identifiers.Logger)
-	private readonly logger!: Services.Logger;
-
 	public signature = "network:generate";
 
 	public description = "Generates a new network configuration.";
