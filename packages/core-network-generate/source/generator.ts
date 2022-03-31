@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Container } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
@@ -23,11 +22,9 @@ import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@a
 import { ServiceProvider as CoreCryptoTransactionVote, VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@arkecosystem/core-crypto-wif";
-import { ServiceProvider as CoreDatabase } from "@arkecosystem/core-database";
 import { ServiceProvider as CoreFees } from "@arkecosystem/core-fees";
 import { ServiceProvider as CoreFeesStatic } from "@arkecosystem/core-fees-static";
 import { Application } from "@arkecosystem/core-kernel";
-import { ServiceProvider as CoreLMDB } from "@arkecosystem/core-lmdb";
 import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 import { BigNumber } from "@arkecosystem/utils";
@@ -37,7 +34,7 @@ import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import { join, resolve } from "path";
 
-import { Options } from "./contracts";
+import { InternalOptions, Options } from "./contracts";
 
 interface Wallet {
 	address: string;
@@ -59,7 +56,33 @@ export class NetworkGenerator {
 	}
 
 	public async generateNetwork(options: Options): Promise<void> {
-		await this.#initialize(options);
+		const internalOptions: InternalOptions = {
+			blockTime: 8,
+			coreDBHost: "localhost",
+			coreDBPort: 5432,
+			coreMonitorPort: 4005,
+			coreP2PPort: 4000,
+			coreWebhooksPort: 4004,
+			distribute: false,
+			epoch: new Date(new Date().toISOString().slice(0, 11) + "00:00:00.000Z"),
+			explorer: "",
+			force: false,
+			maxBlockPayload: 2_097_152,
+			maxTxPerBlock: 150,
+			network: "testnet",
+			overwriteConfig: false,
+			peers: "127.0.0.1",
+			premine: "12500000000000000",
+			pubKeyHash: 30,
+			rewardAmount: "200000000",
+			rewardHeight: 75_600,
+			validators: 51,
+			vendorFieldLength: 255,
+			wif: 186,
+			...options,
+		};
+
+		await this.#initialize(internalOptions);
 
 		this.#app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
@@ -68,25 +91,26 @@ export class NetworkGenerator {
 				milestones: [{ address: { bech32m: "ark" } }],
 			});
 
-		const paths = envPaths(options.token, { suffix: "core" });
-		const configPath = options.configPath ? options.configPath : paths.config;
+		const paths = envPaths(internalOptions.token, { suffix: "core" });
+		const configPath = internalOptions.configPath ? internalOptions.configPath : paths.config;
 
-		const coreConfigDestination = join(configPath, options.network);
+		const coreConfigDestination = join(configPath, internalOptions.network);
 
-		const validators: any[] = await this.#generateCoreValidators(options.validators, options.pubKeyHash);
+		const validators: any[] = await this.#generateCoreValidators(
+			internalOptions.validators,
+			internalOptions.pubKeyHash,
+		);
 
 		const genesisWallet = await this.#createWallet();
 
 		const tasks: Task[] = [
 			{
 				task: async () => {
-					if (!options.overwriteConfig && existsSync(coreConfigDestination)) {
+					if (!internalOptions.overwriteConfig && existsSync(coreConfigDestination)) {
 						throw new Error(`${coreConfigDestination} already exists.`);
 					}
 
 					ensureDirSync(coreConfigDestination);
-
-					console.log("Task 1");
 				},
 				title: `Prepare directories.`,
 			},
@@ -95,15 +119,13 @@ export class NetworkGenerator {
 					writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, {
 						spaces: 4,
 					});
-
-					console.log("Task 2");
 				},
 				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
 			},
 			{
 				task: async () => {
 					// Milestones
-					const milestones = this.#generateCryptoMilestones(options);
+					const milestones = this.#generateCryptoMilestones(internalOptions);
 
 					this.#app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
 						// @ts-ignore
@@ -114,27 +136,29 @@ export class NetworkGenerator {
 					});
 
 					// Genesis Block
-					const genesisBlock = await this.#generateCryptoGenesisBlock(genesisWallet, validators, options);
+					const genesisBlock = await this.#generateCryptoGenesisBlock(
+						genesisWallet,
+						validators,
+						internalOptions,
+					);
 
 					writeJSONSync(
 						resolve(coreConfigDestination, "crypto.json"),
 						{
 							genesisBlock,
 							milestones,
-							network: this.#generateCryptoNetwork(genesisBlock.payloadHash, options),
+							network: this.#generateCryptoNetwork(genesisBlock.payloadHash, internalOptions),
 						},
 						{
 							spaces: 4,
 						},
 					);
-
-					console.log("Task 3");
 				},
 				title: "Generate crypto network configuration.",
 			},
 			{
 				task: async () => {
-					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.#generatePeers(options), {
+					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.#generatePeers(internalOptions), {
 						spaces: 4,
 					});
 
@@ -144,13 +168,14 @@ export class NetworkGenerator {
 						{ spaces: 4 },
 					);
 
-					writeFileSync(resolve(coreConfigDestination, ".env"), this.#generateEnvironmentVariables(options));
+					writeFileSync(
+						resolve(coreConfigDestination, ".env"),
+						this.#generateEnvironmentVariables(internalOptions),
+					);
 
-					writeJSONSync(resolve(coreConfigDestination, "app.json"), this.#generateApp(options), {
+					writeJSONSync(resolve(coreConfigDestination, "app.json"), this.#generateApp(internalOptions), {
 						spaces: 4,
 					});
-
-					console.log("Task 4");
 				},
 				title: "Generate Core network configuration.",
 			},
@@ -163,7 +188,7 @@ export class NetworkGenerator {
 		// this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
 	}
 
-	async #initialize(options: Options): Promise<void> {
+	async #initialize(options: InternalOptions): Promise<void> {
 		this.#app.bind(Identifiers.LogService).toConstantValue({});
 
 		const paths = envPaths(options.token, { suffix: "core" });
@@ -182,8 +207,6 @@ export class NetworkGenerator {
 		await this.#app.resolve(CoreCryptoAddressBech32m).register();
 		await this.#app.resolve(CoreCryptoWif).register();
 		await this.#app.resolve(CoreCryptoBlock).register();
-		// await this.#app.resolve(CoreLMDB).register();
-		// await this.#app.resolve(CoreDatabase).register();
 		await this.#app.resolve(CoreFees).register();
 		await this.#app.resolve(CoreFeesStatic).register();
 		await this.#app.resolve(CoreCryptoTransaction).register();
@@ -195,7 +218,7 @@ export class NetworkGenerator {
 		await this.#app.resolve(CoreCryptoTransactionVote).register();
 	}
 
-	#generateCryptoNetwork(nethash: string, options: Options) {
+	#generateCryptoNetwork(nethash: string, options: InternalOptions) {
 		return {
 			client: {
 				explorer: options.explorer,
@@ -211,7 +234,7 @@ export class NetworkGenerator {
 		};
 	}
 
-	#generateCryptoMilestones(options: Options) {
+	#generateCryptoMilestones(options: InternalOptions) {
 		return [
 			{
 				activeValidators: options.validators,
@@ -244,7 +267,7 @@ export class NetworkGenerator {
 	async #generateCryptoGenesisBlock(
 		genesisWallet,
 		validators,
-		options: Options,
+		options: InternalOptions,
 	): Promise<Contracts.Crypto.IBlockData> {
 		const premineWallet: Wallet = await this.#createWallet();
 
@@ -278,7 +301,7 @@ export class NetworkGenerator {
 		return this.#createGenesisBlock(premineWallet.keys, transactions, options);
 	}
 
-	#generateEnvironmentVariables(options: Options): string {
+	#generateEnvironmentVariables(options: InternalOptions): string {
 		let result = "";
 
 		result += "CORE_LOG_LEVEL=info\n";
@@ -302,7 +325,7 @@ export class NetworkGenerator {
 		return result;
 	}
 
-	#generatePeers(options: Options): { list: { ip: string; port: number }[] } {
+	#generatePeers(options: InternalOptions): { list: { ip: string; port: number }[] } {
 		if (options.peers === "") {
 			return { list: [] };
 		}
@@ -322,7 +345,7 @@ export class NetworkGenerator {
 		return { list };
 	}
 
-	#generateApp(options: Options): any {
+	#generateApp(options: InternalOptions): any {
 		return readJSONSync(resolve(__dirname, "../../core/bin/config/testnet/app.json"));
 	}
 
@@ -446,7 +469,7 @@ export class NetworkGenerator {
 	async #createGenesisBlock(
 		keys: Contracts.Crypto.IKeyPair,
 		transactions,
-		options: Options,
+		options: InternalOptions,
 	): Promise<Contracts.Crypto.IBlockData> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,

@@ -1,4 +1,4 @@
-export interface Options {
+export type InternalOptions = {
 	network: string;
 	premine: string;
 	validators: number;
@@ -34,4 +34,10 @@ export interface Options {
 	configPath?: string;
 	overwriteConfig: boolean;
 	force: boolean;
-}
+};
+
+export type Options = Partial<InternalOptions> & {
+	network: string;
+	token: string;
+	symbol: string;
+};
