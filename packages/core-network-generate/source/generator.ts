@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Container } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@arkecosystem/core-crypto-address-bech32m";
@@ -36,49 +37,13 @@ import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import { join, resolve } from "path";
 
+import { Options } from "./contracts";
+
 interface Wallet {
 	address: string;
 	passphrase: string;
 	keys: Contracts.Crypto.IKeyPair;
 	username: string | undefined;
-}
-
-interface Options {
-	network: string;
-	premine: string;
-	validators: number;
-	blockTime: number;
-	maxTxPerBlock: number;
-	maxBlockPayload: number;
-	rewardHeight: number;
-	rewardAmount: string | number;
-	pubKeyHash: number;
-	wif: number;
-	token: string;
-	symbol: string;
-	explorer: string;
-	distribute: boolean;
-	epoch: Date;
-	vendorFieldLength: number;
-
-	// Env
-	coreDBHost: string;
-	coreDBPort: number;
-	coreDBUsername?: string;
-	coreDBPassword?: string;
-	coreDBDatabase?: string;
-
-	coreP2PPort: number;
-	coreWebhooksPort: number;
-	coreMonitorPort: number;
-
-	// Peers
-	peers: string;
-
-	// General
-	configPath?: string;
-	overwriteConfig: boolean;
-	force: boolean;
 }
 
 interface Task {
@@ -93,8 +58,118 @@ export class NetworkGenerator {
 		this.#app = new Application(new Container());
 	}
 
-	public async initialize(): Promise<void> {
+	public async generateNetwork(options: Options): Promise<void> {
+		await this.#initialize(options);
+
+		this.#app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			// @ts-ignore
+			.setConfig({
+				milestones: [{ address: { bech32m: "ark" } }],
+			});
+
+		const paths = envPaths(options.token, { suffix: "core" });
+		const configPath = options.configPath ? options.configPath : paths.config;
+
+		const coreConfigDestination = join(configPath, options.network);
+
+		const validators: any[] = await this.#generateCoreValidators(options.validators, options.pubKeyHash);
+
+		const genesisWallet = await this.#createWallet();
+
+		const tasks: Task[] = [
+			{
+				task: async () => {
+					if (!options.overwriteConfig && existsSync(coreConfigDestination)) {
+						throw new Error(`${coreConfigDestination} already exists.`);
+					}
+
+					ensureDirSync(coreConfigDestination);
+
+					console.log("Task 1");
+				},
+				title: `Prepare directories.`,
+			},
+			{
+				task: async () => {
+					writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, {
+						spaces: 4,
+					});
+
+					console.log("Task 2");
+				},
+				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
+			},
+			{
+				task: async () => {
+					// Milestones
+					const milestones = this.#generateCryptoMilestones(options);
+
+					this.#app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
+						// @ts-ignore
+						genesisBlock: {},
+						milestones,
+						// @ts-ignore
+						network: {},
+					});
+
+					// Genesis Block
+					const genesisBlock = await this.#generateCryptoGenesisBlock(genesisWallet, validators, options);
+
+					writeJSONSync(
+						resolve(coreConfigDestination, "crypto.json"),
+						{
+							genesisBlock,
+							milestones,
+							network: this.#generateCryptoNetwork(genesisBlock.payloadHash, options),
+						},
+						{
+							spaces: 4,
+						},
+					);
+
+					console.log("Task 3");
+				},
+				title: "Generate crypto network configuration.",
+			},
+			{
+				task: async () => {
+					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.#generatePeers(options), {
+						spaces: 4,
+					});
+
+					writeJSONSync(
+						resolve(coreConfigDestination, "validators.json"),
+						{ secrets: validators.map((d) => d.passphrase) },
+						{ spaces: 4 },
+					);
+
+					writeFileSync(resolve(coreConfigDestination, ".env"), this.#generateEnvironmentVariables(options));
+
+					writeJSONSync(resolve(coreConfigDestination, "app.json"), this.#generateApp(options), {
+						spaces: 4,
+					});
+
+					console.log("Task 4");
+				},
+				title: "Generate Core network configuration.",
+			},
+		];
+
+		for (const task of tasks) {
+			await task.task();
+		}
+
+		// this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
+	}
+
+	async #initialize(options: Options): Promise<void> {
 		this.#app.bind(Identifiers.LogService).toConstantValue({});
+
+		const paths = envPaths(options.token, { suffix: "core" });
+		for (const [type, path] of Object.entries(paths)) {
+			this.#app.bind(`path.${type}`).toConstantValue(path);
+		}
 
 		await this.#app.resolve(CoreSerializer).register();
 		await this.#app.resolve(CoreValidation).register();
@@ -107,8 +182,8 @@ export class NetworkGenerator {
 		await this.#app.resolve(CoreCryptoAddressBech32m).register();
 		await this.#app.resolve(CoreCryptoWif).register();
 		await this.#app.resolve(CoreCryptoBlock).register();
-		await this.#app.resolve(CoreLMDB).register();
-		await this.#app.resolve(CoreDatabase).register();
+		// await this.#app.resolve(CoreLMDB).register();
+		// await this.#app.resolve(CoreDatabase).register();
 		await this.#app.resolve(CoreFees).register();
 		await this.#app.resolve(CoreFeesStatic).register();
 		await this.#app.resolve(CoreCryptoTransaction).register();
@@ -118,110 +193,6 @@ export class NetworkGenerator {
 		await this.#app.resolve(CoreCryptoTransactionMultiSignatureRegistration).register();
 		await this.#app.resolve(CoreCryptoTransactionTransfer).register();
 		await this.#app.resolve(CoreCryptoTransactionVote).register();
-	}
-
-	public async generateNetwork(options: Options): Promise<void> {
-		try {
-			this.#app
-				.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
-				// @ts-ignore
-				.setConfig({
-					milestones: [{ address: { bech32m: "ark" } }],
-				});
-
-			const paths = envPaths(options.token, { suffix: "core" });
-			const configPath = options.configPath ? options.configPath : paths.config;
-
-			const coreConfigDestination = join(configPath, options.network);
-
-			const validators: any[] = await this.#generateCoreValidators(options.validators, options.pubKeyHash);
-
-			const genesisWallet = await this.#createWallet();
-
-			const tasks: Task[] = [
-				{
-					task: async () => {
-						if (!options.overwriteConfig && existsSync(coreConfigDestination)) {
-							throw new Error(`${coreConfigDestination} already exists.`);
-						}
-
-						ensureDirSync(coreConfigDestination);
-					},
-					title: `Prepare directories.`,
-				},
-				{
-					task: async () => {
-						writeJSONSync(resolve(coreConfigDestination, "genesis-wallet.json"), genesisWallet, {
-							spaces: 4,
-						});
-					},
-					title: "Persist genesis wallet to genesis-wallet.json in core config path.",
-				},
-				{
-					task: async () => {
-						// Milestones
-						const milestones = this.#generateCryptoMilestones(options);
-
-						this.#app
-							.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
-							.setConfig({
-								// @ts-ignore
-								genesisBlock: {},
-								milestones,
-								// @ts-ignore
-								network: {},
-							});
-
-						// Genesis Block
-						const genesisBlock = await this.#generateCryptoGenesisBlock(genesisWallet, validators, options);
-
-						writeJSONSync(
-							resolve(coreConfigDestination, "crypto.json"),
-							{
-								genesisBlock,
-								milestones,
-								network: this.#generateCryptoNetwork(genesisBlock.payloadHash, options),
-							},
-							{
-								spaces: 4,
-							},
-						);
-					},
-					title: "Generate crypto network configuration.",
-				},
-				{
-					task: async () => {
-						writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.#generatePeers(options), {
-							spaces: 4,
-						});
-
-						writeJSONSync(
-							resolve(coreConfigDestination, "validators.json"),
-							{ secrets: validators.map((d) => d.passphrase) },
-							{ spaces: 4 },
-						);
-
-						writeFileSync(
-							resolve(coreConfigDestination, ".env"),
-							this.#generateEnvironmentVariables(options),
-						);
-
-						writeJSONSync(resolve(coreConfigDestination, "app.json"), this.#generateApp(options), {
-							spaces: 4,
-						});
-					},
-					title: "Generate Core network configuration.",
-				},
-			];
-
-			for (const task of tasks) {
-				await task.task();
-			}
-
-			// this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
-		} catch {
-			// console.log(error);
-		}
 	}
 
 	#generateCryptoNetwork(nethash: string, options: Options) {
@@ -352,7 +323,7 @@ export class NetworkGenerator {
 	}
 
 	#generateApp(options: Options): any {
-		return readJSONSync(resolve(__dirname, "../../bin/config/testnet/app.json"));
+		return readJSONSync(resolve(__dirname, "../../core/bin/config/testnet/app.json"));
 	}
 
 	async #generateCoreValidators(activeValidators: number, pubKeyHash: number): Promise<Wallet[]> {
