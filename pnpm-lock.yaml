@@ -1380,6 +1380,16 @@ importers:
       joi: 17.4.2
       winston: 3.6.0
 
+  packages/core-network-generate:
+    specifiers:
+      '@arkecosystem/core-container': workspace:*
+      '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-kernel': workspace:*
+    dependencies:
+      '@arkecosystem/core-container': link:../core-container
+      '@arkecosystem/core-contracts': link:../core-contracts
+      '@arkecosystem/core-kernel': link:../core-kernel
+
   packages/core-networking-dns:
     specifiers:
       '@arkecosystem/core-container': workspace:*
