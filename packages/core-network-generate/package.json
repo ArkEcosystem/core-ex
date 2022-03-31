@@ -21,7 +21,6 @@
 	"dependencies": {
 		"@arkecosystem/core-container": "workspace:*",
 		"@arkecosystem/core-contracts": "workspace:*",
-		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
 		"@arkecosystem/core-crypto-block": "workspace:*",
 		"@arkecosystem/core-crypto-config": "workspace:*",
@@ -38,6 +37,7 @@
 		"@arkecosystem/core-database": "workspace:*",
 		"@arkecosystem/core-fees": "workspace:*",
 		"@arkecosystem/core-fees-static": "workspace:*",
+		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-lmdb": "workspace:*",
 		"@arkecosystem/core-serializer": "workspace:*",
 		"@arkecosystem/core-validation": "workspace:*",
