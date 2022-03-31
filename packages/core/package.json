@@ -65,6 +65,7 @@
 		"@arkecosystem/core-validation": "workspace:*",
 		"@arkecosystem/core-webhooks": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
+		"@arkecosystem/core-network-generate": "workspace:*",
 		"argon2": "0.28.2",
 		"bip39": "3.0.4",
 		"boxen": "4.2.0",

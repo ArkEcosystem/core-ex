@@ -158,6 +158,7 @@ importers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-lmdb': workspace:*
       '@arkecosystem/core-logger-pino': workspace:*
+      '@arkecosystem/core-network-generate': workspace:*
       '@arkecosystem/core-networking-dns': workspace:*
       '@arkecosystem/core-networking-ntp': workspace:*
       '@arkecosystem/core-p2p': workspace:*
@@ -217,6 +218,7 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-lmdb': link:../core-lmdb
       '@arkecosystem/core-logger-pino': link:../core-logger-pino
+      '@arkecosystem/core-network-generate': link:../core-network-generate
       '@arkecosystem/core-networking-dns': link:../core-networking-dns
       '@arkecosystem/core-networking-ntp': link:../core-networking-ntp
       '@arkecosystem/core-p2p': link:../core-p2p
