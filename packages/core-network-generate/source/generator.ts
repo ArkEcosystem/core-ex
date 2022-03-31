@@ -34,19 +34,61 @@ import envPaths from "env-paths";
 import { ensureDirSync, existsSync, readJSONSync, writeFileSync, writeJSONSync } from "fs-extra";
 import { join, resolve } from "path";
 
-import { InternalOptions, Options } from "./contracts";
-
-interface Wallet {
+type Wallet = {
 	address: string;
 	passphrase: string;
 	keys: Contracts.Crypto.IKeyPair;
 	username: string | undefined;
-}
+};
 
-interface Task {
+type Task = {
 	task: () => Promise<void>;
 	title: string;
-}
+};
+
+type InternalOptions = {
+	network: string;
+	premine: string;
+	validators: number;
+	blockTime: number;
+	maxTxPerBlock: number;
+	maxBlockPayload: number;
+	rewardHeight: number;
+	rewardAmount: string | number;
+	pubKeyHash: number;
+	wif: number;
+	token: string;
+	symbol: string;
+	explorer: string;
+	distribute: boolean;
+	epoch: Date;
+	vendorFieldLength: number;
+
+	// Env
+	coreDBHost: string;
+	coreDBPort: number;
+	coreDBUsername?: string;
+	coreDBPassword?: string;
+	coreDBDatabase?: string;
+
+	coreP2PPort: number;
+	coreWebhooksPort: number;
+	coreMonitorPort: number;
+
+	// Peers
+	peers: string[];
+
+	// General
+	configPath?: string;
+	overwriteConfig: boolean;
+	force: boolean;
+};
+
+type Options = Partial<InternalOptions> & {
+	network: string;
+	token: string;
+	symbol: string;
+};
 
 export class NetworkGenerator {
 	#app: Application;
