@@ -1,16 +1,21 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts as AppContracts } from "@arkecosystem/core-contracts";
 import { NetworkGenerator } from "@arkecosystem/core-network-generate";
 import Joi from "joi";
 import prompts from "prompts";
 
-interface Flag {
+type Flag = {
 	name: string;
 	description: string;
 	schema: Joi.Schema;
 	promptType?: string;
 	default?: any;
-}
+};
+
+type Flags = AppContracts.NetworkGenerator.Options & {
+	peers: string;
+};
 
 @injectable()
 export class Command extends Commands.Command {
@@ -195,7 +200,7 @@ export class Command extends Commands.Command {
 			return accumulator;
 		}, {});
 
-		let options = {
+		let options: Flags = {
 			...defaults,
 			...flags,
 		};
@@ -203,7 +208,7 @@ export class Command extends Commands.Command {
 		const networkGenerator = new NetworkGenerator(this.logger);
 
 		if (flags.force || allFlagsSet) {
-			return networkGenerator.generate(this.#convertPeers(options) as any);
+			return networkGenerator.generate(this.#convertPeers(options));
 		}
 
 		const response = await prompts(
@@ -251,10 +256,10 @@ export class Command extends Commands.Command {
 			throw new Error(`Flag ${flag.name} is required.`);
 		}
 
-		await networkGenerator.generate(this.#convertPeers(options) as any);
+		await networkGenerator.generate(this.#convertPeers(options));
 	}
 
-	#convertPeers(options: { peers: string }): { peers: string[] } {
+	#convertPeers(options: Flags): AppContracts.NetworkGenerator.Options {
 		return {
 			...options,
 			peers: options.peers.replace(" ", "").split(","),
