@@ -71,7 +71,7 @@ export class NetworkGenerator {
 			maxTxPerBlock: 150,
 			network: "testnet",
 			overwriteConfig: false,
-			peers: "127.0.0.1",
+			peers: ["127.0.0.1"],
 			premine: "12500000000000000",
 			pubKeyHash: 30,
 			rewardAmount: "200000000",
@@ -158,7 +158,7 @@ export class NetworkGenerator {
 			},
 			{
 				task: async () => {
-					writeJSONSync(resolve(coreConfigDestination, "peers.json"), this.#generatePeers(internalOptions), {
+					writeJSONSync(resolve(coreConfigDestination, "peers.json"), internalOptions.peers, {
 						spaces: 4,
 					});
 
@@ -323,26 +323,6 @@ export class NetworkGenerator {
 		result += `CORE_MANAGER_PORT=${options.coreMonitorPort}\n\n`;
 
 		return result;
-	}
-
-	#generatePeers(options: InternalOptions): { list: { ip: string; port: number }[] } {
-		if (options.peers === "") {
-			return { list: [] };
-		}
-
-		const list = options.peers
-			.replace(" ", "")
-			.split(",")
-			.map((peer) => {
-				const [ip, port] = peer.split(":");
-
-				return {
-					ip,
-					port: Number.isNaN(Number.parseInt(port)) ? options.coreP2PPort : Number.parseInt(port),
-				};
-			});
-
-		return { list };
 	}
 
 	#generateApp(options: InternalOptions): any {

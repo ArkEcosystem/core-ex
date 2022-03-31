@@ -28,7 +28,7 @@ export type InternalOptions = {
 	coreMonitorPort: number;
 
 	// Peers
-	peers: string;
+	peers: string[];
 
 	// General
 	configPath?: string;
