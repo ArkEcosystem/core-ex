@@ -1,9 +1,10 @@
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";
 
-import { describe } from "../../core-test-framework";
+import { describe, Sandbox } from "../../core-test-framework";
 import { NetworkGenerator } from "./generator";
 
 describe<{
@@ -93,6 +94,36 @@ describe<{
 			}),
 			{ spaces: 4 },
 		);
+	});
+
+	it("should log if app is provided", async (context) => {
+		const sandbox = new Sandbox();
+
+		const logger = {
+			info: () => {},
+		};
+
+		sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+
+		context.networkGenerator = new NetworkGenerator(sandbox.app);
+
+		const log = stub(logger, "info");
+		const existsSync = stub(fs, "existsSync");
+		const ensureDirSync = stub(fs, "ensureDirSync");
+		const writeJSONSync = stub(fs, "writeJSONSync");
+		const writeFileSync = stub(fs, "writeFileSync");
+
+		await context.networkGenerator.generate({
+			network: "testnet",
+			symbol: "my",
+			token: "myn",
+		});
+
+		existsSync.calledWith(configCore);
+		ensureDirSync.calledWith(configCore);
+		writeJSONSync.calledTimes(5);
+		writeFileSync.calledOnce();
+		log.calledTimes(5);
 	});
 
 	it("should throw if the core configuration destination already exists", async (context) => {

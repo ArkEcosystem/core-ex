@@ -89,9 +89,14 @@ type Options = Partial<InternalOptions> & {
 
 export class NetworkGenerator {
 	#app: Application;
+	#logger?: Contracts.Kernel.Logger;
 
-	public constructor() {
+	public constructor(app?: Contracts.Kernel.Application) {
 		this.#app = new Application(new Container());
+
+		if (app) {
+			this.#logger = app.get(Identifiers.LogService);
+		}
 	}
 
 	public async generate(options: Options): Promise<void> {
@@ -221,10 +226,11 @@ export class NetworkGenerator {
 		];
 
 		for (const task of tasks) {
+			this.#logger?.info(task.title);
 			await task.task();
 		}
 
-		// this.logger.info(`Configuration generated on location: ${coreConfigDestination}`);
+		this.#logger?.info(`Configuration generated on location: ${coreConfigDestination}`);
 	}
 
 	async #initialize(): Promise<void> {
