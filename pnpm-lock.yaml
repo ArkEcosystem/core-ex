@@ -1407,6 +1407,11 @@ importers:
       '@arkecosystem/core-lmdb': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-validation': workspace:*
+      '@arkecosystem/utils': workspace:*
+      bip39: 3.0.4
+      dayjs: 1.10.7
+      env-paths: 2.2.1
+      fs-extra: 8.1.0
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -1433,6 +1438,11 @@ importers:
       '@arkecosystem/core-lmdb': link:../core-lmdb
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-validation': link:../core-validation
+      '@arkecosystem/utils': link:../utils
+      bip39: 3.0.4
+      dayjs: 1.10.7
+      env-paths: 2.2.1
+      fs-extra: 8.1.0
 
   packages/core-networking-dns:
     specifiers:
