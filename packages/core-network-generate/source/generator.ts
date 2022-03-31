@@ -8,8 +8,6 @@ import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTime } from "@arkecosystem/core-crypto-time";
 import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
-import { ServiceProvider as CoreCryptoTransactionMultiPayment } from "@arkecosystem/core-crypto-transaction-multi-payment";
-import { ServiceProvider as CoreCryptoTransactionMultiSignatureRegistration } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
 import {
 	ServiceProvider as CoreCryptoTransactionTransfer,
 	TransferBuilder,
@@ -18,7 +16,6 @@ import {
 	ServiceProvider as CoreCryptoTransactionValidatorRegistration,
 	ValidatorRegistrationBuilder,
 } from "@arkecosystem/core-crypto-transaction-validator-registration";
-import { ServiceProvider as CoreCryptoTransactionValidatorResignation } from "@arkecosystem/core-crypto-transaction-validator-resignation";
 import { ServiceProvider as CoreCryptoTransactionVote, VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@arkecosystem/core-crypto-wif";
@@ -248,9 +245,6 @@ export class NetworkGenerator {
 		await this.#app.resolve(CoreFeesStatic).register();
 		await this.#app.resolve(CoreCryptoTransaction).register();
 		await this.#app.resolve(CoreCryptoTransactionValidatorRegistration).register();
-		await this.#app.resolve(CoreCryptoTransactionValidatorResignation).register();
-		await this.#app.resolve(CoreCryptoTransactionMultiPayment).register();
-		await this.#app.resolve(CoreCryptoTransactionMultiSignatureRegistration).register();
 		await this.#app.resolve(CoreCryptoTransactionTransfer).register();
 		await this.#app.resolve(CoreCryptoTransactionVote).register();
 	}
