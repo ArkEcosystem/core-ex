@@ -1,5 +1,5 @@
-import { Commands, Contracts } from "@arkecosystem/core-cli";
-import { injectable } from "@arkecosystem/core-container";
+import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { NetworkGenerator } from "@arkecosystem/core-network-generate";
 import Joi from "joi";
 import prompts from "prompts";
@@ -14,6 +14,9 @@ interface Flag {
 
 @injectable()
 export class Command extends Commands.Command {
+	@inject(Container.Identifiers.Logger)
+	private readonly logger!: Services.Logger;
+
 	public signature = "network:generate";
 
 	public description = "Generates a new network configuration.";
@@ -197,7 +200,7 @@ export class Command extends Commands.Command {
 			...flags,
 		};
 
-		const networkGenerator = new NetworkGenerator();
+		const networkGenerator = new NetworkGenerator(this.logger);
 
 		if (flags.force || allFlagsSet) {
 			return networkGenerator.generate(this.#convertPeers(options) as any);
