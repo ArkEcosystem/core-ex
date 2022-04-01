@@ -19,7 +19,15 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder";
-import { FactoryFunctionOptions } from "../types";
+import {
+	MultiPaymentOptions,
+	MultiSignatureOptions,
+	TransactionOptions,
+	TransferOptions,
+	ValidatorRegistrationOptions,
+	ValidatorResignationOptions,
+	VoteOptions,
+} from "../types";
 import { generateApp } from "./generate-app";
 
 const AMOUNT = 1;
@@ -27,7 +35,7 @@ const FEE = 1;
 
 interface EntityOptions<T extends TransactionBuilder<T>> {
 	entity: TransactionBuilder<T>;
-	options: FactoryFunctionOptions;
+	options: TransactionOptions;
 }
 
 const sign = async <T extends TransactionBuilder<T>>({
@@ -50,7 +58,7 @@ const multiSign = async <T extends TransactionBuilder<T>>({
 
 const applyModifiers = <T extends TransactionBuilder<T>>(
 	entity: TransactionBuilder<T>,
-	options: FactoryFunctionOptions,
+	options: TransactionOptions,
 ): TransactionBuilder<T> => {
 	if (options.version) {
 		entity.version(options.version);
@@ -72,7 +80,7 @@ const applyModifiers = <T extends TransactionBuilder<T>>(
 };
 
 export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("Transfer", async ({ options }) => {
+	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {
 		const transferBuilder = app.resolve(TransferBuilder);
 
 		return applyModifiers(
@@ -101,7 +109,7 @@ export const registerValidatorRegistrationFactory = (
 	factory: FactoryBuilder,
 	app: Contracts.Kernel.Application,
 ): void => {
-	factory.set("ValidatorRegistration", async ({ options }) =>
+	factory.set("ValidatorRegistration", async ({ options }: { options: ValidatorRegistrationOptions }) =>
 		applyModifiers(
 			app
 				.resolve(ValidatorRegistrationBuilder)
@@ -118,7 +126,7 @@ export const registerValidatorResignationFactory = (
 	factory: FactoryBuilder,
 	app: Contracts.Kernel.Application,
 ): void => {
-	factory.set("ValidatorResignation", async ({ options }) =>
+	factory.set("ValidatorResignation", async ({ options }: { options: ValidatorResignationOptions }) =>
 		applyModifiers(
 			app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(options.fee || 1).toFixed()),
 			options,
@@ -128,7 +136,7 @@ export const registerValidatorResignationFactory = (
 };
 
 export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("Vote", async ({ options }) =>
+	factory.set("Vote", async ({ options }: { options: VoteOptions }) =>
 		applyModifiers(
 			app
 				.resolve(VoteBuilder)
@@ -148,7 +156,7 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 };
 
 export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("Unvote", async ({ options }) =>
+	factory.set("Unvote", async ({ options }: { options: VoteOptions }) =>
 		applyModifiers(
 			app
 				.resolve(VoteBuilder)
@@ -168,7 +176,7 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 };
 
 export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("MultiSignature", async ({ options }) => {
+	factory.set("MultiSignature", async ({ options }: { options: MultiSignatureOptions }) => {
 		const publicKeyFactory = app.get<Contracts.Crypto.IPublicKeyFactory>(
 			Identifiers.Cryptography.Identity.PublicKeyFactory,
 		);
@@ -196,21 +204,32 @@ export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.K
 };
 
 export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application) => {
-	factory.set("MultiPayment", async ({ options }) =>
-		applyModifiers(
-			app
-				.resolve(MultiPaymentBuilder)
-				.fee(BigNumber.make(options.fee || FEE).toFixed())
-				.addPayment(
-					options.recipientId ||
-						(await app
-							.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
-							.fromMnemonic(secrets[0])),
-					BigNumber.make(options.amount || AMOUNT).toFixed(),
-				),
-			options,
-		),
-	);
+	factory.set("MultiPayment", async ({ options }: { options: MultiPaymentOptions }) => {
+		const builder = app.resolve(MultiPaymentBuilder).fee(BigNumber.make(options.fee || FEE).toFixed());
+
+		const payments = options.payments || [
+			{
+				amount: AMOUNT.toString(),
+				recipientId: await app
+					.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+					.fromMnemonic(secrets[0]),
+			},
+			{
+				amount: AMOUNT.toString(),
+				recipientId: await app
+					.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+					.fromMnemonic(secrets[1]),
+			},
+		];
+
+		for (const payment of payments) {
+			builder.addPayment(payment.recipientId, payment.amount);
+		}
+
+		applyModifiers(builder, options);
+
+		return builder;
+	});
 
 	factory.get("MultiPayment").state("sign", sign);
 	factory.get("MultiPayment").state("multiSign", multiSign);
