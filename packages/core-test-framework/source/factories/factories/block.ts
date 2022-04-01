@@ -5,8 +5,14 @@ import dayjs from "dayjs";
 import secrets from "../../internal/passphrases.json";
 import { Signer } from "../../internal/signer";
 import { FactoryBuilder } from "../factory-builder";
+import { generateApp } from "./generate-app";
 
-export const registerBlockFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+export const registerBlockFactory = async (
+	factory: FactoryBuilder,
+	config: Contracts.Crypto.NetworkConfig,
+): Promise<void> => {
+	const app = await generateApp(config);
+
 	factory.set("Block", async ({ options }) => {
 		const previousBlock = options.getPreviousBlock
 			? options.getPreviousBlock()

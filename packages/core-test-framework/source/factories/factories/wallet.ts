@@ -1,12 +1,18 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Application, Services } from "@arkecosystem/core-kernel";
+import { Services } from "@arkecosystem/core-kernel";
 import { Wallets } from "@arkecosystem/core-state";
 import { generateMnemonic } from "bip39";
 
 import { getWalletAttributeSet } from "../../internal/wallet-attributes";
 import { FactoryBuilder } from "../factory-builder";
+import { generateApp } from "./generate-app";
 
-export const registerWalletFactory = (factoryBuilder: FactoryBuilder, app: Application): void => {
+export const registerWalletFactory = async (
+	factoryBuilder: FactoryBuilder,
+	config: Contracts.Crypto.NetworkConfig,
+): Promise<void> => {
+	const app = await generateApp(config);
+
 	factoryBuilder.set("Wallet", async ({ options }) => {
 		const passphrase: string = options.passphrase || generateMnemonic();
 

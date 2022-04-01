@@ -5,8 +5,14 @@ import { BigNumber } from "@arkecosystem/utils";
 import passphrases from "../../internal/passphrases.json";
 import { knownAttributes } from "../../internal/wallet-attributes";
 import { FactoryBuilder } from "../factory-builder";
+import { generateApp } from "./generate-app";
 
-export const registerRoundFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+export const registerRoundFactory = async (
+	factory: FactoryBuilder,
+	config: Contracts.Crypto.NetworkConfig,
+): Promise<void> => {
+	const app = await generateApp(config);
+
 	factory.set("Round", async ({ options }) => {
 		const publicKeys: string[] =
 			options.publicKeys ||

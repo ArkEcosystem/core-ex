@@ -1,9 +1,7 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { Configuration } from "@arkecosystem/core-crypto-config";
-import { Types } from "@arkecosystem/core-kernel";
+import { Contracts } from "@arkecosystem/core-contracts";
 
 import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json"; // TODO: Generate
-import { describe, Sandbox } from "../../index";
+import { describe } from "../../index";
 import { FactoryBuilder } from "../factory-builder";
 import { registerIdentityFactory } from "./identity";
 
@@ -17,47 +15,13 @@ interface Identity {
 	secondPassphrase?: string;
 }
 
-type ServiceProvider = {
-	name: string;
-	path: string;
-	klass: Types.Class<any, any[]>;
-};
-
-const addressBech32m: ServiceProvider = {
-	klass: require("@arkecosystem/core-crypto-address-bech32m").ServiceProvider,
-	name: "@arkecosystem/core-crypto-address-bech32m",
-	path: "@arkecosystem/core-crypto-address-bech32m",
-};
-
-const keyPairSchnorr: ServiceProvider = {
-	klass: require("@arkecosystem/core-crypto-key-pair-schnorr").ServiceProvider,
-	name: "@arkecosystem/core-crypto-key-pair-schnorr",
-	path: "@arkecosystem/core-crypto-key-pair-schnorr",
-};
-
-const cryptoWif: ServiceProvider = {
-	klass: require("@arkecosystem/core-crypto-wif").ServiceProvider,
-	name: "@arkecosystem/core-crypto-wif",
-	path: "@arkecosystem/core-crypto-wif",
-};
-
 describe<{
-	sandbox: Sandbox;
 	factoryBuilder: FactoryBuilder;
 }>("IdentityFactory", ({ beforeAll, it, assert }) => {
 	beforeAll(async (context) => {
-		context.sandbox = new Sandbox();
-
-		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoConfig);
-		await context.sandbox.registerServiceProvider(addressBech32m);
-		await context.sandbox.registerServiceProvider(keyPairSchnorr);
-		await context.sandbox.registerServiceProvider(cryptoWif);
-
 		context.factoryBuilder = new FactoryBuilder();
 
-		registerIdentityFactory(context.factoryBuilder, context.sandbox.app);
+		await registerIdentityFactory(context.factoryBuilder, cryptoConfig);
 	});
 
 	it("should make an identity with a single passphrase", async ({ factoryBuilder }) => {
