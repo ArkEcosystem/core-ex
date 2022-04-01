@@ -1,25 +1,22 @@
+import cryptoConfig from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../index";
 import { factory } from "./helpers";
 
 describe<{
 	sandbox: Sandbox;
-}>("Helpers", ({ beforeEach, it, assert }) => {
-	beforeEach((context) => {
-		context.sandbox = new Sandbox();
-	});
-
+}>("Helpers", ({ it, assert }) => {
 	it("should register all factories", async ({ sandbox }) => {
-		assert.defined(factory("Block", sandbox.app));
-		assert.defined(factory("Identity", sandbox.app));
-		assert.defined(factory("Peer", sandbox.app));
-		assert.defined(factory("Round", sandbox.app));
-		assert.defined(factory("Transfer", sandbox.app));
-		assert.defined(factory("ValidatorRegistration", sandbox.app));
-		assert.defined(factory("ValidatorResignation", sandbox.app));
-		assert.defined(factory("Vote", sandbox.app));
-		assert.defined(factory("Unvote", sandbox.app));
-		assert.defined(factory("MultiSignature", sandbox.app));
-		assert.defined(factory("MultiPayment", sandbox.app));
-		assert.defined(factory("Wallet", sandbox.app));
+		assert.defined(await factory("Block", cryptoConfig));
+		assert.defined(await factory("Identity", cryptoConfig));
+		assert.defined(await factory("Peer", cryptoConfig));
+		assert.defined(await factory("Round", cryptoConfig));
+		assert.defined(await factory("Transfer", cryptoConfig));
+		assert.defined(await factory("ValidatorRegistration", cryptoConfig));
+		assert.defined(await factory("ValidatorResignation", cryptoConfig));
+		assert.defined(await factory("Vote", cryptoConfig));
+		assert.defined(await factory("Unvote", cryptoConfig));
+		assert.defined(await factory("MultiSignature", cryptoConfig));
+		assert.defined(await factory("MultiPayment", cryptoConfig));
+		assert.defined(await factory("Wallet", cryptoConfig));
 	});
 });

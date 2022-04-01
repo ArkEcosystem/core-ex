@@ -1,4 +1,4 @@
-import { Application } from "@arkecosystem/core-kernel";
+import { Contracts } from "@arkecosystem/core-contracts";
 import memoize from "fast-memoize";
 
 import {
@@ -12,22 +12,25 @@ import {
 import { Factory } from "./factory";
 import { FactoryBuilder } from "./factory-builder";
 
-const createFactory = memoize((app: Application): FactoryBuilder => {
+const createFactory = memoize(async (config: Contracts.Crypto.NetworkConfig): Promise<FactoryBuilder> => {
 	const factory: FactoryBuilder = new FactoryBuilder();
 
-	registerBlockFactory(factory, app);
+	await registerBlockFactory(factory, config);
 
-	registerIdentityFactory(factory, app);
+	await registerIdentityFactory(factory, config);
 
 	registerPeerFactory(factory);
 
-	registerRoundFactory(factory, app);
+	await registerRoundFactory(factory, config);
 
-	registerTransactionFactory(factory, app);
+	await registerTransactionFactory(factory, config);
 
-	registerWalletFactory(factory, app);
+	await registerWalletFactory(factory, config);
 
 	return factory;
 });
 
-export const factory = (name: string, app: Application): Factory => createFactory(app).get(name);
+export const factory = async (name: string, config: Contracts.Crypto.NetworkConfig): Promise<Factory> => {
+	const factoryBuilder = await createFactory(config);
+	return factoryBuilder.get(name);
+};
