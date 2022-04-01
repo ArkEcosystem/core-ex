@@ -1,20 +1,11 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { TransactionBuilder, TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
-import { MultiPaymentBuilder, MultiPaymentTransaction } from "@arkecosystem/core-crypto-transaction-multi-payment";
-import {
-	MultiSignatureBuilder,
-	MultiSignatureRegistrationTransaction,
-} from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
-import { TransferBuilder, TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
-import {
-	ValidatorRegistrationBuilder,
-	ValidatorRegistrationTransaction,
-} from "@arkecosystem/core-crypto-transaction-validator-registration";
-import {
-	ValidatorResignationBuilder,
-	ValidatorResignationTransaction,
-} from "@arkecosystem/core-crypto-transaction-validator-resignation";
-import { VoteBuilder, VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
+import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
+import { MultiPaymentBuilder } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { MultiSignatureBuilder } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
+import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
+import { ValidatorRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-validator-registration";
+import { ValidatorResignationBuilder } from "@arkecosystem/core-crypto-transaction-validator-resignation";
+import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { BigNumber } from "@arkecosystem/utils";
 
 import secrets from "../../internal/passphrases.json";
@@ -240,25 +231,6 @@ export const registerTransactionFactory = async (
 	config: Contracts.Crypto.NetworkConfig,
 ): Promise<void> => {
 	const app = await generateApp(config);
-
-	app.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry).registerTransactionType(
-		TransferTransaction,
-	);
-	app.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry).registerTransactionType(
-		ValidatorRegistrationTransaction,
-	);
-	app.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry).registerTransactionType(
-		ValidatorResignationTransaction,
-	);
-	app.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry).registerTransactionType(
-		VoteTransaction,
-	);
-	app.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry).registerTransactionType(
-		MultiSignatureRegistrationTransaction,
-	);
-	app.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry).registerTransactionType(
-		MultiPaymentTransaction,
-	);
 
 	registerTransferFactory(factory, app);
 	registerValidatorRegistrationFactory(factory, app);

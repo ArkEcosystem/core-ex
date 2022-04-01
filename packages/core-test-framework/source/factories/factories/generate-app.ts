@@ -1,5 +1,12 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { TransactionRegistry } from "@arkecosystem/core-crypto-transaction";
+import { MultiPaymentTransaction } from "@arkecosystem/core-crypto-transaction-multi-payment";
+import { MultiSignatureRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-multi-signature-registration";
+import { TransferTransaction } from "@arkecosystem/core-crypto-transaction-transfer";
+import { ValidatorRegistrationTransaction } from "@arkecosystem/core-crypto-transaction-validator-registration";
+import { ValidatorResignationTransaction } from "@arkecosystem/core-crypto-transaction-validator-resignation";
+import { VoteTransaction } from "@arkecosystem/core-crypto-transaction-vote";
 import { Types } from "@arkecosystem/core-kernel";
 
 import { Sandbox } from "../../app/sandbox";
@@ -81,6 +88,25 @@ export const generateApp = async (config: Contracts.Crypto.NetworkConfig): Promi
 	await sandbox.registerServiceProvider(cryptoBlock);
 	await sandbox.registerServiceProvider(cryptoSerializer);
 	await sandbox.registerServiceProvider(cryptoWif);
+
+	sandbox.app
+		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+		.registerTransactionType(TransferTransaction);
+	sandbox.app
+		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+		.registerTransactionType(ValidatorRegistrationTransaction);
+	sandbox.app
+		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+		.registerTransactionType(ValidatorResignationTransaction);
+	sandbox.app
+		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+		.registerTransactionType(VoteTransaction);
+	sandbox.app
+		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+		.registerTransactionType(MultiSignatureRegistrationTransaction);
+	sandbox.app
+		.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
+		.registerTransactionType(MultiPaymentTransaction);
 
 	return sandbox.app;
 };

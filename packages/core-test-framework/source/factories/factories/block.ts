@@ -24,21 +24,19 @@ export const registerBlockFactory = async (
 
 		const transactions = options.transactions || [];
 		if (options.transactionsCount) {
-			const signer = new Signer(
-				app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).all(),
-				options.nonce,
-			);
-			const genesisWallets = previousBlock.transactions
+			const signer = new Signer(config, options.nonce);
+
+			const genesisAddresses = previousBlock.transactions
 				.map((transaction) => transaction.recipientId)
 				.filter((address: string) => !!address);
 
 			for (let index = 0; index < options.transactionsCount; index++) {
 				transactions.push(
-					signer.makeTransfer({
-						amount: (options.amount || 2) + index,
+					await signer.makeTransfer({
+						amount: ((options.amount || 2) + index).toString(),
+						fee: (options.fee || 1).toString(),
 						passphrase: secrets[0],
-						recipient: genesisWallets[Math.floor(Math.random() * genesisWallets.length)],
-						transferFee: options.fee || 0.1,
+						recipientId: genesisAddresses[Math.floor(Math.random() * genesisAddresses.length)],
 					}),
 				);
 			}

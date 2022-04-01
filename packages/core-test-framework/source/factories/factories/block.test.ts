@@ -63,27 +63,28 @@ describe<{
 		assert.array(entity.transactions);
 	});
 
-	// it("should create a single block with transactions in options", async ({ factoryBuilder }) => {
-	// 	const options = {
-	// 		transactionsCount: 1,
-	// 	};
+	it("should create a single block with transactions in options", async ({ factoryBuilder }) => {
+		const options = {
+			transactionsCount: 1,
+		};
 
-	// 	const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.IBlock>();
+		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.IBlock>();
 
-	// 	assert.string(entity.data.blockSignature);
-	// 	assert.string(entity.data.generatorPublicKey);
-	// 	assert.number(entity.data.height);
-	// 	assert.string(entity.data.id);
-	// 	assert.number(entity.data.numberOfTransactions);
-	// 	assert.string(entity.data.payloadHash);
-	// 	assert.number(entity.data.payloadLength);
-	// 	assert.string(entity.data.previousBlock);
-	// 	assert.instance(entity.data.reward, BigNumber);
-	// 	assert.number(entity.data.timestamp);
-	// 	assert.instance(entity.data.totalAmount, BigNumber);
-	// 	assert.instance(entity.data.totalFee, BigNumber);
-	// 	assert.number(entity.data.version);
-	// 	assert.string(entity.serialized);
-	// 	assert.array(entity.transactions);
-	// });
+		assert.string(entity.data.blockSignature);
+		assert.string(entity.data.generatorPublicKey);
+		assert.number(entity.data.height);
+		assert.string(entity.data.id);
+		assert.number(entity.data.numberOfTransactions);
+		assert.string(entity.data.payloadHash);
+		assert.number(entity.data.payloadLength);
+		assert.string(entity.data.previousBlock);
+		assert.instance(entity.data.reward, BigNumber);
+		assert.number(entity.data.timestamp);
+		assert.instance(entity.data.totalAmount, BigNumber);
+		assert.instance(entity.data.totalFee, BigNumber);
+		assert.number(entity.data.version);
+		assert.string(entity.serialized);
+		assert.array(entity.transactions);
+		assert.equal(entity.transactions.length, 1);
+	});
 });
