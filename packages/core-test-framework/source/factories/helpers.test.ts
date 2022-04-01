@@ -1,11 +1,9 @@
 import cryptoConfig from "../../../core/bin/config/testnet/crypto.json";
-import { describe, Sandbox } from "../index";
+import { describe } from "../index";
 import { factory } from "./helpers";
 
-describe<{
-	sandbox: Sandbox;
-}>("Helpers", ({ it, assert }) => {
-	it("should register all factories", async ({ sandbox }) => {
+describe("Helpers", ({ it, assert }) => {
+	it("should register all factories", async () => {
 		assert.defined(await factory("Block", cryptoConfig));
 		assert.defined(await factory("Identity", cryptoConfig));
 		assert.defined(await factory("Peer", cryptoConfig));
