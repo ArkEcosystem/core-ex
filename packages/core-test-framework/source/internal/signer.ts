@@ -2,7 +2,16 @@ import { Contracts } from "@arkecosystem/core-contracts";
 import { TransactionBuilder } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber } from "@arkecosystem/utils";
 
-import { Factories, FactoryBuilder, Types } from "../factories";
+import { registerTransactionFactory } from "../factories/factories/transaction";
+import { FactoryBuilder } from "../factories/factory-builder";
+import {
+	MultiPaymentOptions,
+	MultiSignatureOptions,
+	TransferOptions,
+	ValidatorRegistrationOptions,
+	VoteOptions,
+} from "../factories/types";
+
 export class Signer {
 	#config: Contracts.Crypto.NetworkConfig;
 	#nonce: BigNumber;
@@ -17,7 +26,7 @@ export class Signer {
 		this.#factoryBuilder = new FactoryBuilder();
 	}
 
-	public async makeTransfer(options: Types.TransferOptions): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeTransfer(options: TransferOptions): Promise<Contracts.Crypto.ITransactionData> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -38,9 +47,7 @@ export class Signer {
 		return transferBuilder.getStruct();
 	}
 
-	public async makeValidator(
-		options: Types.ValidatorRegistrationOptions,
-	): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.ITransactionData> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -55,7 +62,7 @@ export class Signer {
 		return transferBuilder.getStruct();
 	}
 
-	public async makeVote(options: Types.VoteOptions): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.ITransactionData> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -71,7 +78,7 @@ export class Signer {
 	}
 
 	public async makeMultiSignatureRegistration(
-		options: Types.MultiSignatureOptions,
+		options: MultiSignatureOptions,
 	): Promise<Contracts.Crypto.ITransactionData> {
 		await this.#initialize();
 
@@ -87,7 +94,7 @@ export class Signer {
 		return transferBuilder.getStruct();
 	}
 
-	public async makeMultipayment(options: Types.MultiPaymentOptions): Promise<Contracts.Crypto.ITransactionData> {
+	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.ITransactionData> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -108,7 +115,7 @@ export class Signer {
 
 	async #initialize() {
 		if (!this.#initialized) {
-			await Factories.registerTransactionFactory(this.#factoryBuilder, this.#config);
+			await registerTransactionFactory(this.#factoryBuilder, this.#config);
 			this.#initialized = true;
 		}
 	}
