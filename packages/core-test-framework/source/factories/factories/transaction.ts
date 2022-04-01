@@ -51,6 +51,8 @@ const applyModifiers = <T extends TransactionBuilder<T>>(
 	entity: TransactionBuilder<T>,
 	options: TransactionOptions,
 ): TransactionBuilder<T> => {
+	entity.fee(BigNumber.make(options.fee || FEE).toFixed());
+
 	if (options.version) {
 		entity.version(options.version);
 	}
@@ -77,7 +79,6 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 		return applyModifiers(
 			transferBuilder
 				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
-				.fee(BigNumber.make(options.fee || FEE).toFixed())
 				.recipientId(
 					options.recipientId ||
 						(await app
@@ -104,7 +105,6 @@ export const registerValidatorRegistrationFactory = (
 		applyModifiers(
 			app
 				.resolve(ValidatorRegistrationBuilder)
-				.fee(BigNumber.make(options.fee || FEE).toFixed())
 				.usernameAsset(options.username || Math.random().toString(36).slice(8)),
 			options,
 		),
@@ -118,10 +118,7 @@ export const registerValidatorResignationFactory = (
 	app: Contracts.Kernel.Application,
 ): void => {
 	factory.set("ValidatorResignation", async ({ options }: { options: ValidatorResignationOptions }) =>
-		applyModifiers(
-			app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(options.fee || 1).toFixed()),
-			options,
-		),
+		applyModifiers(app.resolve(ValidatorResignationBuilder), options),
 	);
 	factory.get("ValidatorResignation").state("sign", sign);
 };
@@ -131,7 +128,6 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 		applyModifiers(
 			app
 				.resolve(VoteBuilder)
-				.fee(BigNumber.make(options.fee || FEE).toFixed())
 				.votesAsset([
 					options.publicKey ||
 						(await app
@@ -151,7 +147,6 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 		applyModifiers(
 			app
 				.resolve(VoteBuilder)
-				.fee(BigNumber.make(options.fee || FEE).toFixed())
 				.unvotesAsset([
 					options.publicKey ||
 						(await app
@@ -196,7 +191,7 @@ export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.K
 
 export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application) => {
 	factory.set("MultiPayment", async ({ options }: { options: MultiPaymentOptions }) => {
-		const builder = app.resolve(MultiPaymentBuilder).fee(BigNumber.make(options.fee || FEE).toFixed());
+		const builder = app.resolve(MultiPaymentBuilder);
 
 		const payments = options.payments || [
 			{

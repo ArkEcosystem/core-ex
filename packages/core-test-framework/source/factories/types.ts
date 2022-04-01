@@ -7,6 +7,7 @@ export type HookFunction = ({ entity, options }: { entity?: any; options: Factor
 export type TransactionOptions = {
 	version?: number;
 	nonce?: string;
+	fee?: string;
 	timestamp?: number;
 	senderPublicKey?: string;
 	passphrase?: string;
@@ -15,33 +16,26 @@ export type TransactionOptions = {
 
 export type TransferOptions = TransactionOptions & {
 	amount?: string;
-	fee?: string;
 	recipientId?: string;
 	vendorField?: string;
 };
 
 export type ValidatorRegistrationOptions = TransactionOptions & {
-	fee?: string;
 	username?: string;
 };
 
-export type ValidatorResignationOptions = TransactionOptions & {
-	fee?: string;
-};
+export type ValidatorResignationOptions = TransactionOptions & {};
 
 export type VoteOptions = TransactionOptions & {
-	fee?: string;
 	publicKey?: string;
 };
 
 export type MultiSignatureOptions = TransactionOptions & {
-	fee?: string;
 	publicKeys?: string[];
 	min?: number;
 };
 
 export type MultiPaymentOptions = TransactionOptions & {
-	fee?: string;
 	payments?: {
 		amount: string;
 		recipientId: string;
