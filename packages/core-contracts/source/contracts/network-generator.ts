@@ -9,6 +9,15 @@ export type EnvironmentOptions = {
 	coreWebhooksPort: number;
 };
 
+export type MilestoneOptions = {
+	validators: number;
+	maxBlockPayload: number;
+	maxTxPerBlock: number;
+	blockTime: number;
+	epoch: Date;
+	vendorFieldLength: number;
+};
+
 export type InternalOptions = EnvironmentOptions & {
 	network: string;
 	premine: string;
