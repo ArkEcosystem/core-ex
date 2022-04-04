@@ -6,7 +6,7 @@ export type InternalOptions = {
 	maxTxPerBlock: number;
 	maxBlockPayload: number;
 	rewardHeight: number;
-	rewardAmount: string | number;
+	rewardAmount: string;
 	pubKeyHash: number;
 	wif: number;
 	token: string;
