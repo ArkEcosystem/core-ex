@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
-import { generateMnemonic } from "bip39";
+
+import { MnemonicGenerator } from "./mnemonic-generator";
 
 export type Wallet = {
 	address: string;
@@ -16,19 +17,21 @@ export class Generator {
 		this.app = app;
 	}
 
-	protected async createWallet(): Promise<Wallet> {
-		const passphrase = generateMnemonic(256);
+	protected async createWallet(mnemonic?: string): Promise<Wallet> {
+		if (!mnemonic) {
+			mnemonic = MnemonicGenerator.generate();
+		}
 
 		const keys: Contracts.Crypto.IKeyPair = await this.app
 			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
-			.fromMnemonic(passphrase);
+			.fromMnemonic(mnemonic);
 
 		return {
 			address: await this.app
 				.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
 				.fromPublicKey(keys.publicKey),
 			keys,
-			passphrase,
+			passphrase: mnemonic,
 			username: undefined,
 		};
 	}

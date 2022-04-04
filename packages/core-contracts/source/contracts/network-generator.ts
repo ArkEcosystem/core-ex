@@ -27,6 +27,13 @@ export type NetworkOptions = {
 	wif: number;
 };
 
+export type GenesisBlock = {
+	distribute: boolean;
+	premine: string;
+	pubKeyHash: number;
+	epoch: Date;
+};
+
 export type InternalOptions = EnvironmentOptions & {
 	network: string;
 	premine: string;
