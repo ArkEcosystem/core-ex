@@ -10,21 +10,21 @@ export type Wallet = {
 };
 
 export class Generator {
-	#app: Application;
+	protected app: Application;
 
 	public constructor(app: Application) {
-		this.#app = app;
+		this.app = app;
 	}
 
 	protected async createWallet(): Promise<Wallet> {
 		const passphrase = generateMnemonic(256);
 
-		const keys: Contracts.Crypto.IKeyPair = await this.#app
+		const keys: Contracts.Crypto.IKeyPair = await this.app
 			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
 			.fromMnemonic(passphrase);
 
 		return {
-			address: await this.#app
+			address: await this.app
 				.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
 				.fromPublicKey(keys.publicKey),
 			keys,
