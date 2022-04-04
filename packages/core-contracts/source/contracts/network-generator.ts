@@ -18,6 +18,15 @@ export type MilestoneOptions = {
 	vendorFieldLength: number;
 };
 
+export type NetworkOptions = {
+	network: string;
+	token: string;
+	symbol: string;
+	explorer: string;
+	pubKeyHash: number;
+	wif: number;
+};
+
 export type InternalOptions = EnvironmentOptions & {
 	network: string;
 	premine: string;
