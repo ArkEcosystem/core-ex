@@ -10,14 +10,14 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		assert.defined(sandbox.app);
 	});
 
-	// it("should boot", async () => {
-	// 	const sandbox = new Sandbox();
+	it("should boot", async () => {
+		const sandbox = new Sandbox();
 
-	// 	const callback = spyFn();
+		const callback = spyFn();
 
-	// 	await assert.resolves(() => sandbox.boot(() => callback.call()));
-	// 	callback.calledOnce();
-	// });
+		await assert.resolves(() => sandbox.boot(() => callback.call()));
+		callback.calledOnce();
+	});
 
 	// it("should boot with crypto options", async () => {
 	//     const sandbox = new Sandbox();
@@ -47,22 +47,22 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 	//     expect(callback).toHaveBeenCalled();
 	// });
 
-	// it("should dispose", async () => {
-	//     const sandbox = new Sandbox();
+	it("should dispose", async () => {
+		const sandbox = new Sandbox();
 
-	//     await expect(sandbox.boot()).toResolve();
-	//     await expect(sandbox.dispose()).toResolve();
-	// });
+		await assert.resolves(() => sandbox.boot());
+		await assert.resolves(() => sandbox.dispose());
+	});
 
-	// it("should dispose with callback", async () => {
-	//     const sandbox = new Sandbox();
+	it("should dispose with callback", async () => {
+		const sandbox = new Sandbox();
 
-	//     const callback = jest.fn();
+		const callback = spyFn();
 
-	//     await expect(sandbox.boot()).toResolve();
-	//     await expect(sandbox.dispose(callback)).toResolve();
-	//     expect(callback).toHaveBeenCalled();
-	// });
+		await assert.resolves(() => sandbox.boot());
+		await assert.resolves(() => sandbox.dispose(() => callback.call()));
+		callback.calledOnce();
+	});
 
 	it("should restore", async () => {
 		const sandbox = new Sandbox();

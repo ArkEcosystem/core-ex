@@ -1592,6 +1592,7 @@ importers:
       '@arkecosystem/core-crypto-transaction-vote': workspace:*
       '@arkecosystem/core-crypto-wif': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-network-generate': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -1640,6 +1641,7 @@ importers:
       '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
       '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
       '@arkecosystem/core-kernel': link:../core-kernel
+      '@arkecosystem/core-network-generate': link:../core-network-generate
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state
