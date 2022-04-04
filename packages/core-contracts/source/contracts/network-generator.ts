@@ -1,4 +1,15 @@
-export type InternalOptions = {
+export type EnvironmentOptions = {
+	coreDBHost: string;
+	coreDBPort: number;
+	coreDBUsername?: string;
+	coreDBPassword?: string;
+	coreDBDatabase?: string;
+
+	coreP2PPort: number;
+	coreWebhooksPort: number;
+};
+
+export type InternalOptions = EnvironmentOptions & {
 	network: string;
 	premine: string;
 	validators: number;
@@ -15,17 +26,6 @@ export type InternalOptions = {
 	distribute: boolean;
 	epoch: Date;
 	vendorFieldLength: number;
-
-	// Env
-	coreDBHost: string;
-	coreDBPort: number;
-	coreDBUsername?: string;
-	coreDBPassword?: string;
-	coreDBDatabase?: string;
-
-	coreP2PPort: number;
-	coreWebhooksPort: number;
-	coreMonitorPort: number;
 
 	// Peers
 	peers: string[];

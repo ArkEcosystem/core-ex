@@ -59,7 +59,6 @@ export class NetworkGenerator {
 			blockTime: 8,
 			coreDBHost: "localhost",
 			coreDBPort: 5432,
-			coreMonitorPort: 4005,
 			coreP2PPort: 4000,
 			coreWebhooksPort: 4004,
 			distribute: false,
@@ -310,9 +309,6 @@ export class NetworkGenerator {
 
 		result += "CORE_WEBHOOKS_HOST=0.0.0.0\n";
 		result += `CORE_WEBHOOKS_PORT=${options.coreWebhooksPort}\n\n`;
-
-		result += "CORE_MANAGER_HOST=0.0.0.0\n";
-		result += `CORE_MANAGER_PORT=${options.coreMonitorPort}\n\n`;
 
 		return result;
 	}
