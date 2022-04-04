@@ -1,4 +1,3 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";
@@ -26,6 +25,85 @@ describe<{
 
 		await context.networkGenerator.generate({
 			network: "testnet",
+			symbol: "my",
+			token: "myn",
+		});
+
+		existsSync.calledWith(configCore);
+
+		ensureDirSync.calledWith(configCore);
+
+		writeJSONSync.calledTimes(5);
+		writeFileSync.calledOnce();
+
+		writeJSONSync.calledWith(
+			match("crypto.json"),
+			match({
+				genesisBlock: {
+					blockSignature: match.string,
+					generatorPublicKey: match.string,
+					height: 1,
+					id: match.string,
+					numberOfTransactions: 103,
+					payloadHash: match.string,
+					payloadLength: 3296,
+					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+					reward: BigNumber.ZERO,
+					timestamp: match.number,
+					totalAmount: BigNumber.make("12500000000000000"),
+					totalFee: BigNumber.ZERO,
+					transactions: match.array,
+					version: 1,
+				},
+				milestones: [
+					match({
+						activeValidators: 51,
+						address: match.object,
+						block: match.object,
+						blockTime: 8,
+						epoch: match.string,
+						height: 1,
+						multiPaymentLimit: 256,
+						reward: "0", // TODO: Check
+						satoshi: match.object,
+						vendorFieldLength: 255,
+					}),
+					match({
+						activeValidators: 51,
+						address: match.object,
+						block: match.object,
+						blockTime: 8,
+						epoch: match.string,
+						height: 75_600,
+						multiPaymentLimit: 256,
+						reward: "200000000",
+						satoshi: match.object,
+						vendorFieldLength: 255,
+					}),
+				],
+				network: {
+					client: { explorer: "", symbol: "my", token: "myn" },
+					messagePrefix: "testnet message:\n",
+					name: "testnet",
+					nethash: match.string,
+					pubKeyHash: 30,
+					slip44: 1,
+					wif: 186,
+				},
+			}),
+			{ spaces: 4 },
+		);
+	});
+
+	it("should generate with defined passphrases", async (context) => {
+		const existsSync = stub(fs, "existsSync");
+		const ensureDirSync = stub(fs, "ensureDirSync");
+		const writeJSONSync = stub(fs, "writeJSONSync");
+		const writeFileSync = stub(fs, "writeFileSync");
+
+		await context.networkGenerator.generate({
+			network: "testnet",
+			passphrases: [...Array.from({ length: 5 }).keys()].map((index) => `pasphrase_${index}`),
 			symbol: "my",
 			token: "myn",
 		});

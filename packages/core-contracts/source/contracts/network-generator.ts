@@ -34,6 +34,9 @@ export type InternalOptions = {
 	configPath?: string;
 	overwriteConfig: boolean;
 	force: boolean;
+
+	// Other
+	passphrases?: string[];
 };
 
 export type Options = Partial<InternalOptions> & {

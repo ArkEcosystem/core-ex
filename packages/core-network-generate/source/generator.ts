@@ -95,10 +95,7 @@ export class NetworkGenerator {
 
 		const coreConfigDestination = join(configPath, internalOptions.network);
 
-		const validators: any[] = await this.#generateCoreValidators(
-			internalOptions.validators,
-			internalOptions.pubKeyHash,
-		);
+		const validators: any[] = await this.#generateCoreValidators(internalOptions.validators);
 
 		const genesisWallet = await this.#createWallet();
 
@@ -321,11 +318,11 @@ export class NetworkGenerator {
 		return readJSONSync(resolve(__dirname, "../../core/bin/config/testnet/app.json"));
 	}
 
-	async #generateCoreValidators(activeValidators: number, pubKeyHash: number): Promise<Wallet[]> {
+	async #generateCoreValidators(activeValidators: number, passphrases?: string[]): Promise<Wallet[]> {
 		const wallets: Wallet[] = [];
 
 		for (let index = 0; index < activeValidators; index++) {
-			const validatorWallet: Wallet = await this.#createWallet();
+			const validatorWallet: Wallet = await this.#createWallet(passphrases?.at(index));
 			validatorWallet.username = `genesis_${index + 1}`;
 
 			wallets.push(validatorWallet);
@@ -334,8 +331,10 @@ export class NetworkGenerator {
 		return wallets;
 	}
 
-	async #createWallet(): Promise<Wallet> {
-		const passphrase = generateMnemonic(256);
+	async #createWallet(passphrase?: string): Promise<Wallet> {
+		if (!passphrase) {
+			passphrase = generateMnemonic(256);
+		}
 
 		const keys: Contracts.Crypto.IKeyPair = await this.#app
 			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
