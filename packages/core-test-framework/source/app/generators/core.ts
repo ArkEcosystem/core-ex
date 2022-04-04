@@ -3,6 +3,7 @@ import { copyFileSync, ensureDirSync, existsSync, writeFileSync, writeJSONSync }
 import { resolve } from "path";
 import { dirSync } from "tmp";
 
+import passphrases from "../../internal/passphrases.json";
 import { CoreConfigPaths } from "../contracts";
 import { Generator } from "./generator";
 
@@ -10,7 +11,7 @@ export class CoreGenerator extends Generator {
 	private destination!: string;
 
 	public generate(): CoreConfigPaths {
-		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.flags.network}`);
+		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.network}`);
 
 		if (existsSync(this.destination)) {
 			throw new Error(`${this.destination} already exists.`);
@@ -20,9 +21,7 @@ export class CoreGenerator extends Generator {
 
 		this.writePeers();
 
-		// this.writeValidators(
-		// 	this.generateCoreValidators(this.options.crypto.flags.validators, this.options.crypto.flags.pubKeyHash),
-		// );
+		this.writeValidators();
 
 		this.writeEnvironment();
 
@@ -47,15 +46,15 @@ export class CoreGenerator extends Generator {
 		}
 	}
 
-	// private writeValidators(validators): void {
-	// 	const filePath: string = resolve(this.destination, "validators.json");
+	private writeValidators(): void {
+		const filePath: string = resolve(this.destination, "validators.json");
 
-	// 	if (this.options.core.validators) {
-	// 		writeJSONSync(filePath, this.options.core.validators, { spaces: 4 });
-	// 	} else {
-	// 		writeJSONSync(filePath, { secrets: validators.map((d) => d.passphrase) }, { spaces: 4 });
-	// 	}
-	// }
+		if (this.options.crypto.passphrases) {
+			writeJSONSync(filePath, { secrets: this.options.crypto.passphrases }, { spaces: 4 });
+		} else {
+			writeJSONSync(filePath, { secrets: passphrases }, { spaces: 4 });
+		}
+	}
 
 	private writeEnvironment(): void {
 		const filePath: string = resolve(this.destination, ".env");

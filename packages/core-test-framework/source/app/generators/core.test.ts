@@ -2,6 +2,7 @@ import { readFileSync, readJSONSync } from "fs-extra";
 
 import { sandboxOptions } from "../../../test/assets/sanbox-options";
 import { describe } from "../../index";
+import passphrases from "../../internal/passphrases.json";
 import { CoreConfigPaths } from "../contracts";
 import { CoreGenerator } from "./core";
 
@@ -31,7 +32,7 @@ describe("CoreGenerator", ({ it, assert }) => {
 
 		assert.equal(readFileSync(result.env).toString(), "TEST=test\n");
 		assert.equal(readJSONSync(result.app), {});
-		// assert.equal(readJSONSync(result.validators), {}); // TODO: Generate validators
+		assert.equal(readJSONSync(result.validators), { secrets: passphrases });
 		assert.equal(readJSONSync(result.peers), {});
 	});
 });
