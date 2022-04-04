@@ -322,7 +322,7 @@ export class NetworkGenerator {
 		const wallets: Wallet[] = [];
 
 		for (let index = 0; index < activeValidators; index++) {
-			const validatorWallet: Wallet = await this.#createWallet(passphrases?.at(index));
+			const validatorWallet: Wallet = await this.#createWallet(passphrases ? passphrases[index] : undefined);
 			validatorWallet.username = `genesis_${index + 1}`;
 
 			wallets.push(validatorWallet);
