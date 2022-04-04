@@ -13,7 +13,7 @@ export class CryptoGenerator extends Generator {
 	private destination!: string;
 
 	public generate(): CryptoConfigPaths {
-		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.flags.network}`);
+		this.destination = resolve(__dirname, `${dirSync().name}/${this.options.crypto.network}`);
 
 		if (existsSync(this.destination)) {
 			throw new Error(`${this.destination} already exists.`);

@@ -1,17 +1,10 @@
 import { Container, interfaces } from "@arkecosystem/core-container";
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Providers, Services, Types } from "@arkecosystem/core-kernel";
 import { removeSync } from "fs-extra";
 import { setGracefulCleanup } from "tmp";
 
-import {
-	CoreConfigPaths,
-	CoreOptions,
-	CryptoConfigPaths,
-	CryptoOptions,
-	SandboxCallback,
-	SandboxOptions,
-} from "./contracts";
+import { CoreConfigPaths, CoreOptions, CryptoConfigPaths, SandboxCallback, SandboxOptions } from "./contracts";
 import { generateCoreConfig, generateCryptoConfig } from "./generators";
 
 export class Sandbox {
@@ -27,22 +20,20 @@ export class Sandbox {
 	private readonly options: SandboxOptions = {
 		core: {},
 		crypto: {
-			flags: {
-				blockTime: 8,
-				distribute: true,
-				explorer: "http://uexplorer.ark.io",
-				maxBlockPayload: 2_097_152,
-				maxTxPerBlock: 150,
-				network: "unitnet",
-				premine: "15300000000000000",
-				pubKeyHash: 23,
-				rewardAmount: 200_000_000,
-				rewardHeight: 75_600,
-				symbol: "UѦ",
-				token: "UARK",
-				validators: 51,
-				wif: 186,
-			},
+			blockTime: 8,
+			distribute: true,
+			explorer: "http://uexplorer.ark.io",
+			maxBlockPayload: 2_097_152,
+			maxTxPerBlock: 150,
+			network: "unitnet",
+			premine: "15300000000000000",
+			pubKeyHash: 23,
+			rewardAmount: "200_000_000",
+			rewardHeight: 75_600,
+			symbol: "UѦ",
+			token: "UARK",
+			validators: 51,
+			wif: 186,
 		},
 	};
 
@@ -60,7 +51,7 @@ export class Sandbox {
 		return this;
 	}
 
-	public withCryptoOptions(options: CryptoOptions): this {
+	public withCryptoOptions(options: Contracts.NetworkGenerator.Options): this {
 		this.options.crypto = { ...this.options.crypto, ...options };
 
 		return this;

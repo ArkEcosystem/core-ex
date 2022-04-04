@@ -26,33 +26,9 @@ export interface CoreOptions {
 	app?: Types.JsonObject;
 }
 
-export interface CryptoFlags {
-	network: string;
-	premine: string;
-	validators: number;
-	blockTime: number;
-	maxTxPerBlock: number;
-	maxBlockPayload: number;
-	rewardHeight: number;
-	rewardAmount: number;
-	pubKeyHash: number;
-	wif: number;
-	token: string;
-	symbol: string;
-	explorer: string;
-	distribute: boolean;
-}
-
-export interface CryptoOptions {
-	flags: CryptoFlags;
-	genesisBlock?: Types.JsonObject;
-	milestones?: Types.JsonObject;
-	network?: Types.JsonObject;
-}
-
 export interface SandboxOptions {
 	core: CoreOptions;
-	crypto: CryptoOptions;
+	crypto: Contracts.NetworkGenerator.Options;
 }
 
 export interface CoreConfigPaths {
