@@ -1,4 +1,11 @@
-type Data = Record<string, string | number>;
+import { Contracts } from "@arkecosystem/core-contracts";
+
+type PartialRecord<K extends keyof any, T> = {
+	[P in K]?: T;
+};
+
+type Data = PartialRecord<Contracts.Flags.Flag, string | number>;
+
 export class EnvironmentGenerator {
 	#data: Data = {};
 
@@ -17,7 +24,7 @@ export class EnvironmentGenerator {
 		return this;
 	}
 
-	addRecord(key: string, value: string | number): EnvironmentGenerator {
+	addRecord(key: Contracts.Flags.Flag, value: string | number): EnvironmentGenerator {
 		this.#data[key] = value;
 
 		return this;
