@@ -1,15 +1,11 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 
-type PartialRecord<K extends keyof any, T> = {
-	[P in K]?: T;
-};
-
-type Data = PartialRecord<Contracts.Flags.Flag, string | number>;
+import { EnviromentData } from "../contracts";
 
 @injectable()
 export class EnvironmentGenerator {
-	#data: Data = {};
+	#data: EnviromentData = {};
 
 	addInitialRecords(): EnvironmentGenerator {
 		this.#data = {
@@ -32,7 +28,7 @@ export class EnvironmentGenerator {
 		return this;
 	}
 
-	generate(): Data {
+	generate(): EnviromentData {
 		return this.#data;
 	}
 }

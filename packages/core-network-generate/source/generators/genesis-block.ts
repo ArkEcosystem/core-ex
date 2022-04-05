@@ -6,7 +6,8 @@ import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { BigNumber } from "@arkecosystem/utils";
 import dayjs from "dayjs";
 
-import { Generator, Wallet } from "./generator";
+import { Wallet } from "../contracts";
+import { Generator } from "./generator";
 
 @injectable()
 export class GenesisBlockGenerator extends Generator {

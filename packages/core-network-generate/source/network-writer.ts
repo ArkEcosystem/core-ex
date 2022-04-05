@@ -1,9 +1,11 @@
 import { inject, injectable } from "@arkecosystem/core-container";
+import { Contracts } from "@arkecosystem/core-contracts";
 import { Types } from "@arkecosystem/core-kernel";
 import { stringifySync } from "envfile";
 import { writeFileSync, writeJSONSync } from "fs-extra";
 import { join } from "path";
 
+import { EnviromentData, Wallet } from "./contracts";
 import { Identifiers } from "./identifiers";
 
 @injectable()
@@ -11,13 +13,13 @@ export class NetworkWriter {
 	@inject(Identifiers.DataPath)
 	private dataPath: string;
 
-	writeApp(appData: Types.JsonObject) {
+	writeApp(appData: Types.JsonObject): void {
 		writeJSONSync(join(this.dataPath, "app.json"), appData, {
 			spaces: 4,
 		});
 	}
 
-	writeEnvironment(environment: Record<string, string | number>) {
+	writeEnvironment(environment: EnviromentData): void {
 		writeFileSync(join(this.dataPath, ".env"), stringifySync(environment));
 	}
 
@@ -31,13 +33,13 @@ export class NetworkWriter {
 		);
 	}
 
-	writeGenesisWallet(wallet) {
+	writeGenesisWallet(wallet: Wallet): void {
 		writeJSONSync(join(this.dataPath, "genesis-wallet.json"), wallet, {
 			spaces: 4,
 		});
 	}
 
-	writeValidators(mnemonics: string[]) {
+	writeValidators(mnemonics: string[]): void {
 		writeJSONSync(
 			join(this.dataPath, "validators.json"),
 			{
@@ -49,7 +51,11 @@ export class NetworkWriter {
 		);
 	}
 
-	writeCrypto(genesisBlock, milestones, network) {
+	writeCrypto(
+		genesisBlock: Contracts.Crypto.IBlockData,
+		milestones: Types.JsonObject[],
+		network: Types.JsonObject,
+	): void {
 		writeJSONSync(
 			join(this.dataPath, "crypto.json"),
 			{

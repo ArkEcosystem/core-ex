@@ -1,6 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 
-import { Generator, Wallet } from "./generator";
+import { Wallet } from "../contracts";
+import { Generator } from "./generator";
 
 @injectable()
 export class WalletGenerator extends Generator {

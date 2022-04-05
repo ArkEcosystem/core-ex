@@ -2,15 +2,9 @@ import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 
+import { Wallet } from "../contracts";
 import { Identifiers as InternalIdentifiers } from "../identifiers";
 import { MnemonicGenerator } from "./mnemonic";
-
-export type Wallet = {
-	address: string;
-	passphrase: string;
-	keys: Contracts.Crypto.IKeyPair;
-	username: string | undefined;
-};
 
 @injectable()
 export class Generator {

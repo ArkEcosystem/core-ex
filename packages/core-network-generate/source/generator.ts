@@ -88,7 +88,7 @@ export class NetworkGenerator2 {
 			},
 			{
 				task: async () => {
-					networkWriter.writeGenesisWallet(walletGenerator.generate(genesisWalletMnemonic));
+					networkWriter.writeGenesisWallet(await walletGenerator.generate(genesisWalletMnemonic));
 				},
 				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
 			},
@@ -147,6 +147,8 @@ export class NetworkGenerator2 {
 
 		this.#logger?.info(`Configuration generated on location: ${coreConfigDestination}`);
 	}
+
+	// #preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions) {}
 
 	#generateEnvironmentVariables(options: Contracts.NetworkGenerator.InternalOptions): string {
 		let result = "";
