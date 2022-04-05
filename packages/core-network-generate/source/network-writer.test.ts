@@ -3,6 +3,8 @@ import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../core-test-framework";
+import { makeApplication } from "./application-factory";
+import { Identifiers } from "./identifiers";
 import { NetworkWriter } from "./network-writer";
 
 describe<{
@@ -13,9 +15,12 @@ describe<{
 		setGracefulCleanup();
 	});
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.dataPath = dirSync().name;
-		context.networkWriter = new NetworkWriter(context.dataPath);
+
+		const app = await makeApplication(context.dataPath);
+
+		context.networkWriter = app.get<NetworkWriter>(Identifiers.NetworkWriter);
 	});
 
 	it("#writeApp - should write app.json", ({ dataPath, networkWriter }) => {

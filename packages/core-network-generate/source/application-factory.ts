@@ -31,7 +31,7 @@ import {
 import { Identifiers as InternalIdentifiers } from "./identifiers";
 import { NetworkWriter } from "./network-writer";
 
-export const makeApplication = async () => {
+export const makeApplication = async (dataPath?: string) => {
 	const app = new Application(new Container());
 
 	app.bind(Identifiers.LogService).toConstantValue({});
@@ -59,7 +59,8 @@ export const makeApplication = async () => {
 		milestones: [{ address: { bech32m: "ark" } }],
 	});
 
-	app.bind(InternalIdentifiers.NetworkWriter).toConstantValue(NetworkWriter);
+	app.bind(InternalIdentifiers.DataPath).toConstantValue(dataPath);
+	app.bind(InternalIdentifiers.NetworkWriter).to(NetworkWriter);
 
 	app.bind(InternalIdentifiers.Generator.App).to(AppGenerator);
 	app.bind(InternalIdentifiers.Generator.Environment).to(EnvironmentGenerator);
