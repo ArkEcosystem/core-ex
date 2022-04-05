@@ -7,7 +7,7 @@ import { AppGenerator } from "./app";
 describe<{
 	dataPath: string;
 	appGenerator: AppGenerator;
-}>("App generator", ({ it, assert, beforeEach, beforeAll }) => {
+}>("AppGenerator", ({ it, assert, beforeEach, beforeAll }) => {
 	beforeAll(() => {
 		setGracefulCleanup();
 	});

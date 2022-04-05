@@ -6,7 +6,7 @@ import { EnvironmentGenerator } from "./environment";
 describe<{
 	dataPath: string;
 	generator: EnvironmentGenerator;
-}>("App generator", ({ it, assert, beforeEach, beforeAll }) => {
+}>("EnvironmentGenerator", ({ it, assert, beforeEach, beforeAll }) => {
 	beforeAll(() => {
 		setGracefulCleanup();
 	});

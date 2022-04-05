@@ -1,7 +1,7 @@
 import { describe } from "../../../core-test-framework/distribution";
 import { MnemonicGenerator } from "./mnemonic";
 
-describe("Mnemonic generator", ({ it, assert }) => {
+describe("MnemonicGenerator", ({ it, assert }) => {
 	it("#generate - should generate mnemonic", () => {
 		assert.string(MnemonicGenerator.generate());
 	});

@@ -4,7 +4,7 @@ import { MilestonesGenerator } from "./milestones";
 describe<{
 	dataPath: string;
 	generator: MilestonesGenerator;
-}>("App generator", ({ it, assert, beforeEach }) => {
+}>("MilestonesGenerator", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.generator = new MilestonesGenerator();
 	});

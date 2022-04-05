@@ -4,7 +4,7 @@ import { NetworkGenerator } from "./network";
 describe<{
 	dataPath: string;
 	generator: NetworkGenerator;
-}>("App generator", ({ it, assert, beforeEach }) => {
+}>("NetworkGenerator", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.generator = new NetworkGenerator();
 	});

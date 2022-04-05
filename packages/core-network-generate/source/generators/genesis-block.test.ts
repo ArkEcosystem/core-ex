@@ -5,7 +5,7 @@ import { MnemonicGenerator } from "./mnemonic";
 
 describe<{
 	generator: GenesisBlockGenerator;
-}>("App generator", ({ it, assert, beforeEach }) => {
+}>("GenesisBlockGenerator", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		context.generator = new GenesisBlockGenerator(await buildApp());
 	});
