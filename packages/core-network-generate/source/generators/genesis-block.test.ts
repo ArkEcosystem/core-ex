@@ -1,5 +1,6 @@
 import { describe } from "../../../core-test-framework/distribution";
 import { makeApplication } from "../application-factory";
+import { Identifiers } from "../identifiers";
 import { GenesisBlockGenerator } from "./genesis-block";
 import { MnemonicGenerator } from "./mnemonic";
 
@@ -8,8 +9,10 @@ describe<{
 	mnemonicGenerator: MnemonicGenerator;
 }>("GenesisBlockGenerator", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
-		context.generator = new GenesisBlockGenerator(await makeApplication());
-		context.mnemonicGenerator = new MnemonicGenerator();
+		const app = await makeApplication();
+
+		context.generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
+		context.mnemonicGenerator = app.get<MnemonicGenerator>(Identifiers.Generator.Mnemonic);
 	});
 
 	it("#generate - should return generated data", async ({ generator, mnemonicGenerator }) => {

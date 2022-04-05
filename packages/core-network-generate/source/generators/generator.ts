@@ -1,4 +1,4 @@
-import { injectable } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 
@@ -14,15 +14,15 @@ export type Wallet = {
 
 @injectable()
 export class Generator {
+	@inject(Identifiers.Application)
 	protected app: Application;
 
-	public constructor(app: Application) {
-		this.app = app;
-	}
+	@inject(InternalIdentifiers.Generator.Mnemonic)
+	private mnemonicGenerator: MnemonicGenerator;
 
 	protected async createWallet(mnemonic?: string): Promise<Wallet> {
 		if (!mnemonic) {
-			mnemonic = this.app.get<MnemonicGenerator>(InternalIdentifiers.Generator.Mnemonic).generate();
+			mnemonic = this.mnemonicGenerator.generate();
 		}
 
 		const keys: Contracts.Crypto.IKeyPair = await this.app
