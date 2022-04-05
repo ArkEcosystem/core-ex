@@ -1,23 +1,16 @@
-import { dirSync, setGracefulCleanup } from "tmp";
-
 import { describe } from "../../../core-test-framework/distribution";
 import { MilestonesGenerator } from "./milestones";
 
 describe<{
 	dataPath: string;
 	generator: MilestonesGenerator;
-}>("App generator", ({ it, assert, beforeEach, beforeAll }) => {
-	beforeAll(() => {
-		setGracefulCleanup();
-	});
-
+}>("App generator", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.dataPath = dirSync().name;
 		context.generator = new MilestonesGenerator();
 	});
 
-	it("#get - should return data", ({ generator }) => {
-		assert.equal(generator.get(), []);
+	it("#generate - should return empty data", ({ generator }) => {
+		assert.equal(generator.generate(), []);
 	});
 
 	it("#setInitial - should set initial milestone", ({ generator }) => {
@@ -26,14 +19,14 @@ describe<{
 		assert.equal(
 			generator
 				.setInitial({
-					validators: 51,
-					maxBlockPayload: 2000,
-					maxTxPerBlock: 100,
 					blockTime: 8,
 					epoch: date,
+					maxBlockPayload: 2000,
+					maxTxPerBlock: 100,
+					validators: 51,
 					vendorFieldLength: 255,
 				})
-				.get(),
+				.generate(),
 			[
 				{
 					activeValidators: 51,
@@ -60,8 +53,8 @@ describe<{
 		);
 	});
 
-	it("#setReward - should set reward", ({ generator, dataPath }) => {
-		assert.equal(generator.setReward(3, "200").get(), [
+	it("#setReward - should set reward", ({ generator }) => {
+		assert.equal(generator.setReward(3, "200").generate(), [
 			{
 				height: 3,
 				reward: "200",

@@ -1,5 +1,3 @@
-import { existsSync, readFileSync } from "fs-extra";
-import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../../core-test-framework/distribution";
@@ -18,32 +16,26 @@ describe<{
 		context.generator = new EnvironmentGenerator();
 	});
 
-	it("#get - should return generated data", ({ generator }) => {
-		assert.object(generator.get());
+	it("#generate - should return generated data", ({ generator }) => {
+		assert.object(generator.generate());
 	});
 
-	it("#generate - should append records", ({ generator }) => {
-		assert.undefined(generator.get().TEST);
+	it("#addInitialRecords - should add initial records", ({ generator }) => {
+		const resul = generator.addInitialRecords().generate();
 
-		assert.equal(generator.generate({ TEST: "test" }).get().TEST, "test");
+		assert.equal(resul.CORE_DB_HOST, "localhost");
+		assert.equal(resul.CORE_DB_PORT, 5432);
+		assert.equal(resul.CORE_LOG_LEVEL, "info");
+		assert.equal(resul.CORE_LOG_LEVEL_FILE, "info");
+		assert.equal(resul.CORE_P2P_HOST, "0.0.0.0");
+		assert.equal(resul.CORE_P2P_PORT, 4000);
+		assert.equal(resul.CORE_WEBHOOKS_HOST, "0.0.0.0");
+		assert.equal(resul.CORE_WEBHOOKS_PORT, 4004);
 	});
 
-	it("#write - should write generated data", ({ generator, dataPath }) => {
-		assert.false(existsSync(join(dataPath, ".env")));
+	it("#addRecord - should add record", ({ generator }) => {
+		const resul = generator.addRecord("TEST", "test").generate();
 
-		generator.write(dataPath);
-
-		assert.true(existsSync(join(dataPath, ".env")));
-
-		const content = readFileSync(join(dataPath, ".env")).toString();
-
-		assert.true(content.includes("CORE_DB_HOST=localhost"));
-		assert.true(content.includes("CORE_DB_PORT=5432"));
-		assert.true(content.includes("CORE_LOG_LEVEL=info"));
-		assert.true(content.includes("CORE_LOG_LEVEL_FILE=info"));
-		assert.true(content.includes("CORE_P2P_HOST=0.0.0.0"));
-		assert.true(content.includes("CORE_P2P_PORT=4000"));
-		assert.true(content.includes("CORE_WEBHOOKS_HOST=0.0.0.0"));
-		assert.true(content.includes("CORE_WEBHOOKS_PORT=4004"));
+		assert.equal(resul.TEST, "test");
 	});
 });

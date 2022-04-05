@@ -1,11 +1,9 @@
 import { Contracts } from "@arkecosystem/core-contracts";
+import { Types } from "@arkecosystem/core-kernel";
 
+// TODO: Fix types
 export class MilestonesGenerator {
-	#data = [];
-
-	get(): string[] {
-		return this.#data;
-	}
+	#data: Types.JsonObject[] = [];
 
 	setInitial(options: Contracts.NetworkGenerator.MilestoneOptions): MilestonesGenerator {
 		this.#data = [
@@ -42,5 +40,9 @@ export class MilestonesGenerator {
 		});
 
 		return this;
+	}
+
+	generate(): Types.JsonObject[] {
+		return this.#data;
 	}
 }

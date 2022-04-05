@@ -1,7 +1,6 @@
-import { existsSync } from "fs-extra";
-import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import appJson from "../../../core/bin/config/testnet/app.json";
 import { describe } from "../../../core-test-framework/distribution";
 import { AppGenerator } from "./app";
 
@@ -18,23 +17,7 @@ describe<{
 		context.appGenerator = new AppGenerator();
 	});
 
-	it("#get - should return generated data", ({ appGenerator }) => {
-		assert.object(appGenerator.generate().get());
-	});
-
-	it("#get - should throw if not generated", ({ appGenerator }) => {
-		assert.throws(() => appGenerator.get());
-	});
-
-	it("#write - should write generated data", ({ appGenerator, dataPath }) => {
-		assert.false(existsSync(join(dataPath, "app.json")));
-
-		appGenerator.generate().write(dataPath);
-
-		assert.true(existsSync(join(dataPath, "app.json")));
-	});
-
-	it("#write - should throw if not generated", ({ appGenerator, dataPath }) => {
-		assert.throws(() => appGenerator.write(dataPath));
+	it("#generateDefault - should default data", ({ appGenerator }) => {
+		assert.equal(appGenerator.generateDefault(), appJson);
 	});
 });

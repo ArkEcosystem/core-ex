@@ -1,16 +1,9 @@
 import { Contracts } from "@arkecosystem/core-contracts";
-import { Types, Utils } from "@arkecosystem/core-kernel";
+import { Types } from "@arkecosystem/core-kernel";
 
 export class NetworkGenerator {
-	#data?: Types.JsonObject;
-
-	get(): Types.JsonObject {
-		Utils.assert.defined(this.#data);
-		return this.#data;
-	}
-
-	generate(nethash: string, options: Contracts.NetworkGenerator.NetworkOptions): NetworkGenerator {
-		this.#data = {
+	generate(nethash: string, options: Contracts.NetworkGenerator.NetworkOptions): Types.JsonObject {
+		return {
 			client: {
 				explorer: options.explorer,
 				symbol: options.symbol,
@@ -23,7 +16,5 @@ export class NetworkGenerator {
 			slip44: 1,
 			wif: options.wif,
 		};
-
-		return this;
 	}
 }
