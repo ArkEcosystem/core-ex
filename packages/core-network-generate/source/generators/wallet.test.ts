@@ -1,12 +1,12 @@
 import { describe } from "../../../core-test-framework/distribution";
-import { buildApp } from "../app-builder";
+import { makeApplication } from "../application-factory";
 import { WalletGenerator } from "./wallet";
 
 describe<{
 	appGenerator: WalletGenerator;
 }>("WalletGenerator", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
-		context.appGenerator = new WalletGenerator(await buildApp());
+		context.appGenerator = new WalletGenerator(await makeApplication());
 	});
 
 	it("#generate - should return wallet", async ({ appGenerator }) => {

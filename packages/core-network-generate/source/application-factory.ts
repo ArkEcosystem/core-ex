@@ -19,7 +19,19 @@ import { Application } from "@arkecosystem/core-kernel";
 import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 
-export const buildApp = async () => {
+import {
+	AppGenerator,
+	EnvironmentGenerator,
+	GenesisBlockGenerator,
+	MilestonesGenerator,
+	MnemonicGenerator,
+	NetworkGenerator,
+	WalletGenerator,
+} from "./generators";
+import { Identifiers as InternalIdentifiers } from "./identifiers";
+import { NetworkWriter } from "./network-writer";
+
+export const makeApplication = async () => {
 	const app = new Application(new Container());
 
 	app.bind(Identifiers.LogService).toConstantValue({});
@@ -46,6 +58,16 @@ export const buildApp = async () => {
 	app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
 		milestones: [{ address: { bech32m: "ark" } }],
 	});
+
+	app.bind(InternalIdentifiers.NetworkWriter).toConstantValue(NetworkWriter);
+
+	app.bind(InternalIdentifiers.Generator.App).to(AppGenerator);
+	app.bind(InternalIdentifiers.Generator.Environment).to(EnvironmentGenerator);
+	app.bind(InternalIdentifiers.Generator.GenesisBlock).to(GenesisBlockGenerator);
+	app.bind(InternalIdentifiers.Generator.Milestones).to(MilestonesGenerator);
+	app.bind(InternalIdentifiers.Generator.Mnemonic).to(MnemonicGenerator);
+	app.bind(InternalIdentifiers.Generator.Network).to(NetworkGenerator);
+	app.bind(InternalIdentifiers.Generator.Wallet).to(WalletGenerator);
 
 	return app;
 };

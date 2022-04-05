@@ -2,6 +2,7 @@ import { injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 
+import { Identifiers as InternalIdentifiers } from "../identifiers";
 import { MnemonicGenerator } from "./mnemonic";
 
 export type Wallet = {
@@ -21,7 +22,7 @@ export class Generator {
 
 	protected async createWallet(mnemonic?: string): Promise<Wallet> {
 		if (!mnemonic) {
-			mnemonic = MnemonicGenerator.generate();
+			mnemonic = this.app.get<MnemonicGenerator>(InternalIdentifiers.Generator.Mnemonic).generate();
 		}
 
 		const keys: Contracts.Crypto.IKeyPair = await this.app
