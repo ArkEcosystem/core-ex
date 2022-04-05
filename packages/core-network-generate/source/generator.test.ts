@@ -5,17 +5,17 @@ import fs from "fs-extra";
 import { join } from "path";
 
 import { describe } from "../../core-test-framework";
-import { NetworkGenerator } from "./generator";
+import { NetworkGenerator2 } from "./generator";
 
 describe<{
-	networkGenerator: NetworkGenerator;
+	networkGenerator: NetworkGenerator2;
 }>("NetworkGenerator", ({ beforeEach, it, assert, stub, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
 	const configCrypto = join(configCore, "crypto");
 
 	beforeEach(async (context) => {
-		context.networkGenerator = new NetworkGenerator();
+		context.networkGenerator = new NetworkGenerator2();
 	});
 
 	it("should generate a new configuration", async (context) => {
