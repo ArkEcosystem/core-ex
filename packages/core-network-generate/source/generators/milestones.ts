@@ -1,7 +1,9 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { Types } from "@arkecosystem/core-kernel";
 
 // TODO: Fix types
+@injectable()
 export class MilestonesGenerator {
 	#data: Types.JsonObject[] = [];
 

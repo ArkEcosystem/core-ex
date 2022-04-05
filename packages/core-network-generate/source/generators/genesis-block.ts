@@ -1,3 +1,4 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { TransferBuilder } from "@arkecosystem/core-crypto-transaction-transfer";
 import { ValidatorRegistrationBuilder } from "@arkecosystem/core-crypto-transaction-validator-registration";
@@ -7,6 +8,7 @@ import dayjs from "dayjs";
 
 import { Generator, Wallet } from "./generator";
 
+@injectable()
 export class GenesisBlockGenerator extends Generator {
 	async generate(
 		genesisMnemonic: string,

@@ -1,3 +1,4 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 
@@ -10,6 +11,7 @@ export type Wallet = {
 	username: string | undefined;
 };
 
+@injectable()
 export class Generator {
 	protected app: Application;
 

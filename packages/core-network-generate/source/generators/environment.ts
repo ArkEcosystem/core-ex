@@ -1,3 +1,4 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 
 type PartialRecord<K extends keyof any, T> = {
@@ -6,6 +7,7 @@ type PartialRecord<K extends keyof any, T> = {
 
 type Data = PartialRecord<Contracts.Flags.Flag, string | number>;
 
+@injectable()
 export class EnvironmentGenerator {
 	#data: Data = {};
 

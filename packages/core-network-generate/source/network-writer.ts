@@ -1,8 +1,10 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Types } from "@arkecosystem/core-kernel";
 import { stringifySync } from "envfile";
 import { writeFileSync, writeJSONSync } from "fs-extra";
 import { join } from "path";
 
+@injectable()
 export class NetworkWriter {
 	#dataPath: string;
 

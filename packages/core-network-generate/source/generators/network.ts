@@ -1,6 +1,8 @@
+import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
 import { Types } from "@arkecosystem/core-kernel";
 
+@injectable()
 export class NetworkGenerator {
 	generate(nethash: string, options: Contracts.NetworkGenerator.NetworkOptions): Types.JsonObject {
 		return {
