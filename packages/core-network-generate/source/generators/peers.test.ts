@@ -2,8 +2,8 @@ import { existsSync, readJSONSync } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../core-test-framework";
-import { PeersGenerator } from "./peers-generator";
+import { describe } from "../../../core-test-framework/distribution";
+import { PeersGenerator } from "./peers";
 
 describe<{
 	dataPath: string;

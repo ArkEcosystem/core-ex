@@ -1,7 +1,7 @@
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../core-test-framework/distribution";
 import { buildApp } from "../app-builder";
-import { GenesisBlockGenerator } from "./genesis-block-generator";
-import { MnemonicGenerator } from "./mnemonic-generator";
+import { GenesisBlockGenerator } from "./genesis-block";
+import { MnemonicGenerator } from "./mnemonic";
 
 describe<{
 	generator: GenesisBlockGenerator;

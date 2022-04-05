@@ -2,9 +2,9 @@ import { existsSync } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../core-test-framework";
+import { describe } from "../../../core-test-framework/distribution";
 import { buildApp } from "../app-builder";
-import { GenesisWalletGenerator } from "./genesis-wallet-generator";
+import { GenesisWalletGenerator } from "./genesis-wallet";
 
 describe<{
 	dataPath: string;

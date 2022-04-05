@@ -2,8 +2,8 @@ import { existsSync } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../core-test-framework";
-import { AppGenerator } from "./app-generator";
+import { describe } from "../../../core-test-framework/distribution";
+import { AppGenerator } from "./app";
 
 describe<{
 	dataPath: string;

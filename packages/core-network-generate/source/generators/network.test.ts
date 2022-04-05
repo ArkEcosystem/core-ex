@@ -1,7 +1,7 @@
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../core-test-framework";
-import { NetworkGenerator } from "./network-generator";
+import { describe } from "../../../core-test-framework/distribution";
+import { NetworkGenerator } from "./network";
 
 describe<{
 	dataPath: string;

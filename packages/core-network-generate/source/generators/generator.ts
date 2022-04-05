@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 
-import { MnemonicGenerator } from "./mnemonic-generator";
+import { MnemonicGenerator } from "./mnemonic";
 
 export type Wallet = {
 	address: string;

@@ -1,7 +1,7 @@
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../../core-test-framework";
-import { MilestonesGenerator } from "./milestones-generator";
+import { describe } from "../../../core-test-framework/distribution";
+import { MilestonesGenerator } from "./milestones";
 
 describe<{
 	dataPath: string;

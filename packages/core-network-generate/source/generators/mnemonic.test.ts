@@ -1,5 +1,5 @@
-import { describe } from "../../../core-test-framework";
-import { MnemonicGenerator } from "./mnemonic-generator";
+import { describe } from "../../../core-test-framework/distribution";
+import { MnemonicGenerator } from "./mnemonic";
 
 describe("Mnemonic generator", ({ it, assert }) => {
 	it("#generate - should generate mnemonic", () => {
