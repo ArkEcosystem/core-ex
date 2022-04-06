@@ -28,6 +28,7 @@ import {
 	MilestonesGenerator,
 	MnemonicGenerator,
 	NetworkGenerator,
+	PeersGenerator,
 	WalletGenerator,
 } from "./generators";
 import { Identifiers as InternalIdentifiers } from "./identifiers";
@@ -71,6 +72,7 @@ export const makeApplication = async (configurationPath?: string) => {
 	app.bind(InternalIdentifiers.Generator.Mnemonic).to(MnemonicGenerator);
 	app.bind(InternalIdentifiers.Generator.Network).to(NetworkGenerator);
 	app.bind(InternalIdentifiers.Generator.Wallet).to(WalletGenerator);
+	app.bind(InternalIdentifiers.Generator.Peers).to(PeersGenerator);
 
 	return app;
 };

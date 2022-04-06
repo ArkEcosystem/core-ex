@@ -39,7 +39,7 @@ describe<{
 	});
 
 	it("#writePeers - should write peers.json", ({ dataPath, networkWriter }) => {
-		const peers = ["127.0.0.1"];
+		const peers = [{ ip: "127.0.0.1", port: 4000 }];
 
 		networkWriter.writePeers(peers);
 

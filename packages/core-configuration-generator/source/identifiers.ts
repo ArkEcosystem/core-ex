@@ -10,6 +10,7 @@ export const Identifiers = {
 		Milestones: Symbol.for("Generator<Milestones>"),
 		Mnemonic: Symbol.for("Generator<Mnemonic>"),
 		Network: Symbol.for("Generator<Network>"),
+		Peers: Symbol.for("Generator<Peers>"),
 		Wallet: Symbol.for("Generator<Wallet>"),
 	},
 	LogService: Symbol.for("Configuration<Logger>"),

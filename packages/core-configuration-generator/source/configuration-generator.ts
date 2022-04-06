@@ -12,6 +12,7 @@ import {
 	MilestonesGenerator,
 	MnemonicGenerator,
 	NetworkGenerator,
+	PeersGenerator,
 	WalletGenerator,
 } from "./generators";
 import { Identifiers as InternalIdentifiers } from "./identifiers";
@@ -49,6 +50,9 @@ export class ConfigurationGenerator {
 
 	@inject(InternalIdentifiers.Generator.Network)
 	private networkGenerator: NetworkGenerator;
+
+	@inject(InternalIdentifiers.Generator.Peers)
+	private peersGenerator: PeersGenerator;
 
 	@inject(InternalIdentifiers.Generator.Wallet)
 	private walletGenerator: WalletGenerator;
@@ -91,13 +95,6 @@ export class ConfigurationGenerator {
 			writeValidators: true,
 			...writeOptions,
 		};
-
-		// const paths = envPaths(internalOptions.token, { suffix: "core" });
-		// const configPath = internalOptions.configPath ? internalOptions.configPath : paths.config;
-
-		// const coreConfigDestination = join(configPath, internalOptions.network);
-
-		// this.app = await makeApplication(coreConfigDestination);
 
 		const genesisWalletMnemonic = this.mnemonicGenerator.generate();
 		const validatorsMnemonics = this.mnemonicGenerator.generateMany(internalOptions.validators);
@@ -159,7 +156,9 @@ export class ConfigurationGenerator {
 		if (writeOptions.writePeers) {
 			tasks.push({
 				task: async () => {
-					this.configurationWriter.writePeers(internalOptions.peers);
+					this.configurationWriter.writePeers(
+						this.peersGenerator.generate(internalOptions.coreP2PPort, internalOptions.peers),
+					);
 				},
 				title: "Writing peers.json in core config path.",
 			});
