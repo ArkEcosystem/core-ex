@@ -34,8 +34,6 @@ import { NetworkWriter } from "./network-writer";
 export const makeApplication = async (dataPath?: string) => {
 	const app = new Application(new Container());
 
-	app.bind(Identifiers.LogService).toConstantValue({});
-
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();
 	await app.resolve(CoreCryptoConfig).register();

@@ -1,10 +1,10 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";
 
 import { describe } from "../../core-test-framework";
+import { makeApplication } from "./application-factory";
 import { NetworkGenerate } from "./generator";
 
 describe<{
@@ -12,10 +12,11 @@ describe<{
 }>("NetworkGenerator", ({ beforeEach, it, assert, stub, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
-	const configCrypto = join(configCore, "crypto");
 
 	beforeEach(async (context) => {
-		context.networkGenerator = new NetworkGenerate();
+		const app = await makeApplication(configCore);
+
+		context.networkGenerator = app.resolve(NetworkGenerate);
 	});
 
 	it("should generate a new configuration", async (context) => {

@@ -1,11 +1,8 @@
-import { Container } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
-import envPaths from "env-paths";
 import { ensureDirSync, existsSync } from "fs-extra";
-import { join } from "path";
 
-import { makeApplication } from "./application-factory";
 import { EnviromentData } from "./contracts";
 import {
 	AppGenerator,
@@ -24,16 +21,37 @@ type Task = {
 	title: string;
 };
 
-type Logger = { info: (message: string) => void };
+@injectable()
 export class NetworkGenerate {
-	#app: Application;
-	#logger?: Logger;
+	@inject(Identifiers.Application)
+	private app: Application;
 
-	public constructor(logger?: Logger) {
-		this.#logger = logger;
+	@inject(InternalIdentifiers.NetworkWriter)
+	private networkWriter: NetworkWriter;
 
-		this.#app = new Application(new Container());
-	}
+	@inject(InternalIdentifiers.Generator.App)
+	private appGenerator: AppGenerator;
+
+	@inject(InternalIdentifiers.Generator.Environment)
+	private environmentGenerator: EnvironmentGenerator;
+
+	@inject(InternalIdentifiers.Generator.GenesisBlock)
+	private genesisBlockGenerator: GenesisBlockGenerator;
+
+	@inject(InternalIdentifiers.Generator.Milestones)
+	private milestonesGenerator: MilestonesGenerator;
+
+	@inject(InternalIdentifiers.Generator.Mnemonic)
+	private mnemonicGenerator: MnemonicGenerator;
+
+	@inject(InternalIdentifiers.Generator.Network)
+	private networkGenerator: NetworkGenerator;
+
+	@inject(InternalIdentifiers.Generator.Wallet)
+	private walletGenerator: WalletGenerator;
+
+	@inject(InternalIdentifiers.DataPath)
+	private dataPath: string;
 
 	public async generate(
 		options: Contracts.NetworkGenerator.Options,
@@ -74,53 +92,47 @@ export class NetworkGenerate {
 			...writeOptions,
 		};
 
-		const paths = envPaths(internalOptions.token, { suffix: "core" });
-		const configPath = internalOptions.configPath ? internalOptions.configPath : paths.config;
+		// const paths = envPaths(internalOptions.token, { suffix: "core" });
+		// const configPath = internalOptions.configPath ? internalOptions.configPath : paths.config;
 
-		const coreConfigDestination = join(configPath, internalOptions.network);
+		// const coreConfigDestination = join(configPath, internalOptions.network);
 
-		this.#app = await makeApplication(coreConfigDestination);
+		// this.app = await makeApplication(coreConfigDestination);
 
-		const mnemonicGenerator = this.#app.get<MnemonicGenerator>(InternalIdentifiers.Generator.Mnemonic);
-		const walletGenerator = this.#app.get<WalletGenerator>(InternalIdentifiers.Generator.Wallet);
-
-		const networkWriter = this.#app.get<NetworkWriter>(InternalIdentifiers.NetworkWriter);
-
-		const genesisWalletMnemonic = mnemonicGenerator.generate();
-		const validatorsMnemonics = mnemonicGenerator.generateMany(internalOptions.validators);
+		const genesisWalletMnemonic = this.mnemonicGenerator.generate();
+		const validatorsMnemonics = this.mnemonicGenerator.generateMany(internalOptions.validators);
 
 		const tasks: Task[] = [
 			{
 				task: async () => {
-					if (!internalOptions.overwriteConfig && existsSync(coreConfigDestination)) {
-						throw new Error(`${coreConfigDestination} already exists.`);
+					if (!internalOptions.overwriteConfig && existsSync(this.dataPath)) {
+						throw new Error(`${this.dataPath} already exists.`);
 					}
 
-					ensureDirSync(coreConfigDestination);
+					ensureDirSync(this.dataPath);
 				},
-				title: `Prepare directories.`,
+				title: `Preparing directories.`,
 			},
 		];
 
 		if (writeOptions.writeGenesisBlock) {
 			tasks.push({
 				task: async () => {
-					networkWriter.writeGenesisWallet(await walletGenerator.generate(genesisWalletMnemonic));
+					this.networkWriter.writeGenesisWallet(await this.walletGenerator.generate(genesisWalletMnemonic));
 				},
-				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
+				title: "Writing genesis-wallet.json in core config path.",
 			});
 		}
 
 		if (writeOptions.writeCrypto) {
 			tasks.push({
 				task: async () => {
-					const milestones = this.#app
-						.get<MilestonesGenerator>(InternalIdentifiers.Generator.Milestones)
+					const milestones = this.milestonesGenerator
 						.setInitial(internalOptions)
 						.setReward(internalOptions.rewardHeight, internalOptions.rewardAmount as string) // TODO: fix type
 						.generate();
 
-					this.#app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
+					this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
 						// @ts-ignore
 						genesisBlock: {},
 						milestones,
@@ -128,70 +140,72 @@ export class NetworkGenerate {
 						network: {},
 					});
 
-					const genesisBlock = await this.#app
-						.get<GenesisBlockGenerator>(InternalIdentifiers.Generator.GenesisBlock)
-						.generate(genesisWalletMnemonic, validatorsMnemonics, internalOptions);
+					const genesisBlock = await this.genesisBlockGenerator.generate(
+						genesisWalletMnemonic,
+						validatorsMnemonics,
+						internalOptions,
+					);
 
-					const network = this.#app
-						.get<NetworkGenerator>(InternalIdentifiers.Generator.Network)
-						.generate(genesisBlock.payloadHash, internalOptions);
+					const network = this.networkGenerator.generate(genesisBlock.payloadHash, internalOptions);
 
-					networkWriter.writeCrypto(genesisBlock, milestones, network);
+					this.networkWriter.writeCrypto(genesisBlock, milestones, network);
 				},
-				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
+				title: "Writing crypto.json in core config path.",
 			});
 		}
 
 		if (writeOptions.writePeers) {
 			tasks.push({
 				task: async () => {
-					networkWriter.writePeers(internalOptions.peers);
+					this.networkWriter.writePeers(internalOptions.peers);
 				},
-				title: "Write peers.json",
+				title: "Writing peers.json in core config path.",
 			});
 		}
 
 		if (writeOptions.writeValidators) {
 			tasks.push({
 				task: async () => {
-					networkWriter.writeValidators(validatorsMnemonics);
+					this.networkWriter.writeValidators(validatorsMnemonics);
 				},
-				title: "Write validators.json",
+				title: "Writing validators.json in core config path.",
 			});
 		}
 
 		if (writeOptions.writeValidators) {
 			tasks.push({
 				task: async () => {
-					networkWriter.writeEnvironment(
-						this.#app
-							.get<EnvironmentGenerator>(InternalIdentifiers.Generator.Environment)
+					this.networkWriter.writeEnvironment(
+						this.environmentGenerator
 							.addInitialRecords()
 							.addRecords(this.#preparteEnvironmentOptions(internalOptions))
 							.generate(),
 					);
 				},
-				title: "Write .env",
+				title: "Writing .env in core config path.",
 			});
 		}
 
 		if (writeOptions.writeApp) {
 			tasks.push({
 				task: async () => {
-					networkWriter.writeApp(
-						this.#app.get<AppGenerator>(InternalIdentifiers.Generator.App).generateDefault(),
-					);
+					this.networkWriter.writeApp(this.appGenerator.generateDefault());
 				},
-				title: "Write app.json",
+				title: "Writing app.json in core config path.",
 			});
 		}
 
+		let logger: Contracts.Kernel.Logger | undefined;
+		if (this.app.isBound(Identifiers.LogService)) {
+			logger = this.app.get<Contracts.Kernel.Logger>(Identifiers.LogService);
+		}
+
 		for (const task of tasks) {
-			this.#logger?.info(task.title);
+			logger?.info(task.title);
 			await task.task();
 		}
 
-		this.#logger?.info(`Configuration generated on location: ${coreConfigDestination}`);
+		logger?.info(`Configuration generated on location: ${this.dataPath}`);
 	}
 
 	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions): EnviromentData {
