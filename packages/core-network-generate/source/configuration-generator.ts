@@ -64,7 +64,7 @@ export class ConfigurationGenerator {
 			coreP2PPort: 4000,
 			coreWebhooksPort: 4004,
 			distribute: false,
-			epoch: new Date(new Date().toISOString().slice(0, 11) + "00:00:00.000Z"),
+			epoch: new Date(),
 			explorer: "",
 			force: false,
 			maxBlockPayload: 2_097_152,
