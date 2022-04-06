@@ -196,8 +196,8 @@ export class ConfigurationGenerator {
 		}
 
 		let logger: Contracts.Kernel.Logger | undefined;
-		if (this.app.isBound(Identifiers.LogService)) {
-			logger = this.app.get<Contracts.Kernel.Logger>(Identifiers.LogService);
+		if (this.app.isBound(InternalIdentifiers.LogService)) {
+			logger = this.app.get<Contracts.Kernel.Logger>(InternalIdentifiers.LogService);
 		}
 
 		for (const task of tasks) {

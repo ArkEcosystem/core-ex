@@ -1,4 +1,3 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import envPaths from "env-paths";
@@ -105,7 +104,7 @@ describe<{
 			info: () => {},
 		};
 
-		app.bind(Identifiers.LogService).toConstantValue(logger);
+		app.bind(InternalIdentifiers.LogService).toConstantValue(logger);
 
 		const log = stub(logger, "info");
 		const existsSync = stub(fs, "existsSync");
