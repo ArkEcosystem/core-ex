@@ -1,3 +1,5 @@
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Application } from "@arkecosystem/core-kernel";
 import { BigNumber } from "@arkecosystem/utils";
 import envPaths from "env-paths";
 import fs from "fs-extra";
@@ -6,18 +8,18 @@ import { join } from "path";
 import { describe } from "../../core-test-framework/distribution";
 import { makeApplication } from "./application-factory";
 import { ConfigurationGenerator } from "./configuration-generator";
-import { Identifiers } from "./identifiers";
+import { Identifiers as InternalIdentifiers } from "./identifiers";
 
 describe<{
+	app: Application;
 	generator: ConfigurationGenerator;
 }>("NetworkGenerator", ({ beforeEach, it, assert, stub, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
 
 	beforeEach(async (context) => {
-		const app = await makeApplication(configCore);
-
-		context.generator = app.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator);
+		context.app = await makeApplication(configCore);
+		context.generator = context.app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
 	});
 
 	it("should generate a new configuration", async ({ generator }) => {
@@ -98,10 +100,12 @@ describe<{
 		);
 	});
 
-	it("should log if logger is provided", async ({ generator }) => {
+	it("should log if logger is provided", async ({ generator, app }) => {
 		const logger = {
 			info: () => {},
 		};
+
+		app.bind(Identifiers.LogService).toConstantValue(logger);
 
 		const log = stub(logger, "info");
 		const existsSync = stub(fs, "existsSync");
@@ -119,7 +123,7 @@ describe<{
 		ensureDirSync.calledWith(configCore);
 		writeJSONSync.calledTimes(5);
 		writeFileSync.calledOnce();
-		log.calledTimes(5);
+		log.calledTimes(8);
 	});
 
 	it("should throw if the core configuration destination already exists", async ({ generator }) => {
