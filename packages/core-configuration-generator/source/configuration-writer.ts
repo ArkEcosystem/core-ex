@@ -9,7 +9,7 @@ import { EnviromentData, Wallet } from "./contracts";
 import { Identifiers } from "./identifiers";
 
 @injectable()
-export class NetworkWriter {
+export class ConfigurationWriter {
 	@inject(Identifiers.ConfigurationPath)
 	private configurationPath: string;
 

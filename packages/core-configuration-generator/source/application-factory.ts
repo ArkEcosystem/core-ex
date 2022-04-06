@@ -20,6 +20,7 @@ import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 
 import { ConfigurationGenerator } from "./configuration-generator";
+import { ConfigurationWriter } from "./configuration-writer";
 import {
 	AppGenerator,
 	EnvironmentGenerator,
@@ -30,7 +31,6 @@ import {
 	WalletGenerator,
 } from "./generators";
 import { Identifiers as InternalIdentifiers } from "./identifiers";
-import { NetworkWriter } from "./network-writer";
 
 export const makeApplication = async (configurationPath?: string) => {
 	const app = new Application(new Container());
@@ -62,7 +62,7 @@ export const makeApplication = async (configurationPath?: string) => {
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);
 
 	app.bind(InternalIdentifiers.ConfigurationPath).toConstantValue(configurationPath);
-	app.bind(InternalIdentifiers.NetworkWriter).to(NetworkWriter);
+	app.bind(InternalIdentifiers.ConfigurationWriter).to(ConfigurationWriter);
 
 	app.bind(InternalIdentifiers.Generator.App).to(AppGenerator);
 	app.bind(InternalIdentifiers.Generator.Environment).to(EnvironmentGenerator);

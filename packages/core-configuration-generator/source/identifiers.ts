@@ -2,6 +2,7 @@ export const Identifiers = {
 	Application: Symbol.for("Configuration<Application>"),
 	ConfigurationGenerator: Symbol.for("Configuration<Generator>"),
 	ConfigurationPath: Symbol.for("Configuration<Path>"),
+	ConfigurationWriter: Symbol.for("Configuration<Writer>"),
 	Generator: {
 		App: Symbol.for("Generator<App>"),
 		Environment: Symbol.for("Generator<Environment>"),
@@ -12,5 +13,4 @@ export const Identifiers = {
 		Wallet: Symbol.for("Generator<Wallet>"),
 	},
 	LogService: Symbol.for("Configuration<Logger>"),
-	NetworkWriter: Symbol.for("Configuration<Writer>"),
 };

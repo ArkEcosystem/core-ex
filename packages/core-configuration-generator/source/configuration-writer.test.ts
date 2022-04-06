@@ -2,14 +2,14 @@ import { existsSync, readFileSync, readJSONSync } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../core-test-framework/distribution";
 import { makeApplication } from "./application-factory";
 import { Identifiers } from "./identifiers";
-import { NetworkWriter } from "./network-writer";
+import { ConfigurationWriter } from "./configuration-writer";
 
 describe<{
 	dataPath: string;
-	networkWriter: NetworkWriter;
+	networkWriter: ConfigurationWriter;
 }>("NetworkWriter", ({ beforeAll, beforeEach, it, assert }) => {
 	beforeAll(() => {
 		setGracefulCleanup();
@@ -20,7 +20,7 @@ describe<{
 
 		const app = await makeApplication(context.dataPath);
 
-		context.networkWriter = app.get<NetworkWriter>(Identifiers.NetworkWriter);
+		context.networkWriter = app.get<ConfigurationWriter>(Identifiers.ConfigurationWriter);
 	});
 
 	it("#writeApp - should write app.json", ({ dataPath, networkWriter }) => {

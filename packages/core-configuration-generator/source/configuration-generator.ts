@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 import { ensureDirSync, existsSync } from "fs-extra";
 
+import { ConfigurationWriter } from "./configuration-writer";
 import { EnviromentData } from "./contracts";
 import {
 	AppGenerator,
@@ -14,7 +15,6 @@ import {
 	WalletGenerator,
 } from "./generators";
 import { Identifiers as InternalIdentifiers } from "./identifiers";
-import { NetworkWriter } from "./network-writer";
 
 type Task = {
 	task: () => Promise<void>;
@@ -26,8 +26,11 @@ export class ConfigurationGenerator {
 	@inject(InternalIdentifiers.Application)
 	private app: Application;
 
-	@inject(InternalIdentifiers.NetworkWriter)
-	private networkWriter: NetworkWriter;
+	@inject(InternalIdentifiers.ConfigurationPath)
+	private configurationPath: string;
+
+	@inject(InternalIdentifiers.ConfigurationWriter)
+	private configurationWriter: ConfigurationWriter;
 
 	@inject(InternalIdentifiers.Generator.App)
 	private appGenerator: AppGenerator;
@@ -49,9 +52,6 @@ export class ConfigurationGenerator {
 
 	@inject(InternalIdentifiers.Generator.Wallet)
 	private walletGenerator: WalletGenerator;
-
-	@inject(InternalIdentifiers.ConfigurationPath)
-	private configurationPath: string;
 
 	public async generate(
 		options: Contracts.NetworkGenerator.Options,
@@ -118,7 +118,9 @@ export class ConfigurationGenerator {
 		if (writeOptions.writeGenesisBlock) {
 			tasks.push({
 				task: async () => {
-					this.networkWriter.writeGenesisWallet(await this.walletGenerator.generate(genesisWalletMnemonic));
+					this.configurationWriter.writeGenesisWallet(
+						await this.walletGenerator.generate(genesisWalletMnemonic),
+					);
 				},
 				title: "Writing genesis-wallet.json in core config path.",
 			});
@@ -148,7 +150,7 @@ export class ConfigurationGenerator {
 
 					const network = this.networkGenerator.generate(genesisBlock.payloadHash, internalOptions);
 
-					this.networkWriter.writeCrypto(genesisBlock, milestones, network);
+					this.configurationWriter.writeCrypto(genesisBlock, milestones, network);
 				},
 				title: "Writing crypto.json in core config path.",
 			});
@@ -157,7 +159,7 @@ export class ConfigurationGenerator {
 		if (writeOptions.writePeers) {
 			tasks.push({
 				task: async () => {
-					this.networkWriter.writePeers(internalOptions.peers);
+					this.configurationWriter.writePeers(internalOptions.peers);
 				},
 				title: "Writing peers.json in core config path.",
 			});
@@ -166,7 +168,7 @@ export class ConfigurationGenerator {
 		if (writeOptions.writeValidators) {
 			tasks.push({
 				task: async () => {
-					this.networkWriter.writeValidators(validatorsMnemonics);
+					this.configurationWriter.writeValidators(validatorsMnemonics);
 				},
 				title: "Writing validators.json in core config path.",
 			});
@@ -175,7 +177,7 @@ export class ConfigurationGenerator {
 		if (writeOptions.writeValidators) {
 			tasks.push({
 				task: async () => {
-					this.networkWriter.writeEnvironment(
+					this.configurationWriter.writeEnvironment(
 						this.environmentGenerator
 							.addInitialRecords()
 							.addRecords(this.#preparteEnvironmentOptions(internalOptions))
@@ -189,7 +191,7 @@ export class ConfigurationGenerator {
 		if (writeOptions.writeApp) {
 			tasks.push({
 				task: async () => {
-					this.networkWriter.writeApp(this.appGenerator.generateDefault());
+					this.configurationWriter.writeApp(this.appGenerator.generateDefault());
 				},
 				title: "Writing app.json in core config path.",
 			});
