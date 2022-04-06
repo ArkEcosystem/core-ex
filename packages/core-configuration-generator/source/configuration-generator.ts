@@ -128,7 +128,7 @@ export class ConfigurationGenerator {
 				task: async () => {
 					const milestones = this.milestonesGenerator
 						.setInitial(internalOptions)
-						.setReward(internalOptions.rewardHeight, internalOptions.rewardAmount as string) // TODO: fix type
+						.setReward(internalOptions.rewardHeight, internalOptions.rewardAmount)
 						.generate();
 
 					this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
