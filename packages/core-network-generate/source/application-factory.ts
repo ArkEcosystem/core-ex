@@ -19,6 +19,7 @@ import { Application } from "@arkecosystem/core-kernel";
 import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 
+import { ConfigurationGenerator } from "./configuration-generator";
 import {
 	AppGenerator,
 	EnvironmentGenerator,
@@ -56,6 +57,8 @@ export const makeApplication = async (dataPath?: string) => {
 	app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
 		milestones: [{ address: { bech32m: "ark" } }],
 	});
+
+	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);
 
 	app.bind(InternalIdentifiers.DataPath).toConstantValue(dataPath);
 	app.bind(InternalIdentifiers.NetworkWriter).to(NetworkWriter);

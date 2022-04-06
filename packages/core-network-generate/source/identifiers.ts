@@ -1,4 +1,5 @@
 export const Identifiers = {
+	ConfigurationGenerator: Symbol.for("Configuration<Generator>"),
 	DataPath: Symbol.for("Writer<DataPath>"),
 	Generator: {
 		App: Symbol.for("Generator<App>"),

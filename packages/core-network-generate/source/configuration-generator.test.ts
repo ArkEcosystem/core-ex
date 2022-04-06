@@ -6,6 +6,7 @@ import { join } from "path";
 import { describe } from "../../core-test-framework/distribution";
 import { makeApplication } from "./application-factory";
 import { ConfigurationGenerator } from "./configuration-generator";
+import { Identifiers } from "./identifiers";
 
 describe<{
 	generator: ConfigurationGenerator;
@@ -16,7 +17,7 @@ describe<{
 	beforeEach(async (context) => {
 		const app = await makeApplication(configCore);
 
-		context.generator = app.resolve(ConfigurationGenerator);
+		context.generator = app.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator);
 	});
 
 	it("should generate a new configuration", async ({ generator }) => {
