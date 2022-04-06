@@ -8,7 +8,7 @@ import { MnemonicGenerator } from "./mnemonic";
 
 @injectable()
 export class Generator {
-	@inject(Identifiers.Application)
+	@inject(InternalIdentifiers.Application)
 	protected app: Application;
 
 	@inject(InternalIdentifiers.Generator.Mnemonic)

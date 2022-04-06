@@ -23,7 +23,7 @@ type Task = {
 
 @injectable()
 export class ConfigurationGenerator {
-	@inject(Identifiers.Application)
+	@inject(InternalIdentifiers.Application)
 	private app: Application;
 
 	@inject(InternalIdentifiers.NetworkWriter)

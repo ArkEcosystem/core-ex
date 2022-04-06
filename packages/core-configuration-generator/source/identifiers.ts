@@ -1,4 +1,5 @@
 export const Identifiers = {
+	Application: Symbol.for("Configuration<Application>"),
 	LogService: Symbol.for("Configuration<Logger>"),
 	ConfigurationGenerator: Symbol.for("Configuration<Generator>"),
 	DataPath: Symbol.for("Writer<DataPath>"),

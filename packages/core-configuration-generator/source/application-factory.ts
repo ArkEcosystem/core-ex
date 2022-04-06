@@ -58,6 +58,7 @@ export const makeApplication = async (dataPath?: string) => {
 		milestones: [{ address: { bech32m: "ark" } }],
 	});
 
+	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);
 
 	app.bind(InternalIdentifiers.DataPath).toConstantValue(dataPath);
