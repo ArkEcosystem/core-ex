@@ -32,7 +32,7 @@ import {
 import { Identifiers as InternalIdentifiers } from "./identifiers";
 import { NetworkWriter } from "./network-writer";
 
-export const makeApplication = async (dataPath?: string) => {
+export const makeApplication = async (configurationPath?: string) => {
 	const app = new Application(new Container());
 
 	await app.resolve(CoreSerializer).register();
@@ -61,7 +61,7 @@ export const makeApplication = async (dataPath?: string) => {
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);
 
-	app.bind(InternalIdentifiers.DataPath).toConstantValue(dataPath);
+	app.bind(InternalIdentifiers.ConfigurationPath).toConstantValue(configurationPath);
 	app.bind(InternalIdentifiers.NetworkWriter).to(NetworkWriter);
 
 	app.bind(InternalIdentifiers.Generator.App).to(AppGenerator);

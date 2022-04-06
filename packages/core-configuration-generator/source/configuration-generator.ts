@@ -50,8 +50,8 @@ export class ConfigurationGenerator {
 	@inject(InternalIdentifiers.Generator.Wallet)
 	private walletGenerator: WalletGenerator;
 
-	@inject(InternalIdentifiers.DataPath)
-	private dataPath: string;
+	@inject(InternalIdentifiers.ConfigurationPath)
+	private configurationPath: string;
 
 	public async generate(
 		options: Contracts.NetworkGenerator.Options,
@@ -105,11 +105,11 @@ export class ConfigurationGenerator {
 		const tasks: Task[] = [
 			{
 				task: async () => {
-					if (!internalOptions.overwriteConfig && existsSync(this.dataPath)) {
-						throw new Error(`${this.dataPath} already exists.`);
+					if (!internalOptions.overwriteConfig && existsSync(this.configurationPath)) {
+						throw new Error(`${this.configurationPath} already exists.`);
 					}
 
-					ensureDirSync(this.dataPath);
+					ensureDirSync(this.configurationPath);
 				},
 				title: `Preparing directories.`,
 			},
@@ -205,7 +205,7 @@ export class ConfigurationGenerator {
 			await task.task();
 		}
 
-		logger?.info(`Configuration generated on location: ${this.dataPath}`);
+		logger?.info(`Configuration generated on location: ${this.configurationPath}`);
 	}
 
 	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions): EnviromentData {

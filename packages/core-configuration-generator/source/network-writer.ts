@@ -10,22 +10,22 @@ import { Identifiers } from "./identifiers";
 
 @injectable()
 export class NetworkWriter {
-	@inject(Identifiers.DataPath)
-	private dataPath: string;
+	@inject(Identifiers.ConfigurationPath)
+	private configurationPath: string;
 
 	writeApp(appData: Types.JsonObject): void {
-		writeJSONSync(join(this.dataPath, "app.json"), appData, {
+		writeJSONSync(join(this.configurationPath, "app.json"), appData, {
 			spaces: 4,
 		});
 	}
 
 	writeEnvironment(environment: EnviromentData): void {
-		writeFileSync(join(this.dataPath, ".env"), stringifySync(environment));
+		writeFileSync(join(this.configurationPath, ".env"), stringifySync(environment));
 	}
 
 	writePeers(peers: string[]) {
 		writeJSONSync(
-			join(this.dataPath, "peers.json"),
+			join(this.configurationPath, "peers.json"),
 			{ list: peers },
 			{
 				spaces: 4,
@@ -34,14 +34,14 @@ export class NetworkWriter {
 	}
 
 	writeGenesisWallet(wallet: Wallet): void {
-		writeJSONSync(join(this.dataPath, "genesis-wallet.json"), wallet, {
+		writeJSONSync(join(this.configurationPath, "genesis-wallet.json"), wallet, {
 			spaces: 4,
 		});
 	}
 
 	writeValidators(mnemonics: string[]): void {
 		writeJSONSync(
-			join(this.dataPath, "validators.json"),
+			join(this.configurationPath, "validators.json"),
 			{
 				secrets: mnemonics,
 			},
@@ -57,7 +57,7 @@ export class NetworkWriter {
 		network: Types.JsonObject,
 	): void {
 		writeJSONSync(
-			join(this.dataPath, "crypto.json"),
+			join(this.configurationPath, "crypto.json"),
 			{
 				genesisBlock,
 				milestones,

@@ -1,8 +1,7 @@
 export const Identifiers = {
 	Application: Symbol.for("Configuration<Application>"),
-	LogService: Symbol.for("Configuration<Logger>"),
 	ConfigurationGenerator: Symbol.for("Configuration<Generator>"),
-	DataPath: Symbol.for("Writer<DataPath>"),
+	ConfigurationPath: Symbol.for("Configuration<Path>"),
 	Generator: {
 		App: Symbol.for("Generator<App>"),
 		Environment: Symbol.for("Generator<Environment>"),
@@ -12,5 +11,6 @@ export const Identifiers = {
 		Network: Symbol.for("Generator<Network>"),
 		Wallet: Symbol.for("Generator<Wallet>"),
 	},
-	NetworkWriter: Symbol.for("Writer<Network>"),
+	LogService: Symbol.for("Configuration<Logger>"),
+	NetworkWriter: Symbol.for("Configuration<Writer>"),
 };
