@@ -28,6 +28,14 @@ export class EnvironmentGenerator {
 		return this;
 	}
 
+	addRecords(data: EnviromentData): EnvironmentGenerator {
+		for (const [key, value] of Object.entries(data)) {
+			this.addRecord(key as Contracts.Flags.Flag, value);
+		}
+
+		return this;
+	}
+
 	generate(): EnviromentData {
 		return this.#data;
 	}

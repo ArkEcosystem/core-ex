@@ -1,7 +1,7 @@
 import { Commands, Container, Contracts, Services } from "@arkecosystem/core-cli";
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts as AppContracts } from "@arkecosystem/core-contracts";
-import { NetworkGenerator } from "@arkecosystem/core-network-generate";
+import { NetworkGenerate } from "@arkecosystem/core-network-generate";
 import Joi from "joi";
 import prompts from "prompts";
 
@@ -205,7 +205,7 @@ export class Command extends Commands.Command {
 			...flags,
 		};
 
-		const networkGenerator = new NetworkGenerator(this.logger);
+		const networkGenerator = new NetworkGenerate(this.logger);
 
 		if (flags.force || allFlagsSet) {
 			return networkGenerator.generate(this.#convertPeers(options));

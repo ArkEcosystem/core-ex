@@ -38,4 +38,10 @@ describe<{
 
 		assert.equal(resul.TEST, "test");
 	});
+
+	it("#addRecords - should add records", ({ generator }) => {
+		const resul = generator.addRecords({ TEST: "test" }).generate();
+
+		assert.equal(resul.TEST, "test");
+	});
 });

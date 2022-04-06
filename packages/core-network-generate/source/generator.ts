@@ -2,12 +2,14 @@ import { Container } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application } from "@arkecosystem/core-kernel";
 import envPaths from "env-paths";
-import { ensureDirSync, existsSync, writeFileSync } from "fs-extra";
-import { join, resolve } from "path";
+import { ensureDirSync, existsSync } from "fs-extra";
+import { join } from "path";
 
 import { makeApplication } from "./application-factory";
+import { EnviromentData } from "./contracts";
 import {
 	AppGenerator,
+	EnvironmentGenerator,
 	GenesisBlockGenerator,
 	MilestonesGenerator,
 	MnemonicGenerator,
@@ -23,7 +25,7 @@ type Task = {
 };
 
 type Logger = { info: (message: string) => void };
-export class NetworkGenerator2 {
+export class NetworkGenerate {
 	#app: Application;
 	#logger?: Logger;
 
@@ -127,9 +129,12 @@ export class NetworkGenerator2 {
 
 					networkWriter.writeValidators(validatorsMnemonics);
 
-					writeFileSync(
-						resolve(coreConfigDestination, ".env"),
-						this.#generateEnvironmentVariables(internalOptions),
+					networkWriter.writeEnvironment(
+						this.#app
+							.get<EnvironmentGenerator>(InternalIdentifiers.Generator.Environment)
+							.addInitialRecords()
+							.addRecords(this.#preparteEnvironmentOptions(internalOptions))
+							.generate(),
 					);
 
 					networkWriter.writeApp(
@@ -148,26 +153,26 @@ export class NetworkGenerator2 {
 		this.#logger?.info(`Configuration generated on location: ${coreConfigDestination}`);
 	}
 
-	// #preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions) {}
+	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions): EnviromentData {
+		const data: EnviromentData = {
+			CORE_DB_HOST: options.coreDBHost,
+			CORE_DB_PORT: options.coreDBPort,
+			CORE_P2P_PORT: options.coreP2PPort,
+			CORE_WEBHOOKS_PORT: options.coreWebhooksPort,
+		};
 
-	#generateEnvironmentVariables(options: Contracts.NetworkGenerator.InternalOptions): string {
-		let result = "";
+		if (options.coreDBDatabase) {
+			data.CORE_DB_DATABASE = options.coreDBDatabase;
+		}
 
-		result += "CORE_LOG_LEVEL=info\n";
-		result += "CORE_LOG_LEVEL_FILE=info\n\n";
+		if (options.coreDBUsername) {
+			data.CORE_DB_USERNAME = options.coreDBUsername;
+		}
 
-		result += `CORE_DB_HOST=${options.coreDBHost}\n`;
-		result += `CORE_DB_PORT=${options.coreDBPort}\n`;
-		result += options.coreDBUsername ? `CORE_DB_USERNAME=${options.coreDBUsername}\n` : "";
-		result += options.coreDBPassword ? `CORE_DB_PASSWORD=${options.coreDBPassword}\n` : "";
-		result += options.coreDBDatabase ? `CORE_DB_DATABASE=${options.coreDBDatabase}\n\n` : "\n";
+		if (options.coreDBPassword) {
+			data.CORE_DB_PASSWORD = options.coreDBDatabase;
+		}
 
-		result += "CORE_P2P_HOST=0.0.0.0\n";
-		result += `CORE_P2P_PORT=${options.coreP2PPort}\n\n`;
-
-		result += "CORE_WEBHOOKS_HOST=0.0.0.0\n";
-		result += `CORE_WEBHOOKS_PORT=${options.coreWebhooksPort}\n\n`;
-
-		return result;
+		return data;
 	}
 }
