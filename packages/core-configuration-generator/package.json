@@ -1,7 +1,7 @@
 {
-	"name": "@arkecosystem/core-network-generate",
+	"name": "@arkecosystem/core-configuration-generator",
 	"version": "0.0.1",
-	"description": "Network generator for ARK Core",
+	"description": "Configuration generator for ARK Core",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
