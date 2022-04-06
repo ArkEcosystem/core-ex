@@ -22,7 +22,7 @@ type Task = {
 };
 
 @injectable()
-export class NetworkGenerate {
+export class ConfigurationGenerator {
 	@inject(Identifiers.Application)
 	private app: Application;
 

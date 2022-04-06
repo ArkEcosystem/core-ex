@@ -3,12 +3,12 @@ import envPaths from "env-paths";
 import fs from "fs-extra";
 import { join } from "path";
 
-import { describe } from "../../core-test-framework";
+import { describe } from "../../core-test-framework/distribution";
 import { makeApplication } from "./application-factory";
-import { NetworkGenerate } from "./generator";
+import { ConfigurationGenerator } from "./configuration-generator";
 
 describe<{
-	networkGenerator: NetworkGenerate;
+	generator: ConfigurationGenerator;
 }>("NetworkGenerator", ({ beforeEach, it, assert, stub, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
@@ -16,16 +16,16 @@ describe<{
 	beforeEach(async (context) => {
 		const app = await makeApplication(configCore);
 
-		context.networkGenerator = app.resolve(NetworkGenerate);
+		context.generator = app.resolve(ConfigurationGenerator);
 	});
 
-	it("should generate a new configuration", async (context) => {
+	it("should generate a new configuration", async ({ generator }) => {
 		const existsSync = stub(fs, "existsSync");
 		const ensureDirSync = stub(fs, "ensureDirSync");
 		const writeJSONSync = stub(fs, "writeJSONSync");
 		const writeFileSync = stub(fs, "writeFileSync");
 
-		await context.networkGenerator.generate({
+		await generator.generate({
 			network: "testnet",
 			symbol: "my",
 			token: "myn",
@@ -97,12 +97,10 @@ describe<{
 		);
 	});
 
-	it("should log if logger is provided", async (context) => {
+	it("should log if logger is provided", async ({ generator }) => {
 		const logger = {
 			info: () => {},
 		};
-
-		context.networkGenerator = new NetworkGenerator(logger);
 
 		const log = stub(logger, "info");
 		const existsSync = stub(fs, "existsSync");
@@ -110,7 +108,7 @@ describe<{
 		const writeJSONSync = stub(fs, "writeJSONSync");
 		const writeFileSync = stub(fs, "writeFileSync");
 
-		await context.networkGenerator.generate({
+		await generator.generate({
 			network: "testnet",
 			symbol: "my",
 			token: "myn",
@@ -123,12 +121,12 @@ describe<{
 		log.calledTimes(5);
 	});
 
-	it("should throw if the core configuration destination already exists", async (context) => {
+	it("should throw if the core configuration destination already exists", async ({ generator }) => {
 		stub(fs, "existsSync").returnValueOnce(true);
 
 		await assert.rejects(
 			() =>
-				context.networkGenerator.generate({
+				generator.generate({
 					network: "testnet",
 					symbol: "my",
 					token: "myn",
@@ -137,20 +135,19 @@ describe<{
 		);
 	});
 
-	it("should generate a new configuration with additional flags", async (context) => {
+	it("should generate a new configuration with additional flags", async ({ generator }) => {
 		const existsSync = stub(fs, "existsSync");
 		const ensureDirSync = stub(fs, "ensureDirSync");
 		const writeJSONSync = stub(fs, "writeJSONSync");
 		const writeFileSync = stub(fs, "writeFileSync");
 
-		await context.networkGenerator.generate({
+		await generator.generate({
 			blockTime: 9,
 			coreDBDatabase: "database",
 			coreDBHost: "localhost",
 			coreDBPassword: "password",
 			coreDBPort: 5432,
 			coreDBUsername: "username",
-			coreMonitorPort: 4005,
 			coreP2PPort: 4000,
 			coreWebhooksPort: 4004,
 			distribute: true,
