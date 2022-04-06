@@ -14,7 +14,7 @@ export class GenesisBlockGenerator extends Generator {
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
-		options: Contracts.NetworkGenerator.GenesisBlock,
+		options: Contracts.NetworkGenerator.GenesisBlockOptions,
 	): Promise<Contracts.Crypto.IBlockData> {
 		const premineWallet = await this.createWallet();
 
@@ -144,7 +144,7 @@ export class GenesisBlockGenerator extends Generator {
 	async #createGenesisBlock(
 		keys: Contracts.Crypto.IKeyPair,
 		transactions,
-		options: Contracts.NetworkGenerator.GenesisBlock,
+		options: Contracts.NetworkGenerator.GenesisBlockOptions,
 	): Promise<Contracts.Crypto.IBlockData> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,

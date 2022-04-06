@@ -35,7 +35,10 @@ export class NetworkGenerate {
 		this.#app = new Application(new Container());
 	}
 
-	public async generate(options: Contracts.NetworkGenerator.Options): Promise<void> {
+	public async generate(
+		options: Contracts.NetworkGenerator.Options,
+		writeOptions?: Contracts.NetworkGenerator.WriteOptions,
+	): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
 			blockTime: 8,
 			coreDBHost: "localhost",
@@ -61,6 +64,16 @@ export class NetworkGenerate {
 			...options,
 		};
 
+		writeOptions = {
+			writeApp: true,
+			writeCrypto: true,
+			writeEnvironment: true,
+			writeGenesisBlock: true,
+			writePeers: true,
+			writeValidators: true,
+			...writeOptions,
+		};
+
 		const paths = envPaths(internalOptions.token, { suffix: "core" });
 		const configPath = internalOptions.configPath ? internalOptions.configPath : paths.config;
 
@@ -74,7 +87,6 @@ export class NetworkGenerate {
 		const networkWriter = this.#app.get<NetworkWriter>(InternalIdentifiers.NetworkWriter);
 
 		const genesisWalletMnemonic = mnemonicGenerator.generate();
-
 		const validatorsMnemonics = mnemonicGenerator.generateMany(internalOptions.validators);
 
 		const tasks: Task[] = [
@@ -88,15 +100,20 @@ export class NetworkGenerate {
 				},
 				title: `Prepare directories.`,
 			},
-			{
+		];
+
+		if (writeOptions.writeGenesisBlock) {
+			tasks.push({
 				task: async () => {
 					networkWriter.writeGenesisWallet(await walletGenerator.generate(genesisWalletMnemonic));
 				},
 				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
-			},
-			{
+			});
+		}
+
+		if (writeOptions.writeCrypto) {
+			tasks.push({
 				task: async () => {
-					// Milestones
 					const milestones = this.#app
 						.get<MilestonesGenerator>(InternalIdentifiers.Generator.Milestones)
 						.setInitial(internalOptions)
@@ -121,14 +138,31 @@ export class NetworkGenerate {
 
 					networkWriter.writeCrypto(genesisBlock, milestones, network);
 				},
-				title: "Generate crypto network configuration.",
-			},
-			{
+				title: "Persist genesis wallet to genesis-wallet.json in core config path.",
+			});
+		}
+
+		if (writeOptions.writePeers) {
+			tasks.push({
 				task: async () => {
 					networkWriter.writePeers(internalOptions.peers);
+				},
+				title: "Write peers.json",
+			});
+		}
 
+		if (writeOptions.writeValidators) {
+			tasks.push({
+				task: async () => {
 					networkWriter.writeValidators(validatorsMnemonics);
+				},
+				title: "Write validators.json",
+			});
+		}
 
+		if (writeOptions.writeValidators) {
+			tasks.push({
+				task: async () => {
 					networkWriter.writeEnvironment(
 						this.#app
 							.get<EnvironmentGenerator>(InternalIdentifiers.Generator.Environment)
@@ -136,14 +170,21 @@ export class NetworkGenerate {
 							.addRecords(this.#preparteEnvironmentOptions(internalOptions))
 							.generate(),
 					);
+				},
+				title: "Write .env",
+			});
+		}
 
+		if (writeOptions.writeApp) {
+			tasks.push({
+				task: async () => {
 					networkWriter.writeApp(
 						this.#app.get<AppGenerator>(InternalIdentifiers.Generator.App).generateDefault(),
 					);
 				},
-				title: "Generate Core network configuration.",
-			},
-		];
+				title: "Write app.json",
+			});
+		}
 
 		for (const task of tasks) {
 			this.#logger?.info(task.title);

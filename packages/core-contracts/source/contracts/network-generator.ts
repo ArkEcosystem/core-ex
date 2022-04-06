@@ -27,42 +27,43 @@ export type NetworkOptions = {
 	wif: number;
 };
 
-export type GenesisBlock = {
-	distribute: boolean;
-	premine: string;
-	pubKeyHash: number;
-	epoch: Date;
-};
-
-export type InternalOptions = EnvironmentOptions & {
-	network: string;
-	premine: string;
-	validators: number;
-	blockTime: number;
-	maxTxPerBlock: number;
-	maxBlockPayload: number;
+export type RewardOptions = {
 	rewardHeight: number;
-	rewardAmount: string | number;
-	pubKeyHash: number;
-	wif: number;
-	token: string;
-	symbol: string;
-	explorer: string;
-	distribute: boolean;
-	epoch: Date;
-	vendorFieldLength: number;
-
-	// Peers
-	peers: string[];
-
-	// General
-	configPath?: string;
-	overwriteConfig: boolean;
-	force: boolean;
+	rewardAmount: string;
 };
+
+export type GenesisBlockOptions = {
+	distribute: boolean;
+	premine: string;
+	pubKeyHash: number;
+	epoch: Date;
+};
+
+export type InternalOptions = EnvironmentOptions &
+	MilestoneOptions &
+	NetworkOptions &
+	RewardOptions &
+	GenesisBlockOptions & {
+		// Peers
+		peers: string[];
+
+		// General
+		configPath?: string;
+		overwriteConfig: boolean;
+		force: boolean;
+	};
 
 export type Options = Partial<InternalOptions> & {
 	network: string;
 	token: string;
 	symbol: string;
+};
+
+export type WriteOptions = {
+	writeApp: boolean;
+	writePeers: boolean;
+	writeEnvironment: boolean;
+	writeValidators: boolean;
+	writeGenesisBlock: boolean;
+	writeCrypto: boolean;
 };
