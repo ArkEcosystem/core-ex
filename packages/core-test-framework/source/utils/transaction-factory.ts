@@ -32,6 +32,7 @@ export class TransactionFactory {
 	protected builder: any;
 	protected app: Contracts.Kernel.Application;
 
+	// @ts-ignore
 	#network = "testnet";
 	#networkConfig: Contracts.Crypto.NetworkConfig | undefined;
 	#nonce: BigNumber | undefined;
