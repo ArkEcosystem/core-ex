@@ -86,8 +86,8 @@ export class CommandLineInterface {
 			}
 		};
 
-		setPathIfExists(join(__dirname, "../../../"));
-		setPathIfExists(join(__dirname, "../../../node_modules"));
+		setPathIfExists(join(__dirname, "../"));
+		setPathIfExists(join(__dirname, "../node_modules"));
 
 		require("module").Module._initPaths();
 	}
