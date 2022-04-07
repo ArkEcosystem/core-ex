@@ -1577,6 +1577,7 @@ importers:
     specifiers:
       '@arkecosystem/core-blockchain': workspace:*
       '@arkecosystem/core-cli': workspace:*
+      '@arkecosystem/core-configuration-generator': workspace:*
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-address-bech32m': workspace:*
@@ -1594,7 +1595,6 @@ importers:
       '@arkecosystem/core-crypto-transaction-vote': workspace:*
       '@arkecosystem/core-crypto-wif': workspace:*
       '@arkecosystem/core-kernel': workspace:*
-      '@arkecosystem/core-network-generate': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-serializer': workspace:*
       '@arkecosystem/core-state': workspace:*
@@ -1626,6 +1626,7 @@ importers:
     dependencies:
       '@arkecosystem/core-blockchain': link:../core-blockchain
       '@arkecosystem/core-cli': link:../core-cli
+      '@arkecosystem/core-configuration-generator': link:../core-configuration-generator
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
       '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
@@ -1643,7 +1644,6 @@ importers:
       '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
       '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
       '@arkecosystem/core-kernel': link:../core-kernel
-      '@arkecosystem/core-network-generate': link:../core-network-generate
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-serializer': link:../core-serializer
       '@arkecosystem/core-state': link:../core-state

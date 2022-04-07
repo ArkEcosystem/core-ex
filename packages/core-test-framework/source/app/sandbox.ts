@@ -1,7 +1,7 @@
 import { Container, interfaces } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Providers, Types } from "@arkecosystem/core-kernel";
-import { NetworkGenerator } from "@arkecosystem/core-network-generate";
+// import { makeApp } from "@arkecosystem/core-configuration-generator";
 import { removeSync } from "fs-extra";
 import { resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -48,9 +48,9 @@ export class Sandbox {
 	}
 
 	public async boot(callback?: SandboxCallback): Promise<void> {
-		const generator = new NetworkGenerator();
+		// const generator = new NetworkGenerator();
 
-		await generator.generate(this.networkOptions);
+		// await generator.generate(this.networkOptions);
 
 		// Generate Configurations
 		// this.paths = {

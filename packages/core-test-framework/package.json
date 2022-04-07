@@ -37,7 +37,7 @@
 		"@arkecosystem/core-crypto-transaction": "workspace:*",
 		"@arkecosystem/core-crypto-wif": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
-		"@arkecosystem/core-network-generate": "workspace:*",
+		"@arkecosystem/core-configuration-generator": "workspace:*",
 		"@arkecosystem/core-p2p": "workspace:*",
 		"@arkecosystem/core-serializer": "workspace:*",
 		"@arkecosystem/core-state": "workspace:*",
