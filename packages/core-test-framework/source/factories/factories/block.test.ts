@@ -1,7 +1,7 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
-import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json"; // TODO: Generate
+import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../index";
 import { FactoryBuilder } from "../factory-builder";
 import { registerBlockFactory } from "./block";

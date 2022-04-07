@@ -1,6 +1,6 @@
 import { Wallets } from "@arkecosystem/core-state";
 
-import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json"; // TODO: Generate
+import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../index";
 import { FactoryBuilder } from "../factory-builder";
 import { registerWalletFactory } from "./wallet";
