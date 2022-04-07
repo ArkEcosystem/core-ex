@@ -1580,12 +1580,7 @@ importers:
       '@arkecosystem/core-configuration-generator': workspace:*
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
-      '@arkecosystem/core-crypto-address-bech32m': workspace:*
-      '@arkecosystem/core-crypto-block': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
-      '@arkecosystem/core-crypto-hash-bcrypto': workspace:*
-      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
-      '@arkecosystem/core-crypto-signature-schnorr': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-crypto-transaction-multi-payment': workspace:*
       '@arkecosystem/core-crypto-transaction-multi-signature-registration': workspace:*
@@ -1593,7 +1588,6 @@ importers:
       '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
       '@arkecosystem/core-crypto-transaction-validator-resignation': workspace:*
       '@arkecosystem/core-crypto-transaction-vote': workspace:*
-      '@arkecosystem/core-crypto-wif': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-p2p': workspace:*
       '@arkecosystem/core-serializer': workspace:*
@@ -1629,12 +1623,7 @@ importers:
       '@arkecosystem/core-configuration-generator': link:../core-configuration-generator
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
-      '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
-      '@arkecosystem/core-crypto-block': link:../core-crypto-block
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
-      '@arkecosystem/core-crypto-hash-bcrypto': link:../core-crypto-hash-bcrypto
-      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
-      '@arkecosystem/core-crypto-signature-schnorr': link:../core-crypto-signature-schnorr
       '@arkecosystem/core-crypto-transaction': link:../core-crypto-transaction
       '@arkecosystem/core-crypto-transaction-multi-payment': link:../core-crypto-transaction-multi-payment
       '@arkecosystem/core-crypto-transaction-multi-signature-registration': link:../core-crypto-transaction-multi-signature-registration
@@ -1642,7 +1631,6 @@ importers:
       '@arkecosystem/core-crypto-transaction-validator-registration': link:../core-crypto-transaction-validator-registration
       '@arkecosystem/core-crypto-transaction-validator-resignation': link:../core-crypto-transaction-validator-resignation
       '@arkecosystem/core-crypto-transaction-vote': link:../core-crypto-transaction-vote
-      '@arkecosystem/core-crypto-wif': link:../core-crypto-wif
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/core-p2p': link:../core-p2p
       '@arkecosystem/core-serializer': link:../core-serializer
