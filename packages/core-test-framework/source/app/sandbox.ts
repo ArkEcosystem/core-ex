@@ -11,13 +11,13 @@ import { SandboxCallback } from "./contracts";
 export class Sandbox {
 	public readonly app: Application;
 
-	private readonly container: interfaces.Container;
+	readonly #container: interfaces.Container;
 
-	private path = dirSync().name;
+	#path = dirSync().name;
 
-	private configurationOptions: Contracts.NetworkGenerator.Options = {
+	#configurationOptions: Contracts.NetworkGenerator.Options = {
 		blockTime: 8,
-		configPath: resolve(`${this.path}/unitnet`),
+		configPath: resolve(`${this.#path}/unitnet`),
 		distribute: true,
 		explorer: "http://uexplorer.ark.io",
 		maxBlockPayload: 2_097_152,
@@ -36,38 +36,38 @@ export class Sandbox {
 	public constructor() {
 		setGracefulCleanup();
 
-		this.container = new Container();
+		this.#container = new Container();
 
-		this.app = new Application(this.container);
+		this.app = new Application(this.#container);
 	}
 
 	public getConfigurationPath() {
-		return join(this.path, this.configurationOptions.network);
+		return join(this.#path, this.#configurationOptions.network);
 	}
 
 	public withConfigurationOptions(options: Contracts.NetworkGenerator.Options) {
-		this.configurationOptions = { ...this.configurationOptions, ...options };
+		this.#configurationOptions = { ...this.#configurationOptions, ...options };
 
 		return this;
 	}
 
 	public async boot(callback?: SandboxCallback): Promise<void> {
 		const configApp = await makeApplication(this.getConfigurationPath());
-		await configApp.resolve(ConfigurationGenerator).generate(this.configurationOptions);
+		await configApp.resolve(ConfigurationGenerator).generate(this.#configurationOptions);
 
 		if (this.app.isBound(Identifiers.Cryptography.Configuration)) {
 			this.app
 				.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
-				.setConfig(readJSONSync(join(this.configurationOptions.configPath, "crypto.json")));
+				.setConfig(readJSONSync(join(this.#configurationOptions.configPath, "crypto.json")));
 		}
 
 		// Configure Application
-		process.env.CORE_PATH_CONFIG = this.path;
+		process.env.CORE_PATH_CONFIG = this.getConfigurationPath();
 
 		if (callback) {
 			callback({
 				app: this.app,
-				container: this.container,
+				container: this.#container,
 			});
 
 			this.snapshot();
@@ -81,20 +81,20 @@ export class Sandbox {
 			// We encountered a unexpected error.
 		}
 
-		removeSync(this.path);
+		removeSync(this.#path);
 
 		if (callback) {
-			callback({ app: this.app, container: this.container });
+			callback({ app: this.app, container: this.#container });
 		}
 	}
 
 	public snapshot(): void {
-		this.container.snapshot();
+		this.#container.snapshot();
 	}
 
 	public restore(): void {
 		try {
-			this.container.restore();
+			this.#container.restore();
 		} catch {
 			// No snapshot available to restore.
 		}
