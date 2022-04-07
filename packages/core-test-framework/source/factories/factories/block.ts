@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import dayjs from "dayjs";
+import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";
 import { Signer } from "../../internal/signer";
@@ -9,9 +10,11 @@ import { generateApp } from "./generate-app";
 
 export const registerBlockFactory = async (
 	factory: FactoryBuilder,
-	config: Contracts.Crypto.NetworkConfig,
+	config?: Contracts.Crypto.NetworkConfig,
 ): Promise<void> => {
-	const app = await generateApp(config);
+	const app = await generateApp(
+		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/crypto.json")),
+	);
 
 	factory.set("Block", async ({ options }) => {
 		const previousBlock = options.getPreviousBlock

@@ -7,6 +7,7 @@ import { ValidatorRegistrationBuilder } from "@arkecosystem/core-crypto-transact
 import { ValidatorResignationBuilder } from "@arkecosystem/core-crypto-transaction-validator-resignation";
 import { VoteBuilder } from "@arkecosystem/core-crypto-transaction-vote";
 import { BigNumber } from "@arkecosystem/utils";
+import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder";
@@ -223,9 +224,11 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contra
 
 export const registerTransactionFactory = async (
 	factory: FactoryBuilder,
-	config: Contracts.Crypto.NetworkConfig,
+	config?: Contracts.Crypto.NetworkConfig,
 ): Promise<void> => {
-	const app = await generateApp(config);
+	const app = await generateApp(
+		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/crypto.json")),
+	);
 
 	registerTransferFactory(factory, app);
 	registerValidatorRegistrationFactory(factory, app);

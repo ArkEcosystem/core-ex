@@ -1,14 +1,17 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { generateMnemonic } from "bip39";
+import { join } from "path";
 
 import { FactoryBuilder } from "../factory-builder";
 import { generateApp } from "./generate-app";
 
 export const registerIdentityFactory = async (
 	factory: FactoryBuilder,
-	config: Contracts.Crypto.NetworkConfig,
+	config?: Contracts.Crypto.NetworkConfig,
 ): Promise<void> => {
-	const app = await generateApp(config);
+	const app = await generateApp(
+		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/crypto.json")),
+	);
 
 	factory.set("Identity", async ({ options }) => {
 		const passphrase: string = options.passphrase || generateMnemonic();

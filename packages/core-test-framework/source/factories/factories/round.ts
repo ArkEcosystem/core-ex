@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Wallets } from "@arkecosystem/core-state";
 import { BigNumber } from "@arkecosystem/utils";
+import { join } from "path";
 
 import passphrases from "../../internal/passphrases.json";
 import { knownAttributes } from "../../internal/wallet-attributes";
@@ -9,9 +10,11 @@ import { generateApp } from "./generate-app";
 
 export const registerRoundFactory = async (
 	factory: FactoryBuilder,
-	config: Contracts.Crypto.NetworkConfig,
+	config?: Contracts.Crypto.NetworkConfig,
 ): Promise<void> => {
-	const app = await generateApp(config);
+	const app = await generateApp(
+		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/crypto.json")),
+	);
 
 	factory.set("Round", async ({ options }) => {
 		const publicKeys: string[] =

@@ -12,7 +12,7 @@ import {
 import { Factory } from "./factory";
 import { FactoryBuilder } from "./factory-builder";
 
-const createFactory = memoize(async (config: Contracts.Crypto.NetworkConfig): Promise<FactoryBuilder> => {
+const createFactory = memoize(async (config?: Contracts.Crypto.NetworkConfig): Promise<FactoryBuilder> => {
 	const factory: FactoryBuilder = new FactoryBuilder();
 
 	await registerBlockFactory(factory, config);
