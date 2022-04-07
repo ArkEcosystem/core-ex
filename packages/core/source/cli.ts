@@ -80,14 +80,14 @@ export class CommandLineInterface {
 			process.env.NODE_PATH = "";
 		}
 
-		const setPathIfExists = (path: string) => {
+		const setPath = (path: string) => {
 			if (existsSync(path)) {
 				process.env.NODE_PATH += `${delimiter}${path}`;
 			}
 		};
 
-		setPathIfExists(join(__dirname, "../"));
-		setPathIfExists(join(__dirname, "../node_modules"));
+		setPath(join(__dirname, "../"));
+		setPath(join(__dirname, "../node_modules"));
 
 		require("module").Module._initPaths();
 	}
