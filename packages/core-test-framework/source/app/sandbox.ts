@@ -1,9 +1,9 @@
+import { ConfigurationGenerator, makeApplication } from "@arkecosystem/core-configuration-generator";
 import { Container, interfaces } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Application, Providers, Types } from "@arkecosystem/core-kernel";
-// import { makeApp } from "@arkecosystem/core-configuration-generator";
-import { removeSync } from "fs-extra";
-import { resolve } from "path";
+import { readJSONSync, removeSync } from "fs-extra";
+import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { SandboxCallback } from "./contracts";
@@ -15,7 +15,7 @@ export class Sandbox {
 
 	private path = dirSync().name;
 
-	private networkOptions: Contracts.NetworkGenerator.Options = {
+	private configurationOptions: Contracts.NetworkGenerator.Options = {
 		blockTime: 8,
 		configPath: resolve(`${this.path}/unitnet`),
 		distribute: true,
@@ -41,41 +41,25 @@ export class Sandbox {
 		this.app = new Application(this.container);
 	}
 
-	public withNetworkOptions(options: Contracts.NetworkGenerator.Options) {
-		this.networkOptions = { ...this.networkOptions, ...options };
+	public getConfigurationPath() {
+		return join(this.path, this.configurationOptions.network);
+	}
+
+	public withConfigurationOptions(options: Contracts.NetworkGenerator.Options) {
+		this.configurationOptions = { ...this.configurationOptions, ...options };
 
 		return this;
 	}
 
 	public async boot(callback?: SandboxCallback): Promise<void> {
-		// const generator = new NetworkGenerator();
+		const configApp = await makeApplication(this.getConfigurationPath());
+		await configApp.resolve(ConfigurationGenerator).generate(this.configurationOptions);
 
-		// await generator.generate(this.networkOptions);
-
-		// Generate Configurations
-		// this.paths = {
-		// 	core: generateCoreConfig(this.options),
-		// 	crypto: generateCryptoConfig(this.options),
-		// };
-
-		// // Configure Crypto
-		// const genesisBlock = require(this.paths.crypto.crypto).genesisBlock;
-		// const milestones = require(this.paths.crypto.crypto).milestones;
-		// const network = require(this.paths.crypto.crypto).network;
-
-		// this.configuration.setConfig({
-		// 	genesisBlock,
-		// 	milestones,
-		// 	network,
-		// });
-
-		// this.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).merge({
-		// 	crypto: {
-		// 		genesisBlock,
-		// 		milestones,
-		// 		network,
-		// 	},
-		// });
+		if (this.app.isBound(Identifiers.Cryptography.Configuration)) {
+			this.app
+				.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+				.setConfig(readJSONSync(join(this.configurationOptions.configPath, "crypto.json")));
+		}
 
 		// Configure Application
 		process.env.CORE_PATH_CONFIG = this.path;

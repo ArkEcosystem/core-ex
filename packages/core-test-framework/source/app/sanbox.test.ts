@@ -1,4 +1,6 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { readJSONSync } from "fs-extra";
+import { join } from "path";
 
 import { describe } from "../index";
 import { Sandbox } from "./sandbox";
@@ -19,33 +21,34 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		callback.calledOnce();
 	});
 
-	// it("should boot with crypto options", async () => {
-	//     const sandbox = new Sandbox();
+	it("should boot with configuration options", async () => {
+		const sandbox = new Sandbox();
 
-	//     const callback = jest.fn();
+		const callback = spyFn();
 
-	//     const coreOptions: CryptoOptions = {
-	//         flags: {
-	//             network: "dummynet",
-	//             premine: "15300000000000000",
-	//             delegates: 51,
-	//             blocktime: 8,
-	//             maxTxPerBlock: 150,
-	//             maxBlockPayload: 2097152,
-	//             rewardHeight: 75600,
-	//             rewardAmount: 200000000,
-	//             pubKeyHash: 23,
-	//             wif: 186,
-	//             token: "DARK",
-	//             symbol: "DѦ",
-	//             explorer: "http://dexplorer.ark.io",
-	//             distribute: true,
-	//         },
-	//     };
+		const coreOptions: Contracts.NetworkGenerator.Options = {
+			blockTime: 8,
+			distribute: true,
+			explorer: "http://dexplorer.ark.io",
+			maxBlockPayload: 2_097_152,
+			maxTxPerBlock: 150,
+			network: "dummynet",
+			premine: "15300000000000000",
+			pubKeyHash: 23,
+			rewardAmount: "200000000",
+			rewardHeight: 75_600,
+			symbol: "DѦ",
+			token: "DARK",
+			validators: 51,
+			wif: 186,
+		};
 
-	//     await expect(sandbox.withCryptoOptions(coreOptions).boot(callback)).toResolve();
-	//     expect(callback).toHaveBeenCalled();
-	// });
+		await assert.resolves(() => sandbox.withConfigurationOptions(coreOptions).boot(() => callback.call()));
+		callback.calledOnce();
+
+		const crypto = readJSONSync(join(sandbox.getConfigurationPath(), "crypto.json"));
+		assert.equal(crypto.network.client.token, "DARK");
+	});
 
 	it("should dispose", async () => {
 		const sandbox = new Sandbox();
