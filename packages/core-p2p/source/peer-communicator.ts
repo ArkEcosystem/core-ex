@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct, tagged } from "@arkecosystem/core-container";
-import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Enums, Providers, Types, Utils } from "@arkecosystem/core-kernel";
 import dayjs from "dayjs";
 import delay from "delay";
@@ -128,7 +128,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			throw new Exceptions.PeerStatusResponseError(peer.ip);
 		}
 
-		if (process.env.CORE_SKIP_PEER_STATE_VERIFICATION !== "true") {
+		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] !== "true") {
 			if (!this.#validatePeerConfig(peer, pingResponse.config)) {
 				throw new Exceptions.PeerVerificationFailedError();
 			}
