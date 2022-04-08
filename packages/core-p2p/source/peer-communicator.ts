@@ -199,7 +199,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			headersOnly,
 		}: { fromBlockHeight: number; blockLimit?: number; headersOnly?: boolean },
 	): Promise<Contracts.Crypto.IBlockData[]> {
-		// const maxPayload = headersOnly ? blockLimit * constants.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
+		// const maxPayload = headersOnly ? blockLimit * Constants.Unit.KILOBYTE : constants.DEFAULT_MAX_PAYLOAD;
 
 		const peerBlocks = await this.#get({
 			path: "blocks",
