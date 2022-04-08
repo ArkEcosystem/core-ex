@@ -1,6 +1,6 @@
 type Flag = typeof FlagNames[number];
 
-export const FlagNames: string[] = [
+export const FlagNames = [
 	"CORE_LOG_LEVEL_FILE",
 	"CORE_LOG_LEVEL",
 	"CORE_MAX_TRANSACTIONS_IN_POOL",
@@ -21,6 +21,6 @@ export const FlagNames: string[] = [
 	"CORE_WEBHOOKS_HOST",
 	"CORE_WEBHOOKS_PORT",
 	"CORE_WEBHOOKS_TIMEOUT",
-];
+] as const;
 
-export const Flags: Record<Flag, string> = FlagNames.reduce((item, flagName) => (item[flagName] = flagName), {});
+export const Flags = FlagNames.reduce((item, flagName) => (item[flagName] = flagName), {}) as Record<Flag, string>;
