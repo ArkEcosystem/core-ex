@@ -23,4 +23,7 @@ export const FlagNames = [
 	"CORE_WEBHOOKS_TIMEOUT",
 ] as const;
 
-export const Flags = FlagNames.reduce((item, flagName) => (item[flagName] = flagName), {}) as Record<Flag, string>;
+export const Flags = FlagNames.reduce((item, flagName) => {
+	item[flagName] = flagName;
+	return item;
+}, {}) as Record<Flag, string>;
