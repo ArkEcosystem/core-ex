@@ -5,11 +5,11 @@ import fs from "fs-extra";
 import { join } from "path";
 import prompts from "prompts";
 
-import { Command } from "./network-generate";
+import { Command } from "./config-generate";
 
 describe<{
 	cli: Console;
-}>("NetworkGenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
+}>("ConfigGenerateCommand", ({ beforeEach, it, stub, assert, match }) => {
 	const paths = envPaths("myn", { suffix: "core" });
 	const configCore = join(paths.config, "testnet");
 	const configCrypto = join(configCore, "crypto");

@@ -24,9 +24,9 @@ export class Command extends Commands.Command {
 	@inject(Container.Identifiers.Logger)
 	private readonly logger!: Services.Logger;
 
-	public signature = "network:generate";
+	public signature = "config:generate";
 
-	public description = "Generates a new network configuration.";
+	public description = "Generate a new configuration.";
 
 	public requiresNetwork = false;
 
