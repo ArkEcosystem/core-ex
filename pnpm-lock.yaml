@@ -1111,6 +1111,7 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-test-framework': workspace:*
       '@types/tmp': ^0.2.0
       '@types/uuid': ^8.0.0
       '@types/wif': ^2.0.1
@@ -1118,6 +1119,7 @@ importers:
       tmp: ^0.2.0
       util: ^0.12.3
       uuid: ^8.0.0
+      uvu: ^0.5.3
       wif: ^2.0.6
     dependencies:
       '@arkecosystem/core-container': link:../core-container
@@ -1125,6 +1127,7 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-test-framework': link:../core-test-framework
       '@types/tmp': 0.2.3
       '@types/uuid': 8.3.1
       '@types/wif': 2.0.2
@@ -1132,6 +1135,7 @@ importers:
       tmp: 0.2.1
       util: 0.12.4
       uuid: 8.3.2
+      uvu: 0.5.3
 
   packages/core-database:
     specifiers:
