@@ -17,7 +17,10 @@ export interface IConfiguration {
 
 	getMilestone(height?: number): Milestone;
 
-	getNextMilestoneWithNewKey(previousMilestone: number, key: MilestoneKey): MilestoneSearchResult;
+	getNextMilestoneWithNewKey<K extends MilestoneKey>(
+		previousMilestone: number,
+		key: K,
+	): MilestoneSearchResult<Milestone[K]>;
 
 	getMilestones(): any;
 }

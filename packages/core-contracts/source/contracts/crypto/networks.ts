@@ -51,8 +51,8 @@ export type Milestone = {
 
 export type MilestoneKey = keyof Milestone;
 
-export type MilestoneSearchResult = {
+export type MilestoneSearchResult<T> = {
 	found: boolean;
 	height: number;
-	data: any;
+	data: T;
 };

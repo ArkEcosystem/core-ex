@@ -99,10 +99,10 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestone.data;
 	}
 
-	public getNextMilestoneWithNewKey(
+	public getNextMilestoneWithNewKey<K extends Contracts.Crypto.MilestoneKey>(
 		previousMilestone: number,
-		key: Contracts.Crypto.MilestoneKey,
-	): Contracts.Crypto.MilestoneSearchResult {
+		key: K,
+	): Contracts.Crypto.MilestoneSearchResult<Contracts.Crypto.Milestone[K]> {
 		if (!this.#milestones || this.#milestones.length === 0) {
 			throw new Error(`Attempted to get next milestone but none were set`);
 		}
