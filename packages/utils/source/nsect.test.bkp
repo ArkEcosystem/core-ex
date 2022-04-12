@@ -1,4 +1,4 @@
-import "jest-extended";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { NSect } from "./nsect";
 
