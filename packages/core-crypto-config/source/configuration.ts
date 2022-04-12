@@ -3,12 +3,11 @@ import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import deepmerge from "deepmerge";
 import get from "lodash.get";
 import set from "lodash.set";
-
 @injectable()
 export class Configuration implements Contracts.Crypto.IConfiguration {
 	#config: Contracts.Crypto.NetworkConfig | undefined;
 	#height: number | undefined;
-	#milestone: Contracts.Crypto.IMilestone | undefined;
+	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
 	#milestones: Contracts.Crypto.Milestone[] | undefined;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfig): void {
