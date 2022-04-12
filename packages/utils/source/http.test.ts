@@ -10,83 +10,69 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll }) => {
 	let serverURL: string;
 
 	beforeAll(async () => {
+		process.env.NOCK_OFF = true;
+
 		server = Hapi.server({
-			port: 3000,
 			host: "localhost",
+			port: 3000,
 		});
 
 		server.route({
+			handler: (_, h) => h.response("success").type("application/json"),
 			method: "GET",
 			path: "/malformed",
-			handler: (_, h) => {
-				return h.response("success").type("application/json");
-			},
 		});
 
 		server.route({
-			method: "GET",
-			path: "/timeout",
 			handler: async () => {
 				await sleep(2000);
 
 				return {};
 			},
+			method: "GET",
+			path: "/timeout",
 		});
 
 		server.route({
+			handler: () => ({}),
 			method: "GET",
 			path: "/get",
-			handler: () => {
-				return {};
-			},
 		});
 
 		server.route({
+			handler: () => Boom.notFound(),
 			method: "GET",
 			path: "/status/404",
-			handler: () => {
-				return Boom.notFound();
-			},
 		});
 
 		server.route({
+			handler: () => ({}),
 			method: "POST",
 			path: "/post",
-			handler: () => {
-				return {};
-			},
 		});
 
 		server.route({
+			handler: (_, h) => h.response({}).code(201),
 			method: "POST",
 			path: "/status/201",
-			handler: (_, h) => {
-				return h.response({}).code(201);
-			},
 		});
 
 		server.route({
+			handler: () => ({}),
 			method: "PUT",
 			path: "/put",
-			handler: () => {
-				return {};
-			},
 		});
 
 		server.route({
+			handler: () => ({}),
 			method: "PATCH",
 			path: "/patch",
-			handler: () => {
-				return {};
-			},
 		});
 
 		server.route({
+			handler: () => ({}),
 			method: "DELETE",
 			path: "/delete",
-			handler: () => {
-				return {};
-			},
 		});
 
 		await server.start();
@@ -94,9 +80,12 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll }) => {
 		serverURL = server.info.uri;
 	});
 
-	afterAll(async () => server.stop());
+	afterAll(async () => {
+		delete process.env.NOCK_OFF;
+		server.stop();
+	});
 
-	it.only("#get - should send a request and receive status code 200", async () => {
+	it("#get - should send a request and receive status code 200", async () => {
 		const { statusCode } = await http.get(`${serverURL}/get?key=value`);
 
 		assert.equal(statusCode, 200);
@@ -121,7 +110,7 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll }) => {
 	});
 
 	it("#head - should send a request and receive status code 404", async () => {
-		await expect(http.head(`${serverURL}/status/404`)).rejects.toThrow("Not Found");
+		await assert.rejects(() => http.head(`${serverURL}/status/404`), "Not Found");
 	});
 
 	// HTTP GET will throw error because body is malformed
