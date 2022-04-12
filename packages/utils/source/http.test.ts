@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 

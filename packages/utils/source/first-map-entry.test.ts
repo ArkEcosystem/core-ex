@@ -1,4 +1,4 @@
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 
 import { firstMapEntry } from "./first-map-entry";
 

@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { describe } from "@arkecosystem/core-test-framework";
+import { describe } from "../../core-test-framework";
 import { resolve } from "path";
 
 import { dotenv } from "./dot-env";

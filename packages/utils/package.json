@@ -28,7 +28,6 @@
 		"type-fest": "^0.17.0"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"@hapi/boom": "^9.1.0",
 		"@hapi/hapi": "^20.0.1",
 		"@types/benchmark": "^1.0.33",

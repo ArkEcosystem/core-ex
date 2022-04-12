@@ -1795,7 +1795,6 @@ importers:
 
   packages/utils:
     specifiers:
-      '@arkecosystem/core-test-framework': workspace:*
       '@hapi/boom': ^9.1.0
       '@hapi/bourne': ^2.0.0
       '@hapi/hapi': ^20.0.1
@@ -1825,7 +1824,6 @@ importers:
       fast-sort: 2.2.0
       type-fest: 0.17.0
     devDependencies:
-      '@arkecosystem/core-test-framework': link:../core-test-framework
       '@hapi/boom': 9.1.4
       '@hapi/hapi': 20.1.5
       '@types/benchmark': 1.0.33
