@@ -1,4 +1,4 @@
-import { Milestone, MilestoneSearchResult, NetworkConfig, NetworkConfigPartial } from "./networks";
+import { Milestone, MilestoneKey, MilestoneSearchResult, NetworkConfig, NetworkConfigPartial } from "./networks";
 
 export interface IConfiguration {
 	setConfig(config: NetworkConfigPartial): void;
@@ -17,7 +17,7 @@ export interface IConfiguration {
 
 	getMilestone(height?: number): Milestone;
 
-	getNextMilestoneWithNewKey(previousMilestone: number, key: string): MilestoneSearchResult;
+	getNextMilestoneWithNewKey(previousMilestone: number, key: MilestoneKey): MilestoneSearchResult;
 
 	getMilestones(): any;
 }
