@@ -1,4 +1,5 @@
+import { Milestone } from "./networks";
 export interface IMilestone {
 	index: number;
-	data: { [key: string]: any };
+	data: Milestone;
 }

@@ -71,7 +71,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestones.some((milestone) => milestone.height === height);
 	}
 
-	public getMilestone(height?: number): { [key: string]: any } {
+	public getMilestone(height?: number): Contracts.Crypto.Milestone {
 		if (!this.#milestone || !this.#milestones) {
 			throw new Error();
 		}
