@@ -2,6 +2,12 @@ import { IBlockJson } from "./block";
 
 export interface NetworkConfig {
 	genesisBlock: IBlockJson;
+	milestones: Milestone[];
+	network: Network;
+}
+
+export interface NetworkConfigPartial {
+	genesisBlock: IBlockJson;
 	milestones: Partial<Milestone>[];
 	network: Network;
 }

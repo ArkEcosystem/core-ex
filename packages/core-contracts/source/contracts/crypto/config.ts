@@ -1,7 +1,7 @@
-import { MilestoneSearchResult, NetworkConfig, Milestone } from "./networks";
+import { Milestone, MilestoneSearchResult, NetworkConfig, NetworkConfigPartial } from "./networks";
 
 export interface IConfiguration {
-	setConfig(config: NetworkConfig): void;
+	setConfig(config: NetworkConfigPartial): void;
 
 	all(): NetworkConfig | undefined;
 
