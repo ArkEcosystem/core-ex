@@ -9,7 +9,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	#config: Contracts.Crypto.NetworkConfig | undefined;
 	#height: number | undefined;
 	#milestone: Contracts.Crypto.IMilestone | undefined;
-	#milestones: Record<string, any> | undefined;
+	#milestones: Contracts.Crypto.Milestone[] | undefined;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfig): void {
 		this.#config = {
@@ -136,7 +136,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			throw new Error();
 		}
 
-		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height);
+		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height) as Contracts.Crypto.Milestone[];
 		this.#milestone = {
 			data: this.#milestones[0],
 			index: 0,
