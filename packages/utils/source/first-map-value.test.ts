@@ -1,9 +1,9 @@
-import "jest-extended";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { firstMapValue } from "./first-map-value";
 
-describe("#firstMapValue", () => {
+describe("#firstMapValue", ({ it, assert }) => {
 	it("should return the first value", () => {
-		expect(firstMapValue(new Map([["Hello", "World"]]))).toBe("World");
+		assert.equal(firstMapValue(new Map([["Hello", "World"]])), "World");
 	});
 });
