@@ -53,7 +53,7 @@ export class ConfigurationWriter {
 
 	writeCrypto(
 		genesisBlock: Contracts.Crypto.IBlockData,
-		milestones: Types.JsonObject[],
+		milestones: Partial<Contracts.Crypto.Milestone>[],
 		network: Contracts.Crypto.Network,
 	): void {
 		writeJSONSync(
