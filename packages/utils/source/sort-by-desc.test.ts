@@ -1,4 +1,4 @@
-import { describeWithContext } from "@arkecosystem/core-test-framework";
+import { describeWithContext } from "../../core-test-framework";
 
 import { sortByDesc } from "./sort-by-desc";
 
