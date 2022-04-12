@@ -1,11 +1,11 @@
-import "jest-extended";
+import { describe } from "@arkecosystem/core-test-framework";
 
 import { cloneObject } from "./clone-object";
 
-describe("#cloneObject", () => {
+describe("#cloneObject", ({ it, assert }) => {
 	it("should work like lodash", () => {
 		const objects = { a: 1 };
 
-		expect(cloneObject(objects)).toEqual(objects);
+		assert.equal(cloneObject(objects), objects);
 	});
 });
