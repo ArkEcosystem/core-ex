@@ -68,11 +68,15 @@ export const replySchemas = {
 				properties: {
 					network: {
 						additionalProperties: false,
-						required: ["name", "nethash", "explorer", "token"],
 						properties: {
+							explorer: {
+								maxLength: 128,
+								minLength: 0,
+								type: "string",
+							},
 							name: {
-								minLength: 1,
 								maxLength: 20,
+								minLength: 1,
 								type: "string",
 							},
 							nethash: {
@@ -81,51 +85,45 @@ export const replySchemas = {
 										$ref: "hex",
 									},
 									{
+										maxLength: 64,
 										minLength: 64,
 										type: "string",
-										maxLength: 64,
 									},
 								],
 							},
-							explorer: {
-								minLength: 0,
-								type: "string",
-								maxLength: 128,
-							},
-							version: {
-								type: "integer",
-								minimum: 0,
-								maximum: 255,
-							},
 							token: {
-								required: ["name", "symbol"],
 								additionalProperties: false,
-								type: "object",
 								properties: {
 									name: {
-										minLength: 1,
 										maxLength: 8,
+										minLength: 1,
 										type: "string",
 									},
 									symbol: {
-										minLength: 1,
 										maxLength: 4,
+										minLength: 1,
 										type: "string",
 									},
 								},
+								required: ["name", "symbol"],
+								type: "object",
+							},
+							version: {
+								maximum: 255,
+								minimum: 0,
+								type: "integer",
 							},
 						},
+						required: ["name", "nethash", "explorer", "token"],
 						type: "object",
 					},
 					plugins: {
 						additionalProperties: false,
 						maxProperties: 32,
 						minProperties: 0,
-						type: "object",
 						patternProperties: {
 							"^.{4,64}$": {
 								additionalProperties: false,
-								required: ["port", "enabled"],
 								properties: {
 									enabled: {
 										type: "boolean",
@@ -134,18 +132,20 @@ export const replySchemas = {
 										type: "boolean",
 									},
 									port: {
-										type: "integer",
+										maximum: 65_535,
 										minimum: 0,
-										maximum: 65535,
+										type: "integer",
 									},
 								},
+								required: ["port", "enabled"],
 								type: "object",
 							},
 						},
+						type: "object",
 					},
 					version: {
-						minLength: 5,
 						maxLength: 24,
+						minLength: 5,
 						type: "string",
 					},
 				},
