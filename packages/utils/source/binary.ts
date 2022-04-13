@@ -8,7 +8,7 @@ const encode = (value: string): string =>
 const decode = (value: string): string =>
 	value
 		.split(" ")
-		.map((character: string) => String.fromCharCode(parseInt(character, 2)))
+		.map((character: string) => String.fromCharCode(Number.parseInt(character, 2)))
 		.join("");
 
-export const binary = { encode, decode };
+export const binary = { decode, encode };

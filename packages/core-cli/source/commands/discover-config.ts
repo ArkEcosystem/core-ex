@@ -2,7 +2,7 @@ import { Constants } from "@arkecosystem/core-contracts";
 import { readJSON } from "fs-extra";
 import { join } from "path";
 
-import { envPaths } from "../env-paths";
+import { envPaths as environmentPaths } from "../env-paths";
 import { injectable } from "../ioc";
 
 interface Config {
@@ -18,7 +18,7 @@ export class DiscoverConfig {
 		} catch {}
 
 		try {
-			return await readJSON(join(envPaths.get(token, { suffix: "core" }).config, network, "config.json"));
+			return await readJSON(join(environmentPaths.get(token, { suffix: "core" }).config, network, "config.json"));
 		} catch {}
 
 		return undefined;

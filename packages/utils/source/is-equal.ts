@@ -1,3 +1,5 @@
-import isEqual from "fast-deep-equal";
 
-export { isEqual };
+
+
+
+export {default as isEqual} from "fast-deep-equal";

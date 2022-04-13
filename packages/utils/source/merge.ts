@@ -1,3 +1,5 @@
-import merge from "deepmerge";
 
-export { merge };
+
+
+
+export {default as merge} from "deepmerge";

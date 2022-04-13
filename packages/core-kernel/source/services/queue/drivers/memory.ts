@@ -1,6 +1,6 @@
-import { EventEmitter } from "events";
 import { decorateInjectable, inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
 import { QueueEvent } from "../../../enums";
