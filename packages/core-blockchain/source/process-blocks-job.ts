@@ -209,6 +209,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 
 	async #handleCorrupted() {
 		this.logger.error("Shutting down app, because state is corrupted");
+		// eslint-disable-next-line unicorn/no-process-exit
 		process.exit(1);
 	}
 }

@@ -146,6 +146,7 @@ export class DatabaseInteraction {
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// ! no reason to pass this.emitter

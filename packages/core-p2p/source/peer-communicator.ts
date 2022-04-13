@@ -392,6 +392,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			peer.sequentialErrorCounter++;
 
 			if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
 			}
 
