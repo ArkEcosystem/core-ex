@@ -101,7 +101,11 @@ export class ProcessManager {
 		return this.#shellSync("pm2 update");
 	}
 
-	public async trigger(id: ProcessIdentifier, processActionName: string, parameter?: string): Promise<ExecaReturnValue> {
+	public async trigger(
+		id: ProcessIdentifier,
+		processActionName: string,
+		parameter?: string,
+	): Promise<ExecaReturnValue> {
 		return this.#shell(`pm2 trigger ${id} ${processActionName} ${parameter}`);
 	}
 

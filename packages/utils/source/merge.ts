@@ -1,5 +1,1 @@
-
-
-
-
-export {default as merge} from "deepmerge";
+export { default as merge } from "deepmerge";
