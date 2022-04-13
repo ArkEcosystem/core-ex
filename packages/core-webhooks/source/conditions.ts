@@ -1,6 +1,6 @@
 import { BigNumber } from "@arkecosystem/utils";
 
-const toBoolean = (value): boolean => (value.toString().toLowerCase().trim() === "true");
+const toBoolean = (value): boolean => value.toString().toLowerCase().trim() === "true";
 
 const compareBigNumber = (value, expected, comparison): boolean => {
 	try {

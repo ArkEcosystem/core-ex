@@ -1,5 +1,5 @@
 import { inject, tagged } from "@arkecosystem/core-container";
-import { Contracts, Exceptions,Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers, Utils } from "@arkecosystem/core-kernel";
 import { FastifyRequest } from "fastify";
 

@@ -28,7 +28,9 @@ export class MethodArgumentNotImplemented extends BadMethodCallException {
 
 export class MethodArgumentValueNotImplemented extends BadMethodCallException {
 	public constructor(methodName: string, argumentName: string, argumentValue) {
-		super(`The ${methodName}() method's argument $${argumentName} value ${argumentValue} behavior is not implemented.`);
+		super(
+			`The ${methodName}() method's argument $${argumentName} value ${argumentValue} behavior is not implemented.`,
+		);
 	}
 }
 

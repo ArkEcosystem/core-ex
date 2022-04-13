@@ -3,7 +3,6 @@ export const cloneObject = <T>(input: T): T => {
 	const cloned = {};
 
 	for (const key of keys) {
-
 		cloned[key] = input[key];
 	}
 

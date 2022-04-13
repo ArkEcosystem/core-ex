@@ -1,5 +1,1 @@
-
-
-
-
-export {interfaces as Container} from "inversify";
+export { interfaces as Container } from "inversify";

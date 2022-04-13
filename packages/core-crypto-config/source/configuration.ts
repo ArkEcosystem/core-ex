@@ -138,7 +138,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			throw new Error();
 		}
 
-		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height) ;
+		this.#milestones = this.#config.milestones.sort((a, b) => a.height - b.height);
 		this.#milestone = {
 			data: this.#milestones[0],
 			index: 0,
