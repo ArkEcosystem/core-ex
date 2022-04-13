@@ -1,10 +1,9 @@
 import { isArray } from "./is-array";
 
-export const concat = <T>(...values: any[]): T[] => {
+export const concat = <T>(...values: (T | T[])[]): T[] => {
 	const result: T[] = [];
 
-	for (const item: T | T[] of values) {
-
+	for (const item of values) {
 		if (isArray(item)) {
 			const childLength: number = item.length;
 

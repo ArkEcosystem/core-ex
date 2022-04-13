@@ -43,7 +43,8 @@ export class NSect {
 			//    1101 and 1199.
 
 			// Case A.
-			if (highestMatching === indexesToProbe.at(- 1)) {
+			// @ts-ignore unsupported .at
+			if (highestMatching === indexesToProbe.at(-1)) {
 				break;
 			}
 

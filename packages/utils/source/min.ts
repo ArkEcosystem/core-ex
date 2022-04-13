@@ -1,8 +1,7 @@
 export const min = (values: number[]): number => {
-	let min: number = values[0];
+	let min = values[0];
 
-	for (const value: number of values) {
-
+	for (const value of values) {
 		min = value < min ? value : min;
 	}
 
