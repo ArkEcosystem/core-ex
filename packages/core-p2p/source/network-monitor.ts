@@ -105,6 +105,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#scheduleUpdateNetworkStatus(nextRunDelaySeconds);
 	}
 
@@ -222,11 +223,13 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 						.call("validateAndAcceptPeer", { options: { lessVerbose: true }, peer: p }),
 				),
 			);
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.#pingPeerPorts(pingAll);
 
 			return true;
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#pingPeerPorts();
 
 		return false;
@@ -572,6 +575,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		} catch {}
 
 		if (!peerList || peerList.length === 0) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.app.terminate("No seed peers defined in peers.json");
 		}
 

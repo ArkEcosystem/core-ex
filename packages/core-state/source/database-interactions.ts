@@ -75,6 +75,7 @@ export class DatabaseInteraction {
 			await this.#emitTransactionEvents(transaction);
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.events.dispatch(Enums.BlockEvent.Applied, block.data);
 	}
 
@@ -83,9 +84,11 @@ export class DatabaseInteraction {
 		await this.blockState.revertBlock(block);
 
 		for (let index = block.transactions.length - 1; index >= 0; index--) {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.events.dispatch(Enums.TransactionEvent.Reverted, block.transactions[index].data);
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.events.dispatch(Enums.BlockEvent.Reverted, block.data);
 	}
 

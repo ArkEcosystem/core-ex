@@ -34,6 +34,7 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	public async start(): Promise<void> {
 		this.#started = true;
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#processJobs();
 	}
 
@@ -64,6 +65,7 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
 		this.#jobs.push(job);
 
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.#processJobs();
 	}
 

@@ -162,6 +162,7 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			lastProcessedBlock
 		) {
 			if (this.stateStore.isStarted() && this.stateMachine.getState() === "newBlock") {
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.networkMonitor.broadcastBlock(lastProcessedBlock);
 			}
 		} else if (forkBlock) {
