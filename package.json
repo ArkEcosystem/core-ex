@@ -17,6 +17,8 @@
 		"format": "pnpm run lint && pnpm run prettier",
 		"lint:check": "eslint packages/*/source --ext .ts --ignore-pattern *.test.ts --max-warnings 0",
 		"lint:fix": "eslint packages/*/source --ext .ts --ignore-pattern *.test.ts --fix",
+		"lint:test:check": "eslint packages/ --ext .test.ts --max-warnings 0",
+		"lint:test:fix": "eslint packages/ --ext .test.ts --fix",
 		"madge:circular": "node ./scripts/circular.js",
 		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/source",
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
