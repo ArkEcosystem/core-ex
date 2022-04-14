@@ -112,7 +112,11 @@ describeSkip<{
 
 			const transfer = context.factory
 				.get("Transfer")
-				.withOptions({ amount: 96_579, recipientId: recipientWallet.address, senderPublicKey: sender.publicKey })
+				.withOptions({
+					amount: 96_579,
+					recipientId: recipientWallet.address,
+					senderPublicKey: sender.publicKey,
+				})
 				.make();
 
 			const delegateReg = context.factory

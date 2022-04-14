@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { Exceptions,Identifiers } from "@arkecosystem/core-contracts";
+import { Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { resolve } from "path";
 
 import { describe } from "../../../../../core-test-framework";

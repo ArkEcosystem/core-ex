@@ -32,7 +32,7 @@ const generateValidators = (count: number): any[] => {
 
 	for (let index = 1; index <= count; index++) {
 		const validator: any = {
-			getAttribute: (key: string) => key === "validator.username" ? "username_" + index : index,
+			getAttribute: (key: string) => (key === "validator.username" ? "username_" + index : index),
 			getPublicKey: () => "public_key_" + index,
 			setAttribute: () => {},
 			username: "username_" + index,
@@ -589,7 +589,9 @@ describeSkip<{
 		});
 
 		const setAttributeSpy = spy(delegates[0], "setAttribute");
-		const walletRepoStub = stub(context.walletRepository, "findByUsername").callsFake((username) => delegates.find((delegate) => delegate.username === username));
+		const walletRepoStub = stub(context.walletRepository, "findByUsername").callsFake((username) =>
+			delegates.find((delegate) => delegate.username === username),
+		);
 
 		const roundInfo: any = { round: 1 };
 
@@ -716,7 +718,8 @@ describeSkip<{
 		context.roundState.forgingValidators = delegates;
 		const blocksInCurrentRound = generateBlocks(3);
 
-		context.walletRepository.findByPublicKey = (publicKey) => delegates.find((delegate) => delegate.getPublicKey() === publicKey);
+		context.walletRepository.findByPublicKey = (publicKey) =>
+			delegates.find((delegate) => delegate.getPublicKey() === publicKey);
 
 		// @ts-ignore
 		context.roundState.blocksInCurrentRound = blocksInCurrentRound;
@@ -737,7 +740,8 @@ describeSkip<{
 		context.roundState.forgingValidators = delegates;
 		const blocksInCurrentRound = generateBlocks(3);
 
-		context.walletRepository.findByPublicKey = (publicKey) => delegates.find((delegate) => delegate.getPublicKey() === publicKey);
+		context.walletRepository.findByPublicKey = (publicKey) =>
+			delegates.find((delegate) => delegate.getPublicKey() === publicKey);
 
 		blocksInCurrentRound[2].data.generatorPublicKey = "public_key_1";
 
@@ -791,7 +795,7 @@ describeSkip<{
 		const block = {
 			data: {
 				// Last block in round 1
-generatorPublicKey: "public_key_51", 
+				generatorPublicKey: "public_key_51",
 				height: 51,
 			},
 		};
@@ -800,7 +804,9 @@ generatorPublicKey: "public_key_51",
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
 		stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		stub(context.triggerService, "call").callsFake((name, arguments_) => context.roundState.getActiveValidators(arguments_.roundInfo, arguments_.delegates));
+		stub(context.triggerService, "call").callsFake((name, arguments_) =>
+			context.roundState.getActiveValidators(arguments_.roundInfo, arguments_.delegates),
+		);
 
 		const spyOnShuffleDelegates = spy(context.roundState, "shuffleDelegates");
 		const spyOnDetectMissedRound = spy(context.roundState, "detectMissedRound");
@@ -832,7 +838,7 @@ generatorPublicKey: "public_key_51",
 		const block = {
 			data: {
 				// Last block in round 1
-generatorPublicKey: "public_key_51", 
+				generatorPublicKey: "public_key_51",
 				height: 51,
 			},
 		};
@@ -840,7 +846,9 @@ generatorPublicKey: "public_key_51",
 		const eventSpy = spy(context.eventDispatcher, "dispatch");
 
 		stub(context.dposState, "getRoundValidators").returnValue(delegates);
-		stub(context.triggerService, "call").callsFake((name, arguments_) => context.roundState.getActiveValidators(arguments_.roundInfo, arguments_.delegates));
+		stub(context.triggerService, "call").callsFake((name, arguments_) =>
+			context.roundState.getActiveValidators(arguments_.roundInfo, arguments_.delegates),
+		);
 
 		const spyOnShuffleDelegates = spy(context.roundState, "shuffleDelegates");
 		const spyOnDetectMissedRound = spy(context.roundState, "detectMissedRound");

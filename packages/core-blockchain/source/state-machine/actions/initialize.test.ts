@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { Constants,Identifiers } from "@arkecosystem/core-contracts";
+import { Constants, Identifiers } from "@arkecosystem/core-contracts";
 import { Utils } from "@arkecosystem/core-kernel";
 
 // import { Managers } from "@arkecosystem/crypto";

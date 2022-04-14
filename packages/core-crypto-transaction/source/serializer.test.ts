@@ -1,5 +1,5 @@
 import { describe } from "../../core-test-framework";
-import { Address, Keys,PublicKey } from "../identities";
+import { Address, Keys, PublicKey } from "../identities";
 import { ITransaction } from "../interfaces";
 import { configManager } from "../managers";
 import {

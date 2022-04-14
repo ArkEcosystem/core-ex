@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { Contracts,Identifiers  } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 
 import { AddressFactory } from "../../core-crypto-address-base58/source/address.factory";
