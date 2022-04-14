@@ -45,12 +45,12 @@ describe<{
 		context.stateStore = {
 			blockPing: undefined,
 			clearWakeUpTimeout: () => {},
-			
+
 			getBlockPing: () => {},
-			
-getLastBlock: () => {},
+
+			getLastBlock: () => {},
 			// getGenesisBlock: () => ({ data: Networks.testnet.genesisBlock }),
-getLastDownloadedBlock: () => {},
+			getLastDownloadedBlock: () => {},
 			getMaxLastBlocks: () => 200,
 			getNetworkStart: () => false,
 			getNumberOfBlocksToRollback: () => 0,

@@ -1,5 +1,8 @@
 import { describe } from "../../core-test-framework";
-import { transaction as transactionDataFixture,transaction as transactionFixture  } from "../../test/fixtures/transaction";
+import {
+	transaction as transactionDataFixture,
+	transaction as transactionFixture,
+} from "../../test/fixtures/transaction";
 import { createRandomTx } from "../../test/support";
 import { InvalidTransactionBytesError, TransactionSchemaError, UnkownTransactionError } from "../errors";
 import { ITransactionData, ITransactionJson, NetworkConfig } from "../interfaces";
@@ -26,11 +29,10 @@ describe<{
 		context.transactionData = { ...transactionDataFixture };
 		context.transactionDataJSON = {
 			...context.transactionData,
-			
-				amount: context.transactionData.amount.toFixed(),
-				fee: context.transactionData.fee.toFixed(),
-				nonce: context.transactionData.nonce?.toFixed()
-			,
+
+			amount: context.transactionData.amount.toFixed(),
+			fee: context.transactionData.fee.toFixed(),
+			nonce: context.transactionData.nonce?.toFixed(),
 		};
 	});
 
@@ -119,7 +121,7 @@ describe<{
 			() =>
 				TransactionFactory.fromData({
 					...transaction.data,
-					 fee: BigNumber.make(0) ,
+					fee: BigNumber.make(0),
 				}),
 			(error) => error instanceof TransactionSchemaError,
 		);
@@ -128,12 +130,11 @@ describe<{
 	// Old tests
 	it("fromData - should match transaction id", (context) => {
 		configManager.setFromPreset("testnet");
-		for (const transaction of [0, 2, 3]
-			.map((type) => createRandomTx(type))) {
-				const originalId = transaction.data.id;
-				const newTransaction = TransactionFactory.fromData(transaction.data);
-				assert.equal(newTransaction.data.id, originalId);
-			}
+		for (const transaction of [0, 2, 3].map((type) => createRandomTx(type))) {
+			const originalId = transaction.data.id;
+			const newTransaction = TransactionFactory.fromData(transaction.data);
+			assert.equal(newTransaction.data.id, originalId);
+		}
 	});
 
 	it("fromData - should throw when getting garbage", (context) => {
@@ -163,7 +164,7 @@ describe<{
 			() =>
 				TransactionFactory.fromJson({
 					...transactionJson,
-					 senderPublicKey: "something" ,
+					senderPublicKey: "something",
 				}),
 			(error) => error instanceof TransactionSchemaError,
 		);

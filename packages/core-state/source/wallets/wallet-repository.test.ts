@@ -175,7 +175,9 @@ describeSkip<{
 			context.walletRepo.index(wallet);
 		}
 
-		for (const address of walletAddresses)  {assert.true(context.walletRepo.has(address));}
+		for (const address of walletAddresses) {
+			assert.true(context.walletRepo.has(address));
+		}
 
 		const publicKey = "02511f16ffb7b7e9afc12f04f317a11d9644e4be9eb5a5f64673946ad0f6336f34";
 
@@ -183,9 +185,13 @@ describeSkip<{
 		context.walletRepo.getIndex("usernames").set("username", wallets[2]);
 		context.walletRepo.getIndex("resignations").set("resign", wallets[3]);
 
-		for (const wallet of wallets)  {context.walletRepo.index(wallet);}
+		for (const wallet of wallets) {
+			context.walletRepo.index(wallet);
+		}
 
-		for (const address of walletAddresses)  {assert.true(context.walletRepo.has(address));}
+		for (const address of walletAddresses) {
+			assert.true(context.walletRepo.has(address));
+		}
 	});
 
 	it("should get the nonce of a wallet", (context) => {

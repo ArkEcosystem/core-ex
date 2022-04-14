@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { Contracts , Exceptions,Identifiers  } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { describe } from "../../core-test-framework";

@@ -6,7 +6,7 @@ import { PublicKey } from "../identities";
 import { Utils } from "../index";
 import { IMultiSignatureAsset, NetworkConfig } from "../interfaces";
 import { configManager } from "../managers";
-import { BuilderFactory , TransactionTypeFactory } from "../transactions";
+import { BuilderFactory, TransactionTypeFactory } from "../transactions";
 import { schemas } from "../transactions/types";
 import { TransactionSchema } from "../transactions/types/schemas";
 import { validator as Ajv } from "../validation";

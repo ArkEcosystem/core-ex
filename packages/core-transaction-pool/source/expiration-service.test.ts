@@ -1,5 +1,5 @@
 import { Container } from "@arkecosystem/core-container";
-import { Contracts,Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { BlockTimeCalculator } from "@arkecosystem/core-crypto-time/source/block-time-calculator";
 import { Slots } from "@arkecosystem/core-crypto-time/source/slots";

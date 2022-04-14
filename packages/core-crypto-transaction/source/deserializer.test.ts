@@ -276,7 +276,7 @@ describe("Transaction serializer / deserializer", ({ it, assert }) => {
 			.getStruct();
 
 		const transaction = TransactionFactory.fromData(multiSignatureRegistration);
-		transaction.serialized = transaction.serialized.slice(0, - 2);
+		transaction.serialized = transaction.serialized.slice(0, -2);
 
 		assert.throws(
 			() => TransactionFactory.fromBytes(transaction.serialized),

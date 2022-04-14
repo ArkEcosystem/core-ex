@@ -39,6 +39,8 @@ describeSkip<{
 		const copiedTransaction = Utils.cloneObject(transaction[0]) as any;
 		copiedTransaction.id = "wrong";
 
-		context.transactionValidator.validate(copiedTransaction).catch((error) => assert.instance(error, AssertionError));
+		context.transactionValidator
+			.validate(copiedTransaction)
+			.catch((error) => assert.instance(error, AssertionError));
 	});
 });
