@@ -34,9 +34,9 @@ describe<{
 
 		context.blockStorage = {
 			count: () => {},
+			deleteBlocks: () => {},
 			findByHeightRange: () => {},
 			findByHeightRangeWithTransactions: () => {},
-			deleteBlocks: () => {},
 			findByHeightRangeWithTransactionsForDownload: () => {},
 			findByHeights: () => {},
 			findByIds: () => {},
@@ -50,9 +50,9 @@ describe<{
 
 		context.blockHeightStorage = {
 			count: () => {},
+			deleteBlocks: () => {},
 			findByHeightRange: () => {},
 			findByHeightRangeWithTransactions: () => {},
-			deleteBlocks: () => {},
 			findByHeightRangeWithTransactionsForDownload: () => {},
 			findByHeights: () => {},
 			findByIds: () => {},

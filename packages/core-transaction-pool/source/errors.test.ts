@@ -9,8 +9,8 @@ describe<{
 	beforeAll((context) => {
 		context.transaction = {
 			data: {
-				fee: BigNumber.make(900),
 				amount: BigNumber.make(100),
+				fee: BigNumber.make(900),
 				id: "dummy-tx-id",
 				network: 30,
 				nonce: BigNumber.make(1),

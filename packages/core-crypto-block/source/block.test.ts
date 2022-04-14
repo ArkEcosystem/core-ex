@@ -347,40 +347,40 @@ describe<{
 
 	it("constructor - should fail to verify a block with invalid S in signature (not low S value)", () => {
 		const block = BlockFactory.fromData({
+			blockSignature:
+				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.true(block.verification.verified);
 		assert.equal(block.verification.errors, []);
 
 		const blockHighS = BlockFactory.fromData({
+			blockSignature:
+				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220afe9ef0f2ab672fd702d898915da6858ef2e0d8e18612058c570fc4f9e371835",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220afe9ef0f2ab672fd702d898915da6858ef2e0d8e18612058c570fc4f9e371835",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.false(blockHighS.verification.verified);
@@ -389,40 +389,40 @@ describe<{
 
 	it("constructor - should fail to verify a block with wrong signature length", () => {
 		const block = BlockFactory.fromData({
+			blockSignature:
+				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.true(block.verification.verified);
 		assert.equal(block.verification.errors, []);
 
 		const blockInvalidSignatureLength = BlockFactory.fromData({
+			blockSignature:
+				"3046022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c00",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"3046022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c00",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.false(blockInvalidSignatureLength.verification.verified);
@@ -431,40 +431,40 @@ describe<{
 
 	it("constructor - should fail to verify a block with negative R", () => {
 		const block = BlockFactory.fromData({
+			blockSignature:
+				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.true(block.verification.verified);
 		assert.equal(block.verification.errors, []);
 
 		const blockInvalidR = BlockFactory.fromData({
+			blockSignature:
+				"30440220c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"30440220c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.false(blockInvalidR.verification.verified);
@@ -473,40 +473,40 @@ describe<{
 
 	it("constructor - should fail to verify a block with long form signature", () => {
 		const block = BlockFactory.fromData({
+			blockSignature:
+				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"3045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.true(block.verification.verified);
 		assert.equal(block.verification.errors, []);
 
 		const blockLongFormSig = BlockFactory.fromData({
+			blockSignature:
+				"30820045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c0239111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
 			height: 5_470_549,
 			id: "62b348a7aba2c60506929eec1311eaecb48ef232d4b154db2ede3f5e53700be9",
 			numberOfTransactions: 0,
-			generatorPublicKey: "026a423b3323de175dd82788c7eab57850c6a37ea6a470308ebadd7007baf8ceb3",
-			payloadLength: 0,
-			blockSignature:
-				"30820045022100c92d7d0c3ea2ba72576f6494a81fc498d0420286896f806a7ead443d0b5d89720220501610f0d5498d028fd27676ea2597a5cb80cf5896e77fe2fa61623d31ff290c0239111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-			timestamp: 102_041_016,
+			payloadLength: 0,
+			previousBlock: "2d270cae7e2bd9da27f6160b521859820f2c90315672e1774733bdd6415abb86",
 			reward: Utils.BigNumber.make("200000000"),
-			version: 0,
+			timestamp: 102_041_016,
 			totalAmount: Utils.BigNumber.ZERO,
 			totalFee: Utils.BigNumber.ZERO,
+			version: 0,
 		});
 
 		assert.false(blockLongFormSig.verification.verified);
@@ -701,19 +701,18 @@ describe<{
 		configManager.setFromPreset("mainnet");
 
 		const issue = {
-			height: 3_084_276,
-			numberOfTransactions: 2,
-			payloadHash: "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538",
 			blockSignature:
 				"30440220543f71d6f6445b703459b4f91d2c6f2446cbe6669e9c9008b1c77cc57073af2402206036fee3b434ffd5a31a579dd5b514a1c6384962291fda27b2463de903422834",
-			previousBlock: "7184109965722665625",
 			generatorPublicKey: "02fa6902e91e127d6d3410f6abc271a79ae24029079caa0db5819757e3c1c1c5a4",
-			previousBlockHex: "63b315f3663e4299",
+			height: 3_084_276,
 			id: "11773170219525190460",
-			timestamp: 25_029_544,
+			numberOfTransactions: 2,
+			payloadHash: "c2fa2d400b4c823873d476f6e0c9e423cf925e9b48f1b5706c7e2771d4095538",
 			payloadLength: 64,
-			version: 0,
+			previousBlock: "7184109965722665625",
+			previousBlockHex: "63b315f3663e4299",
 			reward: Utils.BigNumber.make(200_000_000),
+			timestamp: 25_029_544,
 			totalAmount: Utils.BigNumber.make(0),
 			totalFee: Utils.BigNumber.make(600_000_000),
 			transactions: [
@@ -749,6 +748,7 @@ describe<{
 					type: 3,
 				},
 			],
+			version: 0,
 		};
 
 		const block = BlockFactory.fromData(issue);
