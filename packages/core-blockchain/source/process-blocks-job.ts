@@ -171,8 +171,6 @@ export class ProcessBlocksJob implements Contracts.Kernel.QueueJob {
 			this.blockchain.clearQueue();
 			this.blockchain.resetLastDownloadedBlock();
 		}
-
-		return;
 	}
 
 	async #revertBlocks(blocksToRevert: Contracts.Crypto.IBlock[]): Promise<void> {

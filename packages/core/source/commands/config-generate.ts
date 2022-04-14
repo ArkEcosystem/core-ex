@@ -188,7 +188,7 @@ export class Command extends Commands.Command {
 
 		const allFlagsSet = !this.#flagSettings
 			.filter((flag) => flag.promptType)
-			.find((flag) => flags[flag.name] === undefined);
+			.some((flag) => flags[flag.name] === undefined);
 
 		const defaults = this.#flagSettings.reduce<any>((accumulator: any, flag: Flag) => {
 			accumulator[flag.name] = flag.default;

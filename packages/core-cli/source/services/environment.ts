@@ -1,7 +1,7 @@
 import { Constants } from "@arkecosystem/core-contracts";
 import { parseFileSync, stringifySync } from "envfile";
 import { existsSync, writeFileSync } from "fs-extra";
-import { resolve } from "path";
+import path from "path";
 
 import { envPaths as environmentPaths, Paths } from "../env-paths";
 import { injectable } from "../ioc";
@@ -18,14 +18,14 @@ export class Environment {
 		if (process.env[Constants.Flags.CORE_PATH_CONFIG]) {
 			paths = {
 				...paths,
-				config: resolve(process.env[Constants.Flags.CORE_PATH_CONFIG]),
+				config: path.resolve(process.env[Constants.Flags.CORE_PATH_CONFIG]),
 			};
 		}
 
 		if (process.env[Constants.Flags.CORE_PATH_DATA]) {
 			paths = {
 				...paths,
-				data: resolve(process.env[Constants.Flags.CORE_PATH_DATA]),
+				data: path.resolve(process.env[Constants.Flags.CORE_PATH_DATA]),
 			};
 		}
 

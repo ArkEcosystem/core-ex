@@ -231,7 +231,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
 			}
 
-			if (!removedTransactions.find((t) => t.id === transaction.id)) {
+			if (!removedTransactions.some((t) => t.id === transaction.id)) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.error(`Removed ${transaction} from storage`);
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -264,7 +264,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.debug(`Removed forged ${removedTransaction}`);
 			}
 
-			if (!removedTransactions.find((t) => t.id === transaction.id)) {
+			if (!removedTransactions.some((t) => t.id === transaction.id)) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.error(`Removed forged ${transaction} from storage`);
 			}

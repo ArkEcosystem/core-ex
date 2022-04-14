@@ -157,7 +157,7 @@ export class ProcessManager {
 		try {
 			const { stdout } = this.#shellSync(`pm2 id ${id} | awk '{ print $2 }'`);
 
-			return !!stdout && !isNaN(Number(stdout));
+			return !!stdout && !Number.isNaN(Number(stdout));
 		} catch {
 			return false;
 		}
