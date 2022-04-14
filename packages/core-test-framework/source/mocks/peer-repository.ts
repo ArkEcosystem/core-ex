@@ -9,7 +9,7 @@ export const setPeers = (peers: Partial<Contracts.P2P.Peer>[]) => {
 
 class PeerRepositoryMock implements Partial<PeerRepository> {
 	public getPeers(): Contracts.P2P.Peer[] {
-		return mockPeers as Contracts.P2P.Peer[];
+		return mockPeers;
 	}
 
 	public hasPeer(ip: string): boolean {
@@ -17,7 +17,7 @@ class PeerRepositoryMock implements Partial<PeerRepository> {
 	}
 
 	public getPeer(ip: string): Contracts.P2P.Peer {
-		return mockPeers[0] as Contracts.P2P.Peer;
+		return mockPeers[0];
 	}
 }
 
