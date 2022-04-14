@@ -325,7 +325,6 @@ describe<{
 				feeStaticDelegateResignation: 8,
 				feeStaticMultiPayment: 7,
 				feeStaticMultiSignature: 5,
-				validators: "47",
 				feeStaticTransfer: 1,
 				feeStaticVote: 4,
 				maxBlockPayload: "123444",
@@ -338,6 +337,7 @@ describe<{
 				rewardHeight: "23000",
 				symbol: "my",
 				token: "myn",
+				validators: "47",
 				vendorFieldLength: "64",
 				wif: "27",
 			})
