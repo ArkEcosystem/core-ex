@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 
 import crypto from "../../core/bin/config/testnet/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../core-crypto-address-bech32m";
@@ -62,6 +62,26 @@ describe<{
 			}),
 			204,
 		);
+	});
+
+	it("should return size with transactions", async ({ serializer, sandbox }) => {
+		await sandbox.app
+			.get<Contracts.Crypto.ITransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
+			.fromData(blockDataWithTransactions.transactions[1]);
+
+		// assert.equal(
+		// 	serializer.size({
+		// 		data: blockDataWithTransactions,
+		// 		transactions: await Promise.all(
+		// 			blockDataWithTransactions.transactions.map(async (tx) => {
+		// 				return await sandbox.app
+		// 					.get<Contracts.Crypto.ITransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
+		// 					.fromData(tx);
+		// 			}),
+		// 		),
+		// 	}),
+		// 	204,
+		// );
 	});
 
 	it("should serialize and deserialize block", async ({ serializer, deserializer }) => {

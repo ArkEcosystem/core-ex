@@ -73,6 +73,8 @@ describe<{
 			assert.equal(deserialized[field].toString(), blockData[field].toString());
 		}
 
+		assert.undefined(deserialized.transactions);
+
 		// assert.length(deserialized.transactions, dummyBlock2.data.transactions.length);
 
 		// const transactionFields = [
