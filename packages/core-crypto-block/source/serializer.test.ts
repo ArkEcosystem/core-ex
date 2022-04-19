@@ -17,7 +17,8 @@ import { ServiceProvider as CoreFeesStatic } from "../../core-fees-static";
 import { ServiceProvider as CoreSerializer } from "../../core-serializer";
 import { describe, Sandbox } from "../../core-test-framework";
 import { ServiceProvider as CoreValidation } from "../../core-validation";
-import { blockData } from "../test/fixtures/block";
+import { blockData, blockDataWithTransactions } from "../test/fixtures/block";
+import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { Deserializer } from "./deserializer";
 import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
@@ -26,7 +27,7 @@ describe<{
 	sandbox: Sandbox;
 	serializer: Serializer;
 	deserializer: Deserializer;
-}>("block deserializer", ({ it, assert, beforeEach }) => {
+}>("Serializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		context.sandbox = new Sandbox();
 
@@ -68,6 +69,24 @@ describe<{
 
 		const deserialized = await deserializer.deserialize(serialized);
 
-		assert.equal(deserialized.data, blockData);
+		assertBlockData(assert, deserialized.data, blockData);
+	});
+
+	it("should serialize and deserialize block with transactions", async ({ serializer, deserializer }) => {
+		const serialized = await serializer.serializeWithTransactions(blockDataWithTransactions);
+
+		const deserialized = await deserializer.deserialize(serialized);
+
+		assertBlockData(assert, deserialized.data, blockDataWithTransactions);
+
+		assert.length(deserialized.data.transactions, blockDataWithTransactions.transactions.length);
+
+		for (let index = 0; index < blockDataWithTransactions.transactions.length; index++) {
+			assertTransactionData(
+				assert,
+				deserialized.data.transactions[index],
+				blockDataWithTransactions.transactions[index],
+			);
+		}
 	});
 });
