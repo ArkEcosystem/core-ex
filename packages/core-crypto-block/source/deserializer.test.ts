@@ -17,7 +17,8 @@ import { ServiceProvider as CoreFeesStatic } from "../../core-fees-static";
 import { ServiceProvider as CoreSerializer } from "../../core-serializer";
 import { describe, Sandbox } from "../../core-test-framework";
 import { ServiceProvider as CoreValidation } from "../../core-validation";
-import { blockData, serialized } from "../test/fixtures/block";
+import { blockData, blockDataWithTransactions, serialized, serializedWithTransactions } from "../test/fixtures/block";
+import { assertBlockData, assertTransactionData } from "../test/helpers/asserts";
 import { Deserializer } from "./deserializer";
 import { IDFactory } from "./id.factory";
 import { Serializer } from "./serializer";
@@ -54,45 +55,24 @@ describe<{
 	it("should correctly deserialize a block", async ({ deserializer }) => {
 		const deserialized = (await deserializer.deserialize(Buffer.from(serialized, "hex"))).data;
 
-		const blockFields = [
-			"id",
-			"timestamp",
-			"version",
-			"height",
-			"previousBlock",
-			"numberOfTransactions",
-			"totalAmount",
-			"totalFee",
-			"reward",
-			"payloadLength",
-			"payloadHash",
-			"generatorPublicKey",
-			"blockSignature",
-		];
-		for (const field of blockFields) {
-			assert.equal(deserialized[field].toString(), blockData[field].toString());
-		}
+		assertBlockData(assert, deserialized, blockData);
 
 		assert.undefined(deserialized.transactions);
+	});
 
-		// assert.length(deserialized.transactions, dummyBlock2.data.transactions.length);
+	it("should correctly deserialize a block with transactions", async ({ deserializer }) => {
+		const deserialized = (await deserializer.deserialize(Buffer.from(serializedWithTransactions, "hex"))).data;
 
-		// const transactionFields = [
-		// 	"id",
-		// 	"type",
-		// 	"timestamp",
-		// 	"senderPublicKey",
-		// 	"fee",
-		// 	"amount",
-		// 	"recipientId",
-		// 	"signature",
-		// ];
-		// for (const tx of deserialized.transactions) {
-		// 	const dummyBlockTx = dummyBlock2.data.transactions.find((dummyTx) => dummyTx.id === tx.id);
-		// 	assert.defined(dummyBlockTx);
-		// 	for (const field of transactionFields) {
-		// 		assert.equal(tx[field].toString(), dummyBlockTx[field].toString());
-		// 	}
-		// }
+		assertBlockData(assert, deserialized, blockDataWithTransactions);
+
+		assert.length(deserialized.transactions, blockDataWithTransactions.transactions.length);
+
+		for (let index = 0; index < blockDataWithTransactions.transactions.length; index++) {
+			assertTransactionData(
+				assert,
+				deserialized.transactions[index],
+				blockDataWithTransactions.transactions[index],
+			);
+		}
 	});
 });
