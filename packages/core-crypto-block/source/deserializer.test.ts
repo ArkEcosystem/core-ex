@@ -75,4 +75,13 @@ describe<{
 			);
 		}
 	});
+
+	it("should correctly deserialize a block header with transactions", async ({ deserializer }) => {
+		const deserialized = (await deserializer.deserialize(Buffer.from(serializedWithTransactions, "hex"), true))
+			.data;
+
+		assertBlockData(assert, deserialized, blockDataWithTransactions);
+
+		assert.undefined(deserialized.transactions);
+	});
 });
