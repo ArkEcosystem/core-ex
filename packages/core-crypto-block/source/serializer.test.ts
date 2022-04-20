@@ -56,6 +56,7 @@ describe<{
 
 	it("should return size", ({ serializer }) => {
 		assert.equal(
+			// @ts-ignore
 			serializer.size({
 				data: blockData,
 				transactions: [],
@@ -65,23 +66,20 @@ describe<{
 	});
 
 	it("should return size with transactions", async ({ serializer, sandbox }) => {
-		await sandbox.app
-			.get<Contracts.Crypto.ITransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
-			.fromData(blockDataWithTransactions.transactions[1]);
-
-		// assert.equal(
-		// 	serializer.size({
-		// 		data: blockDataWithTransactions,
-		// 		transactions: await Promise.all(
-		// 			blockDataWithTransactions.transactions.map(async (tx) => {
-		// 				return await sandbox.app
-		// 					.get<Contracts.Crypto.ITransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
-		// 					.fromData(tx);
-		// 			}),
-		// 		),
-		// 	}),
-		// 	204,
-		// );
+		assert.equal(
+			// @ts-ignore
+			serializer.size({
+				data: blockDataWithTransactions,
+				transactions: await Promise.all(
+					blockDataWithTransactions.transactions.map(async (tx) =>
+						sandbox.app
+							.get<Contracts.Crypto.ITransactionFactory>(Identifiers.Cryptography.Transaction.Factory)
+							.fromData(tx),
+					),
+				),
+			}),
+			584,
+		);
 	});
 
 	it("should serialize and deserialize block", async ({ serializer, deserializer }) => {
