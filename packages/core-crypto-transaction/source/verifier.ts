@@ -51,7 +51,7 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 				const publicKey: string = publicKeys[publicKeyIndex];
 
 				if (
-					this.signatureFactory.verify(
+					await this.signatureFactory.verify(
 						hash,
 						Buffer.from(partialSignature, "hex"),
 						Buffer.from(publicKey, "hex"),
