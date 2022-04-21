@@ -21,15 +21,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {
-		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
+		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.ConfigRepository);
 
 		return {
-			// @ts-ignore
-			genesisBlock: configRepository.get<IBlockJson>("crypto.genesisBlock")!,
-			// @ts-ignore
-			milestones: configRepository.get<Array<Record<string, any>>>("crypto.milestones")!,
-			// @ts-ignore
-			network: configRepository.get<Network>("crypto.network")!,
+			genesisBlock: configRepository.get<Contracts.Crypto.IBlockJson>("crypto.genesisBlock")!,
+			milestones: configRepository.get<Contracts.Crypto.MilestonePartial[]>("crypto.milestones")!,
+			network: configRepository.get<Contracts.Crypto.Network>("crypto.network")!,
 		};
 	}
 }
