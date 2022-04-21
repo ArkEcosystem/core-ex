@@ -1,6 +1,7 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts, Exceptions } from "@arkecosystem/core-contracts";
 import deepmerge from "deepmerge";
+import clone from "lodash.clone";
 import get from "lodash.get";
 import set from "lodash.set";
 @injectable()
@@ -12,9 +13,9 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#config = {
-			genesisBlock: config.genesisBlock,
-			milestones: config.milestones as Contracts.Crypto.Milestone[],
-			network: config.network,
+			genesisBlock: clone(config.genesisBlock),
+			milestones: clone(config.milestones) as Contracts.Crypto.Milestone[],
+			network: clone(config.network),
 		};
 
 		this.#validateMilestones();
