@@ -10,10 +10,10 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
 	#milestones: Contracts.Crypto.Milestone[] | undefined;
 
-	public setConfig(config: Contracts.Crypto.NetworkConfig): void {
+	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#config = {
 			genesisBlock: config.genesisBlock,
-			milestones: config.milestones,
+			milestones: config.milestones as Contracts.Crypto.Milestone[],
 			network: config.network,
 		};
 
