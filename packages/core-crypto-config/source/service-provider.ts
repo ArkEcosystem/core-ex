@@ -12,8 +12,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
-			console.log(config.milestones);
-
 			this.app.bind<Contracts.Crypto.NetworkConfigPartial>(Identifiers.Crypto).toConstantValue(config);
 		} catch {
 			// @TODO: this breaks during network config generation
