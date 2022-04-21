@@ -11,9 +11,7 @@ describe<{}>("Block", ({ it, assert, beforeAll, afterAll, stub, each }) => {
 		const transactionFactory = await Factories.factory("Transfer", crypto);
 
 		const transaction1 = await transactionFactory.withStates("sign").make<Contracts.Crypto.ITransaction>();
-		const transaction2 = await transactionFactory.make<Contracts.Crypto.ITransaction>();
-
-		console.log(JSON.stringify(transaction1.data));
+		const transaction2 = await transactionFactory.withStates("sign").make<Contracts.Crypto.ITransaction>();
 
 		const indexedTransaction1 = clone(transaction1);
 		indexedTransaction1.data.sequence = 1;
