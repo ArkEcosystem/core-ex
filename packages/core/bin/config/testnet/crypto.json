@@ -2653,7 +2653,7 @@
 			"epoch": "2022-03-18T00:00:00.000Z",
 			"height": 75600,
 			"multiPaymentLimit": 256,
-			"reward": 200000000,
+			"reward": "200000000",
 			"satoshi": {
 				"decimals": 8,
 				"denomination": 100000000
