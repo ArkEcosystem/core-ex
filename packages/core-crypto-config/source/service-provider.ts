@@ -8,17 +8,19 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		try {
-			const config: Contracts.Crypto.NetworkConfig = this.#fromConfigRepository();
+			const config: Contracts.Crypto.NetworkConfigPartial = this.#fromConfigRepository();
 
 			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
-			this.app.bind<Contracts.Crypto.NetworkConfig>(Identifiers.Crypto).toConstantValue(config);
+			console.log(config.milestones);
+
+			this.app.bind<Contracts.Crypto.NetworkConfigPartial>(Identifiers.Crypto).toConstantValue(config);
 		} catch {
 			// @TODO: this breaks during network config generation
 		}
 	}
 
-	#fromConfigRepository(): Contracts.Crypto.NetworkConfig {
+	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {
 		const configRepository: any = this.app.get(Identifiers.ConfigRepository);
 
 		return {
