@@ -54,7 +54,7 @@ describe<{
 		context.deserializer = context.sandbox.app.resolve(Deserializer);
 	});
 
-	it("should return size", ({ serializer }) => {
+	it("#size - should return size", ({ serializer }) => {
 		assert.equal(
 			// @ts-ignore
 			serializer.size({
@@ -65,7 +65,7 @@ describe<{
 		);
 	});
 
-	it("should return size with transactions", async ({ serializer, sandbox }) => {
+	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
 		assert.equal(
 			// @ts-ignore
 			serializer.size({
@@ -82,7 +82,7 @@ describe<{
 		);
 	});
 
-	it("should serialize and deserialize block", async ({ serializer, deserializer }) => {
+	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {
 		const serialized = await serializer.serialize(blockData);
 
 		const deserialized = await deserializer.deserialize(serialized);
@@ -90,7 +90,10 @@ describe<{
 		assertBlockData(assert, deserialized.data, blockData);
 	});
 
-	it("should serialize and deserialize block with transactions", async ({ serializer, deserializer }) => {
+	it("#serialize - should serialize and deserialize block with transactions", async ({
+		serializer,
+		deserializer,
+	}) => {
 		const serialized = await serializer.serializeWithTransactions(blockDataWithTransactions);
 
 		const deserialized = await deserializer.deserialize(serialized);

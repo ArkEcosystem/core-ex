@@ -46,7 +46,7 @@ describe<{
 	sandbox: Sandbox;
 	factory: BlockFactory;
 	serializer: Serializer;
-}>("BlockFactory", ({ it, assert, beforeEach }) => {
+}>("Factory", ({ it, assert, beforeEach }) => {
 	const blockDataOriginal = clone(blockData);
 	// Recalculated id
 	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
@@ -137,7 +137,7 @@ describe<{
 		// assert.length(block.transactions, blockDataWithTransactionsClone.transaction.length);
 	});
 
-	it("fromBytes - should create a block instance from a buffer", async ({ factory }) => {
+	it("#fromBytes - should create a block instance from a buffer", async ({ factory }) => {
 		const block = await factory.fromBytes(Buffer.from(serialized, "hex"));
 
 		assertBlockData(assert, block.data, blockDataClone);
@@ -146,7 +146,7 @@ describe<{
 		assert.equal(block.serialized, serialized);
 	});
 
-	it("fromBytes - should create a block with transactions instance from a buffer", async ({ factory }) => {
+	it("#fromBytes - should create a block with transactions instance from a buffer", async ({ factory }) => {
 		const block = await factory.fromBytes(Buffer.from(serializedWithTransactions, "hex"));
 
 		assertBlockData(assert, block.data, blockDataWithTransactionsClone);
@@ -157,7 +157,7 @@ describe<{
 		// assert.length(block.transactions, blockDataWithTransactionsClone.transaction.length);
 	});
 
-	it("fromData - should create a block instance from an object", async (context) => {
+	it("#fromData - should create a block instance from an object", async (context) => {
 		const block = await context.factory.fromData(blockData);
 
 		assertBlockData(assert, block.data, blockData);
@@ -166,7 +166,7 @@ describe<{
 		assert.string(block.serialized);
 	});
 
-	it("fromData - should create a block with transactions instance from an object", async (context) => {
+	it("#fromData - should create a block with transactions instance from an object", async (context) => {
 		const block = await context.factory.fromData(blockDataWithTransactions);
 
 		assertBlockData(assert, block.data, blockDataWithTransactions);
@@ -182,14 +182,14 @@ describe<{
 		}
 	});
 
-	it("fromData - should throw on invalid input data - block property has an unexpected value", async ({
+	it("#fromData - should throw on invalid input data - block property has an unexpected value", async ({
 		factory,
 	}) => {
 		const b2 = Object.assign({}, blockData, { totalAmount: "abcd" });
 		await assert.rejects(() => factory.fromData(b2), "Cannot convert abcd to a BigInt");
 	});
 
-	it("fromData - should throw on invalid input data - required block property is missing", async ({ factory }) => {
+	it("#fromData - should throw on invalid input data - required block property is missing", async ({ factory }) => {
 		delete blockDataClone.generatorPublicKey;
 		await assert.rejects(
 			() => factory.fromData(blockDataClone),
@@ -197,7 +197,7 @@ describe<{
 		);
 	});
 
-	it("fromData - should throw on invalid transaction data", async ({ factory }) => {
+	it("#fromData - should throw on invalid transaction data", async ({ factory }) => {
 		delete blockDataWithTransactionsClone.transactions[0].id;
 
 		await assert.rejects(
@@ -206,7 +206,7 @@ describe<{
 		);
 	});
 
-	it("fromJson - should create a block instance from JSON", async ({ factory }) => {
+	it("#fromJson - should create a block instance from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataJson);
 
 		// Recalculated id
@@ -218,7 +218,7 @@ describe<{
 		assert.string(block.serialized);
 	});
 
-	it("fromJson - should create a block instance with transactions from JSON", async ({ factory }) => {
+	it("#fromJson - should create a block instance with transactions from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataWithTransactionsJson);
 
 		// Recalculated id

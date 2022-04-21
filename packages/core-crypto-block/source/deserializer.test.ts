@@ -26,7 +26,7 @@ import { Serializer } from "./serializer";
 describe<{
 	sandbox: Sandbox;
 	deserializer: Deserializer;
-}>("block deserializer", ({ it, assert, beforeEach }) => {
+}>("Deserializer", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		context.sandbox = new Sandbox();
 
@@ -52,7 +52,7 @@ describe<{
 		context.deserializer = context.sandbox.app.resolve(Deserializer);
 	});
 
-	it("should correctly deserialize a block", async ({ deserializer }) => {
+	it("#deserialize - should correctly deserialize a block", async ({ deserializer }) => {
 		const deserialized = (await deserializer.deserialize(Buffer.from(serialized, "hex"))).data;
 
 		assertBlockData(assert, deserialized, blockData);
@@ -60,7 +60,7 @@ describe<{
 		assert.undefined(deserialized.transactions);
 	});
 
-	it("should correctly deserialize a block with transactions", async ({ deserializer }) => {
+	it("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
 		const deserialized = (await deserializer.deserialize(Buffer.from(serializedWithTransactions, "hex"))).data;
 
 		assertBlockData(assert, deserialized, blockDataWithTransactions);
@@ -76,7 +76,7 @@ describe<{
 		}
 	});
 
-	it("should correctly deserialize a block header with transactions", async ({ deserializer }) => {
+	it("#deserialize - should correctly deserialize a block header with transactions", async ({ deserializer }) => {
 		const deserialized = (await deserializer.deserialize(Buffer.from(serializedWithTransactions, "hex"), true))
 			.data;
 
