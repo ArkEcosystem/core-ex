@@ -923,6 +923,7 @@ importers:
       micro-bmark: ^0.1.3
       process-es6: 0.11.6
       util: 0.12.4
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -959,6 +960,7 @@ importers:
       micro-bmark: 0.1.3
       process-es6: 0.11.6
       util: 0.12.4
+      uvu: 0.5.3
 
   packages/core-crypto-transaction-multi-payment:
     specifiers:

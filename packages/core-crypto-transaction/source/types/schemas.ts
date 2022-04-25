@@ -17,6 +17,8 @@ export const transactionBaseSchema: Record<string, any> = {
 	else: { required: ["type", "senderPublicKey", "fee", "amount", "nonce"] },
 	if: { properties: { version: { anyOf: [{ type: "null" }, { const: 1 }] } } },
 	properties: {
+		// amount: { bignumber: { bypassGenesis: true, minimum: 1 } },
+		// fee: { bignumber: { bypassGenesis: true, minimum: 0 } },
 		amount: { bignumber: { bypassGenesis: true, minimum: 1 } },
 		fee: { bignumber: { bypassGenesis: true, minimum: 0 } },
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
