@@ -1090,10 +1090,12 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
       ajv: 6.12.6
       ajv-keywords: 3.4.1
       ipaddr.js: 2.0.1
+      uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -1103,6 +1105,9 @@ importers:
       ajv: 6.12.6
       ajv-keywords: 3.4.1_ajv@6.12.6
       ipaddr.js: 2.0.1
+      uvu: 0.5.3
+    devDependencies:
+      '@arkecosystem/core-validation': link:../core-validation
 
   packages/core-crypto-wif:
     specifiers:

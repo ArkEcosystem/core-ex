@@ -1,225 +1,310 @@
-import Ajv from "ajv";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Validator } from "@arkecosystem/core-validation/source/validator";
+import { BigNumber } from "@arkecosystem/utils";
 
-import { describe } from "../../core-test-framework";
-import { Managers, Utils, Validation } from "..";
-import { TransactionType } from "../enums";
+import cryptoJson from "../../core/bin/config/testnet/crypto.json";
+import { describe, Sandbox } from "../../core-test-framework";
+import { registerKeywords } from "./keywords";
+
+type Context = {
+	validator: Validator;
+	sandbox: Sandbox;
+};
 
 describe<{
-	ajv: Ajv;
-}>("Keywords", ({ it, beforeAll, assert }) => {
-	beforeAll((context) => {
-		context.ajv = Validation.validator.getInstance();
+	sandbox: Sandbox;
+	validator: Validator;
+}>("Keywords", ({ it, beforeEach, assert }) => {
+	const register = ({ sandbox, validator }: Context) => {
+		const formats = registerKeywords(sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
+
+		validator.extend((ajv) => {
+			formats.transactionType(ajv);
+		});
+
+		validator.extend((ajv) => {
+			formats.network(ajv);
+		});
+
+		validator.extend((ajv) => {
+			formats.bignum(ajv);
+		});
+
+		validator.extend((ajv) => {
+			formats.blockId(ajv);
+		});
+
+		validator.extend((ajv) => {
+			formats.maxBytes(ajv);
+		});
+	};
+
+	beforeEach((context) => {
+		context.sandbox = new Sandbox();
+
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+
+		context.validator = context.sandbox.app.resolve(Validator);
 	});
 
-	it("keyword maxBytes should be ok", (context) => {
-		const schema = { maxBytes: 64, type: "string" };
-		const validate = context.ajv.compile(schema);
+	// TODO: Parent schema !== string
+	// TODO: Negative value
+	it("keyword maxBytes should be ok", async (context) => {
+		register(context);
 
-		assert.true(validate("1234"));
-		assert.true(validate("a".repeat(64)));
-		assert.false(validate("a".repeat(65)));
-		assert.true(validate("⊁".repeat(21)));
-		assert.false(validate("⊁".repeat(22)));
-		assert.false(validate({}));
-		assert.false(validate());
-	});
-
-	it("keyword network should be ok", (context) => {
-		const schema = { network: true };
-		const validate = context.ajv.compile(schema);
-
-		assert.true(validate(30));
-		assert.false(validate(23));
-		assert.false(validate("a"));
-
-		Managers.configManager.setFromPreset("mainnet");
-
-		assert.true(validate(23));
-		assert.false(validate(30));
-
-		Managers.configManager.setFromPreset("devnet");
-
-		assert.true(validate(30));
-		assert.false(validate(23));
-		assert.false(validate({}));
-		assert.false(validate());
-	});
-
-	it("keyword transactionType should be ok", (context) => {
-		const schema = { transactionType: TransactionType.Transfer };
-		const validate = context.ajv.compile(schema);
-
-		assert.true(validate(0));
-		assert.false(validate(TransactionType.Vote));
-		assert.false(validate(-1));
-		assert.false(validate(""));
-		assert.false(validate("0"));
-		assert.false(validate());
-	});
-
-	it("keyword blockId should be ok", (context) => {
-		const schema = { blockId: {} };
-		const validate = context.ajv.compile(schema);
-
-		assert.true(validate("1"));
-		assert.true(validate("1234"));
-		assert.true(validate("15654541800058894516"));
-		assert.false(validate("156545418000588945160"));
-
-		assert.true(validate("e3b0c44298fc1c14"));
-		assert.false(validate("e3b0c44298fc1c1"));
-		assert.false(validate("e3b0c44298fc1c140"));
-
-		assert.true(validate("94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb40"));
-		assert.false(validate("94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb4"));
-		assert.false(validate("94c220691e711c39c79d437ce185748a0018940e1a4144293af9d05627d2eb400"));
-	});
-
-	it("keyword blockId should not be ok", (context) => {
-		const schema = { blockId: { hex: true } };
-		const validate = context.ajv.compile(schema);
-
-		assert.false(validate("nein"));
-		assert.false(validate({}));
-		assert.false(validate(""));
-		assert.false(validate());
-		assert.false(validate(1243));
-		assert.false(validate(Utils.BigNumber.make(0)));
-	});
-
-	it("keyword blockId should be ok (genesis)", (context) => {
 		const schema = {
+			$id: "test",
+			maxBytes: 64,
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", "1234")).error);
+		assert.undefined((await context.validator.validate("test", "a".repeat(64))).error);
+		assert.undefined((await context.validator.validate("test", "⊁".repeat(21))).error);
+
+		assert.defined((await context.validator.validate("test", "a".repeat(65))).error);
+		assert.defined((await context.validator.validate("test", "⊁".repeat(22))).error);
+		assert.defined((await context.validator.validate("test", {})).error);
+		assert.defined((await context.validator.validate("test", null)).error);
+		assert.defined((await context.validator.validate("test")).error);
+		assert.defined((await context.validator.validate("test", 123)).error);
+	});
+
+	// TODO: Flase value
+	it("keyword network should be ok", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			network: true,
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", 30)).error);
+
+		assert.defined((await context.validator.validate("test", 23)).error);
+		assert.defined((await context.validator.validate("test", "a")).error);
+	});
+
+	it("keyword transactionType should be ok", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			transactionType: Contracts.Crypto.TransactionType.Transfer,
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", Contracts.Crypto.TransactionType.Transfer)).error);
+
+		assert.defined((await context.validator.validate("test", Contracts.Crypto.TransactionType.Vote)).error);
+		assert.defined((await context.validator.validate("test", -1)).error);
+		assert.defined((await context.validator.validate("test", "")).error);
+		assert.defined((await context.validator.validate("test", "0")).error);
+		assert.defined((await context.validator.validate("test", null)).error);
+		assert.defined((await context.validator.validate("test")).error);
+	});
+
+	// TODO: Properties
+	it("keyword blockId should be ok", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			blockId: {},
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", "1".repeat(64))).error);
+
+		assert.defined((await context.validator.validate("test", "1".repeat(63))).error);
+		assert.defined((await context.validator.validate("test", "1".repeat(63))).error);
+		assert.defined((await context.validator.validate("test", "1".repeat(65))).error);
+		assert.defined((await context.validator.validate("test", "")).error);
+		assert.defined((await context.validator.validate("test", null)).error);
+		assert.defined((await context.validator.validate("test")).error);
+		assert.defined((await context.validator.validate("test", {})).error);
+	});
+
+	it("keyword blockId - should allow null for geneis", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
 			properties: {
 				height: { type: "number" },
-				previousBlock: { blockId: { allowNullWhenGenesis: true, hex: true } },
+				id: {
+					blockId: {
+						allowNullWhenGenesis: true,
+					},
+				},
 			},
 		};
+		context.validator.addSchema(schema);
 
-		const validate = context.ajv.compile(schema);
-
-		assert.true(validate({ height: 1, previousBlock: "" }));
-		assert.true(validate({ height: 1, previousBlock: undefined }));
-		assert.true(validate({ height: 1, previousBlock: 0 }));
-		assert.true(validate({ height: 1, previousBlock: "1234" }));
-
-		assert.false(validate({ height: 1, previousBlock: "abc" }));
-		assert.false(validate({ height: 1, previousBlock: {} }));
-
-		assert.false(validate({ height: 2, previousBlock: "" }));
-		assert.false(validate({ height: 2, previousBlock: 0 }));
+		assert.undefined((await context.validator.validate("test", { height: 1, id: "1".repeat(64) })).error);
+		assert.undefined((await context.validator.validate("test", { height: 1, id: null })).error);
 	});
 
-	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
-		const schema = { bignumber: { maximum: 100, minimum: 100, type: "number" } };
-		const validate = context.ajv.compile(schema);
+	it("keyword bignumber should be ok if only one possible value is allowed", async (context) => {
+		register(context);
 
-		assert.true(validate(100));
-		assert.false(validate(99));
-		assert.false(validate(101));
+		const schema = {
+			$id: "test",
+			bignumber: { maximum: 100, minimum: 100 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", 100)).error);
+
+		assert.defined((await context.validator.validate("test", 99)).error);
+		assert.defined((await context.validator.validate("test", 101)).error);
+		assert.defined((await context.validator.validate("test", null)).error);
+		assert.defined((await context.validator.validate("test")).error);
+		assert.defined((await context.validator.validate("test", {})).error);
 	});
 
-	it("keyword bignumber should be ok if above or equal minimum", (context) => {
-		const schema = { bignumber: { minimum: 20, type: "number" } };
-		const validate = context.ajv.compile(schema);
+	it("keyword bignumber should be ok if above or equal minimum", async (context) => {
+		register(context);
 
-		assert.true(validate(25));
-		assert.true(validate(20));
-		assert.false(validate(19));
+		const schema = {
+			$id: "test",
+			bignumber: { minimum: 20 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", 25)).error);
+		assert.undefined((await context.validator.validate("test", 20)).error);
+
+		assert.defined((await context.validator.validate("test", 19)).error);
 	});
 
-	it("keyword bignumber should be ok if above or equal maximum", (context) => {
-		const schema = { bignumber: { maximum: 20, type: "number" } };
-		const validate = context.ajv.compile(schema);
+	it("keyword bignumber should be ok if above or equal maximum", async (context) => {
+		register(context);
 
-		assert.true(validate(20));
-		assert.false(validate(Number.MAX_SAFE_INTEGER));
-		assert.false(validate(25));
+		const schema = {
+			$id: "test",
+			bignumber: { maximum: 20 },
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", 19)).error);
+		assert.undefined((await context.validator.validate("test", 20)).error);
+		assert.undefined((await context.validator.validate("test", 0)).error);
+
+		// assert.undefined((await context.validator.validate("test", -1)).error); TODO: Min is defined to 0, make test
+
+		assert.defined((await context.validator.validate("test", 21)).error);
 	});
 
-	it("keyword bignumber should not be ok for values bigger than the absolute maximum", (context) => {
-		const schema = { bignumber: {} };
-		const validate = context.ajv.compile(schema);
+	it("keyword bignumber should not be ok for values bigger than the absolute maximum", async (context) => {
+		register(context);
 
-		assert.true(validate(Number.MAX_SAFE_INTEGER));
-		assert.true(validate("9223372036854775807"));
-		assert.false(validate("9223372036854775808"));
+		const schema = {
+			$id: "test",
+			bignumber: {},
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", Number.MAX_SAFE_INTEGER)).error);
+
+		assert.defined((await context.validator.validate("test", 9_223_372_036_854_775_808)).error);
 	});
 
-	it("keyword bignumber should be ok for number, string and bignumber as input", (context) => {
-		const schema = { bignumber: { maximum: 2000, minimum: 100, type: "number" } };
-		const validate = context.ajv.compile(schema);
+	it("keyword bignumber should be ok for number, string and bignumber as input", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			bignumber: { maximum: 2000, minimum: 100, type: "number" },
+		};
+		context.validator.addSchema(schema);
 
 		for (const value of [100, 1e2, 1020, 500, 2000]) {
-			assert.true(validate(value));
-			assert.true(validate(String(value)));
-			assert.true(validate(Utils.BigNumber.make(value)));
+			assert.undefined((await context.validator.validate("test", value)).error);
+			assert.undefined((await context.validator.validate("test", value.toString())).error);
+			assert.undefined((await context.validator.validate("test", BigNumber.make(value))).error);
 		}
 
 		for (const value of [1e8, 1999.000_001, 1 / 1e8, -100, -500, -2000.1]) {
-			assert.false(validate(value));
-			assert.false(validate(String(value)));
+			assert.defined((await context.validator.validate("test", value)).error);
+			assert.defined((await context.validator.validate("test", value.toString())).error);
+			// assert.defined((await context.validator.validate("test", BigNumber.make(value))).error);
 		}
 	});
 
-	it("keyword bignumber should not accept garbage", (context) => {
-		const schema = { bignumber: {} };
-		const validate = context.ajv.compile(schema);
+	it("keyword bignumber should not accept garbage", async (context) => {
+		register(context);
 
-		assert.false(validate());
-		assert.false(validate({}));
-		assert.false(validate(/d+/));
-		assert.false(validate(""));
-		assert.false(validate("\u0000"));
-	});
-
-	it("keyword bignumber should cast number to Bignumber", (context) => {
 		const schema = {
-			properties: {
-				amount: { bignumber: {} },
-			},
-			type: "object",
+			$id: "test",
+			bignumber: {},
 		};
+		context.validator.addSchema(schema);
 
-		const data = {
-			amount: 100,
-		};
-
-		const validate = context.ajv.compile(schema);
-		assert.true(validate(data));
-		assert.instance(data.amount, Utils.BigNumber);
-		assert.equal(data.amount, Utils.BigNumber.make(100));
+		assert.defined((await context.validator.validate("test", undefined)).error);
+		assert.defined((await context.validator.validate("test", {})).error);
+		assert.defined((await context.validator.validate("test", /d+/)).error);
+		assert.defined((await context.validator.validate("test", "")).error);
+		assert.defined((await context.validator.validate("test", "\u0000")).error);
 	});
 
-	it("keyword bignumber should cast string to Bignumber", (context) => {
-		const schema = {
-			properties: {
-				amount: { bignumber: {} },
-			},
-			type: "object",
-		};
+	// it("keyword bignumber should cast number to Bignumber", async (context) => {
+	// 	const schema = {
+	// 		$id: "test",
+	// 		properties: {
+	// 			amount: { bignumber: {} },
+	// 		},
+	// 		type: "object",
+	// 	};
+	// 	context.validator.addSchema(schema);
 
-		const data = {
-			amount: "100",
-		};
+	// 	const data = {
+	// 		amount: 100,
+	// 	};
 
-		const validate = context.ajv.compile(schema);
-		assert.true(validate(data));
-		assert.instance(data.amount, Utils.BigNumber);
-		assert.equal(data.amount, Utils.BigNumber.make(100));
-	});
+	// 	assert.undefined((await context.validator.validate("test", data)).error);
+	// 	// assert.instance(data.amount, BigNumber);
+	// 	// assert.equal(data.amount, Utils.BigNumber.make(100));
+	// });
 
-	it("keyword bignumber bypassGenesis should be ok", (context) => {
-		const schema = {
-			properties: {
-				amount: { bignumber: { bypassGenesis: true, minimum: 100, type: "number" } },
-			},
-			type: "object",
-		};
+	// it("keyword bignumber should cast string to Bignumber", async (context) => {
+	// 	const schema = {
+	// 		$id: "test",
+	// 		properties: {
+	// 			amount: { bignumber: {} },
+	// 		},
+	// 		type: "object",
+	// 	};
+	// 	context.validator.addSchema(schema);
 
-		const validate = context.ajv.compile(schema);
+	// 	const data = {
+	// 		amount: "100",
+	// 	};
 
-		assert.true(validate({ amount: 0, id: "3e3817fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
-		assert.false(validate({ amount: 0, id: "affe17fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
-		assert.false(validate({ amount: 0 }));
-	});
+	// 	assert.undefined((await context.validator.validate("test", data)).error);
+
+	// 	// const validate = context.ajv.compile(schema);
+	// 	// assert.true(validate(data));
+	// 	// assert.instance(data.amount, Utils.BigNumber);
+	// 	// assert.equal(data.amount, Utils.BigNumber.make(100));
+	// });
+
+	// it("keyword bignumber bypassGenesis should be ok", (context) => {
+	// 	const schema = {
+	// 		properties: {
+	// 			amount: { bignumber: { bypassGenesis: true, minimum: 100, type: "number" } },
+	// 		},
+	// 		type: "object",
+	// 	};
+
+	// 	const validate = context.ajv.compile(schema);
+
+	// 	assert.true(validate({ amount: 0, id: "3e3817fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
+	// 	assert.false(validate({ amount: 0, id: "affe17fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
+	// 	assert.false(validate({ amount: 0 }));
+	// });
 });

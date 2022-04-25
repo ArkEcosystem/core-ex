@@ -1,44 +1,98 @@
-import Ajv from "ajv";
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+import { Validator } from "@arkecosystem/core-validation/source/validator";
 
-import { describe } from "../../core-test-framework";
-import { Managers, Validation } from "..";
+import cryptoJson from "../../core/bin/config/testnet/crypto.json";
+import { describe, Sandbox } from "../../core-test-framework";
+import { registerFormats } from "./formats";
 
-describe<{
-	ajv: Ajv;
-}>("format vendorField", ({ it, assert, beforeAll }) => {
-	beforeAll((context) => {
-		context.ajv = Validation.validator.getInstance();
+type Context = {
+	validator: Validator;
+	sandbox: Sandbox;
+};
+
+describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
+	const register = ({ sandbox, validator }: Context) => {
+		const formats = registerFormats(sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
+
+		validator.extend((ajv) => {
+			formats.vendorField(ajv);
+		});
+
+		validator.extend((ajv) => {
+			formats.validPeer(ajv);
+		});
+	};
+
+	beforeEach((context) => {
+		context.sandbox = new Sandbox();
+
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+
+		context.validator = context.sandbox.app.resolve(Validator);
 	});
 
-	it("should be ok with 64 bytes", (context) => {
-		const schema = { format: "vendorField", type: "string" };
-		const validate = context.ajv.compile(schema);
+	it("#vendorField - should be ok", async (context) => {
+		register(context);
 
-		assert.true(validate("1234"));
-		assert.true(validate("a".repeat(64)));
-		assert.false(validate("a".repeat(65)));
-		assert.true(validate("⊁".repeat(21)));
-		assert.false(validate("⊁".repeat(22)));
-		assert.false(validate({}));
-		assert.false(validate(null));
-		assert.false(validate());
+		const schema = {
+			$id: "test",
+			format: "vendorField",
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", "false")).error);
+		assert.undefined((await context.validator.validate("test", "a".repeat(255))).error);
+		assert.undefined((await context.validator.validate("test", "⊁".repeat(85))).error);
 	});
 
-	it("should not be ok with over 64 bytes without milestone ", (context) => {
-		const schema = { format: "vendorField", type: "string" };
-		const validate = context.ajv.compile(schema);
-		assert.false(validate("a".repeat(65)));
+	it("#vendorField - should not be ok", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			format: "vendorField",
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		assert.defined((await context.validator.validate("test", "a".repeat(256))).error);
+		assert.defined((await context.validator.validate("test", "⊁".repeat(86))).error);
+		assert.defined((await context.validator.validate("test", {})).error);
+		assert.defined((await context.validator.validate("test", null)).error);
+		assert.defined((await context.validator.validate("test")).error);
 	});
 
-	it("should be ok with up to 255 bytes with milestone ", (context) => {
-		Managers.configManager.getMilestone().vendorFieldLength = 255;
-		const schema = { format: "vendorField", type: "string" };
-		const validate = context.ajv.compile(schema);
-		assert.true(validate("a".repeat(65)));
-		assert.true(validate("⊁".repeat(85)));
-		assert.false(validate("a".repeat(256)));
-		assert.false(validate("⊁".repeat(86)));
+	it("#peer - should be ok", async (context) => {
+		register(context);
 
-		Managers.configManager.getMilestone().vendorFieldLength = 64;
+		const schema = {
+			$id: "test",
+			format: "peer",
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", "192.168.178.0")).error);
+		assert.undefined((await context.validator.validate("test", "5.196.105.32")).error);
+	});
+
+	it("#peer - should not be ok", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			format: "peer",
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		assert.defined((await context.validator.validate("test", "aaaa")).error);
+		assert.defined((await context.validator.validate("test", "127.0.0.1")).error);
+		assert.defined((await context.validator.validate("test", null)).error);
+		assert.defined((await context.validator.validate("test", {})).error);
+		assert.defined((await context.validator.validate("test")).error);
 	});
 });
