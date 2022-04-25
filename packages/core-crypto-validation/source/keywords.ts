@@ -8,9 +8,9 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		ajv.addKeyword("maxBytes", {
 			compile(schema, parentSchema) {
 				return (data) => {
-					if ((parentSchema as any).type !== "string") {
-						return false;
-					}
+					// if ((parentSchema as any).type !== "string") {
+					// 	return false;
+					// }
 
 					return Buffer.from(data, "utf8").byteLength <= schema;
 				};
@@ -30,16 +30,17 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 			compile(schema) {
 				return (data, dataPath, parentObject: Contracts.Crypto.ITransactionData) => {
 					// Impose dynamic multipayment limit based on milestone
-					if (
-						data === Contracts.Crypto.TransactionType.MultiPayment &&
-						parentObject &&
-						(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
-						parentObject.asset &&
-						parentObject.asset.payments
-					) {
-						const limit: number = configuration.getMilestone().multiPaymentLimit || 256;
-						return parentObject.asset.payments.length <= limit;
-					}
+					// TODO: Move under multi payment
+					// if (
+					// 	data === Contracts.Crypto.TransactionType.MultiPayment &&
+					// 	parentObject &&
+					// 	(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
+					// 	parentObject.asset &&
+					// 	parentObject.asset.payments
+					// ) {
+					// 	const limit: number = configuration.getMilestone().multiPaymentLimit || 256;
+					// 	return parentObject.asset.payments.length <= limit;
+					// }
 
 					return data === schema;
 				};
@@ -86,17 +87,25 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 						return false;
 					}
 
-					if (parentObject && property) {
-						parentObject[property] = bignum;
-					}
+					// if (parentObject && property) {
+					// 	parentObject[property] = bignum;
+					// }
 
-					const bypassGenesis = false;
+					// const bypassGenesis = false;
 
-					if (bignum.isLessThan(minimum) && !(bignum.isZero() && bypassGenesis)) {
+					// if (bignum.isLessThan(minimum) && !(bignum.isZero() && bypassGenesis)) {
+					// 	return false;
+					// }
+
+					// if (bignum.isGreaterThan(maximum) && !bypassGenesis) {
+					// 	return false;
+					// }
+
+					if (bignum.isLessThan(minimum)) {
 						return false;
 					}
 
-					if (bignum.isGreaterThan(maximum) && !bypassGenesis) {
+					if (bignum.isGreaterThan(maximum)) {
 						return false;
 					}
 
@@ -107,8 +116,8 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 			metaSchema: {
 				additionalItems: false,
 				properties: {
-					block: { type: "boolean" },
-					bypassGenesis: { type: "boolean" },
+					// block: { type: "boolean" },
+					// bypassGenesis: { type: "boolean" },
 					maximum: { type: "integer" },
 					minimum: { type: "integer" },
 				},
@@ -144,7 +153,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 				additionalItems: false,
 				properties: {
 					allowNullWhenGenesis: { type: "boolean" },
-					isPreviousBlock: { type: "boolean" },
+					// isPreviousBlock: { type: "boolean" }, // TODO: Remove
 				},
 				type: "object",
 			},
