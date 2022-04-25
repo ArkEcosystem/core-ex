@@ -44,14 +44,14 @@ export const schemas = {
 			generatorPublicKey: { $ref: "publicKey" },
 			height: { minimum: 1, type: "integer" },
 			id: { blockId: {} },
-			numberOfTransactions: { type: "integer" },
+			numberOfTransactions: { type: "integer", minimum: 0 },
 			payloadHash: { $ref: "hex" },
 			payloadLength: { minimum: 0, type: "integer" },
-			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } },
+			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } }, // TODO: Check blockId props
 			reward: { bignumber: { minimum: 0 } },
 			timestamp: { minimum: 0, type: "integer" },
-			totalAmount: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
-			totalFee: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } },
+			totalAmount: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } }, // TODO: Check bypassGenesis
+			totalFee: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } }, // TODO: Check bypassGenesis
 			version: { enum: [1] },
 		},
 		required: [
@@ -68,14 +68,14 @@ export const schemas = {
 		type: "object",
 	},
 
-	// @TODO: plugins should register this rule
-	genericName: {
-		$id: "genericName",
-		allOf: [
-			{ pattern: "^[a-zA-Z0-9]+(( - |[ ._-])[a-zA-Z0-9]+)*[.]?$", type: "string" },
-			{ maxLength: 40, minLength: 1 },
-		],
-	},
+	// // @TODO: plugins should register this rule
+	// genericName: {
+	// 	$id: "genericName",
+	// 	allOf: [
+	// 		{ pattern: "^[a-zA-Z0-9]+(( - |[ ._-])[a-zA-Z0-9]+)*[.]?$", type: "string" },
+	// 		{ maxLength: 40, minLength: 1 },
+	// 	],
+	// },
 
 	hex: {
 		$id: "hex",
@@ -100,6 +100,7 @@ export const schemas = {
 		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
 	},
 
+	// TODO: Uri format is missing
 	uri: {
 		$id: "uri",
 		allOf: [{ format: "uri" }, { maxLength: 80, minLength: 4 }],
