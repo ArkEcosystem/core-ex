@@ -29,8 +29,10 @@
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"devDependencies": {
+		"@arkecosystem/core-crypto-config": "workspace:*",
+		"@arkecosystem/core-crypto-validation": "workspace:*",
 		"@arkecosystem/core-validation": "workspace:*",
-		"uvu": "0.5.3"
+		"uvu": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=16.x"

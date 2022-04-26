@@ -38,7 +38,7 @@ export class VoteTransaction extends Transaction {
 					type: "object",
 				},
 				fee: { bignumber: { minimum: 1 } },
-				recipientId: { $ref: "address" },
+				recipientId: { $ref: "address" }, // TODO: Check
 				type: { transactionType: Contracts.Crypto.TransactionType.Vote },
 			},
 			required: ["asset"],
