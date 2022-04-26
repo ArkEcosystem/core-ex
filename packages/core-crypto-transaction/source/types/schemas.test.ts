@@ -6,7 +6,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework";
-import { extend, transactionBaseSchema } from "./schemas";
+import { extend, transactionBaseSchema, signedSchema, strictSchema } from "./schemas";
 
 describe<{
 	sandbox: Sandbox;
@@ -45,6 +45,17 @@ describe<{
 		validator.addSchema(schema);
 
 		assert.undefined((await validator.validate("transaction", transactionOriginal)).error);
+	});
+
+	it("transactionBaseSchema - should allow addtional properties", async ({ validator }) => {
+		validator.addSchema(schema);
+
+		const transaction = {
+			...transactionOriginal,
+			test: "test",
+		};
+
+		assert.undefined((await validator.validate("transaction", transaction)).error);
 	});
 
 	it("transactionBaseSchema - should have required fields", async ({ validator }) => {
@@ -352,5 +363,74 @@ describe<{
 
 			assert.true((await validator.validate("transaction", transaction)).error.includes("version"));
 		}
+	});
+
+	it("signedSchema - should be ok with signature", async ({ validator }) => {
+		validator.addSchema(signedSchema(schema));
+
+		const transaction = {
+			...transactionOriginal,
+		};
+
+		assert.undefined((await validator.validate("transactionSigned", transaction)).error);
+	});
+
+	it("signedSchema - should be ok with signatures", async ({ validator }) => {
+		validator.addSchema(signedSchema(schema));
+
+		const transaction = {
+			...transactionOriginal,
+			signatures: ["a".repeat(130)],
+		};
+
+		delete transaction.signature;
+
+		assert.undefined((await validator.validate("transactionSigned", transaction)).error);
+	});
+
+	it("signedSchema - should be ok with signature & signatures", async ({ validator }) => {
+		validator.addSchema(signedSchema(schema));
+
+		const transaction = {
+			...transactionOriginal,
+			signatures: ["a".repeat(130)],
+		};
+
+		assert.undefined((await validator.validate("transactionSigned", transaction)).error);
+	});
+
+	it("signedSchema - should not be ok without signature and signatures", async ({ validator }) => {
+		validator.addSchema(signedSchema(schema));
+
+		const transaction = {
+			...transactionOriginal,
+		};
+		delete transaction.signature;
+
+		assert.defined((await validator.validate("transactionSigned", transaction)).error);
+	});
+
+	it("strictSchema - should not have any additonal properties", async ({ validator }) => {
+		validator.addSchema(strictSchema(schema));
+
+		const transaction = {
+			...transactionOriginal,
+		};
+
+		assert.undefined((await validator.validate("transactionStrict", transaction)).error);
+
+		transaction.test = "test";
+		assert.defined((await validator.validate("transactionStrict", transaction)).error);
+	});
+
+	it("strictSchema - should not be ok without signature and signatures", async ({ validator }) => {
+		validator.addSchema(signedSchema(schema));
+
+		const transaction = {
+			...transactionOriginal,
+		};
+		delete transaction.signature;
+
+		assert.defined((await validator.validate("transactionStrict", transaction)).error);
 	});
 });
