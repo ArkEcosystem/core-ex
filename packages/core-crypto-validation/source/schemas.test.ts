@@ -1,6 +1,10 @@
+import { Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 
+import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";
+import { registerKeywords } from "./keywords";
 import { schemas } from "./schemas";
 
 describe<{
@@ -9,7 +13,35 @@ describe<{
 }>("Schemas", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
+
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+
 		context.validator = context.sandbox.app.resolve(Validator);
+
+		const formats = registerKeywords(
+			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
+		);
+
+		context.validator.extend((ajv) => {
+			formats.transactionType(ajv);
+		});
+
+		context.validator.extend((ajv) => {
+			formats.network(ajv);
+		});
+
+		context.validator.extend((ajv) => {
+			formats.bignum(ajv);
+		});
+
+		context.validator.extend((ajv) => {
+			formats.blockId(ajv);
+		});
+
+		context.validator.extend((ajv) => {
+			formats.maxBytes(ajv);
+		});
 
 		for (const schema of Object.values(schemas)) {
 			context.validator.addSchema(schema);
@@ -31,7 +63,7 @@ describe<{
 		assert.defined((await validator.validate("address", "a".repeat(63))).error);
 		assert.defined((await validator.validate("address", 123)).error);
 		assert.defined((await validator.validate("address", null)).error);
-		assert.defined((await validator.validate("address", undefined)).error);
+		assert.defined((await validator.validate("address")).error);
 		assert.defined((await validator.validate("address", {})).error);
 
 		const invalidChars = "!#$%&'|+/";
@@ -53,7 +85,7 @@ describe<{
 	it("alphanumeric - should not be ok", async ({ validator }) => {
 		assert.defined((await validator.validate("address", 123)).error);
 		assert.defined((await validator.validate("address", null)).error);
-		assert.defined((await validator.validate("address", undefined)).error);
+		assert.defined((await validator.validate("address")).error);
 		assert.defined((await validator.validate("address", {})).error);
 	});
 
@@ -69,7 +101,7 @@ describe<{
 	it("hex - should not be ok", async ({ validator }) => {
 		assert.defined((await validator.validate("hex", 123)).error);
 		assert.defined((await validator.validate("hex", null)).error);
-		assert.defined((await validator.validate("hex", undefined)).error);
+		assert.defined((await validator.validate("hex")).error);
 		assert.defined((await validator.validate("hex", {})).error);
 
 		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
@@ -95,7 +127,7 @@ describe<{
 		assert.defined((await validator.validate("publicKey", "0".repeat(65))).error);
 		assert.defined((await validator.validate("publicKey", 123)).error);
 		assert.defined((await validator.validate("publicKey", null)).error);
-		assert.defined((await validator.validate("publicKey", undefined)).error);
+		assert.defined((await validator.validate("publicKey")).error);
 		assert.defined((await validator.validate("publicKey", {})).error);
 
 		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
@@ -120,7 +152,7 @@ describe<{
 		assert.defined((await validator.validate("transactionId", "0".repeat(65))).error);
 		assert.defined((await validator.validate("transactionId", 123)).error);
 		assert.defined((await validator.validate("transactionId", null)).error);
-		assert.defined((await validator.validate("transactionId", undefined)).error);
+		assert.defined((await validator.validate("transactionId")).error);
 		assert.defined((await validator.validate("transactionId", {})).error);
 
 		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
@@ -145,7 +177,7 @@ describe<{
 		assert.defined((await validator.validate("validatorUsername", "0".repeat(21))).error);
 		assert.defined((await validator.validate("transactionId", 123)).error);
 		assert.defined((await validator.validate("transactionId", null)).error);
-		assert.defined((await validator.validate("transactionId", undefined)).error);
+		assert.defined((await validator.validate("transactionId")).error);
 		assert.defined((await validator.validate("transactionId", {})).error);
 
 		// TODO: Check
@@ -160,10 +192,10 @@ describe<{
 		blockSignature: "123",
 		generatorPublicKey: "a".repeat(64),
 		height: 1,
-		id: "123",
+		id: "1".repeat(64),
 		numberOfTransactions: 0,
 		payloadHash: "123",
-		previousBlock: "0123",
+		previousBlock: "0".repeat(64),
 		reward: 0,
 		timestamp: 0,
 		totalAmount: 0,
@@ -269,18 +301,18 @@ describe<{
 		);
 	});
 
-	// it("blockHeader - id should be blockId", async ({ validator }) => {
-	// 	assert.defined(
-	// 		(
-	// 			await validator.validate("blockHeader", {
-	// 				...blockOriginal,
-	// 				id: "1",
-	// 			})
-	// 		).error.includes("data.height"),
-	// 	);
-	// });
+	it("blockHeader - id should be blockId", async ({ validator }) => {
+		assert.defined(
+			(
+				await validator.validate("blockHeader", {
+					...blockOriginal,
+					id: "1",
+				})
+			).error.includes("data.height"),
+		);
+	});
 
-	it("numberOfTransactions - height should be integer & min 0", async ({ validator }) => {
+	it("blockHeader - numberOfTransactions should be integer & min 0", async ({ validator }) => {
 		assert.defined(
 			(
 				await validator.validate("blockHeader", {
@@ -309,7 +341,7 @@ describe<{
 		assert.defined((await validator.validate("blockHeader", block)).error.includes("data.payloadHash"));
 	});
 
-	it("payloadLength - height should be integer & min 0", async ({ validator }) => {
+	it("blockHeader - payloadLength should be integer & min 0", async ({ validator }) => {
 		assert.defined(
 			(
 				await validator.validate("blockHeader", {
@@ -329,38 +361,37 @@ describe<{
 		);
 	});
 
-	// it("previousBlock - id should be blockId", async ({ validator }) => {
-	// 	assert.defined(
-	// 		(
-	// 			await validator.validate("blockHeader", {
-	// 				...blockOriginal,
-	// 				id: "1",
-	// 			})
-	// 		).error.includes("data.height"),
-	// 	);
-	// });
+	it("blockHeader - id should be blockId", async ({ validator }) => {
+		assert.defined(
+			(
+				await validator.validate("blockHeader", {
+					...blockOriginal,
+					id: "1",
+				})
+			).error.includes("data.height"),
+		);
+	});
 
-	// it("reward - height should be bigNumber & min 0", async ({ validator }) => {
-	// 	// assert.defined(
-	// 	// 	(
-	// 	// 		await validator.validate("blockHeader", {
-	// 	// 			...blockOriginal,
-	// 	// 			reward: "-1",
-	// 	// 		})
-	// 	// 	).error.includes("data.reward"),
-	// 	// );
+	it("blockHeader - reward should be bigNumber & min 0", async ({ validator }) => {
+		assert.defined(
+			(
+				await validator.validate("blockHeader", {
+					...blockOriginal,
+					reward: "-1",
+				})
+			).error.includes("data.reward"),
+		);
+		assert.true(
+			(
+				await validator.validate("blockHeader", {
+					...blockOriginal,
+					reward: -1,
+				})
+			).error.includes("data.reward"),
+		);
+	});
 
-	// 	assert.true(
-	// 		(
-	// 			await validator.validate("blockHeader", {
-	// 				...blockOriginal,
-	// 				reward: -1,
-	// 			})
-	// 		).error.includes("data.reward"),
-	// 	);
-	// });
-
-	it("timestamp - height should be integer & min 0", async ({ validator }) => {
+	it("blockHeader - timestamp should be integer & min 0", async ({ validator }) => {
 		assert.defined(
 			(
 				await validator.validate("blockHeader", {
@@ -380,10 +411,29 @@ describe<{
 		);
 	});
 
-	// TODO: Total ammount
-	// TODO: Total totalFee
+	it("blockHeader - totalAmount should be bigNumber & min 0", async ({ validator }) => {
+		assert.defined(
+			(
+				await validator.validate("blockHeader", {
+					...blockOriginal,
+					totalAmount: -1,
+				})
+			).error.includes("data.totalAmount"),
+		);
+	});
 
-	it("version - height should be 1", async ({ validator }) => {
+	it("blockHeader - totalFee should be bigNumber & min 0", async ({ validator }) => {
+		assert.defined(
+			(
+				await validator.validate("blockHeader", {
+					...blockOriginal,
+					totalFee: -1,
+				})
+			).error.includes("data.totalFee"),
+		);
+	});
+
+	it("blockHeader - version should be 1", async ({ validator }) => {
 		assert.defined(
 			(
 				await validator.validate("blockHeader", {
@@ -402,4 +452,15 @@ describe<{
 			).error.includes("data.version"),
 		);
 	});
+
+	// TODO: Check
+	// it("block - shoudl be ok", async ({ validator }) => {
+	// 	const blockWithTransactions = {
+	// 		...blockOriginal,
+	// 		numberOfTransactions: 2,
+	// 		transactions: [],
+	// 	};
+
+	// 	assert.undefined((await validator.validate("block", blockWithTransactions)).error);
+	// });
 });
