@@ -1,0 +1,171 @@
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Configuration } from "@arkecosystem/core-crypto-config";
+import { ServiceProvider as CryptoValidationServiceProvider } from "@arkecosystem/core-crypto-validation";
+import { ServiceProvider as ValidationServiceProvider } from "@arkecosystem/core-validation";
+import { BigNumber } from "@arkecosystem/utils";
+
+import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
+import { describe, Sandbox } from "../../../core-test-framework";
+import { TransferTransaction } from "./1";
+
+describe<{
+	sandbox: Sandbox;
+	validator: Contracts.Crypto.IValidator;
+}>("Schemas", ({ it, beforeEach, assert }) => {
+	beforeEach(async (context) => {
+		context.sandbox = new Sandbox();
+
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+
+		await context.sandbox.app.resolve(ValidationServiceProvider).register();
+		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
+
+		context.validator = context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator);
+	});
+
+	const transactionOriginal = {
+		amount: 1,
+		fee: 1,
+		nonce: 0,
+		recipientId: "A".repeat(62),
+		senderPublicKey: "A".repeat(64),
+		type: 0,
+	};
+
+	it("#getSchema - should be valid", async ({ validator }) => {
+		validator.addSchema(TransferTransaction.getSchema());
+
+		assert.undefined((await validator.validate("transfer", transactionOriginal)).error);
+	});
+
+	it("#getSchema - expiration should be integer, min 0", async ({ validator }) => {
+		validator.addSchema(TransferTransaction.getSchema());
+
+		const validValues = [0, 1, 100, undefined];
+		for (const value of validValues) {
+			const transaction = {
+				...transactionOriginal,
+				expiration: value,
+			};
+
+			assert.undefined((await validator.validate("transfer", transaction)).error);
+		}
+
+		const invalidValues = [-1, 1.1, BigNumber.ONE, "test", null, {}];
+
+		for (const value of invalidValues) {
+			const transaction = {
+				...transactionOriginal,
+				expiration: value,
+			};
+
+			assert.true((await validator.validate("transfer", transaction)).error.includes("expiration"));
+		}
+	});
+
+	it("#getSchema - fee should be bigNumber, min 1", async ({ validator }) => {
+		validator.addSchema(TransferTransaction.getSchema());
+
+		const validValues = [1, 100, BigNumber.ONE];
+		for (const value of validValues) {
+			const transaction = {
+				...transactionOriginal,
+				fee: value,
+			};
+
+			assert.undefined((await validator.validate("transfer", transaction)).error);
+		}
+
+		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
+		for (const value of invalidValues) {
+			const transaction = {
+				...transactionOriginal,
+				fee: value,
+			};
+
+			assert.true((await validator.validate("transfer", transaction)).error.includes("fee"));
+		}
+	});
+
+	it("#getSchema - recipientId should be address", async ({ validator }) => {
+		validator.addSchema(TransferTransaction.getSchema());
+
+		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		for (const char of validChars) {
+			const transaction = {
+				...transactionOriginal,
+				recipientId: char.repeat(62),
+			};
+
+			assert.undefined((await validator.validate("transfer", transaction)).error);
+		}
+
+		const invalidValues = ["a".repeat(61), "a".repeat(63), "&".repeat(62), null, undefined, {}];
+		for (const value of invalidValues) {
+			const transaction = {
+				...transactionOriginal,
+				recipientId: value,
+			};
+
+			assert.true((await validator.validate("transfer", transaction)).error.includes("recipientId"));
+		}
+	});
+
+	it("#getSchema - type should be transfer", async ({ validator }) => {
+		validator.addSchema(TransferTransaction.getSchema());
+
+		const validValues = [Contracts.Crypto.TransactionType.Transfer];
+		for (const value of validValues) {
+			const transaction = {
+				...transactionOriginal,
+				type: value,
+			};
+
+			assert.undefined((await validator.validate("transfer", transaction)).error);
+		}
+
+		const invalidValues = [
+			-1,
+			1.1,
+			Contracts.Crypto.TransactionType.Vote,
+			BigNumber.ZERO,
+			"test",
+			null,
+			undefined,
+			{},
+		];
+		for (const value of invalidValues) {
+			const transaction = {
+				...transactionOriginal,
+				type: value,
+			};
+
+			assert.true((await validator.validate("transfer", transaction)).error.includes("type"));
+		}
+	});
+
+	it("#getSchema - vendorField should be vendorField or null", async ({ validator }) => {
+		validator.addSchema(TransferTransaction.getSchema());
+
+		const validValues = ["", "dummy", "a".repeat(255), null, undefined];
+		for (const value of validValues) {
+			const transaction = {
+				...transactionOriginal,
+				vendorField: value,
+			};
+
+			assert.undefined((await validator.validate("transfer", transaction)).error);
+		}
+
+		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "a".repeat(256), {}];
+		for (const value of invalidValues) {
+			const transaction = {
+				...transactionOriginal,
+				vendorField: value,
+			};
+
+			assert.true((await validator.validate("transfer", transaction)).error.includes("vendorField"));
+		}
+	});
+});
