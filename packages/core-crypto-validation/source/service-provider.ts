@@ -15,20 +15,18 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	async #registerFormats(): Promise<void> {
-		for (const [name, format] of Object.entries(
-			registerFormats(this.app.get(Identifiers.Cryptography.Configuration)),
-		)) {
-			// @ts-ignore
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+		for (const format of Object.values(registerFormats(this.app.get(Identifiers.Cryptography.Configuration)))) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).extend((ajv) => {
+				format(ajv);
+			});
 		}
 	}
 
 	async #registerKeywords(): Promise<void> {
-		for (const [name, format] of Object.entries(
-			registerKeywords(this.app.get(Identifiers.Cryptography.Configuration)),
-		)) {
-			// @ts-ignore
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+		for (const keywords of Object.values(registerKeywords(this.app.get(Identifiers.Cryptography.Configuration)))) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).extend((ajv) => {
+				keywords(ajv);
+			});
 		}
 	}
 

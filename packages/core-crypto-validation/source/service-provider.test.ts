@@ -18,7 +18,7 @@ describe<{
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.validator = {
-			addFormat: () => {},
+			extend: () => {},
 			addSchema: () => {},
 		};
 
@@ -31,12 +31,12 @@ describe<{
 	});
 
 	it("should register", async ({ validator, serviceProvider }) => {
-		const spyOnAddFromat = spy(validator, "addFormat");
+		const spyOnExtend = spy(validator, "extend");
 		const spyOnAddSchema = spy(validator, "addSchema");
 
 		await assert.resolves(() => serviceProvider.register());
 
-		spyOnAddFromat.called();
+		spyOnExtend.called();
 		spyOnAddSchema.called();
 	});
 });
