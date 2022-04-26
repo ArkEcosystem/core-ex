@@ -19,6 +19,7 @@ export class VoteTransaction extends Transaction {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
+						// TODO: Check that at least one publicKey is provided
 						unvotes: {
 							additionalItems: false,
 							items: { $ref: "publicKey" },
