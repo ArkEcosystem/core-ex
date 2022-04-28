@@ -182,7 +182,7 @@ describe<{
 		assert.defined((await context.validator.validate("test", 19)).error);
 	});
 
-	it("keyword bignumber should be ok if above or equal maximum", async (context) => {
+	it("keyword bignumber should be ok if below or equal maximum", async (context) => {
 		register(context);
 
 		const schema = {
@@ -250,6 +250,58 @@ describe<{
 		assert.defined((await context.validator.validate("test", /d+/)).error);
 		assert.defined((await context.validator.validate("test", "")).error);
 		assert.defined((await context.validator.validate("test", "\u0000")).error);
+	});
+
+	it("keyword bignumber should allow 0 if genensis transaction and bypassGenesis = true", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			properties: {
+				id: { type: "string" },
+				fee: {
+					bignumber: {
+						bypassGenesis: true,
+						minimum: 3,
+					},
+				},
+			},
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(
+			await context.validator.validate("test", {
+				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
+				fee: 0,
+			}).error,
+		);
+	});
+
+	it.only("keyword bignumber should not allow 0 if genensis transaction and bypassGenesis = false", async (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			properties: {
+				id: { type: "string" },
+				fee: {
+					bignumber: {
+						bypassGenesis: false,
+						minimum: 3,
+					},
+				},
+			},
+		};
+		context.validator.addSchema(schema);
+
+		assert.defined(
+			(
+				await context.validator.validate("test", {
+					id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
+					fee: 0,
+				})
+			).error,
+		);
 	});
 
 	// it("keyword bignumber should cast number to Bignumber", async (context) => {

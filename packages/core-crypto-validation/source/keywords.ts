@@ -1,7 +1,20 @@
+// @ts-nocheck
 import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import { Ajv } from "ajv";
 import ajvKeywords from "ajv-keywords";
+
+let genesisTransactions;
+
+const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id: string) => {
+	if (!genesisTransactions) {
+		genesisTransactions = configuration
+			.get("genesisBlock.transactions")
+			.reduce((acc, curr) => Object.assign(acc, { [curr.id]: true }), {});
+	}
+
+	return !!genesisTransactions[id];
+};
 
 export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
 	const maxBytes = (ajv: Ajv) => {
@@ -91,18 +104,20 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 					// 	parentObject[property] = bignum;
 					// }
 
-					// const bypassGenesis = false;
-
-					// if (bignum.isLessThan(minimum) && !(bignum.isZero() && bypassGenesis)) {
-					// 	return false;
-					// }
-
-					// if (bignum.isGreaterThan(maximum) && !bypassGenesis) {
-					// 	return false;
-					// }
-
 					if (bignum.isLessThan(minimum)) {
-						return false;
+						if (bignum.isZero() && schema.bypassGenesis) {
+							let bypassGenesis = false;
+							if (parentObject.id) {
+								// if (schema.block) {
+								// 	bypassGenesis = parentObject.height === 1;
+								// } else {
+								bypassGenesis = isGenesisTransaction(configuration, parentObject.id);
+								// }
+							}
+							return bypassGenesis;
+						} else {
+							return false;
+						}
 					}
 
 					if (bignum.isGreaterThan(maximum)) {
@@ -117,7 +132,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 				additionalItems: false,
 				properties: {
 					// block: { type: "boolean" },
-					// bypassGenesis: { type: "boolean" },
+					bypassGenesis: { type: "boolean" },
 					maximum: { type: "integer" },
 					minimum: { type: "integer" },
 				},
