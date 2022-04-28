@@ -968,10 +968,13 @@ importers:
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-transactions': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
+      uvu: 0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
       '@arkecosystem/core-contracts': link:../core-contracts
@@ -981,6 +984,10 @@ importers:
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
+    devDependencies:
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-validation': link:../core-validation
+      uvu: 0.5.3
 
   packages/core-crypto-transaction-multi-signature-registration:
     specifiers:
