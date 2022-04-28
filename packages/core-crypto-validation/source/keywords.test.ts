@@ -77,6 +77,22 @@ describe<{
 	it("keyword network should be ok", async (context) => {
 		register(context);
 
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("network", {});
+
+		const schema = {
+			$id: "test",
+			network: true,
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined((await context.validator.validate("test", 30)).error);
+		assert.undefined((await context.validator.validate("test", 23)).error);
+		assert.undefined((await context.validator.validate("test", "a")).error);
+	});
+
+	it("keyword network - should return true when network is not set in configuration", async (context) => {
+		register(context);
+
 		const schema = {
 			$id: "test",
 			network: true,
@@ -277,7 +293,36 @@ describe<{
 		);
 	});
 
-	it.only("keyword bignumber should not allow 0 if genensis transaction and bypassGenesis = false", async (context) => {
+	it("keyword bignumber should allow 0 for any transaction when genesisBlock is not set and bypassGenesis = true", async (context) => {
+		register(context);
+
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("genesisBlock", {});
+
+		const schema = {
+			$id: "test",
+			properties: {
+				id: { type: "string" },
+				fee: {
+					bignumber: {
+						bypassGenesis: true,
+						minimum: 3,
+					},
+				},
+			},
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(
+			(
+				await context.validator.validate("test", {
+					id: "random",
+					fee: 0,
+				})
+			).error,
+		);
+	});
+
+	it("keyword bignumber should not allow 0 if genensis transaction and bypassGenesis = false", async (context) => {
 		register(context);
 
 		const schema = {
