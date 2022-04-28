@@ -7,6 +7,10 @@ import ajvKeywords from "ajv-keywords";
 let genesisTransactions;
 
 const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id: string) => {
+	if (!configuration.get("genesisBlock.transactions")) {
+		return true;
+	}
+
 	if (!genesisTransactions) {
 		genesisTransactions = configuration
 			.get("genesisBlock.transactions")
@@ -69,7 +73,13 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 	const network = (ajv: Ajv) => {
 		ajv.addKeyword("network", {
 			compile(schema) {
-				return (data) => schema && data === configuration.get("network.pubKeyHash");
+				return (data) => {
+					const networkHash = configuration.get("network.pubKeyHash");
+					if (!networkHash) {
+						return true;
+					}
+					return schema && data === networkHash;
+				};
 			},
 			errors: false,
 			metaSchema: {
