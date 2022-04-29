@@ -13,7 +13,7 @@ export interface IValidator {
 
 	addKeyword(definition: KeywordDefinition): void;
 
-	addSchema(schema: object | object[], key?: string): void;
+	addSchema(schema: object | object[]): void;
 
 	removeKeyword(keyword: string): void;
 
