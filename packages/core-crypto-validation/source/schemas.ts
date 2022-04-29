@@ -3,6 +3,7 @@ export const schemas = {
 	address: {
 		$id: "address",
 		allOf: [{ maxLength: 62, minLength: 62 }, { $ref: "bech32m" }],
+		type: "string",
 	},
 
 	alphanumeric: {
@@ -30,10 +31,11 @@ export const schemas = {
 		properties: {
 			transactions: {
 				$ref: "transactions",
-				maxItems: { $data: "1/numberOfTransactions" },
-				minItems: { $data: "1/numberOfTransactions" },
+				// maxItems: { $data: "1/numberOfTransactions" },
+				// minItems: { $data: "1/numberOfTransactions" },
 			},
 		},
+		type: "object",
 	},
 
 	// @TODO: plugins should register this rule
@@ -44,7 +46,7 @@ export const schemas = {
 			generatorPublicKey: { $ref: "publicKey" },
 			height: { minimum: 1, type: "integer" },
 			id: { blockId: {} },
-			numberOfTransactions: { type: "integer", minimum: 0 },
+			numberOfTransactions: { minimum: 0, type: "integer" },
 			payloadHash: { $ref: "hex" },
 			payloadLength: { minimum: 0, type: "integer" },
 			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } }, // TODO: Check blockId props
@@ -92,12 +94,14 @@ export const schemas = {
 	publicKey: {
 		$id: "publicKey",
 		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }, { transform: ["toLowerCase"] }], //64=schnorr,66=ecdsa
+		type: "string",
 	},
 
 	// @TODO: plugins should register this rule
 	transactionId: {
 		$id: "transactionId",
 		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
+		type: "string",
 	},
 
 	// TODO: Uri format is missing
@@ -114,5 +118,6 @@ export const schemas = {
 			{ maxLength: 20, minLength: 1 },
 			{ transform: ["toLowerCase"] },
 		],
+		type: "string",
 	},
 };

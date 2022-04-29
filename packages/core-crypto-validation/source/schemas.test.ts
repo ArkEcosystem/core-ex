@@ -48,137 +48,137 @@ describe<{
 		}
 	});
 
-	it("address - should be ok", async ({ validator }) => {
-		assert.undefined((await validator.validate("address", "a".repeat(62))).error);
+	it("address - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("address", "a".repeat(62)).error);
 
 		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
-			assert.undefined((await validator.validate("address", char.repeat(62))).error);
+			assert.undefined(validator.validate("address", char.repeat(62)).error);
 		}
 	});
 
-	it("address - should not be ok", async ({ validator }) => {
-		assert.defined((await validator.validate("address", "a".repeat(61))).error);
-		assert.defined((await validator.validate("address", "a".repeat(63))).error);
-		assert.defined((await validator.validate("address", 123)).error);
-		assert.defined((await validator.validate("address", null)).error);
-		assert.defined((await validator.validate("address")).error);
-		assert.defined((await validator.validate("address", {})).error);
+	it("address - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("address", "a".repeat(61)).error);
+		assert.defined(validator.validate("address", "a".repeat(63)).error);
+		assert.defined(validator.validate("address", 123).error);
+		assert.defined(validator.validate("address", null).error);
+		assert.defined(validator.validate("address").error);
+		assert.defined(validator.validate("address", {}).error);
 
 		const invalidChars = "!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined((await validator.validate("address", char.repeat(62))).error);
+			assert.defined(validator.validate("address", char.repeat(62)).error);
 		}
 	});
 
-	it("alphanumeric - should be ok", async ({ validator }) => {
+	it("alphanumeric - should be ok", ({ validator }) => {
 		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
-			assert.undefined((await validator.validate("alphanumeric", char)).error);
-			assert.undefined((await validator.validate("alphanumeric", char.repeat(20))).error);
+			assert.undefined(validator.validate("alphanumeric", char).error);
+			assert.undefined(validator.validate("alphanumeric", char.repeat(20)).error);
 		}
 	});
 
-	it("alphanumeric - should not be ok", async ({ validator }) => {
-		assert.defined((await validator.validate("address", 123)).error);
-		assert.defined((await validator.validate("address", null)).error);
-		assert.defined((await validator.validate("address")).error);
-		assert.defined((await validator.validate("address", {})).error);
+	it("alphanumeric - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("address", 123).error);
+		assert.defined(validator.validate("address", null).error);
+		assert.defined(validator.validate("address").error);
+		assert.defined(validator.validate("address", {}).error);
 	});
 
-	it("hex - should be ok", async ({ validator }) => {
+	it("hex - should be ok", ({ validator }) => {
 		const validChars = "0123456789ABCDEFabcdef";
 
 		for (const char of validChars) {
-			assert.undefined((await validator.validate("hex", char)).error);
-			assert.undefined((await validator.validate("hex", char.repeat(20))).error);
+			assert.undefined(validator.validate("hex", char).error);
+			assert.undefined(validator.validate("hex", char.repeat(20)).error);
 		}
 	});
 
-	it("hex - should not be ok", async ({ validator }) => {
-		assert.defined((await validator.validate("hex", 123)).error);
-		assert.defined((await validator.validate("hex", null)).error);
-		assert.defined((await validator.validate("hex")).error);
-		assert.defined((await validator.validate("hex", {})).error);
+	it("hex - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("hex", 123).error);
+		assert.defined(validator.validate("hex", null).error);
+		assert.defined(validator.validate("hex").error);
+		assert.defined(validator.validate("hex", {}).error);
 
 		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined((await validator.validate("hex", char)).error);
-			assert.defined((await validator.validate("hex", char.repeat(20))).error);
+			assert.defined(validator.validate("hex", char).error);
+			assert.defined(validator.validate("hex", char.repeat(20)).error);
 		}
 	});
 
-	it("publicKey - should be ok", async ({ validator }) => {
-		assert.undefined((await validator.validate("publicKey", "0".repeat(64))).error);
+	it("publicKey - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("publicKey", "0".repeat(64)).error);
 
 		const validChars = "0123456789ABCDEFabcdef";
 
 		for (const char of validChars) {
-			assert.undefined((await validator.validate("publicKey", char.repeat(64))).error);
+			assert.undefined(validator.validate("publicKey", char.repeat(64)).error);
 		}
 	});
 
-	it("publicKey - should not be ok", async ({ validator }) => {
-		assert.defined((await validator.validate("publicKey", "0".repeat(63))).error);
-		assert.defined((await validator.validate("publicKey", "0".repeat(65))).error);
-		assert.defined((await validator.validate("publicKey", 123)).error);
-		assert.defined((await validator.validate("publicKey", null)).error);
-		assert.defined((await validator.validate("publicKey")).error);
-		assert.defined((await validator.validate("publicKey", {})).error);
+	it("publicKey - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("publicKey", "0".repeat(63)).error);
+		assert.defined(validator.validate("publicKey", "0".repeat(65)).error);
+		assert.defined(validator.validate("publicKey", 123).error);
+		assert.defined(validator.validate("publicKey", null).error);
+		assert.defined(validator.validate("publicKey").error);
+		assert.defined(validator.validate("publicKey", {}).error);
 
 		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined((await validator.validate("publicKey", char.repeat(64))).error);
+			assert.defined(validator.validate("publicKey", char.repeat(64)).error);
 		}
 	});
 
-	it("transactionId - should be ok", async ({ validator }) => {
-		assert.undefined((await validator.validate("transactionId", "0".repeat(64))).error);
+	it("transactionId - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("transactionId", "0".repeat(64)).error);
 
 		const validChars = "0123456789ABCDEFabcdef";
 
 		for (const char of validChars) {
-			assert.undefined((await validator.validate("transactionId", char.repeat(64))).error);
+			assert.undefined(validator.validate("transactionId", char.repeat(64)).error);
 		}
 	});
 
-	it("transactionId - should not be ok", async ({ validator }) => {
-		assert.defined((await validator.validate("transactionId", "0".repeat(63))).error);
-		assert.defined((await validator.validate("transactionId", "0".repeat(65))).error);
-		assert.defined((await validator.validate("transactionId", 123)).error);
-		assert.defined((await validator.validate("transactionId", null)).error);
-		assert.defined((await validator.validate("transactionId")).error);
-		assert.defined((await validator.validate("transactionId", {})).error);
+	it("transactionId - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("transactionId", "0".repeat(63)).error);
+		assert.defined(validator.validate("transactionId", "0".repeat(65)).error);
+		assert.defined(validator.validate("transactionId", 123).error);
+		assert.defined(validator.validate("transactionId", null).error);
+		assert.defined(validator.validate("transactionId").error);
+		assert.defined(validator.validate("transactionId", {}).error);
 
 		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined((await validator.validate("transactionId", char.repeat(64))).error);
+			assert.defined(validator.validate("transactionId", char.repeat(64)).error);
 		}
 	});
 
-	it("validatorUsername - should be ok", async ({ validator }) => {
-		assert.undefined((await validator.validate("validatorUsername", "0".repeat(1))).error);
-		assert.undefined((await validator.validate("validatorUsername", "0".repeat(20))).error);
+	it("validatorUsername - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("validatorUsername", "0".repeat(1)).error);
+		assert.undefined(validator.validate("validatorUsername", "0".repeat(20)).error);
 
 		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz!@$&_.";
 
 		for (const char of validChars) {
-			assert.undefined((await validator.validate("validatorUsername", char.repeat(20))).error);
+			assert.undefined(validator.validate("validatorUsername", char.repeat(20)).error);
 		}
 	});
 
-	it("validatorUsername - should not be ok", async ({ validator }) => {
-		assert.defined((await validator.validate("validatorUsername", "0".repeat(21))).error);
-		assert.defined((await validator.validate("transactionId", 123)).error);
-		assert.defined((await validator.validate("transactionId", null)).error);
-		assert.defined((await validator.validate("transactionId")).error);
-		assert.defined((await validator.validate("transactionId", {})).error);
+	it("validatorUsername - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("validatorUsername", "0".repeat(21)).error);
+		assert.defined(validator.validate("transactionId", 123).error);
+		assert.defined(validator.validate("transactionId", null).error);
+		assert.defined(validator.validate("transactionId").error);
+		assert.defined(validator.validate("transactionId", {}).error);
 
 		// TODO: Check
 		// const invalidChars = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -208,7 +208,7 @@ describe<{
 			...blockOriginal,
 		};
 
-		assert.undefined((await validator.validate("blockHeader", blockOriginal)).error);
+		assert.undefined(validator.validate("blockHeader", blockOriginal).error);
 
 		const optionalFields = ["numberOfTransactions", "payloadHash", "version"];
 
@@ -217,11 +217,11 @@ describe<{
 
 			delete blockWithoutField[field];
 
-			assert.undefined((await validator.validate("blockHeader", blockWithoutField)).error);
+			assert.undefined(validator.validate("blockHeader", blockWithoutField).error);
 		}
 	});
 
-	it("blockHeader - should not be ok if any required field is missing", async ({ validator }) => {
+	it("blockHeader - should not be ok if any required field is missing", ({ validator }) => {
 		const requiredFields = [
 			"id",
 			"timestamp",
@@ -239,228 +239,229 @@ describe<{
 
 			delete blockWithoutField[field];
 
-			assert.defined((await validator.validate("blockHeader", blockWithoutField)).error);
+			assert.defined(validator.validate("blockHeader", blockWithoutField).error);
 		}
 	});
 
-	it("blockHeader - blockSignature should be hex", async ({ validator }) => {
+	it("blockHeader - blockSignature should be hex", ({ validator }) => {
 		const block = {
 			...blockOriginal,
 			blockSignature: "GHIJK",
 		};
 
-		assert.defined((await validator.validate("blockHeader", block)).error.includes("data.blockSignature"));
+		assert.true(validator.validate("blockHeader", block).error.includes("blockSignature"));
 	});
 
-	it("blockHeader - generatorPublicKey should be publicKey", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - generatorPublicKey should be publicKey", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					generatorPublicKey: "a".repeat(63),
 				})
-			).error.includes("data.generatorPublicKey"),
+				.error.includes("generatorPublicKey"),
 		);
 
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					generatorPublicKey: "a".repeat(65),
 				})
-			).error.includes("data.generatorPublicKey"),
+				.error.includes("generatorPublicKey"),
 		);
 	});
 
-	it("blockHeader - height should be integer & min 1", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - height should be integer & min 1", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					height: "1",
 				})
-			).error.includes("data.height"),
+				.error.includes("height"),
 		);
 
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					height: 0,
 				})
-			).error.includes("data.height"),
+				.error.includes("height"),
 		);
 
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					height: -1,
 				})
-			).error.includes("data.height"),
+				.error.includes("height"),
 		);
 	});
 
-	it("blockHeader - id should be blockId", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
-					...blockOriginal,
-					id: "1",
-				})
-			).error.includes("data.height"),
-		);
-	});
+	// it("blockHeader - id should be blockId", ({ validator }) => {
+	// 	assert.true(
+	// 		validator
+	// 			.validate("blockHeader", {
+	// 				...blockOriginal,
+	// 				id: "1",
+	// 			})
+	// 			.error.includes("height"),
+	// 	);
+	// });
 
-	it("blockHeader - numberOfTransactions should be integer & min 0", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - numberOfTransactions should be integer & min 0", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					numberOfTransactions: "1",
 				})
-			).error.includes("data.numberOfTransactions"),
+				.error.includes("numberOfTransactions"),
 		);
 
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					numberOfTransactions: -1,
 				})
-			).error.includes("data.numberOfTransactions"),
+				.error.includes("numberOfTransactions"),
 		);
 	});
 
-	it("blockHeader - payloadHash should be hex", async ({ validator }) => {
+	it("blockHeader - payloadHash should be hex", ({ validator }) => {
 		const block = {
 			...blockOriginal,
 			payloadHash: "GHIJK",
 		};
 
-		assert.defined((await validator.validate("blockHeader", block)).error.includes("data.payloadHash"));
+		assert.true(validator.validate("blockHeader", block).error.includes("payloadHash"));
 	});
 
-	it("blockHeader - payloadLength should be integer & min 0", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - payloadLength should be integer & min 0", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					payloadLength: "1",
 				})
-			).error.includes("data.payloadLength"),
+				.error.includes("payloadLength"),
 		);
 
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					payloadLength: -1,
 				})
-			).error.includes("data.payloadLength"),
+				.error.includes("payloadLength"),
 		);
 	});
 
-	it("blockHeader - id should be blockId", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - id should be blockId", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					id: "1",
 				})
-			).error.includes("data.height"),
+				.error.includes("id"),
 		);
 	});
 
-	it("blockHeader - reward should be bigNumber & min 0", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - reward should be bigNumber & min 0", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					reward: "-1",
 				})
-			).error.includes("data.reward"),
+				.error.includes("reward"),
 		);
 		assert.true(
-			(
-				await validator.validate("blockHeader", {
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					reward: -1,
 				})
-			).error.includes("data.reward"),
+				.error.includes("reward"),
 		);
 	});
 
-	it("blockHeader - timestamp should be integer & min 0", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - timestamp should be integer & min 0", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					timestamp: "1",
 				})
-			).error.includes("data.timestamp"),
+				.error.includes("timestamp"),
 		);
 
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					timestamp: -1,
 				})
-			).error.includes("data.timestamp"),
+				.error.includes("timestamp"),
 		);
 	});
 
-	it("blockHeader - totalAmount should be bigNumber & min 0", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - totalAmount should be bigNumber & min 0", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					totalAmount: -1,
 				})
-			).error.includes("data.totalAmount"),
+				.error.includes("totalAmount"),
 		);
 	});
 
-	it("blockHeader - totalFee should be bigNumber & min 0", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - totalFee should be bigNumber & min 0", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					totalFee: -1,
 				})
-			).error.includes("data.totalFee"),
+				.error.includes("totalFee"),
 		);
 	});
 
-	it("blockHeader - version should be 1", async ({ validator }) => {
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+	it("blockHeader - version should be 1", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					version: 0,
 				})
-			).error.includes("data.version"),
+				.error.includes("version"),
 		);
 
-		assert.defined(
-			(
-				await validator.validate("blockHeader", {
+		assert.true(
+			validator
+				.validate("blockHeader", {
 					...blockOriginal,
 					version: 2,
 				})
-			).error.includes("data.version"),
+				.error.includes("version"),
 		);
 	});
 
 	// TODO: Check
-	// it("block - shoudl be ok", async ({ validator }) => {
+	// it("block - shoudl be ok", ({ validator }) => {
 	// 	const blockWithTransactions = {
 	// 		...blockOriginal,
 	// 		numberOfTransactions: 2,
 	// 		transactions: [],
 	// 	};
 
-	// 	assert.undefined((await validator.validate("block", blockWithTransactions)).error);
+	// 	console.log(validator.validate("block", blockWithTransactions).error);
+	// 	// assert.undefined((await validator.validate("block", blockWithTransactions)).error);
 	// });
 });
