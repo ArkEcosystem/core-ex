@@ -6,7 +6,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework";
-import { extend, transactionBaseSchema, signedSchema, strictSchema } from "./schemas";
+import { extend, signedSchema, strictSchema, transactionBaseSchema } from "./schemas";
 
 describe<{
 	sandbox: Sandbox;
@@ -41,13 +41,13 @@ describe<{
 		version: 1,
 	};
 
-	it("transactionBaseSchema - should be valid", async ({ validator }) => {
+	it("transactionBaseSchema - should be valid", ({ validator }) => {
 		validator.addSchema(schema);
 
-		assert.undefined((await validator.validate("transaction", transactionOriginal)).error);
+		assert.undefined(validator.validate("transaction", transactionOriginal).error);
 	});
 
-	it("transactionBaseSchema - should allow addtional properties", async ({ validator }) => {
+	it("transactionBaseSchema - should allow addtional properties", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const transaction = {
@@ -55,10 +55,10 @@ describe<{
 			test: "test",
 		};
 
-		assert.undefined((await validator.validate("transaction", transaction)).error);
+		assert.undefined(validator.validate("transaction", transaction).error);
 	});
 
-	it("transactionBaseSchema - should have required fields", async ({ validator }) => {
+	it("transactionBaseSchema - should have required fields", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const requiredFields = ["amount", "fee", "nonce", "senderPublicKey", "type"];
@@ -69,7 +69,7 @@ describe<{
 
 			delete transaction[field];
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes(field));
+			assert.true(validator.validate("transaction", transaction).error.includes(field));
 		}
 
 		const optionalFields = ["id", "network", "signature", "typeGroup", "version"];
@@ -80,11 +80,11 @@ describe<{
 
 			delete transaction[field];
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 	});
 
-	it("transactionBaseSchema - amount should be big number min 1", async ({ validator }) => {
+	it("transactionBaseSchema - amount should be big number min 1", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validValues = [1, "1", BigNumber.ONE, 100, "100", BigNumber.make(100)];
@@ -95,7 +95,7 @@ describe<{
 				amount: value,
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [0, "0", 1.1, BigNumber.ZERO, -1, null, undefined, {}, "test"];
@@ -106,11 +106,11 @@ describe<{
 				amount: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("amount"));
+			assert.true(validator.validate("transaction", transaction).error.includes("amount"));
 		}
 	});
 
-	it("transactionBaseSchema - fee should be big number min 0", async ({ validator }) => {
+	it("transactionBaseSchema - fee should be big number min 0", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validValues = [0, "0", BigNumber.ZERO, 100, "100", BigNumber.make(100)];
@@ -121,7 +121,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
@@ -132,11 +132,11 @@ describe<{
 				fee: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("fee"));
+			assert.true(validator.validate("transaction", transaction).error.includes("fee"));
 		}
 	});
 
-	it("transactionBaseSchema - id should be transactionId", async ({ validator }) => {
+	it("transactionBaseSchema - id should be transactionId", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validChars = "0123456789ABCDEFabcdef";
@@ -147,7 +147,7 @@ describe<{
 				id: char.repeat(64),
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = ["0".repeat(63), "0".repeat(65), "G".repeat(64), "g".repeat(64), {}, "test"];
@@ -158,11 +158,11 @@ describe<{
 				id: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("id"));
+			assert.true(validator.validate("transaction", transaction).error.includes("id"));
 		}
 	});
 
-	it("transactionBaseSchema - network should be valid networkByte", async ({ validator }) => {
+	it("transactionBaseSchema - network should be valid networkByte", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const invalidValues = [20, {}, "test"];
@@ -173,11 +173,11 @@ describe<{
 				network: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("network"));
+			assert.true(validator.validate("transaction", transaction).error.includes("network"));
 		}
 	});
 
-	it("transactionBaseSchema - nonce should be big number min 0", async ({ validator }) => {
+	it("transactionBaseSchema - nonce should be big number min 0", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validValues = [0, "0", BigNumber.ZERO, 100, "100", BigNumber.make(100)];
@@ -188,7 +188,7 @@ describe<{
 				nonce: value,
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
@@ -199,11 +199,11 @@ describe<{
 				nonce: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("nonce"));
+			assert.true(validator.validate("transaction", transaction).error.includes("nonce"));
 		}
 	});
 
-	it("transactionBaseSchema - signature should be alphanumeric", async ({ validator }) => {
+	it("transactionBaseSchema - signature should be alphanumeric", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -214,7 +214,7 @@ describe<{
 				signature: char,
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = ["/", "!", "&", {}];
@@ -225,11 +225,11 @@ describe<{
 				signature: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("signature"));
+			assert.true(validator.validate("transaction", transaction).error.includes("signature"));
 		}
 	});
 
-	it("transactionBaseSchema - signatures should be alphanumeric, 130 length, min 1 and max 16, unique items", async ({
+	it("transactionBaseSchema - signatures should be alphanumeric, 130 length, min 1 and max 16, unique items", ({
 		validator,
 	}) => {
 		validator.addSchema(schema);
@@ -242,7 +242,7 @@ describe<{
 				signatures: [char.repeat(130)],
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [
@@ -261,23 +261,23 @@ describe<{
 				signatures: [value],
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("signatures"));
+			assert.true(validator.validate("transaction", transaction).error.includes("signatures"));
 		}
 
 		// Len 0
 		assert.true(
-			(
-				await validator.validate("transaction", {
+			validator
+				.validate("transaction", {
 					...transactionOriginal,
 					signatures: [],
 				})
-			).error.includes("signatures"),
+				.error.includes("signatures"),
 		);
 
 		// Len > 16
 		assert.true(
-			(
-				await validator.validate("transaction", {
+			validator
+				.validate("transaction", {
 					...transactionOriginal,
 					signatures: [
 						"a".repeat(130),
@@ -299,21 +299,21 @@ describe<{
 						"r".repeat(130),
 					],
 				})
-			).error.includes("signatures"),
+				.error.includes("signatures"),
 		);
 
 		// Unique
 		assert.true(
-			(
-				await validator.validate("transaction", {
+			validator
+				.validate("transaction", {
 					...transactionOriginal,
 					signatures: ["a".repeat(130), "a".repeat(130)],
 				})
-			).error.includes("signatures"),
+				.error.includes("signatures"),
 		);
 	});
 
-	it("transactionBaseSchema - typeGroup should be integer min 0", async ({ validator }) => {
+	it("transactionBaseSchema - typeGroup should be integer min 0", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validValues = [0, 1, 100];
@@ -324,7 +324,7 @@ describe<{
 				typeGroup: value,
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [-1, "-1", 1.1, BigNumber.make(1), {}, "test"];
@@ -335,11 +335,11 @@ describe<{
 				typeGroup: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("typeGroup"));
+			assert.true(validator.validate("transaction", transaction).error.includes("typeGroup"));
 		}
 	});
 
-	it("transactionBaseSchema - version should be 1", async ({ validator }) => {
+	it("transactionBaseSchema - version should be 1", ({ validator }) => {
 		validator.addSchema(schema);
 
 		const validValues = [1];
@@ -350,7 +350,7 @@ describe<{
 				version: value,
 			};
 
-			assert.undefined((await validator.validate("transaction", transaction)).error);
+			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
 		const invalidValues = [-1, "1", 0, BigNumber.make(1), {}, "test"];
@@ -361,21 +361,21 @@ describe<{
 				version: value,
 			};
 
-			assert.true((await validator.validate("transaction", transaction)).error.includes("version"));
+			assert.true(validator.validate("transaction", transaction).error.includes("version"));
 		}
 	});
 
-	it("signedSchema - should be ok with signature", async ({ validator }) => {
+	it("signedSchema - should be ok with signature", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
 			...transactionOriginal,
 		};
 
-		assert.undefined((await validator.validate("transactionSigned", transaction)).error);
+		assert.undefined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it("signedSchema - should be ok with signatures", async ({ validator }) => {
+	it("signedSchema - should be ok with signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
@@ -385,10 +385,10 @@ describe<{
 
 		delete transaction.signature;
 
-		assert.undefined((await validator.validate("transactionSigned", transaction)).error);
+		assert.undefined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it("signedSchema - should be ok with signature & signatures", async ({ validator }) => {
+	it("signedSchema - should be ok with signature & signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
@@ -396,10 +396,10 @@ describe<{
 			signatures: ["a".repeat(130)],
 		};
 
-		assert.undefined((await validator.validate("transactionSigned", transaction)).error);
+		assert.undefined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it("signedSchema - should not be ok without signature and signatures", async ({ validator }) => {
+	it("signedSchema - should not be ok without signature and signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
@@ -407,23 +407,23 @@ describe<{
 		};
 		delete transaction.signature;
 
-		assert.defined((await validator.validate("transactionSigned", transaction)).error);
+		assert.defined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it("strictSchema - should not have any additonal properties", async ({ validator }) => {
+	it("strictSchema - should not have any additonal properties", ({ validator }) => {
 		validator.addSchema(strictSchema(schema));
 
 		const transaction = {
 			...transactionOriginal,
 		};
 
-		assert.undefined((await validator.validate("transactionStrict", transaction)).error);
+		assert.undefined(validator.validate("transactionStrict", transaction).error);
 
 		transaction.test = "test";
-		assert.defined((await validator.validate("transactionStrict", transaction)).error);
+		assert.defined(validator.validate("transactionStrict", transaction).error);
 	});
 
-	it("strictSchema - should not be ok without signature and signatures", async ({ validator }) => {
+	it("strictSchema - should not be ok without signature and signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
@@ -431,6 +431,6 @@ describe<{
 		};
 		delete transaction.signature;
 
-		assert.defined((await validator.validate("transactionStrict", transaction)).error);
+		assert.defined(validator.validate("transactionStrict", transaction).error);
 	});
 });

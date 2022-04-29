@@ -25,8 +25,8 @@ export const transactionBaseSchema: Record<string, any> = {
 		senderPublicKey: { $ref: "publicKey" },
 		signature: { $ref: "alphanumeric" },
 		signatures: {
-			additionalItems: false,
-			items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }] },
+			// additionalItems: false,
+			items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
 			maxItems: 16,
 			minItems: 1,
 			type: "array",
