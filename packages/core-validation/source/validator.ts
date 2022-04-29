@@ -1,6 +1,6 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
-import Ajv, { FormatDefinition, KeywordDefinition } from "ajv";
+import Ajv, { FormatDefinition, KeywordDefinition, AnySchema } from "ajv";
 import keywords from "ajv-keywords";
 
 @injectable()
@@ -41,11 +41,11 @@ export class Validator implements Contracts.Crypto.IValidator {
 		this.#ajv.addFormat(name, format);
 	}
 
-	public addKeyword(keyword: string, definition: KeywordDefinition): void {
-		this.#ajv.addKeyword(keyword, definition);
+	public addKeyword(definition: KeywordDefinition): void {
+		this.#ajv.addKeyword(definition);
 	}
 
-	public addSchema(schema: object | object[], key?: string): void {
+	public addSchema(schema: AnySchema | AnySchema[], key?: string): void {
 		this.#ajv.addSchema(schema, key);
 	}
 

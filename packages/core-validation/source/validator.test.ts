@@ -55,7 +55,7 @@ describe<{
 	});
 
 	it("#addKeyword - should add keyword", async ({ validator }) => {
-		validator.addKeyword("testKeyword", {
+		validator.addKeyword({
 			compile() {
 				return (data) => data === 1;
 			},
@@ -72,7 +72,7 @@ describe<{
 	});
 
 	it("#removeKeywork - should remove kayword", async ({ validator }) => {
-		validator.addKeyword("testKeyword", {
+		validator.addKeyword({
 			compile() {
 				return (data) => data === 1;
 			},

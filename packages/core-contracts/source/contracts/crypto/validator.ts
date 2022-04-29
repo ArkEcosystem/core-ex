@@ -11,7 +11,7 @@ export interface IValidator {
 
 	addFormat(name: string, format: FormatDefinition<string | number>): void;
 
-	addKeyword(keyword: string, definition: KeywordDefinition): void;
+	addKeyword(definition: KeywordDefinition): void;
 
 	addSchema(schema: object | object[], key?: string): void;
 
