@@ -44,13 +44,13 @@ describe<{
 		type: Contracts.Crypto.TransactionType.MultiPayment,
 	};
 
-	it("#getSchema - should be valid", async ({ validator }) => {
+	it("#getSchema - should be valid", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
-		assert.undefined((await validator.validate("multiPayment", transactionOriginal)).error);
+		assert.undefined(validator.validate("multiPayment", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber, equal 0", async ({ validator }) => {
+	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		const validValues = [0, "0", BigNumber.ZERO];
@@ -60,7 +60,7 @@ describe<{
 				amount: value,
 			};
 
-			assert.undefined((await validator.validate("multiPayment", transaction)).error);
+			assert.undefined(validator.validate("multiPayment", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
@@ -71,11 +71,11 @@ describe<{
 				amount: value,
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("amount"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("amount"));
 		}
 	});
 
-	it("#getSchema - asset should be required object", async ({ validator }) => {
+	it("#getSchema - asset should be required object", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "test", null, {}];
@@ -86,31 +86,29 @@ describe<{
 				asset: value,
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("asset"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("asset"));
 		}
 	});
 
-	it("#getSchema - asset.payments should be min 2, non-unique", async ({ validator }) => {
+	it("#getSchema - asset.payments should be min 2, non-unique", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		assert.undefined(
-			(
-				await validator.validate("multiPayment", {
-					...transactionOriginal,
-					asset: {
-						payments: [
-							{
-								amount: BigNumber.ONE,
-								recipientId: "a".repeat(62),
-							},
-							{
-								amount: BigNumber.ONE,
-								recipientId: "a".repeat(62),
-							},
-						],
-					},
-				})
-			).error,
+			validator.validate("multiPayment", {
+				...transactionOriginal,
+				asset: {
+					payments: [
+						{
+							amount: BigNumber.ONE,
+							recipientId: "a".repeat(62),
+						},
+						{
+							amount: BigNumber.ONE,
+							recipientId: "a".repeat(62),
+						},
+					],
+				},
+			}).error,
 		);
 
 		const invalidValues = [1, BigNumber.ONE, "test", null, {}];
@@ -123,12 +121,12 @@ describe<{
 				},
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("payments"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("payments"));
 		}
 
 		assert.true(
-			(
-				await validator.validate("multiPayment", {
+			validator
+				.validate("multiPayment", {
 					...transactionOriginal,
 					asset: {
 						payments: [
@@ -139,11 +137,11 @@ describe<{
 						],
 					},
 				})
-			).error.includes("asset"),
+				.error.includes("asset"),
 		);
 	});
 
-	it("#getSchema - asset.payments.amount should be bigNumber, >= 1", async ({ validator }) => {
+	it("#getSchema - asset.payments.amount should be bigNumber, >= 1", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		const validValues = [1, "1", BigNumber.ONE, 100, "100", BigNumber.make(100)];
@@ -164,7 +162,7 @@ describe<{
 				},
 			};
 
-			assert.undefined((await validator.validate("multiPayment", transaction)).error);
+			assert.undefined(validator.validate("multiPayment", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -186,11 +184,11 @@ describe<{
 				},
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("amount"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("amount"));
 		}
 	});
 
-	it("#getSchema - asset.payments.recipientId should be adddress", async ({ validator }) => {
+	it("#getSchema - asset.payments.recipientId should be adddress", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		const invalidValues = ["a".repeat(61), "a".repeat(63), -1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -212,11 +210,11 @@ describe<{
 				},
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("recipientId"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("recipientId"));
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", async ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		const validValues = [1, 100, BigNumber.ONE];
@@ -226,7 +224,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined((await validator.validate("multiPayment", transaction)).error);
+			assert.undefined(validator.validate("multiPayment", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -236,11 +234,11 @@ describe<{
 				fee: value,
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("fee"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("fee"));
 		}
 	});
 
-	it("#getSchema - type should be multiPayment", async ({ validator }) => {
+	it("#getSchema - type should be multiPayment", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		const validValues = [Contracts.Crypto.TransactionType.MultiPayment];
@@ -250,7 +248,7 @@ describe<{
 				type: value,
 			};
 
-			assert.undefined((await validator.validate("multiPayment", transaction)).error);
+			assert.undefined(validator.validate("multiPayment", transaction).error);
 		}
 
 		const invalidValues = [
@@ -269,11 +267,11 @@ describe<{
 				type: value,
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("type"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("type"));
 		}
 	});
 
-	it("#getSchema - vendorField should be vendorField or null", async ({ validator }) => {
+	it("#getSchema - vendorField should be vendorField or null", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		const validValues = ["", "dummy", "a".repeat(255), null, undefined];
@@ -283,7 +281,7 @@ describe<{
 				vendorField: value,
 			};
 
-			assert.undefined((await validator.validate("multiPayment", transaction)).error);
+			assert.undefined(validator.validate("multiPayment", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "a".repeat(256), {}];
@@ -293,7 +291,7 @@ describe<{
 				vendorField: value,
 			};
 
-			assert.true((await validator.validate("multiPayment", transaction)).error.includes("vendorField"));
+			assert.true(validator.validate("multiPayment", transaction).error.includes("vendorField"));
 		}
 	});
 });

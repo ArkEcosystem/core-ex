@@ -23,7 +23,7 @@ export class MultiPaymentTransaction extends Transaction {
 				asset: {
 					properties: {
 						payments: {
-							additionalItems: false,
+							// additionalItems: false,
 							items: {
 								properties: {
 									amount: { bignumber: { minimum: 1 } },
