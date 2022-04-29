@@ -33,13 +33,13 @@ describe<{
 		type: 0,
 	};
 
-	it("#getSchema - should be valid", async ({ validator }) => {
+	it("#getSchema - should be valid", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
-		assert.undefined((await validator.validate("transfer", transactionOriginal)).error);
+		assert.undefined(validator.validate("transfer", transactionOriginal).error);
 	});
 
-	it("#getSchema - expiration should be integer, min 0", async ({ validator }) => {
+	it("#getSchema - expiration should be integer, min 0", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
 		const validValues = [0, 1, 100, undefined];
@@ -49,7 +49,7 @@ describe<{
 				expiration: value,
 			};
 
-			assert.undefined((await validator.validate("transfer", transaction)).error);
+			assert.undefined(validator.validate("transfer", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, BigNumber.ONE, "test", null, {}];
@@ -60,11 +60,11 @@ describe<{
 				expiration: value,
 			};
 
-			assert.true((await validator.validate("transfer", transaction)).error.includes("expiration"));
+			assert.true(validator.validate("transfer", transaction).error.includes("expiration"));
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", async ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
 		const validValues = [1, 100, BigNumber.ONE];
@@ -74,7 +74,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined((await validator.validate("transfer", transaction)).error);
+			assert.undefined(validator.validate("transfer", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -84,11 +84,11 @@ describe<{
 				fee: value,
 			};
 
-			assert.true((await validator.validate("transfer", transaction)).error.includes("fee"));
+			assert.true(validator.validate("transfer", transaction).error.includes("fee"));
 		}
 	});
 
-	it("#getSchema - recipientId should be address", async ({ validator }) => {
+	it("#getSchema - recipientId should be address", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
 		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -98,7 +98,7 @@ describe<{
 				recipientId: char.repeat(62),
 			};
 
-			assert.undefined((await validator.validate("transfer", transaction)).error);
+			assert.undefined(validator.validate("transfer", transaction).error);
 		}
 
 		const invalidValues = ["a".repeat(61), "a".repeat(63), "&".repeat(62), null, undefined, {}];
@@ -108,11 +108,11 @@ describe<{
 				recipientId: value,
 			};
 
-			assert.true((await validator.validate("transfer", transaction)).error.includes("recipientId"));
+			assert.true(validator.validate("transfer", transaction).error.includes("recipientId"));
 		}
 	});
 
-	it("#getSchema - type should be transfer", async ({ validator }) => {
+	it("#getSchema - type should be transfer", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
 		const validValues = [Contracts.Crypto.TransactionType.Transfer];
@@ -122,7 +122,7 @@ describe<{
 				type: value,
 			};
 
-			assert.undefined((await validator.validate("transfer", transaction)).error);
+			assert.undefined(validator.validate("transfer", transaction).error);
 		}
 
 		const invalidValues = [
@@ -141,11 +141,11 @@ describe<{
 				type: value,
 			};
 
-			assert.true((await validator.validate("transfer", transaction)).error.includes("type"));
+			assert.true(validator.validate("transfer", transaction).error.includes("type"));
 		}
 	});
 
-	it("#getSchema - vendorField should be vendorField or null", async ({ validator }) => {
+	it("#getSchema - vendorField should be vendorField or null", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
 		const validValues = ["", "dummy", "a".repeat(255), null, undefined];
@@ -155,7 +155,7 @@ describe<{
 				vendorField: value,
 			};
 
-			assert.undefined((await validator.validate("transfer", transaction)).error);
+			assert.undefined(validator.validate("transfer", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "a".repeat(256), {}];
@@ -165,7 +165,7 @@ describe<{
 				vendorField: value,
 			};
 
-			assert.true((await validator.validate("transfer", transaction)).error.includes("vendorField"));
+			assert.true(validator.validate("transfer", transaction).error.includes("vendorField"));
 		}
 	});
 });
