@@ -48,6 +48,7 @@ describe<{
 		validator.addSchema({
 			$id: "test",
 			format: "testFormat",
+			type: "number",
 		});
 
 		assert.undefined((await validator.validate("test", 1)).error);
