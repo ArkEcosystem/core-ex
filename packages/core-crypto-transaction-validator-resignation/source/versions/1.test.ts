@@ -32,13 +32,13 @@ describe<{
 		type: Contracts.Crypto.TransactionType.ValidatorResignation,
 	};
 
-	it("#getSchema - should be valid", async ({ validator }) => {
+	it("#getSchema - should be valid", ({ validator }) => {
 		validator.addSchema(ValidatorResignationTransaction.getSchema());
 
-		assert.undefined((await validator.validate("validatorResignation", transactionOriginal)).error);
+		assert.undefined(validator.validate("validatorResignation", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber, equal 0", async ({ validator }) => {
+	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
 		validator.addSchema(ValidatorResignationTransaction.getSchema());
 
 		const validValues = [0, "0", BigNumber.ZERO];
@@ -48,7 +48,7 @@ describe<{
 				amount: value,
 			};
 
-			assert.undefined((await validator.validate("validatorResignation", transaction)).error);
+			assert.undefined(validator.validate("validatorResignation", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
@@ -59,11 +59,11 @@ describe<{
 				amount: value,
 			};
 
-			assert.true((await validator.validate("validatorResignation", transaction)).error.includes("amount"));
+			assert.true(validator.validate("validatorResignation", transaction).error.includes("amount"));
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", async ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
 		validator.addSchema(ValidatorResignationTransaction.getSchema());
 
 		const validValues = [1, 100, BigNumber.ONE];
@@ -73,7 +73,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined((await validator.validate("validatorResignation", transaction)).error);
+			assert.undefined(validator.validate("validatorResignation", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -83,11 +83,11 @@ describe<{
 				fee: value,
 			};
 
-			assert.true((await validator.validate("validatorResignation", transaction)).error.includes("fee"));
+			assert.true(validator.validate("validatorResignation", transaction).error.includes("fee"));
 		}
 	});
 
-	it("#getSchema - type should be validatorResignation", async ({ validator }) => {
+	it("#getSchema - type should be validatorResignation", ({ validator }) => {
 		validator.addSchema(ValidatorResignationTransaction.getSchema());
 
 		const validValues = [Contracts.Crypto.TransactionType.ValidatorResignation];
@@ -97,7 +97,7 @@ describe<{
 				type: value,
 			};
 
-			assert.undefined((await validator.validate("validatorResignation", transaction)).error);
+			assert.undefined(validator.validate("validatorResignation", transaction).error);
 		}
 
 		const invalidValues = [
@@ -116,7 +116,7 @@ describe<{
 				type: value,
 			};
 
-			assert.true((await validator.validate("validatorResignation", transaction)).error.includes("type"));
+			assert.true(validator.validate("validatorResignation", transaction).error.includes("type"));
 		}
 	});
 });
