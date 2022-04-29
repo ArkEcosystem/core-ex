@@ -585,8 +585,8 @@ importers:
       '@types/lodash.get': 4.4.6
       '@types/lodash.set': 4.3.6
       '@types/wif': 2.0.2
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1
+      ajv: 8.11.0
+      ajv-keywords: 5.1.0
       bcrypto: 5.4.0
       bip32: 2.0.6
       bip39: 3.0.4
@@ -616,8 +616,8 @@ importers:
       '@arkecosystem/core-validation': link:../core-validation
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1_ajv@6.12.6
+      ajv: 8.11.0
+      ajv-keywords: 5.1.0_ajv@8.11.0
       bcrypto: 5.4.0
       bip32: 2.0.6
       bip39: 3.0.4
@@ -5160,14 +5160,6 @@ packages:
     dependencies:
       clean-stack: 2.2.0
       indent-string: 4.0.0
-
-  /ajv-keywords/3.4.1_ajv@6.12.6:
-    resolution: {integrity: sha512-RO1ibKvd27e6FEShVFfPALuHI3WjSVNeK5FIsmme/LYRNxjKuNj+Dt7bucLa6NdSv3JcVTyMlm9kGR84z1XpaQ==}
-    peerDependencies:
-      ajv: ^6.9.1
-    dependencies:
-      ajv: 6.12.6
-    dev: false
 
   /ajv-keywords/3.5.2_ajv@6.12.6:
     resolution: {integrity: sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==}
