@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
-import { Ajv } from "ajv";
+import Ajv, { AnySchemaObject } from "ajv";
 import ajvKeywords from "ajv-keywords";
 
 let genesisTransactions;
@@ -22,7 +22,8 @@ const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id
 
 export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
 	const maxBytes = (ajv: Ajv) => {
-		ajv.addKeyword("maxBytes", {
+		ajv.addKeyword({
+			keyword: "maxBytes",
 			compile(schema, parentSchema) {
 				return (data) => {
 					// if ((parentSchema as any).type !== "string") {
@@ -42,7 +43,8 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 	};
 
 	const transactionType = (ajv: Ajv) => {
-		ajv.addKeyword("transactionType", {
+		ajv.addKeyword({
+			keyword: "transactionType",
 			// @ts-ignore
 			compile(schema) {
 				return (data, dataPath, parentObject: Contracts.Crypto.ITransactionData) => {
@@ -71,7 +73,8 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 	};
 
 	const network = (ajv: Ajv) => {
-		ajv.addKeyword("network", {
+		ajv.addKeyword({
+			keyword: "network",
 			compile(schema) {
 				return (data) => {
 					const networkHash = configuration.get("network.pubKeyHash");
@@ -90,12 +93,13 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 
 	// @TODO: revisit the need for the genesis check
 	const bignum = (ajv: Ajv) => {
-		const instanceOf = ajvKeywords.get("instanceof").definition;
-		instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
+		// const instanceOf = ajvKeywords.get("instanceof").definition;
+		// instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
 
-		ajv.addKeyword("bignumber", {
+		ajv.addKeyword({
+			keyword: "bignumber",
 			compile(schema) {
-				return (data, dataPath, parentObject: any, property) => {
+				return (data, parentSchema: AnySchemaObject) => {
 					const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : 0;
 					const maximum = typeof schema.maximum !== "undefined" ? schema.maximum : "9223372036854775807"; // 8 byte maximum
 
@@ -115,15 +119,15 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 					// }
 
 					if (bignum.isLessThan(minimum)) {
-						if (bignum.isZero() && schema.bypassGenesis) {
+						if (bignum.isZero() && schema.bypassGenesis && parentSchema.parentData?.id) {
 							let bypassGenesis = false;
-							if (parentObject.id) {
-								// if (schema.block) {
-								// 	bypassGenesis = parentObject.height === 1;
-								// } else {
-								bypassGenesis = isGenesisTransaction(configuration, parentObject.id);
-								// }
-							}
+							// if (parentObject.id) {
+							// if (schema.block) {
+							// 	bypassGenesis = parentObject.height === 1;
+							// } else {
+							bypassGenesis = isGenesisTransaction(configuration, parentSchema.parentData.id);
+							// }
+							// }
 							return bypassGenesis;
 						} else {
 							return false;
@@ -139,7 +143,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 			},
 			errors: false,
 			metaSchema: {
-				additionalItems: false,
+				// additionalItems: false,
 				properties: {
 					// block: { type: "boolean" },
 					bypassGenesis: { type: "boolean" },
@@ -154,12 +158,12 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 
 	// @TODO: plugins should register this rule
 	const blockId = (ajv: Ajv) => {
-		ajv.addKeyword("blockId", {
+		ajv.addKeyword({
+			keyword: "blockId",
 			compile(schema) {
-				return (data, dataPath, parentObject: any) => {
+				return (data, parentSchema: AnySchemaObject) => {
 					if (
-						parentObject &&
-						parentObject.height === 1 &&
+						parentSchema.parentData?.height === 1 &&
 						schema.allowNullWhenGenesis &&
 						(!data || Number(data) === 0)
 					) {
@@ -175,7 +179,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 			},
 			errors: false,
 			metaSchema: {
-				additionalItems: false,
+				// additionalItems: false,
 				properties: {
 					allowNullWhenGenesis: { type: "boolean" },
 					// isPreviousBlock: { type: "boolean" }, // TODO: Remove

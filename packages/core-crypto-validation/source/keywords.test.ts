@@ -51,7 +51,7 @@ describe<{
 
 	// TODO: Parent schema !== string
 	// TODO: Negative value
-	it("keyword maxBytes should be ok", async (context) => {
+	it("keyword maxBytes should be ok", (context) => {
 		register(context);
 
 		const schema = {
@@ -61,20 +61,20 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", "1234")).error);
-		assert.undefined((await context.validator.validate("test", "a".repeat(64))).error);
-		assert.undefined((await context.validator.validate("test", "⊁".repeat(21))).error);
+		assert.undefined(context.validator.validate("test", "1234").error);
+		assert.undefined(context.validator.validate("test", "a".repeat(64)).error);
+		assert.undefined(context.validator.validate("test", "⊁".repeat(21)).error);
 
-		assert.defined((await context.validator.validate("test", "a".repeat(65))).error);
-		assert.defined((await context.validator.validate("test", "⊁".repeat(22))).error);
-		assert.defined((await context.validator.validate("test", {})).error);
-		assert.defined((await context.validator.validate("test", null)).error);
-		assert.defined((await context.validator.validate("test")).error);
-		assert.defined((await context.validator.validate("test", 123)).error);
+		assert.defined(context.validator.validate("test", "a".repeat(65)).error);
+		assert.defined(context.validator.validate("test", "⊁".repeat(22)).error);
+		assert.defined(context.validator.validate("test", {}).error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test").error);
+		assert.defined(context.validator.validate("test", 123).error);
 	});
 
 	// TODO: Flase value
-	it("keyword network should be ok", async (context) => {
+	it("keyword network should be ok", (context) => {
 		register(context);
 
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("network", {});
@@ -85,12 +85,12 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", 30)).error);
-		assert.undefined((await context.validator.validate("test", 23)).error);
-		assert.undefined((await context.validator.validate("test", "a")).error);
+		assert.undefined(context.validator.validate("test", 30).error);
+		assert.undefined(context.validator.validate("test", 23).error);
+		assert.undefined(context.validator.validate("test", "a").error);
 	});
 
-	it("keyword network - should return true when network is not set in configuration", async (context) => {
+	it("keyword network - should return true when network is not set in configuration", (context) => {
 		register(context);
 
 		const schema = {
@@ -99,13 +99,13 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", 30)).error);
+		assert.undefined(context.validator.validate("test", 30).error);
 
-		assert.defined((await context.validator.validate("test", 23)).error);
-		assert.defined((await context.validator.validate("test", "a")).error);
+		assert.defined(context.validator.validate("test", 23).error);
+		assert.defined(context.validator.validate("test", "a").error);
 	});
 
-	it("keyword transactionType should be ok", async (context) => {
+	it("keyword transactionType should be ok", (context) => {
 		register(context);
 
 		const schema = {
@@ -114,18 +114,18 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", Contracts.Crypto.TransactionType.Transfer)).error);
+		assert.undefined(context.validator.validate("test", Contracts.Crypto.TransactionType.Transfer).error);
 
-		assert.defined((await context.validator.validate("test", Contracts.Crypto.TransactionType.Vote)).error);
-		assert.defined((await context.validator.validate("test", -1)).error);
-		assert.defined((await context.validator.validate("test", "")).error);
-		assert.defined((await context.validator.validate("test", "0")).error);
-		assert.defined((await context.validator.validate("test", null)).error);
-		assert.defined((await context.validator.validate("test")).error);
+		assert.defined(context.validator.validate("test", Contracts.Crypto.TransactionType.Vote).error);
+		assert.defined(context.validator.validate("test", -1).error);
+		assert.defined(context.validator.validate("test", "").error);
+		assert.defined(context.validator.validate("test", "0").error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test").error);
 	});
 
 	// TODO: Properties
-	it("keyword blockId should be ok", async (context) => {
+	it("keyword blockId should be ok", (context) => {
 		register(context);
 
 		const schema = {
@@ -134,18 +134,19 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", "1".repeat(64))).error);
+		assert.undefined(context.validator.validate("test", "1".repeat(64)).error);
 
-		assert.defined((await context.validator.validate("test", "1".repeat(63))).error);
-		assert.defined((await context.validator.validate("test", "1".repeat(63))).error);
-		assert.defined((await context.validator.validate("test", "1".repeat(65))).error);
-		assert.defined((await context.validator.validate("test", "")).error);
-		assert.defined((await context.validator.validate("test", null)).error);
-		assert.defined((await context.validator.validate("test")).error);
-		assert.defined((await context.validator.validate("test", {})).error);
+		assert.defined(context.validator.validate("test", "1".repeat(63)).error);
+		assert.defined(context.validator.validate("test", "1".repeat(63)).error);
+		assert.defined(context.validator.validate("test", "1".repeat(65)).error);
+		assert.defined(context.validator.validate("test", "").error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test").error);
+		assert.defined(context.validator.validate("test", {}).error);
 	});
 
-	it("keyword blockId - should allow null for geneis", async (context) => {
+	// TODO: check if still required
+	it("keyword blockId - should allow null for geneis", (context) => {
 		register(context);
 
 		const schema = {
@@ -161,11 +162,11 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", { height: 1, id: "1".repeat(64) })).error);
-		assert.undefined((await context.validator.validate("test", { height: 1, id: null })).error);
+		assert.undefined(context.validator.validate("test", { height: 1, id: "1".repeat(64) }).error);
+		assert.undefined(context.validator.validate("test", { height: 1, id: null }).error);
 	});
 
-	it("keyword bignumber should be ok if only one possible value is allowed", async (context) => {
+	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
 		register(context);
 
 		const schema = {
@@ -174,16 +175,16 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", 100)).error);
+		assert.undefined(context.validator.validate("test", 100).error);
 
-		assert.defined((await context.validator.validate("test", 99)).error);
-		assert.defined((await context.validator.validate("test", 101)).error);
-		assert.defined((await context.validator.validate("test", null)).error);
-		assert.defined((await context.validator.validate("test")).error);
-		assert.defined((await context.validator.validate("test", {})).error);
+		assert.defined(context.validator.validate("test", 99).error);
+		assert.defined(context.validator.validate("test", 101).error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test").error);
+		assert.defined(context.validator.validate("test", {}).error);
 	});
 
-	it("keyword bignumber should be ok if above or equal minimum", async (context) => {
+	it("keyword bignumber should be ok if above or equal minimum", (context) => {
 		register(context);
 
 		const schema = {
@@ -192,13 +193,13 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", 25)).error);
-		assert.undefined((await context.validator.validate("test", 20)).error);
+		assert.undefined(context.validator.validate("test", 25).error);
+		assert.undefined(context.validator.validate("test", 20).error);
 
-		assert.defined((await context.validator.validate("test", 19)).error);
+		assert.defined(context.validator.validate("test", 19).error);
 	});
 
-	it("keyword bignumber should be ok if below or equal maximum", async (context) => {
+	it("keyword bignumber should be ok if below or equal maximum", (context) => {
 		register(context);
 
 		const schema = {
@@ -207,16 +208,16 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", 19)).error);
-		assert.undefined((await context.validator.validate("test", 20)).error);
-		assert.undefined((await context.validator.validate("test", 0)).error);
+		assert.undefined(context.validator.validate("test", 19).error);
+		assert.undefined(context.validator.validate("test", 20).error);
+		assert.undefined(context.validator.validate("test", 0).error);
 
 		// assert.undefined((await context.validator.validate("test", -1)).error); TODO: Min is defined to 0, make test
 
-		assert.defined((await context.validator.validate("test", 21)).error);
+		assert.defined(context.validator.validate("test", 21).error);
 	});
 
-	it("keyword bignumber should not be ok for values bigger than the absolute maximum", async (context) => {
+	it("keyword bignumber should not be ok for values bigger than the absolute maximum", (context) => {
 		register(context);
 
 		const schema = {
@@ -225,12 +226,12 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", Number.MAX_SAFE_INTEGER)).error);
+		assert.undefined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
 
-		assert.defined((await context.validator.validate("test", 9_223_372_036_854_775_808)).error);
+		assert.defined(context.validator.validate("test", 9_223_372_036_854_775_808).error);
 	});
 
-	it("keyword bignumber should be ok for number, string and bignumber as input", async (context) => {
+	it("keyword bignumber should be ok for number, string and bignumber as input", (context) => {
 		register(context);
 
 		const schema = {
@@ -240,19 +241,19 @@ describe<{
 		context.validator.addSchema(schema);
 
 		for (const value of [100, 1e2, 1020, 500, 2000]) {
-			assert.undefined((await context.validator.validate("test", value)).error);
-			assert.undefined((await context.validator.validate("test", value.toString())).error);
-			assert.undefined((await context.validator.validate("test", BigNumber.make(value))).error);
+			assert.undefined(context.validator.validate("test", value).error);
+			assert.undefined(context.validator.validate("test", value.toString()).error);
+			assert.undefined(context.validator.validate("test", BigNumber.make(value)).error);
 		}
 
 		for (const value of [1e8, 1999.000_001, 1 / 1e8, -100, -500, -2000.1]) {
-			assert.defined((await context.validator.validate("test", value)).error);
-			assert.defined((await context.validator.validate("test", value.toString())).error);
+			assert.defined(context.validator.validate("test", value).error);
+			assert.defined(context.validator.validate("test", value.toString()).error);
 			// assert.defined((await context.validator.validate("test", BigNumber.make(value))).error);
 		}
 	});
 
-	it("keyword bignumber should not accept garbage", async (context) => {
+	it("keyword bignumber should not accept garbage", (context) => {
 		register(context);
 
 		const schema = {
@@ -261,14 +262,14 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.defined((await context.validator.validate("test", undefined)).error);
-		assert.defined((await context.validator.validate("test", {})).error);
-		assert.defined((await context.validator.validate("test", /d+/)).error);
-		assert.defined((await context.validator.validate("test", "")).error);
-		assert.defined((await context.validator.validate("test", "\u0000")).error);
+		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test", {}).error);
+		assert.defined(context.validator.validate("test", /d+/).error);
+		assert.defined(context.validator.validate("test", "").error);
+		assert.defined(context.validator.validate("test", "\u0000").error);
 	});
 
-	it("keyword bignumber should allow 0 if genensis transaction and bypassGenesis = true", async (context) => {
+	it.only("keyword bignumber should allow 0 if genensis transaction and bypassGenesis = true", (context) => {
 		register(context);
 
 		const schema = {
@@ -282,18 +283,19 @@ describe<{
 					},
 				},
 			},
+			type: "object",
 		};
 		context.validator.addSchema(schema);
 
 		assert.undefined(
-			await context.validator.validate("test", {
+			context.validator.validate("test", {
 				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
 				fee: 0,
 			}).error,
 		);
 	});
 
-	it("keyword bignumber should allow 0 for any transaction when genesisBlock is not set and bypassGenesis = true", async (context) => {
+	it("keyword bignumber should allow 0 for any transaction when genesisBlock is not set and bypassGenesis = true", (context) => {
 		register(context);
 
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("genesisBlock", {});
@@ -313,16 +315,14 @@ describe<{
 		context.validator.addSchema(schema);
 
 		assert.undefined(
-			(
-				await context.validator.validate("test", {
-					id: "random",
-					fee: 0,
-				})
-			).error,
+			context.validator.validate("test", {
+				id: "random",
+				fee: 0,
+			}).error,
 		);
 	});
 
-	it("keyword bignumber should not allow 0 if genensis transaction and bypassGenesis = false", async (context) => {
+	it("keyword bignumber should not allow 0 if genensis transaction and bypassGenesis = false", (context) => {
 		register(context);
 
 		const schema = {
@@ -340,68 +340,66 @@ describe<{
 		context.validator.addSchema(schema);
 
 		assert.defined(
-			(
-				await context.validator.validate("test", {
-					id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
-					fee: 0,
-				})
-			).error,
+			context.validator.validate("test", {
+				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
+				fee: 0,
+			}).error,
 		);
 	});
 
-	// it("keyword bignumber should cast number to Bignumber", async (context) => {
-	// 	const schema = {
-	// 		$id: "test",
-	// 		properties: {
-	// 			amount: { bignumber: {} },
-	// 		},
-	// 		type: "object",
-	// 	};
-	// 	context.validator.addSchema(schema);
+	// // it("keyword bignumber should cast number to Bignumber", async (context) => {
+	// // 	const schema = {
+	// // 		$id: "test",
+	// // 		properties: {
+	// // 			amount: { bignumber: {} },
+	// // 		},
+	// // 		type: "object",
+	// // 	};
+	// // 	context.validator.addSchema(schema);
 
-	// 	const data = {
-	// 		amount: 100,
-	// 	};
+	// // 	const data = {
+	// // 		amount: 100,
+	// // 	};
 
-	// 	assert.undefined((await context.validator.validate("test", data)).error);
-	// 	// assert.instance(data.amount, BigNumber);
-	// 	// assert.equal(data.amount, Utils.BigNumber.make(100));
-	// });
+	// // 	assert.undefined((await context.validator.validate("test", data)).error);
+	// // 	// assert.instance(data.amount, BigNumber);
+	// // 	// assert.equal(data.amount, Utils.BigNumber.make(100));
+	// // });
 
-	// it("keyword bignumber should cast string to Bignumber", async (context) => {
-	// 	const schema = {
-	// 		$id: "test",
-	// 		properties: {
-	// 			amount: { bignumber: {} },
-	// 		},
-	// 		type: "object",
-	// 	};
-	// 	context.validator.addSchema(schema);
+	// // it("keyword bignumber should cast string to Bignumber", async (context) => {
+	// // 	const schema = {
+	// // 		$id: "test",
+	// // 		properties: {
+	// // 			amount: { bignumber: {} },
+	// // 		},
+	// // 		type: "object",
+	// // 	};
+	// // 	context.validator.addSchema(schema);
 
-	// 	const data = {
-	// 		amount: "100",
-	// 	};
+	// // 	const data = {
+	// // 		amount: "100",
+	// // 	};
 
-	// 	assert.undefined((await context.validator.validate("test", data)).error);
+	// // 	assert.undefined((await context.validator.validate("test", data)).error);
 
-	// 	// const validate = context.ajv.compile(schema);
-	// 	// assert.true(validate(data));
-	// 	// assert.instance(data.amount, Utils.BigNumber);
-	// 	// assert.equal(data.amount, Utils.BigNumber.make(100));
-	// });
+	// // 	// const validate = context.ajv.compile(schema);
+	// // 	// assert.true(validate(data));
+	// // 	// assert.instance(data.amount, Utils.BigNumber);
+	// // 	// assert.equal(data.amount, Utils.BigNumber.make(100));
+	// // });
 
-	// it("keyword bignumber bypassGenesis should be ok", (context) => {
-	// 	const schema = {
-	// 		properties: {
-	// 			amount: { bignumber: { bypassGenesis: true, minimum: 100, type: "number" } },
-	// 		},
-	// 		type: "object",
-	// 	};
+	// // it("keyword bignumber bypassGenesis should be ok", (context) => {
+	// // 	const schema = {
+	// // 		properties: {
+	// // 			amount: { bignumber: { bypassGenesis: true, minimum: 100, type: "number" } },
+	// // 		},
+	// // 		type: "object",
+	// // 	};
 
-	// 	const validate = context.ajv.compile(schema);
+	// // 	const validate = context.ajv.compile(schema);
 
-	// 	assert.true(validate({ amount: 0, id: "3e3817fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
-	// 	assert.false(validate({ amount: 0, id: "affe17fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
-	// 	assert.false(validate({ amount: 0 }));
-	// });
+	// // 	assert.true(validate({ amount: 0, id: "3e3817fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
+	// // 	assert.false(validate({ amount: 0, id: "affe17fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
+	// // 	assert.false(validate({ amount: 0 }));
+	// // });
 });
