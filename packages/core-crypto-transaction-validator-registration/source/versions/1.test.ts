@@ -37,13 +37,13 @@ describe<{
 		type: Contracts.Crypto.TransactionType.ValidatorRegistration,
 	};
 
-	it("#getSchema - should be valid", async ({ validator }) => {
+	it("#getSchema - should be valid", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
-		assert.undefined((await validator.validate("validatorRegistration", transactionOriginal)).error);
+		assert.undefined(validator.validate("validatorRegistration", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber, equal 0", async ({ validator }) => {
+	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
 		const validValues = [0, "0", BigNumber.ZERO];
@@ -53,7 +53,7 @@ describe<{
 				amount: value,
 			};
 
-			assert.undefined((await validator.validate("validatorRegistration", transaction)).error);
+			assert.undefined(validator.validate("validatorRegistration", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
@@ -64,11 +64,11 @@ describe<{
 				amount: value,
 			};
 
-			assert.true((await validator.validate("validatorRegistration", transaction)).error.includes("amount"));
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("amount"));
 		}
 	});
 
-	it("#getSchema - asset should be required object", async ({ validator }) => {
+	it("#getSchema - asset should be required object", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "test", null, {}];
@@ -79,11 +79,11 @@ describe<{
 				asset: value,
 			};
 
-			assert.true((await validator.validate("validatorRegistration", transaction)).error.includes("asset"));
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("asset"));
 		}
 	});
 
-	it("#getSchema - asset.validator should be required object", async ({ validator }) => {
+	it("#getSchema - asset.validator should be required object", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "test", null, {}];
@@ -96,11 +96,11 @@ describe<{
 				},
 			};
 
-			assert.true((await validator.validate("validatorRegistration", transaction)).error.includes("validator"));
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("validator"));
 		}
 	});
 
-	it("#getSchema - usernae should be validatorUsername", async ({ validator }) => {
+	it("#getSchema - usernae should be validatorUsername", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "", "a".repeat(21), null, undefined, {}];
@@ -115,11 +115,11 @@ describe<{
 				},
 			};
 
-			assert.true((await validator.validate("validatorRegistration", transaction)).error.includes("username"));
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("username"));
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", async ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
 		const validValues = [1, 100, BigNumber.ONE];
@@ -129,7 +129,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined((await validator.validate("validatorRegistration", transaction)).error);
+			assert.undefined(validator.validate("validatorRegistration", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -139,11 +139,11 @@ describe<{
 				fee: value,
 			};
 
-			assert.true((await validator.validate("validatorRegistration", transaction)).error.includes("fee"));
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("fee"));
 		}
 	});
 
-	it("#getSchema - type should be validatorRegistration", async ({ validator }) => {
+	it("#getSchema - type should be validatorRegistration", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
 		const validValues = [Contracts.Crypto.TransactionType.ValidatorRegistration];
@@ -153,7 +153,7 @@ describe<{
 				type: value,
 			};
 
-			assert.undefined((await validator.validate("validatorRegistration", transaction)).error);
+			assert.undefined(validator.validate("validatorRegistration", transaction).error);
 		}
 
 		const invalidValues = [
@@ -172,7 +172,7 @@ describe<{
 				type: value,
 			};
 
-			assert.true((await validator.validate("validatorRegistration", transaction)).error.includes("type"));
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("type"));
 		}
 	});
 });
