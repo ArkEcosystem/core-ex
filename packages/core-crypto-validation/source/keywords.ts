@@ -2,7 +2,6 @@
 import { Contracts } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 import Ajv, { AnySchemaObject } from "ajv";
-import ajvKeywords from "ajv-keywords";
 
 let genesisTransactions;
 
@@ -12,9 +11,9 @@ const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id
 	}
 
 	if (!genesisTransactions) {
-		genesisTransactions = configuration
-			.get("genesisBlock.transactions")
-			.reduce((acc, curr) => Object.assign(acc, { [curr.id]: true }), {});
+		genesisTransactions = Object.fromEntries(
+			configuration.get("genesisBlock.transactions").map((current) => [current.id, true]),
+		);
 	}
 
 	return !!genesisTransactions[id];
@@ -23,17 +22,16 @@ const isGenesisTransaction = (configuration: Contracts.Crypto.IConfiguration, id
 export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
 	const maxBytes = (ajv: Ajv) => {
 		ajv.addKeyword({
-			keyword: "maxBytes",
 			compile(schema, parentSchema) {
-				return (data) => {
+				return (data) =>
 					// if ((parentSchema as any).type !== "string") {
 					// 	return false;
 					// }
 
-					return Buffer.from(data, "utf8").byteLength <= schema;
-				};
+					Buffer.from(data, "utf8").byteLength <= schema;
 			},
 			errors: false,
+			keyword: "maxBytes",
 			metaSchema: {
 				minimum: 0,
 				type: "integer",
@@ -44,10 +42,9 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 
 	const transactionType = (ajv: Ajv) => {
 		ajv.addKeyword({
-			keyword: "transactionType",
 			// @ts-ignore
 			compile(schema) {
-				return (data, dataPath, parentObject: Contracts.Crypto.ITransactionData) => {
+				return (data, dataPath, parentObject: Contracts.Crypto.ITransactionData) =>
 					// Impose dynamic multipayment limit based on milestone
 					// TODO: Move under multi payment
 					// if (
@@ -61,10 +58,11 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 					// 	return parentObject.asset.payments.length <= limit;
 					// }
 
-					return data === schema;
-				};
+					data === schema;
 			},
+
 			errors: false,
+			keyword: "transactionType",
 			metaSchema: {
 				minimum: 0,
 				type: "integer",
@@ -74,7 +72,6 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 
 	const network = (ajv: Ajv) => {
 		ajv.addKeyword({
-			keyword: "network",
 			compile(schema) {
 				return (data) => {
 					const networkHash = configuration.get("network.pubKeyHash");
@@ -85,6 +82,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 				};
 			},
 			errors: false,
+			keyword: "network",
 			metaSchema: {
 				type: "boolean",
 			},
@@ -97,7 +95,6 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		// instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
 
 		ajv.addKeyword({
-			keyword: "bignumber",
 			compile(schema) {
 				return (data, parentSchema: AnySchemaObject) => {
 					const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : 0;
@@ -142,6 +139,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 				};
 			},
 			errors: false,
+			keyword: "bignumber",
 			metaSchema: {
 				// additionalItems: false,
 				properties: {
@@ -159,7 +157,6 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 	// @TODO: plugins should register this rule
 	const blockId = (ajv: Ajv) => {
 		ajv.addKeyword({
-			keyword: "blockId",
 			compile(schema) {
 				return (data, parentSchema: AnySchemaObject) => {
 					if (
@@ -178,6 +175,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 				};
 			},
 			errors: false,
+			keyword: "blockId",
 			metaSchema: {
 				// additionalItems: false,
 				properties: {

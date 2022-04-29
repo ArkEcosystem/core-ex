@@ -24,8 +24,8 @@
 		"@arkecosystem/core-crypto-config": "workspace:*",
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/utils": "workspace:*",
-		"ajv-keywords": "5.1.0",
 		"ajv": "8.11.0",
+		"ajv-keywords": "5.1.0",
 		"ipaddr.js": "2.0.1",
 		"uvu": "^0.5.3"
 	},
