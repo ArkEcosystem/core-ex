@@ -1,6 +1,7 @@
+import Ajv from "ajv";
+
 import { describe, Sandbox } from "../../core-test-framework";
 import { Validator } from "./validator";
-import Ajv from "ajv";
 
 describe<{
 	validator: Validator;
@@ -33,7 +34,7 @@ describe<{
 		const result = await validator.validate("test", 123);
 
 		assert.equal(result.value, 123);
-		assert.equal(result.error, "data should be string");
+		assert.equal(result.error, "data must be string");
 		assert.array(result.errors);
 		assert.length(result.errors, 1);
 	});
@@ -58,6 +59,7 @@ describe<{
 			compile() {
 				return (data) => data === 1;
 			},
+			keyword: "testKeyword",
 		});
 
 		validator.addSchema({
@@ -74,6 +76,7 @@ describe<{
 			compile() {
 				return (data) => data === 1;
 			},
+			keyword: "testKeyword",
 		});
 
 		validator.addSchema({
@@ -91,8 +94,8 @@ describe<{
 			testKeyword: false,
 		});
 
-		assert.undefined((await validator.validate("test2", 1)).error);
-		assert.undefined((await validator.validate("test2", 2)).error); // No error
+		assert.defined((await validator.validate("test2", 1)).error);
+		assert.defined((await validator.validate("test2", 2)).error); // No error
 	});
 
 	it("#addSchema - should add schema", async ({ validator }) => {

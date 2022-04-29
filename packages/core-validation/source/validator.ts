@@ -1,29 +1,31 @@
 import { injectable, postConstruct } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
-import Ajv from "ajv";
+import Ajv, { FormatDefinition, KeywordDefinition } from "ajv";
 import keywords from "ajv-keywords";
 
 @injectable()
 export class Validator implements Contracts.Crypto.IValidator {
-	#ajv: Ajv.Ajv;
+	#ajv: Ajv;
 
 	@postConstruct()
 	public postConstruct(): void {
 		this.#ajv = new Ajv({
 			$data: true,
-			extendRefs: true,
+			// extendRefs: true,
 			removeAdditional: true,
 		});
 
 		keywords(this.#ajv);
 	}
 
-	public async validate<T = any>(
+	public validate<T = any>(
 		schemaKeyReference: string | boolean | object,
 		data: T,
-	): Promise<Contracts.Crypto.ISchemaValidationResult<T>> {
+	): Contracts.Crypto.ISchemaValidationResult<T> {
 		try {
-			await this.#ajv.validate(schemaKeyReference, data);
+			this.#ajv.validate(schemaKeyReference, data);
+
+			this.#ajv.errors;
 
 			return {
 				error: this.#ajv.errors ? this.#ajv.errorsText() : undefined,
@@ -35,11 +37,11 @@ export class Validator implements Contracts.Crypto.IValidator {
 		}
 	}
 
-	public addFormat(name: string, format: Ajv.FormatDefinition): void {
+	public addFormat(name: string, format: FormatDefinition<string | number>): void {
 		this.#ajv.addFormat(name, format);
 	}
 
-	public addKeyword(keyword: string, definition: Ajv.KeywordDefinition): void {
+	public addKeyword(keyword: string, definition: KeywordDefinition): void {
 		this.#ajv.addKeyword(keyword, definition);
 	}
 
@@ -55,7 +57,7 @@ export class Validator implements Contracts.Crypto.IValidator {
 		this.#ajv.removeSchema(schemaKeyReference);
 	}
 
-	public extend(callback: (ajv: Ajv.Ajv) => void): void {
+	public extend(callback: (ajv: Ajv) => void): void {
 		callback(this.#ajv);
 	}
 }
