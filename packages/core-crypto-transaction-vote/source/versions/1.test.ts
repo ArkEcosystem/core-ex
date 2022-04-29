@@ -107,13 +107,13 @@ describe<{
 		type: Contracts.Crypto.TransactionType.Vote,
 	};
 
-	it("#getSchema - should be valid", async ({ validator }) => {
+	it("#getSchema - should be valid", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 
-		assert.undefined((await validator.validate("vote", transactionOriginal)).error);
+		assert.undefined(validator.validate("vote", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber, equal 0", async ({ validator }) => {
+	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 
 		const validValues = [0, "0", BigNumber.ZERO];
@@ -123,7 +123,7 @@ describe<{
 				amount: value,
 			};
 
-			assert.undefined((await validator.validate("vote", transaction)).error);
+			assert.undefined(validator.validate("vote", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
@@ -134,11 +134,11 @@ describe<{
 				amount: value,
 			};
 
-			assert.true((await validator.validate("vote", transaction)).error.includes("amount"));
+			assert.true(validator.validate("vote", transaction).error.includes("amount"));
 		}
 	});
 
-	it("#getSchema - asset should be required object", async ({ validator }) => {
+	it("#getSchema - asset should be required object", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "test", null, {}];
@@ -149,11 +149,11 @@ describe<{
 				asset: value,
 			};
 
-			assert.true((await validator.validate("vote", transaction)).error.includes("asset"));
+			assert.true(validator.validate("vote", transaction).error.includes("asset"));
 		}
 	});
 
-	it("#getSchema - asset.votes should be required array with public keys, max 1", async ({ validator }) => {
+	it("#getSchema - asset.votes should be required array with public keys, max 1", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 
 		const validValues = ["a".repeat(64)];
@@ -167,7 +167,7 @@ describe<{
 				},
 			};
 
-			assert.undefined((await validator.validate("vote", transaction)).error);
+			assert.undefined(validator.validate("vote", transaction).error);
 		}
 
 		const invalidValues = ["a".repeat(63), "a".repeat(65), 1, BigNumber.ONE, "test", null, {}];
@@ -180,23 +180,23 @@ describe<{
 				},
 			};
 
-			assert.true((await validator.validate("vote", transaction)).error.includes("votes"));
+			assert.true(validator.validate("vote", transaction).error.includes("votes"));
 		}
 
 		assert.true(
-			(
-				await validator.validate("vote", {
+			validator
+				.validate("vote", {
 					...transactionOriginal,
 					asset: {
 						votes: ["a".repeat(64), "b".repeat(64)],
 						unvotes: [],
 					},
 				})
-			).error.includes("votes"),
+				.error.includes("votes"),
 		);
 	});
 
-	it("#getSchema - asset.unvotes should be required array with public keys, max 1", async ({ validator }) => {
+	it("#getSchema - asset.unvotes should be required array with public keys, max 1", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 
 		const validValues = ["a".repeat(64)];
@@ -210,7 +210,7 @@ describe<{
 				},
 			};
 
-			assert.undefined((await validator.validate("vote", transaction)).error);
+			assert.undefined(validator.validate("vote", transaction).error);
 		}
 
 		const invalidValues = ["a".repeat(63), "a".repeat(65), 1, BigNumber.ONE, "test", null, {}];
@@ -223,23 +223,23 @@ describe<{
 				},
 			};
 
-			assert.true((await validator.validate("vote", transaction)).error.includes("unvotes"));
+			assert.true(validator.validate("vote", transaction).error.includes("unvotes"));
 		}
 
 		assert.true(
-			(
-				await validator.validate("vote", {
+			validator
+				.validate("vote", {
 					...transactionOriginal,
 					asset: {
 						votes: [],
 						unvotes: ["a".repeat(64), "b".repeat(64)],
 					},
 				})
-			).error.includes("unvotes"),
+				.error.includes("unvotes"),
 		);
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", async ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 
 		const validValues = [1, 100, BigNumber.ONE];
@@ -249,7 +249,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined((await validator.validate("vote", transaction)).error);
+			assert.undefined(validator.validate("vote", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -259,11 +259,11 @@ describe<{
 				fee: value,
 			};
 
-			assert.true((await validator.validate("vote", transaction)).error.includes("fee"));
+			assert.true(validator.validate("vote", transaction).error.includes("fee"));
 		}
 	});
 
-	it("#getSchema - type should be vote", async ({ validator }) => {
+	it("#getSchema - type should be vote", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 
 		const validValues = [Contracts.Crypto.TransactionType.Vote];
@@ -273,7 +273,7 @@ describe<{
 				type: value,
 			};
 
-			assert.undefined((await validator.validate("vote", transaction)).error);
+			assert.undefined(validator.validate("vote", transaction).error);
 		}
 
 		const invalidValues = [
@@ -292,7 +292,7 @@ describe<{
 				type: value,
 			};
 
-			assert.true((await validator.validate("vote", transaction)).error.includes("type"));
+			assert.true(validator.validate("vote", transaction).error.includes("type"));
 		}
 	});
 });

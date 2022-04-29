@@ -21,14 +21,14 @@ export class VoteTransaction extends Transaction {
 					properties: {
 						// TODO: Check that at least one publicKey is provided
 						unvotes: {
-							additionalItems: false,
+							// additionalItems: false,
 							items: { $ref: "publicKey" },
 							maxItems: 1,
 							minItems: 0,
 							type: "array",
 						},
 						votes: {
-							additionalItems: false,
+							// additionalItems: false,
 							items: { $ref: "publicKey" },
 							maxItems: 1,
 							minItems: 0,
