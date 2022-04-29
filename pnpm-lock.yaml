@@ -1136,8 +1136,8 @@ importers:
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1
+      ajv: 8.11.0
+      ajv-keywords: 5.1.0
       ipaddr.js: 2.0.1
       uvu: ^0.5.3
     dependencies:
@@ -1146,8 +1146,8 @@ importers:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
-      ajv: 6.12.6
-      ajv-keywords: 3.4.1_ajv@6.12.6
+      ajv: 8.11.0
+      ajv-keywords: 5.1.0_ajv@8.11.0
       ipaddr.js: 2.0.1
       uvu: 0.5.3
     devDependencies:

@@ -33,7 +33,7 @@ describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
 		context.validator = context.sandbox.app.resolve(Validator);
 	});
 
-	it("#vendorField - should be ok", async (context) => {
+	it("#vendorField - should be ok", (context) => {
 		register(context);
 
 		const schema = {
@@ -43,12 +43,12 @@ describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", "false")).error);
-		assert.undefined((await context.validator.validate("test", "a".repeat(255))).error);
-		assert.undefined((await context.validator.validate("test", "⊁".repeat(85))).error);
+		assert.undefined(context.validator.validate("test", "false").error);
+		assert.undefined(context.validator.validate("test", "a".repeat(255)).error);
+		assert.undefined(context.validator.validate("test", "⊁".repeat(85)).error);
 	});
 
-	it("#vendorField - should not be ok", async (context) => {
+	it("#vendorField - should not be ok", (context) => {
 		register(context);
 
 		const schema = {
@@ -58,14 +58,14 @@ describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
 		};
 		context.validator.addSchema(schema);
 
-		assert.defined((await context.validator.validate("test", "a".repeat(256))).error);
-		assert.defined((await context.validator.validate("test", "⊁".repeat(86))).error);
-		assert.defined((await context.validator.validate("test", {})).error);
-		assert.defined((await context.validator.validate("test", null)).error);
-		assert.defined((await context.validator.validate("test")).error);
+		assert.defined(context.validator.validate("test", "a".repeat(256)).error);
+		assert.defined(context.validator.validate("test", "⊁".repeat(86)).error);
+		assert.defined(context.validator.validate("test", {}).error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test").error);
 	});
 
-	it("#peer - should be ok", async (context) => {
+	it("#peer - should be ok", (context) => {
 		register(context);
 
 		const schema = {
@@ -75,11 +75,11 @@ describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined((await context.validator.validate("test", "192.168.178.0")).error);
-		assert.undefined((await context.validator.validate("test", "5.196.105.32")).error);
+		assert.undefined(context.validator.validate("test", "192.168.178.0").error);
+		assert.undefined(context.validator.validate("test", "5.196.105.32").error);
 	});
 
-	it("#peer - should not be ok", async (context) => {
+	it("#peer - should not be ok", (context) => {
 		register(context);
 
 		const schema = {
@@ -89,10 +89,10 @@ describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
 		};
 		context.validator.addSchema(schema);
 
-		assert.defined((await context.validator.validate("test", "aaaa")).error);
-		assert.defined((await context.validator.validate("test", "127.0.0.1")).error);
-		assert.defined((await context.validator.validate("test", null)).error);
-		assert.defined((await context.validator.validate("test", {})).error);
-		assert.defined((await context.validator.validate("test")).error);
+		assert.defined(context.validator.validate("test", "aaaa").error);
+		assert.defined(context.validator.validate("test", "127.0.0.1").error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test", {}).error);
+		assert.defined(context.validator.validate("test").error);
 	});
 });
