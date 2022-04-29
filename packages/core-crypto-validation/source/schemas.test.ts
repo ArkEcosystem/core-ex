@@ -453,15 +453,18 @@ describe<{
 		);
 	});
 
-	// TODO: Check
-	// it("block - shoudl be ok", ({ validator }) => {
-	// 	const blockWithTransactions = {
-	// 		...blockOriginal,
-	// 		numberOfTransactions: 2,
-	// 		transactions: [],
-	// 	};
+	it("block - transactions count should be equal numberOfTransactions", ({ validator }) => {
+		assert.undefined(
+			validator.validate("block", { ...blockOriginal, numberOfTransactions: 2, transactions: [{}, {}] }).error,
+		);
 
-	// 	console.log(validator.validate("block", blockWithTransactions).error);
-	// 	// assert.undefined((await validator.validate("block", blockWithTransactions)).error);
-	// });
+		assert.defined(
+			validator.validate("block", { ...blockOriginal, numberOfTransactions: 2, transactions: [{}] }).error,
+		);
+
+		assert.defined(
+			validator.validate("block", { ...blockOriginal, numberOfTransactions: 2, transactions: [{}, {}, {}] })
+				.error,
+		);
+	});
 });

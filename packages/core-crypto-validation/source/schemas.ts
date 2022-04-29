@@ -30,9 +30,11 @@ export const schemas = {
 		$ref: "blockHeader",
 		properties: {
 			transactions: {
-				$ref: "transactions",
-				// maxItems: { $data: "1/numberOfTransactions" },
-				// minItems: { $data: "1/numberOfTransactions" },
+				// TODO: Handle transactions
+				// $ref: "transactions",
+				maxItems: { $data: "1/numberOfTransactions" },
+				minItems: { $data: "1/numberOfTransactions" },
+				type: "array",
 			},
 		},
 		type: "object",
