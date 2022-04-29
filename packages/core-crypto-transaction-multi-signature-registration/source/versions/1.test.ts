@@ -40,13 +40,13 @@ describe<{
 		type: Contracts.Crypto.TransactionType.MultiSignature,
 	};
 
-	it("#getSchema - should be valid", async ({ validator }) => {
+	it("#getSchema - should be valid", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
-		assert.undefined((await validator.validate("multiSignature", transactionOriginal)).error);
+		assert.undefined(validator.validate("multiSignature", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber, equal 0", async ({ validator }) => {
+	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const validValues = [0, "0", BigNumber.ZERO];
@@ -56,7 +56,7 @@ describe<{
 				amount: value,
 			};
 
-			assert.undefined((await validator.validate("multiSignature", transaction)).error);
+			assert.undefined(validator.validate("multiSignature", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
@@ -67,11 +67,11 @@ describe<{
 				amount: value,
 			};
 
-			assert.true((await validator.validate("multiSignature", transaction)).error.includes("amount"));
+			assert.true(validator.validate("multiSignature", transaction).error.includes("amount"));
 		}
 	});
 
-	it("#getSchema - asset should be required object", async ({ validator }) => {
+	it("#getSchema - asset should be required object", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "test", null, undefined, {}];
@@ -82,11 +82,11 @@ describe<{
 				asset: value,
 			};
 
-			assert.defined((await validator.validate("multiSignature", transaction)).error);
+			assert.defined(validator.validate("multiSignature", transaction).error);
 		}
 	});
 
-	it("#getSchema - asset.multiSignature should be required object", async ({ validator }) => {
+	it("#getSchema - asset.multiSignature should be required object", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const invalidValues = [1, BigNumber.ONE, "test", null, undefined, {}];
@@ -99,13 +99,11 @@ describe<{
 				},
 			};
 
-			assert.defined((await validator.validate("multiSignature", transaction)).error);
+			assert.defined(validator.validate("multiSignature", transaction).error);
 		}
 	});
 
-	it("#getSchema - asset.multiSignature.min should be integer, min 1, max = publicKeys.lenght", async ({
-		validator,
-	}) => {
+	it("#getSchema - asset.multiSignature.min should be integer, min 1, max = publicKeys.lenght", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const validValues = [1, 2];
@@ -120,7 +118,7 @@ describe<{
 				},
 			};
 
-			assert.undefined((await validator.validate("multiSignature", transaction)).error);
+			assert.undefined(validator.validate("multiSignature", transaction).error);
 		}
 
 		const invalidValues = [0, -1, 1.1, 3, BigNumber.ONE, "test", null, undefined, {}];
@@ -136,11 +134,11 @@ describe<{
 				},
 			};
 
-			assert.defined((await validator.validate("multiSignature", transaction)).error);
+			assert.defined(validator.validate("multiSignature", transaction).error);
 		}
 	});
 
-	it("#getSchema - asset.multiSignature.publicKeys should be array, min 1, max 16", async ({ validator }) => {
+	it("#getSchema - asset.multiSignature.publicKeys should be array, min 1, max 16", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const invalidValues = [0, -1, 1.1, 3, BigNumber.ONE, "test", null, undefined, {}];
@@ -155,28 +153,26 @@ describe<{
 				},
 			};
 
-			assert.defined((await validator.validate("multiSignature", transaction)).error);
+			assert.defined(validator.validate("multiSignature", transaction).error);
 		}
 
 		// Min 1
 		assert.defined(
-			(
-				await validator.validate("multiSignature", {
-					...transactionOriginal,
-					asset: {
-						multiSignature: {
-							min: 1,
-							publicKeys: [],
-						},
+			validator.validate("multiSignature", {
+				...transactionOriginal,
+				asset: {
+					multiSignature: {
+						min: 1,
+						publicKeys: [],
 					},
-				})
-			).error,
+				},
+			}).error,
 		);
 
 		// Max 16
 		assert.true(
-			(
-				await validator.validate("multiSignature", {
+			validator
+				.validate("multiSignature", {
 					...transactionOriginal,
 					asset: {
 						multiSignature: {
@@ -203,13 +199,13 @@ describe<{
 						},
 					},
 				})
-			).error.includes("publicKeys"),
+				.error.includes("publicKeys"),
 		);
 
 		// Unique
 		assert.true(
-			(
-				await validator.validate("multiSignature", {
+			validator
+				.validate("multiSignature", {
 					...transactionOriginal,
 					asset: {
 						multiSignature: {
@@ -218,13 +214,11 @@ describe<{
 						},
 					},
 				})
-			).error.includes("publicKeys"),
+				.error.includes("publicKeys"),
 		);
 	});
 
-	it("#getSchema - signatures should be lenght 130, min = multiSignature.min, max = publicKeys", async ({
-		validator,
-	}) => {
+	it("#getSchema - signatures should be lenght 130, min = multiSignature.min, max = publicKeys", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const invalidValues = [
@@ -246,11 +240,11 @@ describe<{
 				signatures: value,
 			};
 
-			assert.true((await validator.validate("multiSignature", transaction)).error.includes("signatures"));
+			assert.true(validator.validate("multiSignature", transaction).error.includes("signatures"));
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", async ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const validValues = [1, 100, BigNumber.ONE];
@@ -260,7 +254,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined((await validator.validate("multiSignature", transaction)).error);
+			assert.undefined(validator.validate("multiSignature", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
@@ -270,11 +264,11 @@ describe<{
 				fee: value,
 			};
 
-			assert.true((await validator.validate("multiSignature", transaction)).error.includes("fee"));
+			assert.true(validator.validate("multiSignature", transaction).error.includes("fee"));
 		}
 	});
 
-	it("#getSchema - type should be transfer", async ({ validator }) => {
+	it("#getSchema - type should be transfer", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
 		const validValues = [Contracts.Crypto.TransactionType.MultiSignature];
@@ -284,7 +278,7 @@ describe<{
 				type: value,
 			};
 
-			assert.undefined((await validator.validate("multiSignature", transaction)).error);
+			assert.undefined(validator.validate("multiSignature", transaction).error);
 		}
 
 		const invalidValues = [
@@ -303,7 +297,7 @@ describe<{
 				type: value,
 			};
 
-			assert.true((await validator.validate("multiSignature", transaction)).error.includes("type"));
+			assert.true(validator.validate("multiSignature", transaction).error.includes("type"));
 		}
 	});
 });

@@ -30,7 +30,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 									type: "integer",
 								},
 								publicKeys: {
-									additionalItems: false,
+									// additionalItems: false,
 									items: { $ref: "publicKey" },
 									maxItems: 16,
 									minItems: 1,
@@ -47,7 +47,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 				},
 				fee: { bignumber: { minimum: 1 } },
 				signatures: {
-					additionalItems: false,
+					// additionalItems: false,
 					items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }] },
 					maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },
 					minItems: { $data: "1/asset/multiSignature/min" },
