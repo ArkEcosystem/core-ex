@@ -1,5 +1,5 @@
 import { Contracts } from "@arkecosystem/core-contracts";
-import { Ajv } from "ajv";
+import Ajv from "ajv";
 
 import { isValidPeer } from "./is-valid-peer";
 
