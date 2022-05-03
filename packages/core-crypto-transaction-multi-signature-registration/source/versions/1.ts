@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -15,8 +15,8 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.MultiSignature;
 	public static key = "multiSignature";
 
-	public static getSchema(): schemas.TransactionSchema {
-		return schemas.extend(schemas.transactionBaseSchema, {
+	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+		return extendSchema(schemas.transactionBaseSchema, {
 			$id: "multiSignature",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },

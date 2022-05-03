@@ -1,30 +1,79 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { ServiceProvider as CryptoValidationServiceProvider } from "@arkecosystem/core-crypto-validation";
-import { ServiceProvider as ValidationServiceProvider } from "@arkecosystem/core-validation";
+import { registerKeywords, schemas as sharedSchemas } from "@arkecosystem/core-crypto-validation";
+import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
-import { describe, Sandbox } from "../../../core-test-framework";
-import { extend, signedSchema, strictSchema, transactionBaseSchema } from "./schemas";
+import { describe, Sandbox } from "../../../core-test-framework/distribution";
+import { schemas } from "./schemas";
+import { extend, signedSchema, strictSchema } from "./utils";
 
 describe<{
 	sandbox: Sandbox;
-	validator: Contracts.Crypto.IValidator;
-}>("Schemas", ({ it, beforeEach, assert }) => {
-	beforeEach(async (context) => {
+	validator: Validator;
+}>("Schemas", ({ it, assert, beforeEach }) => {
+	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		await context.sandbox.app.resolve(ValidationServiceProvider).register();
-		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
+		context.validator = context.sandbox.app.resolve(Validator);
 
-		context.validator = context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator);
+		const formats = registerKeywords(
+			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
+		);
+
+		context.validator.extend((ajv) => {
+			formats.transactionType(ajv);
+		});
+
+		context.validator.extend((ajv) => {
+			formats.network(ajv);
+		});
+
+		context.validator.extend((ajv) => {
+			formats.bignum(ajv);
+		});
+
+		context.validator.extend((ajv) => {
+			formats.maxBytes(ajv);
+		});
+
+		for (const schema of Object.values(sharedSchemas)) {
+			context.validator.addSchema(schema);
+		}
+
+		context.validator.addSchema(schemas.transactionId);
 	});
 
-	const schema = extend(transactionBaseSchema, {
+	it("transactionId - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("transactionId", "0".repeat(64)).error);
+
+		const validChars = "0123456789ABCDEFabcdef";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("transactionId", char.repeat(64)).error);
+		}
+	});
+
+	it("transactionId - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("transactionId", "0".repeat(63)).error);
+		assert.defined(validator.validate("transactionId", "0".repeat(65)).error);
+		assert.defined(validator.validate("transactionId", 123).error);
+		assert.defined(validator.validate("transactionId", null).error);
+		assert.defined(validator.validate("transactionId").error);
+		assert.defined(validator.validate("transactionId", {}).error);
+
+		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("transactionId", char.repeat(64)).error);
+		}
+	});
+
+	const schema = extend(schemas.transactionBaseSchema, {
 		$id: "transaction",
 	});
 

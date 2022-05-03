@@ -1,4 +1,4 @@
-import { Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
 import { Deserializer } from "./deserializer";
@@ -8,6 +8,7 @@ import { Serializer } from "./serializer";
 import { Signer } from "./signer";
 import { TransactionTypeFactory } from "./types";
 import { Utils } from "./utils";
+import { schemas } from "./validation";
 import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -20,5 +21,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Transaction.Signer).to(Signer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier).inSingletonScope();
+
+		this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schemas.transactionId);
 	}
 }

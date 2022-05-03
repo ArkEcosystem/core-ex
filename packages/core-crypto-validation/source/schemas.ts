@@ -50,13 +50,6 @@ export const schemas = {
 		type: "string",
 	},
 
-	// @TODO: plugins should register this rule
-	transactionId: {
-		$id: "transactionId",
-		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
-		type: "string",
-	},
-
 	// TODO: Uri format is missing
 	uri: {
 		$id: "uri",
