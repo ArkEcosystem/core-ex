@@ -22,6 +22,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier).inSingletonScope();
 
-		this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schemas.transactionId);
+		for (const schema of Object.values(schemas)) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
 	}
 }

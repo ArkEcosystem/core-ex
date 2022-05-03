@@ -6,8 +6,8 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework/distribution";
-import { schemas } from "./schemas";
-import { extend, signedSchema, strictSchema } from "./utils";
+import { schemas, transactionBaseSchema } from "./schemas";
+import { extendSchema, signedSchema, strictSchema } from "./utils";
 
 describe<{
 	sandbox: Sandbox;
@@ -73,7 +73,7 @@ describe<{
 		}
 	});
 
-	const schema = extend(schemas.transactionBaseSchema, {
+	const schema = extendSchema(transactionBaseSchema, {
 		$id: "transaction",
 	});
 

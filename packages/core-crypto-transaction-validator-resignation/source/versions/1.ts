@@ -1,6 +1,6 @@
 import { injectable } from "@arkecosystem/core-container";
 import { Contracts } from "@arkecosystem/core-contracts";
-import { extendSchema, schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
 import { ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -10,7 +10,7 @@ export class ValidatorResignationTransaction extends Transaction {
 	public static key = "validatorResignation";
 
 	public static getSchema(): Contracts.Crypto.ITransactionSchema {
-		return extendSchema(schemas.transactionBaseSchema, {
+		return extendSchema(transactionBaseSchema, {
 			$id: "validatorResignation",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
-import { extendSchema, schemas, Transaction } from "@arkecosystem/core-crypto-transaction";
+import { extendSchema, Transaction, transactionBaseSchema } from "@arkecosystem/core-crypto-transaction";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 @injectable()
@@ -16,7 +16,7 @@ export class MultiPaymentTransaction extends Transaction {
 	public static key = "multiPayment";
 
 	public static getSchema(): Contracts.Crypto.ITransactionSchema {
-		return extendSchema(schemas.transactionBaseSchema, {
+		return extendSchema(transactionBaseSchema, {
 			$id: "multiPayment",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
