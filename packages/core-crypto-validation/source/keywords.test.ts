@@ -32,10 +32,6 @@ describe<{
 		});
 
 		validator.extend((ajv) => {
-			formats.blockId(ajv);
-		});
-
-		validator.extend((ajv) => {
 			formats.maxBytes(ajv);
 		});
 	};
@@ -122,48 +118,6 @@ describe<{
 		assert.defined(context.validator.validate("test", "0").error);
 		assert.defined(context.validator.validate("test", null).error);
 		assert.defined(context.validator.validate("test").error);
-	});
-
-	// TODO: Properties
-	it("keyword blockId should be ok", (context) => {
-		register(context);
-
-		const schema = {
-			$id: "test",
-			blockId: {},
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", "1".repeat(64)).error);
-
-		assert.defined(context.validator.validate("test", "1".repeat(63)).error);
-		assert.defined(context.validator.validate("test", "1".repeat(63)).error);
-		assert.defined(context.validator.validate("test", "1".repeat(65)).error);
-		assert.defined(context.validator.validate("test", "").error);
-		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test").error);
-		assert.defined(context.validator.validate("test", {}).error);
-	});
-
-	// TODO: check if still required
-	it("keyword blockId - should allow null for geneis", (context) => {
-		register(context);
-
-		const schema = {
-			$id: "test",
-			properties: {
-				height: { type: "number" },
-				id: {
-					blockId: {
-						allowNullWhenGenesis: true,
-					},
-				},
-			},
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", { height: 1, id: "1".repeat(64) }).error);
-		assert.undefined(context.validator.validate("test", { height: 1, id: null }).error);
 	});
 
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
@@ -262,7 +216,7 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.defined(context.validator.validate("test", undefined).error);
+		assert.defined(context.validator.validate("test").error);
 		assert.defined(context.validator.validate("test", {}).error);
 		assert.defined(context.validator.validate("test", /d+/).error);
 		assert.defined(context.validator.validate("test", "").error);
@@ -275,13 +229,13 @@ describe<{
 		const schema = {
 			$id: "test",
 			properties: {
-				id: { type: "string" },
 				fee: {
 					bignumber: {
 						bypassGenesis: true,
 						minimum: 3,
 					},
 				},
+				id: { type: "string" },
 			},
 			type: "object",
 		};
@@ -289,8 +243,8 @@ describe<{
 
 		assert.undefined(
 			context.validator.validate("test", {
-				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
 				fee: 0,
+				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
 			}).error,
 		);
 	});
@@ -303,21 +257,21 @@ describe<{
 		const schema = {
 			$id: "test",
 			properties: {
-				id: { type: "string" },
 				fee: {
 					bignumber: {
 						bypassGenesis: true,
 						minimum: 3,
 					},
 				},
+				id: { type: "string" },
 			},
 		};
 		context.validator.addSchema(schema);
 
 		assert.undefined(
 			context.validator.validate("test", {
-				id: "random",
 				fee: 0,
+				id: "random",
 			}).error,
 		);
 	});
@@ -328,21 +282,21 @@ describe<{
 		const schema = {
 			$id: "test",
 			properties: {
-				id: { type: "string" },
 				fee: {
 					bignumber: {
 						bypassGenesis: false,
 						minimum: 3,
 					},
 				},
+				id: { type: "string" },
 			},
 		};
 		context.validator.addSchema(schema);
 
 		assert.defined(
 			context.validator.validate("test", {
-				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
 				fee: 0,
+				id: "11a3f21c885916c287fae237200aee883555f3a7486457ec2d6434d9646d72c8",
 			}).error,
 		);
 	});
