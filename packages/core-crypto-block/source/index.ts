@@ -4,7 +4,7 @@ import { Providers } from "@arkecosystem/core-kernel";
 import { Deserializer } from "./deserializer";
 import { BlockFactory } from "./factory";
 import { IDFactory } from "./id.factory";
-import { blockId } from "./keywords";
+import { keywords } from "./keywords";
 import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
 import { Verifier } from "./verifier";
@@ -19,7 +19,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Block.Verifier).to(Verifier).inSingletonScope();
 
-		this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(blockId);
+		for (const keyword of Object.values(keywords)) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+		}
 
 		for (const schema of Object.values(schemas)) {
 			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);

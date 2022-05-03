@@ -1,4 +1,6 @@
-export const schemas = {
+import { AnySchemaObject } from "ajv";
+
+export const schemas: Record<string, AnySchemaObject> = {
 	block: {
 		$id: "block",
 		$ref: "blockHeader",
