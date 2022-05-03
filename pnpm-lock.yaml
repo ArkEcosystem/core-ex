@@ -575,6 +575,7 @@ importers:
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
@@ -632,6 +633,7 @@ importers:
       lodash.get: 4.4.2
       lodash.set: 4.3.2
     devDependencies:
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@types/bip32': 2.0.0
       '@types/bip39': 2.4.2
       '@types/buffer-xor': 2.0.0
