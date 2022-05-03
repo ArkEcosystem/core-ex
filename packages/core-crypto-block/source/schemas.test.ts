@@ -1,12 +1,12 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { registerKeywords, schemas } from "@arkecosystem/core-crypto-validation";
+import { registerKeywords, schemas as sharedSchemas } from "@arkecosystem/core-crypto-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";
 import { blockId } from "./keywords";
-import { block, blockHeader } from "./schemas";
+import { schemas } from "./schemas";
 
 describe<{
 	sandbox: Sandbox;
@@ -40,14 +40,14 @@ describe<{
 			formats.maxBytes(ajv);
 		});
 
-		for (const schema of Object.values(schemas)) {
+		for (const schema of Object.values(sharedSchemas)) {
 			context.validator.addSchema(schema);
 		}
 
 		context.validator.addKeyword(blockId);
 
-		context.validator.addSchema(blockHeader);
-		context.validator.addSchema(block);
+		context.validator.addSchema(schemas.blockHeader);
+		context.validator.addSchema(schemas.block);
 	});
 
 	const blockOriginal = {

@@ -5,8 +5,11 @@ import { Deserializer } from "./deserializer";
 import { BlockFactory } from "./factory";
 import { IDFactory } from "./id.factory";
 import { blockId } from "./keywords";
+import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
 import { Verifier } from "./verifier";
+
+export * from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -17,5 +20,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Block.Verifier).to(Verifier).inSingletonScope();
 
 		this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(blockId);
+
+		for (const schema of Object.values(schemas)) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
 	}
 }
