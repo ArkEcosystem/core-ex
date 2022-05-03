@@ -1,17 +1,16 @@
 import { inject, injectable, postConstruct } from "@arkecosystem/core-container";
 import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
-import { schemas } from "@arkecosystem/core-crypto-validation";
 
+// import { schemas } from "@arkecosystem/core-crypto-block";
 import { Transaction } from "./types";
-import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
+// import { signedSchema, strictSchema, TransactionSchema } from "./types/schemas";
 
 export type TransactionConstructor = typeof Transaction;
 
 @injectable()
 export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistry {
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator: Contracts.Crypto.IValidator;
-
+	// private readonly validator: Contracts.Crypto.IValidator;
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory: Contracts.Transactions.ITransactionTypeFactory;
 
@@ -20,7 +19,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		Map<number, TransactionConstructor>
 	> = new Map();
 
-	readonly #transactionSchemas = new Map<string, TransactionSchema>();
+	// readonly #transactionSchemas = new Map<string, TransactionSchema>();
 
 	@postConstruct()
 	public postConstruct() {
@@ -62,7 +61,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		}
 
 		this.#transactionTypes.get(internalType)!.set(constructor.version, constructor);
-		this.#updateSchemas(constructor.getSchema());
+		// this.#updateSchemas(constructor.getSchema());
 	}
 
 	public deregisterTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
@@ -78,7 +77,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			throw new Exceptions.UnkownTransactionError(internalType.toString());
 		}
 
-		this.#updateSchemas(constructor.getSchema(), true);
+		// this.#updateSchemas(constructor.getSchema(), true);
 
 		const constructors = this.#transactionTypes.get(internalType)!;
 		if (!constructors.has(version)) {
@@ -92,38 +91,38 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		}
 	}
 
-	#updateSchemas(schema: TransactionSchema, remove?: boolean): void {
-		this.validator.extend((ajv) => {
-			if (ajv.getSchema(schema.$id)) {
-				remove = true;
-			}
+	// #updateSchemas(schema: TransactionSchema, remove?: boolean): void {
+	// 	this.validator.extend((ajv) => {
+	// 		if (ajv.getSchema(schema.$id)) {
+	// 			remove = true;
+	// 		}
 
-			if (remove) {
-				this.#transactionSchemas.delete(schema.$id);
+	// 		if (remove) {
+	// 			this.#transactionSchemas.delete(schema.$id);
 
-				ajv.removeSchema(schema.$id);
-				ajv.removeSchema(`${schema.$id}Signed`);
-				ajv.removeSchema(`${schema.$id}Strict`);
-			}
+	// 			ajv.removeSchema(schema.$id);
+	// 			ajv.removeSchema(`${schema.$id}Signed`);
+	// 			ajv.removeSchema(`${schema.$id}Strict`);
+	// 		}
 
-			this.#transactionSchemas.set(schema.$id, schema);
+	// 		this.#transactionSchemas.set(schema.$id, schema);
 
-			ajv.addSchema(schema);
-			ajv.addSchema(signedSchema(schema));
-			ajv.addSchema(strictSchema(schema));
+	// 		ajv.addSchema(schema);
+	// 		ajv.addSchema(signedSchema(schema));
+	// 		ajv.addSchema(strictSchema(schema));
 
-			// Update schemas
-			ajv.removeSchema("block");
-			ajv.removeSchema("transactions");
-			ajv.addSchema({
-				$id: "transactions",
-				additionalItems: false,
-				items: { anyOf: [...this.#transactionSchemas.keys()].map((schema) => ({ $ref: `${schema}Signed` })) },
-				type: "array",
-			});
-			ajv.addSchema(schemas.block);
-		});
-	}
+	// 		// Update schemas
+	// 		ajv.removeSchema("block");
+	// 		ajv.removeSchema("transactions");
+	// 		ajv.addSchema({
+	// 			$id: "transactions",
+	// 			additionalItems: false,
+	// 			items: { anyOf: [...this.#transactionSchemas.keys()].map((schema) => ({ $ref: `${schema}Signed` })) },
+	// 			type: "array",
+	// 		});
+	// 		ajv.addSchema(schemas.block);
+	// 	});
+	// }
 }
 
 export const transactionRegistry = new TransactionRegistry();
