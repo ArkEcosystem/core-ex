@@ -7,7 +7,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework/distribution";
-import { keywords } from "./keywords";
+import { makeKeywords } from "./keywords";
 import { schemas, transactionBaseSchema } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utils";
 
@@ -28,10 +28,6 @@ describe<{
 		);
 
 		context.validator.extend((ajv) => {
-			formats.network(ajv);
-		});
-
-		context.validator.extend((ajv) => {
 			formats.bignum(ajv);
 		});
 
@@ -47,7 +43,10 @@ describe<{
 			context.validator.addSchema(schema);
 		}
 
+		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
 		context.validator.addKeyword(keywords.transactionType);
+		context.validator.addKeyword(keywords.network);
+
 		context.validator.addSchema(schemas.transactionId);
 		context.validator.addSchema(schemas.networkByte);
 	});

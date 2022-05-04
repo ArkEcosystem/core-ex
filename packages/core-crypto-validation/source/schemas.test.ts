@@ -24,10 +24,6 @@ describe<{
 		);
 
 		context.validator.extend((ajv) => {
-			formats.network(ajv);
-		});
-
-		context.validator.extend((ajv) => {
 			formats.bignum(ajv);
 		});
 

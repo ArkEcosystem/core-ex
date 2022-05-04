@@ -16,10 +16,6 @@ describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
 		const formats = registerFormats(sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
 
 		validator.extend((ajv) => {
-			formats.vendorField(ajv);
-		});
-
-		validator.extend((ajv) => {
 			formats.validPeer(ajv);
 		});
 	};
@@ -31,38 +27,6 @@ describe<Context>("format vendorField", ({ it, assert, beforeEach }) => {
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
 		context.validator = context.sandbox.app.resolve(Validator);
-	});
-
-	it("#vendorField - should be ok", (context) => {
-		register(context);
-
-		const schema = {
-			$id: "test",
-			format: "vendorField",
-			type: "string",
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", "false").error);
-		assert.undefined(context.validator.validate("test", "a".repeat(255)).error);
-		assert.undefined(context.validator.validate("test", "⊁".repeat(85)).error);
-	});
-
-	it("#vendorField - should not be ok", (context) => {
-		register(context);
-
-		const schema = {
-			$id: "test",
-			format: "vendorField",
-			type: "string",
-		};
-		context.validator.addSchema(schema);
-
-		assert.defined(context.validator.validate("test", "a".repeat(256)).error);
-		assert.defined(context.validator.validate("test", "⊁".repeat(86)).error);
-		assert.defined(context.validator.validate("test", {}).error);
-		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test").error);
 	});
 
 	it("#peer - should be ok", (context) => {

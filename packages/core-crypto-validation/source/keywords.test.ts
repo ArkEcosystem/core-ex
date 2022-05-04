@@ -20,10 +20,6 @@ describe<{
 		const formats = registerKeywords(sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
 
 		validator.extend((ajv) => {
-			formats.network(ajv);
-		});
-
-		validator.extend((ajv) => {
 			formats.bignum(ajv);
 		});
 
@@ -63,38 +59,6 @@ describe<{
 		assert.defined(context.validator.validate("test", null).error);
 		assert.defined(context.validator.validate("test").error);
 		assert.defined(context.validator.validate("test", 123).error);
-	});
-
-	// TODO: Flase value
-	it("keyword network should be ok", (context) => {
-		register(context);
-
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("network", {});
-
-		const schema = {
-			$id: "test",
-			network: true,
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", 30).error);
-		assert.undefined(context.validator.validate("test", 23).error);
-		assert.undefined(context.validator.validate("test", "a").error);
-	});
-
-	it("keyword network - should return true when network is not set in configuration", (context) => {
-		register(context);
-
-		const schema = {
-			$id: "test",
-			network: true,
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", 30).error);
-
-		assert.defined(context.validator.validate("test", 23).error);
-		assert.defined(context.validator.validate("test", "a").error);
 	});
 
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {

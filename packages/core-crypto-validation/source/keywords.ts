@@ -40,25 +40,6 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		});
 	};
 
-	const network = (ajv: Ajv) => {
-		ajv.addKeyword({
-			compile(schema) {
-				return (data) => {
-					const networkHash = configuration.get("network.pubKeyHash");
-					if (!networkHash) {
-						return true;
-					}
-					return schema && data === networkHash;
-				};
-			},
-			errors: false,
-			keyword: "network",
-			metaSchema: {
-				type: "boolean",
-			},
-		});
-	};
-
 	// @TODO: revisit the need for the genesis check
 	const bignum = (ajv: Ajv) => {
 		// const instanceOf = ajvKeywords.get("instanceof").definition;
@@ -124,5 +105,5 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		});
 	};
 
-	return { bignum, maxBytes, network };
+	return { bignum, maxBytes };
 };
