@@ -1,6 +1,22 @@
-import { AnySchemaObject } from "ajv";
+import { SchemaObject } from "ajv";
 
-export const transactionBaseSchema: AnySchemaObject = {
+const transactionId: SchemaObject = {
+	$id: "transactionId",
+	allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
+	type: "string",
+};
+
+const networkByte: SchemaObject = {
+	$id: "networkByte",
+	network: true,
+};
+
+export const schemas = {
+	networkByte,
+	transactionId,
+};
+
+export const transactionBaseSchema: SchemaObject = {
 	$id: undefined,
 	// else: { required: ["type", "senderPublicKey", "fee", "amount", "nonce"] },
 	// if: { properties: { version: { anyOf: [{ type: "null" }, { const: 1 }] } } },
@@ -26,12 +42,4 @@ export const transactionBaseSchema: AnySchemaObject = {
 	// then: { required: ["type", "senderPublicKey", "fee", "amount"] },
 	required: ["type", "senderPublicKey", "fee", "amount", "nonce"],
 	type: "object",
-};
-
-export const schemas = {
-	transactionId: {
-		$id: "transactionId",
-		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
-		type: "string",
-	} as AnySchemaObject,
 };

@@ -11,11 +11,6 @@ export const schemas = {
 		type: "string",
 	},
 
-	networkByte: {
-		$id: "networkByte",
-		network: true,
-	},
-
 	// TODO: Uri format is missing
 	uri: {
 		$id: "uri",

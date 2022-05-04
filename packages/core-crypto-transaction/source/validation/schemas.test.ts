@@ -1,5 +1,6 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { schemas as keyPairSchemas } from "@arkecosystem/core-crypto-key-pair-schnorr/distribution/schemas";
 import { registerKeywords, schemas as sharedSchemas } from "@arkecosystem/core-crypto-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { BigNumber } from "@arkecosystem/utils";
@@ -26,8 +27,6 @@ describe<{
 			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
 		);
 
-		context.validator.addKeyword(keywords.transactionType);
-
 		context.validator.extend((ajv) => {
 			formats.network(ajv);
 		});
@@ -44,10 +43,16 @@ describe<{
 			context.validator.addSchema(schema);
 		}
 
+		for (const schema of Object.values(keyPairSchemas)) {
+			context.validator.addSchema(schema);
+		}
+
+		context.validator.addKeyword(keywords.transactionType);
 		context.validator.addSchema(schemas.transactionId);
+		context.validator.addSchema(schemas.networkByte);
 	});
 
-	it.only("transactionId - should be ok", ({ validator }) => {
+	it("transactionId - should be ok", ({ validator }) => {
 		assert.undefined(validator.validate("transactionId", "0".repeat(64)).error);
 
 		const validChars = "0123456789ABCDEFabcdef";
@@ -70,6 +75,17 @@ describe<{
 		for (const char of invalidChars) {
 			assert.defined(validator.validate("transactionId", char.repeat(64)).error);
 		}
+	});
+
+	it("networkByte - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("networkByte", 30).error);
+	});
+
+	it("networkByte - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("networkByte", 123).error);
+		assert.defined(validator.validate("networkByte", null).error);
+		assert.defined(validator.validate("networkByte").error);
+		assert.defined(validator.validate("networkByte", {}).error);
 	});
 
 	const schema = extendSchema(transactionBaseSchema, {
