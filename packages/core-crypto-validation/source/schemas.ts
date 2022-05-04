@@ -43,13 +43,6 @@ export const schemas = {
 		network: true,
 	},
 
-	// @TODO: plugins should register this rule
-	publicKey: {
-		$id: "publicKey",
-		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }, { transform: ["toLowerCase"] }], //64=schnorr,66=ecdsa
-		type: "string",
-	},
-
 	// TODO: Uri format is missing
 	uri: {
 		$id: "uri",

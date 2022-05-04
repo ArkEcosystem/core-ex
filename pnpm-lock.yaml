@@ -788,7 +788,9 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
       bcrypto: 5.4.0
       uvu: ^0.5.3
@@ -802,6 +804,8 @@ importers:
       bcrypto: 5.4.0
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-validation': link:../core-validation
       uvu: 0.5.3
 
   packages/core-crypto-signature-bls12-381:

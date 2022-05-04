@@ -107,29 +107,4 @@ describe<{
 			assert.defined(validator.validate("hex", char.repeat(20)).error);
 		}
 	});
-
-	it("publicKey - should be ok", ({ validator }) => {
-		assert.undefined(validator.validate("publicKey", "0".repeat(64)).error);
-
-		const validChars = "0123456789ABCDEFabcdef";
-
-		for (const char of validChars) {
-			assert.undefined(validator.validate("publicKey", char.repeat(64)).error);
-		}
-	});
-
-	it("publicKey - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("publicKey", "0".repeat(63)).error);
-		assert.defined(validator.validate("publicKey", "0".repeat(65)).error);
-		assert.defined(validator.validate("publicKey", 123).error);
-		assert.defined(validator.validate("publicKey", null).error);
-		assert.defined(validator.validate("publicKey").error);
-		assert.defined(validator.validate("publicKey", {}).error);
-
-		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
-
-		for (const char of invalidChars) {
-			assert.defined(validator.validate("publicKey", char.repeat(64)).error);
-		}
-	});
 });
