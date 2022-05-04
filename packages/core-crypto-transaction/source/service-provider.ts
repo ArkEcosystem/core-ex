@@ -8,7 +8,7 @@ import { Serializer } from "./serializer";
 import { Signer } from "./signer";
 import { TransactionTypeFactory } from "./types";
 import { Utils } from "./utils";
-import { keywords, schemas } from "./validation";
+import { keywords, makeFormats, schemas } from "./validation";
 import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -26,6 +26,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerValidation(): void {
+		for (const [name, format] of Object.entries(
+			makeFormats(this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)),
+		)) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+		}
+
 		for (const keyword of Object.values(keywords)) {
 			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 		}

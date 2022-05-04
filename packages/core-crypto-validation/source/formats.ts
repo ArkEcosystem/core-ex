@@ -4,16 +4,6 @@ import Ajv from "ajv";
 import { isValidPeer } from "./is-valid-peer";
 
 export const registerFormats = (configuration: Contracts.Crypto.IConfiguration) => {
-	const vendorField = (ajv: Ajv) => {
-		ajv.addFormat("vendorField", (data) => {
-			try {
-				return Buffer.from(data, "utf8").length <= configuration.getMilestone().vendorFieldLength;
-			} catch {
-				return false;
-			}
-		});
-	};
-
 	// @TODO: plugins should register this rule
 	const validPeer = (ajv: Ajv) => {
 		ajv.addFormat("peer", (ip: string) => {
@@ -25,5 +15,5 @@ export const registerFormats = (configuration: Contracts.Crypto.IConfiguration) 
 		});
 	};
 
-	return { validPeer, vendorField };
+	return { validPeer };
 };
