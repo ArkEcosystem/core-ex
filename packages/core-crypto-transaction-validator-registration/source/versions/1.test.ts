@@ -1,11 +1,13 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { schemas as transactionSchemas } from "@arkecosystem/core-crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as ValidationServiceProvider } from "@arkecosystem/core-validation";
 import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework";
+import { schemas } from "../validation/schemas";
 import { ValidatorRegistrationTransaction } from "./1";
 
 describe<{
@@ -22,6 +24,9 @@ describe<{
 		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
 
 		context.validator = context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator);
+
+		context.validator.addSchema(transactionSchemas.transactionId);
+		context.validator.addSchema(schemas.validatorUsername);
 	});
 
 	const transactionOriginal = {

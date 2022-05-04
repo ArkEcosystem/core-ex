@@ -55,15 +55,4 @@ export const schemas = {
 		$id: "uri",
 		allOf: [{ format: "uri" }, { maxLength: 80, minLength: 4 }],
 	},
-
-	// @TODO: plugins should register this rule
-	username: {
-		$id: "validatorUsername",
-		allOf: [
-			{ pattern: "^[a-z0-9!@$&_.]+$", type: "string" },
-			{ maxLength: 20, minLength: 1 },
-			{ transform: ["toLowerCase"] },
-		],
-		type: "string",
-	},
 };

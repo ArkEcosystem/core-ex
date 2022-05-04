@@ -28,10 +28,10 @@ export const transactionBaseSchema: AnySchemaObject = {
 	type: "object",
 };
 
-export const schemas: Record<string, AnySchemaObject> = {
+export const schemas = {
 	transactionId: {
 		$id: "transactionId",
 		allOf: [{ maxLength: 64, minLength: 64 }, { $ref: "hex" }],
 		type: "string",
-	},
+	} as AnySchemaObject,
 };
