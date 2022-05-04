@@ -1,10 +1,10 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { registerKeywords } from "@arkecosystem/core-crypto-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";
-import { registerKeywords } from "./keywords";
 import { schemas } from "./schemas";
 
 describe<{
@@ -44,42 +44,28 @@ describe<{
 		}
 	});
 
-	it("alphanumeric - should be ok", ({ validator }) => {
+	it("address - should be ok", ({ validator }) => {
+		assert.undefined(validator.validate("address", "a".repeat(62)).error);
+
 		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("alphanumeric", char).error);
-			assert.undefined(validator.validate("alphanumeric", char.repeat(20)).error);
+			assert.undefined(validator.validate("address", char.repeat(62)).error);
 		}
 	});
 
-	it("alphanumeric - should not be ok", ({ validator }) => {
+	it("address - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("address", "a".repeat(61)).error);
+		assert.defined(validator.validate("address", "a".repeat(63)).error);
 		assert.defined(validator.validate("address", 123).error);
 		assert.defined(validator.validate("address", null).error);
 		assert.defined(validator.validate("address").error);
 		assert.defined(validator.validate("address", {}).error);
-	});
 
-	it("hex - should be ok", ({ validator }) => {
-		const validChars = "0123456789ABCDEFabcdef";
-
-		for (const char of validChars) {
-			assert.undefined(validator.validate("hex", char).error);
-			assert.undefined(validator.validate("hex", char.repeat(20)).error);
-		}
-	});
-
-	it("hex - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("hex", 123).error);
-		assert.defined(validator.validate("hex", null).error);
-		assert.defined(validator.validate("hex").error);
-		assert.defined(validator.validate("hex", {}).error);
-
-		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
+		const invalidChars = "!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("hex", char).error);
-			assert.defined(validator.validate("hex", char.repeat(20)).error);
+			assert.defined(validator.validate("address", char.repeat(62)).error);
 		}
 	});
 });

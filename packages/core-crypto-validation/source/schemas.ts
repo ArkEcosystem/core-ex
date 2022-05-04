@@ -1,11 +1,4 @@
 export const schemas = {
-	// @TODO: plugins should register this rule
-	address: {
-		$id: "address",
-		allOf: [{ maxLength: 62, minLength: 62 }, { $ref: "bech32m" }],
-		type: "string",
-	},
-
 	alphanumeric: {
 		$id: "alphanumeric",
 		pattern: "^[a-zA-Z0-9]+$",
