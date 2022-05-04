@@ -5,26 +5,6 @@ export const schemas = {
 		type: "string",
 	},
 
-	base58: {
-		$id: "base58",
-		pattern: "^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$",
-		type: "string",
-	},
-
-	bech32m: {
-		$id: "bech32m",
-		pattern: "^[0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]+$",
-		type: "string",
-	},
-	// // @TODO: plugins should register this rule
-	// genericName: {
-	// 	$id: "genericName",
-	// 	allOf: [
-	// 		{ pattern: "^[a-zA-Z0-9]+(( - |[ ._-])[a-zA-Z0-9]+)*[.]?$", type: "string" },
-	// 		{ maxLength: 40, minLength: 1 },
-	// 	],
-	// },
-
 	hex: {
 		$id: "hex",
 		pattern: "^[0123456789A-Fa-f]+$",
