@@ -20,10 +20,6 @@ describe<{
 		const formats = registerKeywords(sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
 
 		validator.extend((ajv) => {
-			formats.transactionType(ajv);
-		});
-
-		validator.extend((ajv) => {
 			formats.network(ajv);
 		});
 
@@ -99,25 +95,6 @@ describe<{
 
 		assert.defined(context.validator.validate("test", 23).error);
 		assert.defined(context.validator.validate("test", "a").error);
-	});
-
-	it("keyword transactionType should be ok", (context) => {
-		register(context);
-
-		const schema = {
-			$id: "test",
-			transactionType: Contracts.Crypto.TransactionType.Transfer,
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", Contracts.Crypto.TransactionType.Transfer).error);
-
-		assert.defined(context.validator.validate("test", Contracts.Crypto.TransactionType.Vote).error);
-		assert.defined(context.validator.validate("test", -1).error);
-		assert.defined(context.validator.validate("test", "").error);
-		assert.defined(context.validator.validate("test", "0").error);
-		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test").error);
 	});
 
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {

@@ -8,7 +8,7 @@ import { Serializer } from "./serializer";
 import { Signer } from "./signer";
 import { TransactionTypeFactory } from "./types";
 import { Utils } from "./utils";
-import { schemas } from "./validation";
+import { keywords, schemas } from "./validation";
 import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -21,6 +21,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Transaction.Signer).to(Signer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier).inSingletonScope();
+
+		this.#registerValidation();
+	}
+
+	#registerValidation(): void {
+		for (const keyword of Object.values(keywords)) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+		}
 
 		for (const schema of Object.values(schemas)) {
 			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);

@@ -6,6 +6,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework/distribution";
+import { keywords } from "./keywords";
 import { schemas, transactionBaseSchema } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utils";
 
@@ -25,9 +26,7 @@ describe<{
 			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
 		);
 
-		context.validator.extend((ajv) => {
-			formats.transactionType(ajv);
-		});
+		context.validator.addKeyword(keywords.transactionType);
 
 		context.validator.extend((ajv) => {
 			formats.network(ajv);
@@ -48,7 +47,7 @@ describe<{
 		context.validator.addSchema(schemas.transactionId);
 	});
 
-	it("transactionId - should be ok", ({ validator }) => {
+	it.only("transactionId - should be ok", ({ validator }) => {
 		assert.undefined(validator.validate("transactionId", "0".repeat(64)).error);
 
 		const validChars = "0123456789ABCDEFabcdef";

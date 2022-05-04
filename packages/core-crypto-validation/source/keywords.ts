@@ -40,36 +40,6 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		});
 	};
 
-	const transactionType = (ajv: Ajv) => {
-		ajv.addKeyword({
-			// @ts-ignore
-			compile(schema) {
-				return (data, dataPath, parentObject: Contracts.Crypto.ITransactionData) =>
-					// Impose dynamic multipayment limit based on milestone
-					// TODO: Move under multi payment
-					// if (
-					// 	data === Contracts.Crypto.TransactionType.MultiPayment &&
-					// 	parentObject &&
-					// 	(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
-					// 	parentObject.asset &&
-					// 	parentObject.asset.payments
-					// ) {
-					// 	const limit: number = configuration.getMilestone().multiPaymentLimit || 256;
-					// 	return parentObject.asset.payments.length <= limit;
-					// }
-
-					data === schema;
-			},
-
-			errors: false,
-			keyword: "transactionType",
-			metaSchema: {
-				minimum: 0,
-				type: "integer",
-			},
-		});
-	};
-
 	const network = (ajv: Ajv) => {
 		ajv.addKeyword({
 			compile(schema) {
@@ -154,5 +124,5 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 		});
 	};
 
-	return { bignum, maxBytes, network, transactionType };
+	return { bignum, maxBytes, network };
 };
