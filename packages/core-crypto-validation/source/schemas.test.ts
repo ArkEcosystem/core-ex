@@ -30,7 +30,7 @@ describe<{
 	});
 
 	it("alphanumeric - should be ok", ({ validator }) => {
-		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
 			assert.undefined(validator.validate("alphanumeric", char).error);
@@ -39,14 +39,37 @@ describe<{
 	});
 
 	it("alphanumeric - should not be ok", ({ validator }) => {
+		const invalidChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("alphanumeric", char).error);
+			assert.defined(validator.validate("alphanumeric", char.repeat(20)).error);
+		}
+
 		assert.defined(validator.validate("address", 123).error);
 		assert.defined(validator.validate("address", null).error);
 		assert.defined(validator.validate("address").error);
 		assert.defined(validator.validate("address", {}).error);
 	});
 
+	it("alphanumericMixedCase - should be ok", ({ validator }) => {
+		const validChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("alphanumericMixedCase", char).error);
+			assert.undefined(validator.validate("alphanumericMixedCase", char.repeat(20)).error);
+		}
+	});
+
+	it("alphanumericMixedCase - should not be ok", ({ validator }) => {
+		assert.defined(validator.validate("alphanumericMixedCase", 123).error);
+		assert.defined(validator.validate("alphanumericMixedCase", null).error);
+		assert.defined(validator.validate("alphanumericMixedCase").error);
+		assert.defined(validator.validate("alphanumericMixedCase", {}).error);
+	});
+
 	it("hex - should be ok", ({ validator }) => {
-		const validChars = "0123456789ABCDEFabcdef";
+		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
 			assert.undefined(validator.validate("hex", char).error);
@@ -60,7 +83,7 @@ describe<{
 		assert.defined(validator.validate("hex").error);
 		assert.defined(validator.validate("hex", {}).error);
 
-		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
+		const invalidChars = "ABCDEFGHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
 			assert.defined(validator.validate("hex", char).error);
