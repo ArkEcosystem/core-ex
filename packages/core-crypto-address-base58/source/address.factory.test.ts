@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { ServiceProvider as ECDSA } from "@arkecosystem/core-crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 import { Application } from "@arkecosystem/core-kernel";
+import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 
 import { describe } from "../../core-test-framework";
 import { AddressFactory } from "./address.factory";
