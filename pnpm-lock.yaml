@@ -1106,7 +1106,9 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-address-bech32m': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-crypto-transaction-validator-registration': workspace:*
       '@arkecosystem/core-crypto-validation': workspace:*
@@ -1126,7 +1128,9 @@ importers:
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
     devDependencies:
+      '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
+      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
       '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-validation': link:../core-validation
       uvu: 0.5.3
