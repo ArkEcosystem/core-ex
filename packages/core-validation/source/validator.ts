@@ -36,7 +36,7 @@ export class Validator implements Contracts.Crypto.IValidator {
 		}
 	}
 
-	public addFormat(name: string, format: FormatDefinition<string | number>): void {
+	public addFormat(name: string, format: FormatDefinition<string> | FormatDefinition<number>): void {
 		this.#ajv.addFormat(name, format);
 	}
 

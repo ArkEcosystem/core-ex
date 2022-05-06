@@ -1,7 +1,7 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { schemas as keyPairSchemas } from "@arkecosystem/core-crypto-key-pair-schnorr/distribution/schemas";
-import { registerKeywords, schemas as sharedSchemas } from "@arkecosystem/core-crypto-validation";
+import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@arkecosystem/core-crypto-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { BigNumber } from "@arkecosystem/utils";
 
@@ -23,32 +23,20 @@ describe<{
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		const formats = registerKeywords(
-			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
-		);
-
-		context.validator.extend((ajv) => {
-			formats.bignum(ajv);
-		});
-
-		context.validator.extend((ajv) => {
-			formats.maxBytes(ajv);
-		});
-
-		for (const schema of Object.values(sharedSchemas)) {
-			context.validator.addSchema(schema);
+		for (const keyword of Object.values({
+			...makeBaseKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+		})) {
+			context.validator.addKeyword(keyword);
 		}
 
-		for (const schema of Object.values(keyPairSchemas)) {
+		for (const schema of Object.values({
+			...baseSchemas,
+			...keyPairSchemas,
+			...schemas,
+		})) {
 			context.validator.addSchema(schema);
 		}
-
-		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
-		context.validator.addKeyword(keywords.transactionType);
-		context.validator.addKeyword(keywords.network);
-
-		context.validator.addSchema(schemas.transactionId);
-		context.validator.addSchema(schemas.networkByte);
 	});
 
 	it("transactionId - should be ok", ({ validator }) => {
