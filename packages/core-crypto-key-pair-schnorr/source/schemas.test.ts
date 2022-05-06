@@ -1,6 +1,6 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { registerKeywords, schemas as basicSchemas } from "@arkecosystem/core-crypto-validation";
+import { schemas as baseSchemas } from "@arkecosystem/core-crypto-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
@@ -19,27 +19,10 @@ describe<{
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		const formats = registerKeywords(
-			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
-		);
-
-		context.validator.extend((ajv) => {
-			formats.network(ajv);
-		});
-
-		context.validator.extend((ajv) => {
-			formats.bignum(ajv);
-		});
-
-		context.validator.extend((ajv) => {
-			formats.maxBytes(ajv);
-		});
-
-		for (const schema of Object.values(basicSchemas)) {
-			context.validator.addSchema(schema);
-		}
-
-		for (const schema of Object.values(schemas)) {
+		for (const schema of Object.values({
+			...baseSchemas,
+			...schemas,
+		})) {
 			context.validator.addSchema(schema);
 		}
 	});
