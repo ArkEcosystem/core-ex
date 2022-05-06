@@ -29,10 +29,10 @@
 		"@arkecosystem/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@arkecosystem/core-crypto-validation": "workspace:*",
-		"@arkecosystem/core-validation": "workspace:*",
 		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",
 		"@arkecosystem/core-crypto-key-pair-schnorr": "workspace:*",
+		"@arkecosystem/core-crypto-validation": "workspace:*",
+		"@arkecosystem/core-validation": "workspace:*",
 		"uvu": "0.5.3"
 	},
 	"engines": {
