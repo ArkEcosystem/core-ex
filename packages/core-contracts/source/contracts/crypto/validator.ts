@@ -1,4 +1,4 @@
-import Ajv, { ErrorObject, FormatDefinition, KeywordDefinition } from "ajv";
+import Ajv, { AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 
 export interface ISchemaValidationResult<T = any> {
 	value: T | undefined;
@@ -7,17 +7,17 @@ export interface ISchemaValidationResult<T = any> {
 }
 
 export interface IValidator {
-	validate<T = any>(schemaKeyReference: string | boolean | object, data: T): ISchemaValidationResult<T>;
+	validate<T = any>(schemaKeyReference: string | Schema, data: T): ISchemaValidationResult<T>;
 
-	addFormat(name: string, format: FormatDefinition<string | number>): void;
+	addFormat(name: string, format: FormatDefinition<string> | FormatDefinition<number>): void;
 
 	addKeyword(definition: KeywordDefinition): void;
 
-	addSchema(schema: object | object[]): void;
+	addSchema(schema: AnySchemaObject): void;
 
 	removeKeyword(keyword: string): void;
 
-	removeSchema(schemaKeyReference: string | boolean | object | RegExp): void;
+	removeSchema(schemaKeyReference: string): void;
 
 	extend(callback: (ajv: Ajv) => void): void;
 }
