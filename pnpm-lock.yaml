@@ -536,6 +536,7 @@ importers:
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
       ethers: ^5.5.4
       uvu: ^0.5.3
@@ -549,6 +550,7 @@ importers:
     devDependencies:
       '@arkecosystem/core-crypto-key-pair-ecdsa': link:../core-crypto-key-pair-ecdsa
       '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
+      '@arkecosystem/core-validation': link:../core-validation
       uvu: 0.5.3
 
   packages/core-crypto-address-ss58:
