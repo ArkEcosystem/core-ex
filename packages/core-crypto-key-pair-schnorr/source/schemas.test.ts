@@ -30,7 +30,7 @@ describe<{
 	it("publicKey - should be ok", ({ validator }) => {
 		assert.undefined(validator.validate("publicKey", "0".repeat(64)).error);
 
-		const validChars = "0123456789ABCDEFabcdef";
+		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
 			assert.undefined(validator.validate("publicKey", char.repeat(64)).error);
@@ -45,7 +45,7 @@ describe<{
 		assert.defined(validator.validate("publicKey").error);
 		assert.defined(validator.validate("publicKey", {}).error);
 
-		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
+		const invalidChars = "ABCDEFGHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
 			assert.defined(validator.validate("publicKey", char.repeat(64)).error);
