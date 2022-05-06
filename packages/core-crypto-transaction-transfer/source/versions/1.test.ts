@@ -1,5 +1,8 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { schemas as addressSchemas } from "@arkecosystem/core-crypto-address-bech32m";
 import { Configuration } from "@arkecosystem/core-crypto-config";
+import { schemas as kayParSchemas } from "@arkecosystem/core-crypto-key-pair-schnorr";
+import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@arkecosystem/core-crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as ValidationServiceProvider } from "@arkecosystem/core-validation";
 import { BigNumber } from "@arkecosystem/utils";
@@ -22,14 +25,34 @@ describe<{
 		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
 
 		context.validator = context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator);
+
+		for (const [name, format] of Object.entries({
+			...makeFormats(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+		})) {
+			context.validator.addFormat(name, format);
+		}
+
+		for (const keyword of Object.values({
+			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+		})) {
+			context.validator.addKeyword(keyword);
+		}
+
+		for (const schema of Object.values({
+			...transactionSchemas,
+			...kayParSchemas,
+			...addressSchemas,
+		})) {
+			context.validator.addSchema(schema);
+		}
 	});
 
 	const transactionOriginal = {
 		amount: 1,
 		fee: 1,
 		nonce: 0,
-		recipientId: "A".repeat(62),
-		senderPublicKey: "A".repeat(64),
+		recipientId: "a".repeat(62),
+		senderPublicKey: "a".repeat(64),
 		type: 0,
 	};
 
@@ -91,7 +114,7 @@ describe<{
 	it("#getSchema - recipientId should be address", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
-		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 		for (const char of validChars) {
 			const transaction = {
 				...transactionOriginal,
@@ -101,7 +124,7 @@ describe<{
 			assert.undefined(validator.validate("transfer", transaction).error);
 		}
 
-		const invalidValues = ["a".repeat(61), "a".repeat(63), "&".repeat(62), null, undefined, {}];
+		const invalidValues = ["a".repeat(61), "a".repeat(63), "A".repeat(62), "&".repeat(62), null, undefined, {}];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
