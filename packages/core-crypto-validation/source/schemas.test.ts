@@ -52,22 +52,6 @@ describe<{
 		assert.defined(validator.validate("address", {}).error);
 	});
 
-	it("alphanumericMixedCase - should be ok", ({ validator }) => {
-		const validChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-		for (const char of validChars) {
-			assert.undefined(validator.validate("alphanumericMixedCase", char).error);
-			assert.undefined(validator.validate("alphanumericMixedCase", char.repeat(20)).error);
-		}
-	});
-
-	it("alphanumericMixedCase - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("alphanumericMixedCase", 123).error);
-		assert.defined(validator.validate("alphanumericMixedCase", null).error);
-		assert.defined(validator.validate("alphanumericMixedCase").error);
-		assert.defined(validator.validate("alphanumericMixedCase", {}).error);
-	});
-
 	it("hex - should be ok", ({ validator }) => {
 		const validChars = "0123456789abcdef";
 

@@ -1,14 +1,9 @@
-import { AnySchemaObject } from "ajv";
+import { SchemaObject } from "ajv";
 
-export const schemas: Record<"alphanumeric" | "alphanumericMixedCase" | "hex", AnySchemaObject> = {
+export const schemas: Record<"alphanumeric" | "hex", SchemaObject> = {
 	alphanumeric: {
 		$id: "alphanumeric",
 		pattern: "^[a-z0-9]+$",
-		type: "string",
-	},
-	alphanumericMixedCase: {
-		$id: "alphanumericMixedCase",
-		pattern: "^[A-Za-z0-9]+$",
 		type: "string",
 	},
 	hex: {
