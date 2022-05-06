@@ -41,7 +41,7 @@ describe<{
 
 	it("blockId - should be ok", ({ validator }) => {
 		const lenght = 64;
-		const validChars = "0123456789abcdefABCDEF";
+		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
 			assert.undefined(validator.validate("blockId", char.repeat(lenght)).error);
@@ -50,7 +50,7 @@ describe<{
 
 	it("blockId - should not be ok", ({ validator }) => {
 		const lenght = 64;
-		const invalidChars = "GHIJKLMNOghijklmno$%!+-";
+		const invalidChars = "ABCDEFGHIJKLMNOghijklmno$%!+-";
 
 		for (const char of invalidChars) {
 			assert.defined(validator.validate("blockId", char.repeat(lenght)).error);
