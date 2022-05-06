@@ -1,11 +1,13 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
+import { schemas as addressSchemas } from "@arkecosystem/core-crypto-address-bech32m";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-import { registerKeywords, schemas as sharedSchemas } from "@arkecosystem/core-crypto-validation";
+import { schemas as kayPairSchemas } from "@arkecosystem/core-crypto-key-pair-schnorr";
+import { schemas as transactionSchemas } from "@arkecosystem/core-crypto-transaction";
+import { makeKeywords, schemas as sharedSchemas } from "@arkecosystem/core-crypto-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";
-import { blockId } from "./keywords";
 import { schemas } from "./schemas";
 
 describe<{
@@ -20,34 +22,42 @@ describe<{
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		const formats = registerKeywords(
-			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
-		);
-
-		context.validator.extend((ajv) => {
-			formats.transactionType(ajv);
-		});
-
-		context.validator.extend((ajv) => {
-			formats.network(ajv);
-		});
-
-		context.validator.extend((ajv) => {
-			formats.bignum(ajv);
-		});
-
-		context.validator.extend((ajv) => {
-			formats.maxBytes(ajv);
-		});
-
-		for (const schema of Object.values(sharedSchemas)) {
-			context.validator.addSchema(schema);
+		for (const keyword of Object.values({
+			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+		})) {
+			context.validator.addKeyword(keyword);
 		}
 
-		context.validator.addKeyword(blockId);
+		for (const schema of Object.values({
+			...sharedSchemas,
+			...addressSchemas,
+			...kayPairSchemas,
+			...transactionSchemas,
+			...schemas,
+		})) {
+			context.validator.addSchema(schema);
+		}
+	});
 
-		context.validator.addSchema(schemas.blockHeader);
-		context.validator.addSchema(schemas.block);
+	it("blockId - should be ok", ({ validator }) => {
+		const lenght = 64;
+		const validChars = "0123456789abcdefABCDEF";
+
+		for (const char of validChars) {
+			assert.undefined(validator.validate("blockId", char.repeat(lenght)).error);
+		}
+	});
+
+	it("blockId - should not be ok", ({ validator }) => {
+		const lenght = 64;
+		const invalidChars = "GHIJKLMNOghijklmno$%!+-";
+
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("blockId", char.repeat(lenght)).error);
+		}
+
+		assert.defined(validator.validate("blockId", "a".repeat(lenght - 1)).error);
+		assert.defined(validator.validate("blockId", "a".repeat(lenght + 1)).error);
 	});
 
 	const blockOriginal = {
@@ -163,16 +173,16 @@ describe<{
 		);
 	});
 
-	// it("blockHeader - id should be blockId", ({ validator }) => {
-	// 	assert.true(
-	// 		validator
-	// 			.validate("blockHeader", {
-	// 				...blockOriginal,
-	// 				id: "1",
-	// 			})
-	// 			.error.includes("height"),
-	// 	);
-	// });
+	it("blockHeader - id should be blockId", ({ validator }) => {
+		assert.true(
+			validator
+				.validate("blockHeader", {
+					...blockOriginal,
+					id: "1",
+				})
+				.error.includes("id"),
+		);
+	});
 
 	it("blockHeader - numberOfTransactions should be integer & min 0", ({ validator }) => {
 		assert.true(

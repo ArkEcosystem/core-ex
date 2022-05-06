@@ -576,7 +576,9 @@ importers:
     specifiers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
+      '@arkecosystem/core-crypto-address-bech32m': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
       '@arkecosystem/core-crypto-time': workspace:*
       '@arkecosystem/core-crypto-transaction': workspace:*
       '@arkecosystem/core-crypto-validation': workspace:*
@@ -637,6 +639,8 @@ importers:
       lodash.get: 4.4.2
       lodash.set: 4.3.2
     devDependencies:
+      '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
+      '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
       '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@types/bip32': 2.0.0
       '@types/bip39': 2.4.2

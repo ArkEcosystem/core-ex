@@ -7,6 +7,8 @@ import { PublicKeyFactory } from "./public";
 import { schemas } from "./schemas";
 import { PublicKeySerializer } from "./serializer";
 
+export * from "./schemas";
+
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(32);

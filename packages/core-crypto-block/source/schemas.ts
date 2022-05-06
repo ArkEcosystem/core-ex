@@ -1,6 +1,6 @@
 import { AnySchemaObject } from "ajv";
 
-export const schemas: Record<string, AnySchemaObject> = {
+export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObject> = {
 	block: {
 		$id: "block",
 		$ref: "blockHeader",
@@ -21,15 +21,15 @@ export const schemas: Record<string, AnySchemaObject> = {
 			blockSignature: { $ref: "hex" },
 			generatorPublicKey: { $ref: "publicKey" },
 			height: { minimum: 1, type: "integer" },
-			id: { blockId: {} },
+			id: { $ref: "blockId" },
 			numberOfTransactions: { minimum: 0, type: "integer" },
 			payloadHash: { $ref: "hex" },
 			payloadLength: { minimum: 0, type: "integer" },
-			previousBlock: { blockId: { allowNullWhenGenesis: true, isPreviousBlock: true } }, // TODO: Check blockId props
+			previousBlock: { $ref: "blockId" },
 			reward: { bignumber: { minimum: 0 } },
 			timestamp: { minimum: 0, type: "integer" },
-			totalAmount: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } }, // TODO: Check bypassGenesis
-			totalFee: { bignumber: { block: true, bypassGenesis: true, minimum: 0 } }, // TODO: Check bypassGenesis
+			totalAmount: { bignumber: { minimum: 0 } },
+			totalFee: { bignumber: { minimum: 0 } },
 			version: { enum: [1] },
 		},
 		required: [
@@ -44,5 +44,16 @@ export const schemas: Record<string, AnySchemaObject> = {
 			"blockSignature",
 		],
 		type: "object",
+	},
+	blockId: {
+		$id: "blockId",
+		allOf: [
+			{
+				$ref: "hex",
+				maxLength: 64,
+				minLength: 64,
+			},
+		],
+		type: "string",
 	},
 };
