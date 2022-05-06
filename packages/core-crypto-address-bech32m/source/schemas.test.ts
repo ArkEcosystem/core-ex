@@ -11,6 +11,8 @@ describe<{
 	sandbox: Sandbox;
 	validator: Validator;
 }>("Schemas", ({ it, assert, beforeEach }) => {
+	const length = 62;
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
@@ -28,27 +30,27 @@ describe<{
 	});
 
 	it("address - should be ok", ({ validator }) => {
-		assert.undefined(validator.validate("address", "a".repeat(62)).error);
+		assert.undefined(validator.validate("address", "a".repeat(length)).error);
 
-		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
-			assert.undefined(validator.validate("address", char.repeat(62)).error);
+			assert.undefined(validator.validate("address", char.repeat(length)).error);
 		}
 	});
 
 	it("address - should not be ok", ({ validator }) => {
-		assert.defined(validator.validate("address", "a".repeat(61)).error);
-		assert.defined(validator.validate("address", "a".repeat(63)).error);
+		assert.defined(validator.validate("address", "a".repeat(length - 1)).error);
+		assert.defined(validator.validate("address", "a".repeat(length + 1)).error);
 		assert.defined(validator.validate("address", 123).error);
 		assert.defined(validator.validate("address", null).error);
 		assert.defined(validator.validate("address").error);
 		assert.defined(validator.validate("address", {}).error);
 
-		const invalidChars = "!#$%&'|+/";
+		const invalidChars = "ABCDEFGHJKLMNPQRSTUVWXYZ!#$%&'|+/";
 
 		for (const char of invalidChars) {
-			assert.defined(validator.validate("address", char.repeat(62)).error);
+			assert.defined(validator.validate("address", char.repeat(length)).error);
 		}
 	});
 });

@@ -42,7 +42,7 @@ describe<{
 	it("transactionId - should be ok", ({ validator }) => {
 		assert.undefined(validator.validate("transactionId", "0".repeat(64)).error);
 
-		const validChars = "0123456789ABCDEFabcdef";
+		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
 			assert.undefined(validator.validate("transactionId", char.repeat(64)).error);
@@ -57,7 +57,7 @@ describe<{
 		assert.defined(validator.validate("transactionId").error);
 		assert.defined(validator.validate("transactionId", {}).error);
 
-		const invalidChars = "GHIJKLghijkl!#$%&'|+/";
+		const invalidChars = "ABCDEFGHIJKLghijkl!#$%&'|+/";
 
 		for (const char of invalidChars) {
 			assert.defined(validator.validate("transactionId", char.repeat(64)).error);
@@ -85,8 +85,8 @@ describe<{
 		id: "1".repeat(64),
 		network: 30,
 		nonce: 0,
-		senderPublicKey: "A".repeat(64),
-		signature: "A".repeat(64),
+		senderPublicKey: "a".repeat(64),
+		signature: "b".repeat(64),
 		type: 1,
 		typeGroup: 0,
 		version: 1,
@@ -190,7 +190,7 @@ describe<{
 	it("transactionBaseSchema - id should be transactionId", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const validChars = "0123456789ABCDEFabcdef";
+		const validChars = "0123456789abcdef";
 
 		for (const char of validChars) {
 			const transaction = {
@@ -257,7 +257,7 @@ describe<{
 	it("transactionBaseSchema - signature should be alphanumeric", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
 			const transaction = {
@@ -268,7 +268,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = ["/", "!", "&", {}];
+		const invalidValues = [..."ABCDEFGHJKLMNPQRSTUVWXYZ", "/", "!", "&", {}];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -285,7 +285,7 @@ describe<{
 	}) => {
 		validator.addSchema(schema);
 
-		const validChars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
 			const transaction = {
@@ -299,6 +299,7 @@ describe<{
 		const invalidValues = [
 			"a".repeat(129),
 			"a".repeat(131),
+			"A".repeat(130),
 			"/".repeat(130),
 			"!".repeat(130),
 			"&".repeat(130),
