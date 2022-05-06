@@ -4,7 +4,7 @@ import { Validator } from "@arkecosystem/core-validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";
-import { registerKeywords } from "./keywords";
+import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";
 
 describe<{
@@ -19,17 +19,10 @@ describe<{
 
 		context.validator = context.sandbox.app.resolve(Validator);
 
-		const formats = registerKeywords(
-			context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration),
-		);
-
-		context.validator.extend((ajv) => {
-			formats.bignum(ajv);
-		});
-
-		context.validator.extend((ajv) => {
-			formats.maxBytes(ajv);
-		});
+		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
+		for (const keyword of Object.values(keywords)) {
+			context.validator.addKeyword(keyword);
+		}
 
 		for (const schema of Object.values(schemas)) {
 			context.validator.addSchema(schema);

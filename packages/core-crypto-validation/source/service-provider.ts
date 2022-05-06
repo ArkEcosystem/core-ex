@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { Providers } from "@arkecosystem/core-kernel";
 
-import { registerKeywords } from "./keywords";
+import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -12,10 +12,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	async #registerKeywords(): Promise<void> {
-		for (const keywords of Object.values(registerKeywords(this.app.get(Identifiers.Cryptography.Configuration)))) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).extend((ajv) => {
-				keywords(ajv);
-			});
+		for (const keyword of Object.values(makeKeywords(this.app.get(Identifiers.Cryptography.Configuration)))) {
+			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 		}
 	}
 

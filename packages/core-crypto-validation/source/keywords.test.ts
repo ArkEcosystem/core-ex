@@ -5,7 +5,7 @@ import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";
-import { registerKeywords } from "./keywords";
+import { makeKeywords } from "./keywords";
 
 type Context = {
 	validator: Validator;
@@ -16,18 +16,6 @@ describe<{
 	sandbox: Sandbox;
 	validator: Validator;
 }>("Keywords", ({ it, beforeEach, assert }) => {
-	const register = ({ sandbox, validator }: Context) => {
-		const formats = registerKeywords(sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
-
-		validator.extend((ajv) => {
-			formats.bignum(ajv);
-		});
-
-		validator.extend((ajv) => {
-			formats.maxBytes(ajv);
-		});
-	};
-
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
@@ -35,11 +23,14 @@ describe<{
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
 		context.validator = context.sandbox.app.resolve(Validator);
+
+		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
+		for (const keyword of Object.values(keywords)) {
+			context.validator.addKeyword(keyword);
+		}
 	});
 
 	it("keyword maxBytes should be ok", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			maxBytes: 64,
@@ -60,8 +51,6 @@ describe<{
 	});
 
 	it("keyword maxBytes - minimum bytes should be 0", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			maxBytes: -1,
@@ -73,8 +62,6 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			bignumber: { maximum: 100, minimum: 100 },
@@ -91,8 +78,6 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok if above or equal minimum", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			bignumber: { minimum: 20 },
@@ -106,8 +91,6 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok if below or equal maximum", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			bignumber: { maximum: 20 },
@@ -123,8 +106,6 @@ describe<{
 	});
 
 	it("keyword bignumber should not be ok for values bigger than the absolute maximum", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			bignumber: {},
@@ -137,8 +118,6 @@ describe<{
 	});
 
 	it("keyword bignumber should be ok for number, string and bignumber as input", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			bignumber: { maximum: 2000, minimum: 100, type: "number" },
@@ -168,8 +147,6 @@ describe<{
 	});
 
 	it("keyword bignumber should not accept garbage", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			bignumber: {},
@@ -184,8 +161,6 @@ describe<{
 	});
 
 	it("keyword bignumber should allow 0 if genensis transaction and bypassGenesis = true", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			properties: {
@@ -210,8 +185,6 @@ describe<{
 	});
 
 	it("keyword bignumber should allow 0 for any transaction when genesisBlock is not set and bypassGenesis = true", (context) => {
-		register(context);
-
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).set("genesisBlock", {});
 
 		const schema = {
@@ -238,8 +211,6 @@ describe<{
 	});
 
 	it("keyword bignumber should not allow 0 if genensis transaction and bypassGenesis = false", (context) => {
-		register(context);
-
 		const schema = {
 			$id: "test",
 			properties: {

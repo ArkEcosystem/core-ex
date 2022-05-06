@@ -18,7 +18,7 @@ describe<{
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.validator = {
-			extend: () => {},
+			addKeyword: () => {},
 			addSchema: () => {},
 		};
 
@@ -31,7 +31,7 @@ describe<{
 	});
 
 	it("should register", async ({ validator, serviceProvider }) => {
-		const spyOnExtend = spy(validator, "extend");
+		const spyOnExtend = spy(validator, "addKeyword");
 		const spyOnAddSchema = spy(validator, "addSchema");
 
 		await assert.resolves(() => serviceProvider.register());
