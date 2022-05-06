@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
 import { BigNumber } from "@arkecosystem/utils";
@@ -37,8 +37,6 @@ describe<{
 		context.validator = context.sandbox.app.resolve(Validator);
 	});
 
-	// TODO: Parent schema !== string
-	// TODO: Negative value
 	it("keyword maxBytes should be ok", (context) => {
 		register(context);
 
@@ -59,6 +57,19 @@ describe<{
 		assert.defined(context.validator.validate("test", null).error);
 		assert.defined(context.validator.validate("test").error);
 		assert.defined(context.validator.validate("test", 123).error);
+	});
+
+	it("keyword maxBytes - minimum bytes should be 0", (context) => {
+		register(context);
+
+		const schema = {
+			$id: "test",
+			maxBytes: -1,
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		assert.true(context.validator.validate("test", "1234").error.includes("data must be >= 0"));
 	});
 
 	it("keyword bignumber should be ok if only one possible value is allowed", (context) => {
@@ -107,8 +118,7 @@ describe<{
 		assert.undefined(context.validator.validate("test", 20).error);
 		assert.undefined(context.validator.validate("test", 0).error);
 
-		// assert.undefined((await context.validator.validate("test", -1)).error); TODO: Min is defined to 0, make test
-
+		assert.defined(context.validator.validate("test", -1).error);
 		assert.defined(context.validator.validate("test", 21).error);
 	});
 
@@ -144,7 +154,16 @@ describe<{
 		for (const value of [1e8, 1999.000_001, 1 / 1e8, -100, -500, -2000.1]) {
 			assert.defined(context.validator.validate("test", value).error);
 			assert.defined(context.validator.validate("test", value.toString()).error);
-			// assert.defined((await context.validator.validate("test", BigNumber.make(value))).error);
+			let pass = true;
+			try {
+				BigNumber.make(value);
+			} catch {
+				pass = false;
+			}
+
+			if (pass) {
+				assert.defined(context.validator.validate("test", BigNumber.make(value)).error);
+			}
 		}
 	});
 
@@ -164,7 +183,7 @@ describe<{
 		assert.defined(context.validator.validate("test", "\u0000").error);
 	});
 
-	it.only("keyword bignumber should allow 0 if genensis transaction and bypassGenesis = true", (context) => {
+	it("keyword bignumber should allow 0 if genensis transaction and bypassGenesis = true", (context) => {
 		register(context);
 
 		const schema = {
@@ -206,6 +225,7 @@ describe<{
 				},
 				id: { type: "string" },
 			},
+			type: "object",
 		};
 		context.validator.addSchema(schema);
 
@@ -231,6 +251,7 @@ describe<{
 				},
 				id: { type: "string" },
 			},
+			type: "object",
 		};
 		context.validator.addSchema(schema);
 
@@ -241,60 +262,4 @@ describe<{
 			}).error,
 		);
 	});
-
-	// // it("keyword bignumber should cast number to Bignumber", async (context) => {
-	// // 	const schema = {
-	// // 		$id: "test",
-	// // 		properties: {
-	// // 			amount: { bignumber: {} },
-	// // 		},
-	// // 		type: "object",
-	// // 	};
-	// // 	context.validator.addSchema(schema);
-
-	// // 	const data = {
-	// // 		amount: 100,
-	// // 	};
-
-	// // 	assert.undefined((await context.validator.validate("test", data)).error);
-	// // 	// assert.instance(data.amount, BigNumber);
-	// // 	// assert.equal(data.amount, Utils.BigNumber.make(100));
-	// // });
-
-	// // it("keyword bignumber should cast string to Bignumber", async (context) => {
-	// // 	const schema = {
-	// // 		$id: "test",
-	// // 		properties: {
-	// // 			amount: { bignumber: {} },
-	// // 		},
-	// // 		type: "object",
-	// // 	};
-	// // 	context.validator.addSchema(schema);
-
-	// // 	const data = {
-	// // 		amount: "100",
-	// // 	};
-
-	// // 	assert.undefined((await context.validator.validate("test", data)).error);
-
-	// // 	// const validate = context.ajv.compile(schema);
-	// // 	// assert.true(validate(data));
-	// // 	// assert.instance(data.amount, Utils.BigNumber);
-	// // 	// assert.equal(data.amount, Utils.BigNumber.make(100));
-	// // });
-
-	// // it("keyword bignumber bypassGenesis should be ok", (context) => {
-	// // 	const schema = {
-	// // 		properties: {
-	// // 			amount: { bignumber: { bypassGenesis: true, minimum: 100, type: "number" } },
-	// // 		},
-	// // 		type: "object",
-	// // 	};
-
-	// // 	const validate = context.ajv.compile(schema);
-
-	// // 	assert.true(validate({ amount: 0, id: "3e3817fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
-	// // 	assert.false(validate({ amount: 0, id: "affe17fd0c35bc36674f3874c2953fa3e35877cbcdb44a08bdc6083dbd39d572" }));
-	// // 	assert.false(validate({ amount: 0 }));
-	// // });
 });

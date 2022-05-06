@@ -23,12 +23,7 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 	const maxBytes = (ajv: Ajv) => {
 		ajv.addKeyword({
 			compile(schema, parentSchema) {
-				return (data) =>
-					// if ((parentSchema as any).type !== "string") {
-					// 	return false;
-					// }
-
-					Buffer.from(data, "utf8").byteLength <= schema;
+				return (data) => Buffer.from(data, "utf8").byteLength <= schema;
 			},
 			errors: false,
 			keyword: "maxBytes",
@@ -42,9 +37,6 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 
 	// @TODO: revisit the need for the genesis check
 	const bignum = (ajv: Ajv) => {
-		// const instanceOf = ajvKeywords.get("instanceof").definition;
-		// instanceOf.CONSTRUCTORS.BigNumber = BigNumber;
-
 		ajv.addKeyword({
 			compile(schema) {
 				return (data, parentSchema: AnySchemaObject) => {
@@ -62,21 +54,9 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 						return false;
 					}
 
-					// if (parentObject && property) {
-					// 	parentObject[property] = bignum;
-					// }
-
 					if (bignum.isLessThan(minimum)) {
 						if (bignum.isZero() && schema.bypassGenesis && parentSchema.parentData?.id) {
-							let bypassGenesis = false;
-							// if (parentObject.id) {
-							// if (schema.block) {
-							// 	bypassGenesis = parentObject.height === 1;
-							// } else {
-							bypassGenesis = isGenesisTransaction(configuration, parentSchema.parentData.id);
-							// }
-							// }
-							return bypassGenesis;
+							return isGenesisTransaction(configuration, parentSchema.parentData.id);
 						} else {
 							return false;
 						}
@@ -92,9 +72,8 @@ export const registerKeywords = (configuration: Contracts.Crypto.IConfiguration)
 			errors: false,
 			keyword: "bignumber",
 			metaSchema: {
-				// additionalItems: false,
 				properties: {
-					// block: { type: "boolean" },
+					block: { type: "boolean" },
 					bypassGenesis: { type: "boolean" },
 					maximum: { type: "integer" },
 					minimum: { type: "integer" },
