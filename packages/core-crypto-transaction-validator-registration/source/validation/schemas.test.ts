@@ -48,11 +48,10 @@ describe<{
 		assert.defined(validator.validate("transactionId").error);
 		assert.defined(validator.validate("transactionId", {}).error);
 
-		// TODO: Check
-		// const invalidChars = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+		const invalidChars = "ABCDEFGHJKLMNPQRSTUVWXYZ+-?";
 
-		// for (const char of invalidChars) {
-		// 	assert.defined((await validator.validate("validatorUsername", char.repeat(20))).error);
-		// }
+		for (const char of invalidChars) {
+			assert.defined(validator.validate("validatorUsername", char.repeat(20)).error);
+		}
 	});
 });
