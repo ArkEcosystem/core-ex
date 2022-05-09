@@ -2,13 +2,18 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas as addressSchemas } from "@arkecosystem/core-crypto-address-bech32m";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { schemas as kayParSchemas } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@arkecosystem/core-crypto-transaction";
+import {
+	makeFormats,
+	makeKeywords as makeTransactionKeywords,
+	schemas as transactionSchemas,
+} from "@arkecosystem/core-crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as ValidationServiceProvider } from "@arkecosystem/core-validation";
 import { BigNumber } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework";
+import { makeKeywords } from "../validation";
 import { MultiPaymentTransaction } from "./1";
 
 describe<{
@@ -33,6 +38,7 @@ describe<{
 		}
 
 		for (const keyword of Object.values({
+			...makeTransactionKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
 		})) {
 			context.validator.addKeyword(keyword);
@@ -113,7 +119,7 @@ describe<{
 		}
 	});
 
-	it("#getSchema - asset.payments should be min 2, non-unique", ({ validator }) => {
+	it("#getSchema - asset.payments should be min 2, max = multiPaymentLimit, non-unique", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
 		assert.undefined(
@@ -147,6 +153,7 @@ describe<{
 			assert.true(validator.validate("multiPayment", transaction).error.includes("payments"));
 		}
 
+		// Min 2
 		assert.true(
 			validator
 				.validate("multiPayment", {
@@ -160,7 +167,22 @@ describe<{
 						],
 					},
 				})
-				.error.includes("asset"),
+				.error.includes("payments"),
+		);
+
+		// Max 256
+		assert.true(
+			validator
+				.validate("multiPayment", {
+					...transactionOriginal,
+					asset: {
+						payments: new Array(257).fill({
+							amount: BigNumber.ONE,
+							recipientId: "a".repeat(62),
+						}),
+					},
+				})
+				.error.includes("payments"),
 		);
 	});
 

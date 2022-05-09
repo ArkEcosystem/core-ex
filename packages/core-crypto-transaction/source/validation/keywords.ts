@@ -4,21 +4,7 @@ import { FuncKeywordDefinition } from "ajv";
 export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
 	const transactionType: FuncKeywordDefinition = {
 		compile(schema) {
-			return (data) =>
-				// Impose dynamic multipayment limit based on milestone
-				// TODO: Move under multi payment
-				// if (
-				// 	data === Contracts.Crypto.TransactionType.MultiPayment &&
-				// 	parentObject &&
-				// 	(!parentObject.typeGroup || parentObject.typeGroup === 1) &&
-				// 	parentObject.asset &&
-				// 	parentObject.asset.payments
-				// ) {
-				// 	const limit: number = configuration.getMilestone().multiPaymentLimit || 256;
-				// 	return parentObject.asset.payments.length <= limit;
-				// }
-
-				data === schema;
+			return (data) => data === schema;
 		},
 
 		errors: false,

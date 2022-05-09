@@ -26,7 +26,8 @@
 		"@arkecosystem/core-kernel": "workspace:*",
 		"@arkecosystem/core-transactions": "workspace:*",
 		"@arkecosystem/crypto-identities": "^1.0.0",
-		"@arkecosystem/utils": "workspace:*"
+		"@arkecosystem/utils": "workspace:*",
+		"ajv": "8.11.0"
 	},
 	"devDependencies": {
 		"@arkecosystem/core-crypto-address-bech32m": "workspace:*",

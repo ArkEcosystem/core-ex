@@ -1000,6 +1000,7 @@ importers:
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/crypto-identities': ^1.0.0
       '@arkecosystem/utils': workspace:*
+      ajv: 8.11.0
       uvu: 0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
@@ -1010,6 +1011,7 @@ importers:
       '@arkecosystem/core-transactions': link:../core-transactions
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
+      ajv: 8.11.0
     devDependencies:
       '@arkecosystem/core-crypto-address-bech32m': link:../core-crypto-address-bech32m
       '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
