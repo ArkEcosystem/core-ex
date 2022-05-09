@@ -326,6 +326,11 @@ describe<{
 	});
 
 	it("block - transactions count should be equal numberOfTransactions", ({ validator }) => {
+		validator.addSchema({
+			$id: "transactions",
+			type: "array",
+		});
+
 		assert.undefined(
 			validator.validate("block", { ...blockOriginal, numberOfTransactions: 2, transactions: [{}, {}] }).error,
 		);
