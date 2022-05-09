@@ -601,7 +601,6 @@ importers:
       '@types/lodash.set': 4.3.6
       '@types/wif': 2.0.2
       ajv: 8.11.0
-      ajv-keywords: 5.1.0
       bcrypto: 5.4.0
       bip32: 2.0.6
       bip39: 3.0.4
@@ -632,7 +631,6 @@ importers:
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
       ajv: 8.11.0
-      ajv-keywords: 5.1.0_ajv@8.11.0
       bcrypto: 5.4.0
       bip32: 2.0.6
       bip39: 3.0.4
@@ -928,7 +926,6 @@ importers:
       '@types/lodash.set': 4.3.6
       '@types/wif': 2.0.2
       ajv: 8.11.0
-      ajv-keywords: 5.1.0
       bcrypto: 5.4.0
       bip32: 2.0.6
       bip39: 3.0.4
@@ -958,7 +955,6 @@ importers:
       '@arkecosystem/crypto-identities': 1.2.0
       '@arkecosystem/utils': link:../utils
       ajv: 8.11.0
-      ajv-keywords: 5.1.0_ajv@8.11.0
       bcrypto: 5.4.0
       bip32: 2.0.6
       bip39: 3.0.4
@@ -1187,7 +1183,6 @@ importers:
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
       ajv: 8.11.0
-      ajv-keywords: 5.1.0
       ipaddr.js: 2.0.1
       uvu: ^0.5.3
     dependencies:
@@ -1197,7 +1192,6 @@ importers:
       '@arkecosystem/core-kernel': link:../core-kernel
       '@arkecosystem/utils': link:../utils
       ajv: 8.11.0
-      ajv-keywords: 5.1.0_ajv@8.11.0
       ipaddr.js: 2.0.1
       uvu: 0.5.3
     devDependencies:
