@@ -1,5 +1,5 @@
 import { inject, injectable } from "@arkecosystem/core-container";
-import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
+import { Contracts, Exceptions, Identifiers } from "@arkecosystem/core-contracts";
 import { BigNumber } from "@arkecosystem/utils";
 
 import { sealBlock } from "./block";
@@ -95,39 +95,38 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	}
 
 	async #applySchema(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockData | undefined> {
-		const result = await this.validator.validate("block", data);
+		const result = this.validator.validate("block", data);
 
 		if (!result.error) {
 			return result.value;
 		}
 
-		// TODO: Handle later
-		// for (const error of result.errors) {
-		// 	let fatal = false;
+		for (const error of result.errors) {
+			let fatal = false;
 
-		// 	const match = error.dataPath.match(/\.transactions\[(\d+)]/);
-		// 	if (match === null) {
-		// 		fatal = true;
-		// 	} else {
-		// 		const txIndex = match[1];
+			const match = error.instancePath.match(/\.transactions\[(\d+)]/);
+			if (match === null) {
+				fatal = true;
+			} else {
+				const txIndex = match[1];
 
-		// 		if (data.transactions) {
-		// 			const tx = data.transactions[txIndex];
+				if (data.transactions) {
+					const tx = data.transactions[txIndex];
 
-		// 			if (tx.id === undefined) {
-		// 				fatal = true;
-		// 			}
-		// 		}
-		// 	}
+					if (tx.id === undefined) {
+						fatal = true;
+					}
+				}
+			}
 
-		// 	if (fatal) {
-		// 		throw new Exceptions.BlockSchemaError(
-		// 			data.height,
-		// 			`Invalid data${error.dataPath ? " at " + error.dataPath : ""}: ` +
-		// 				`${error.message}: ${JSON.stringify(error.data)}`,
-		// 		);
-		// 	}
-		// }
+			if (fatal) {
+				throw new Exceptions.BlockSchemaError(
+					data.height,
+					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
+						`${error.message}: ${JSON.stringify(error.data)}`,
+				);
+			}
+		}
 
 		return result.value;
 	}

@@ -115,7 +115,6 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			ajv.removeSchema("transactions");
 			ajv.addSchema({
 				$id: "transactions",
-				additionalItems: false,
 				items: { anyOf: [...this.#transactionSchemas.keys()].map((schema) => ({ $ref: `${schema}Signed` })) },
 				type: "array",
 			});
