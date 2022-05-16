@@ -76,7 +76,7 @@ describe("isValidPeer", ({ it, assert }) => {
 	});
 
 	it("#isValidPeer - should be true", () => {
-		assert.true(isValidPeer({ ip: "192.168.178.0" })); // TODO: Check
+		assert.true(isValidPeer({ ip: "192.168.178.0" }));
 		assert.true(isValidPeer({ ip: "5.196.105.32" }));
 	});
 
