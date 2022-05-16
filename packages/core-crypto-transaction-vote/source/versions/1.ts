@@ -18,17 +18,15 @@ export class VoteTransaction extends Transaction {
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
+					minVotesUnvotesLength: 1,
 					properties: {
-						// TODO: Check that at least one publicKey is provided
 						unvotes: {
-							// additionalItems: false,
 							items: { $ref: "publicKey" },
 							maxItems: 1,
 							minItems: 0,
 							type: "array",
 						},
 						votes: {
-							// additionalItems: false,
 							items: { $ref: "publicKey" },
 							maxItems: 1,
 							minItems: 0,
@@ -39,7 +37,7 @@ export class VoteTransaction extends Transaction {
 					type: "object",
 				},
 				fee: { bignumber: { minimum: 1 } },
-				recipientId: { $ref: "address" }, // TODO: Check
+				recipientId: { $ref: "address" },
 				type: { transactionType: Contracts.Crypto.TransactionType.Vote },
 			},
 			required: ["asset"],

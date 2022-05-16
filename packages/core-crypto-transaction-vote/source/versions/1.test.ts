@@ -2,13 +2,18 @@ import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { schemas as addressSchemas } from "@arkecosystem/core-crypto-address-bech32m";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { schemas as kayParSchemas } from "@arkecosystem/core-crypto-key-pair-schnorr";
-import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@arkecosystem/core-crypto-transaction";
+import {
+	makeFormats,
+	makeKeywords as makeTransactionKeywords,
+	schemas as transactionSchemas,
+} from "@arkecosystem/core-crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as ValidationServiceProvider } from "@arkecosystem/core-validation";
 import { BigNumber, ByteBuffer } from "@arkecosystem/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../../core-test-framework";
+import { makeKeywords } from "../validation";
 import { VoteTransaction } from "./index";
 
 describe<{
@@ -104,7 +109,8 @@ describe<{
 		}
 
 		for (const keyword of Object.values({
-			...makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeTransactionKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),
+			...makeKeywords(),
 		})) {
 			context.validator.addKeyword(keyword);
 		}
@@ -122,7 +128,7 @@ describe<{
 		amount: 0,
 		asset: {
 			unvotes: [],
-			votes: [],
+			votes: ["a".repeat(64)],
 		},
 		fee: 1,
 		nonce: 0,
@@ -185,8 +191,8 @@ describe<{
 			const transaction = {
 				...transactionOriginal,
 				asset: {
-					votes: [value],
 					unvotes: [],
+					votes: [value],
 				},
 			};
 
@@ -198,8 +204,8 @@ describe<{
 			const transaction = {
 				...transactionOriginal,
 				asset: {
-					votes: [value],
 					unvotes: [],
+					votes: [value],
 				},
 			};
 
@@ -211,8 +217,8 @@ describe<{
 				.validate("vote", {
 					...transactionOriginal,
 					asset: {
-						votes: ["a".repeat(64), "b".repeat(64)],
 						unvotes: [],
+						votes: ["a".repeat(64), "b".repeat(64)],
 					},
 				})
 				.error.includes("votes"),
@@ -228,8 +234,8 @@ describe<{
 			const transaction = {
 				...transactionOriginal,
 				asset: {
-					votes: [],
 					unvotes: [value],
+					votes: [],
 				},
 			};
 
@@ -241,8 +247,8 @@ describe<{
 			const transaction = {
 				...transactionOriginal,
 				asset: {
-					votes: [],
 					unvotes: [value],
+					votes: [],
 				},
 			};
 
@@ -254,11 +260,25 @@ describe<{
 				.validate("vote", {
 					...transactionOriginal,
 					asset: {
-						votes: [],
 						unvotes: ["a".repeat(64), "b".repeat(64)],
+						votes: [],
 					},
 				})
 				.error.includes("unvotes"),
+		);
+	});
+
+	it("#getSchema - asset.unvotes & asset.votes lengths should min 1", ({ validator }) => {
+		validator.addSchema(VoteTransaction.getSchema());
+
+		assert.defined(
+			validator.validate("vote", {
+				...transactionOriginal,
+				asset: {
+					unvotes: [],
+					votes: [],
+				},
+			}).error,
 		);
 	});
 

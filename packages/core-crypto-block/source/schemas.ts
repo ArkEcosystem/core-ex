@@ -6,7 +6,6 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 		$ref: "blockHeader",
 		properties: {
 			transactions: {
-				// TODO: Handle transactions
 				$ref: "transactions",
 				maxItems: { $data: "1/numberOfTransactions" },
 				minItems: { $data: "1/numberOfTransactions" },
