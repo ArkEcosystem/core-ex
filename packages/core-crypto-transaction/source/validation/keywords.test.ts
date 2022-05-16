@@ -40,7 +40,6 @@ describe<{
 		assert.defined(context.validator.validate("test").error);
 	});
 
-	// TODO: Flase value
 	it("keyword network should be ok", (context) => {
 		const schema = {
 			$id: "test",
@@ -50,6 +49,18 @@ describe<{
 
 		assert.undefined(context.validator.validate("test", 30).error);
 
+		assert.defined(context.validator.validate("test", 23).error);
+		assert.defined(context.validator.validate("test", "a").error);
+	});
+
+	it.only("keyword network - should not be ok if value is false ", (context) => {
+		const schema = {
+			$id: "test",
+			network: false,
+		};
+		context.validator.addSchema(schema);
+
+		assert.defined(context.validator.validate("test", 30).error);
 		assert.defined(context.validator.validate("test", 23).error);
 		assert.defined(context.validator.validate("test", "a").error);
 	});
