@@ -10,7 +10,7 @@ const signedTransaction = {
 };
 
 const strictTransaction = {
-	additionalProperties: false,
+	unevaluatedProperties: false,
 };
 
 export const extendSchema = (parent, properties): Contracts.Crypto.ITransactionSchema => deepmerge(parent, properties);

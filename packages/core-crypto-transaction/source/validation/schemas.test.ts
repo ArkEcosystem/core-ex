@@ -77,6 +77,9 @@ describe<{
 
 	const schema = extendSchema(transactionBaseSchema, {
 		$id: "transaction",
+		properties: {
+			type: { minimum: 0, type: "integer" },
+		},
 	});
 
 	const transactionOriginal = {
@@ -465,14 +468,18 @@ describe<{
 	it("strictSchema - should not have any additonal properties", ({ validator }) => {
 		validator.addSchema(strictSchema(schema));
 
-		const transaction = {
-			...transactionOriginal,
-		};
+		assert.undefined(
+			validator.validate("transactionStrict", {
+				...transactionOriginal,
+			}).error,
+		);
 
-		assert.undefined(validator.validate("transactionStrict", transaction).error);
-
-		transaction.test = "test";
-		assert.defined(validator.validate("transactionStrict", transaction).error);
+		assert.defined(
+			validator.validate("transactionStrict", {
+				...transactionOriginal,
+				test: "test",
+			}).error,
+		);
 	});
 
 	it("strictSchema - should not be ok without signature and signatures", ({ validator }) => {
