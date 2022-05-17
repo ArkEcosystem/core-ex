@@ -119,6 +119,52 @@ describe<{
 		}
 	});
 
+	it("#getSchema - asset should not contain unevaluatedProperties", ({ validator }) => {
+		validator.addSchema(MultiPaymentTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			asset: {
+				payments: [
+					{
+						amount: BigNumber.ONE,
+						recipientId: "a".repeat(62),
+					},
+					{
+						amount: BigNumber.ONE,
+						recipientId: "b".repeat(62),
+					},
+				],
+				test: "test",
+			},
+		};
+
+		assert.true(validator.validate("multiPayment", transaction).error.includes("unevaluated properties"));
+	});
+
+	it("#getSchema - payments should not contain unevaluatedProperties", ({ validator }) => {
+		validator.addSchema(MultiPaymentTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			asset: {
+				payments: [
+					{
+						amount: BigNumber.ONE,
+						recipientId: "a".repeat(62),
+						test: "test",
+					},
+					{
+						amount: BigNumber.ONE,
+						recipientId: "b".repeat(62),
+					},
+				],
+			},
+		};
+
+		assert.true(validator.validate("multiPayment", transaction).error.includes("unevaluated properties"));
+	});
+
 	it("#getSchema - asset.payments should be min 2, max = multiPaymentLimit, non-unique", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
@@ -176,7 +222,7 @@ describe<{
 				.validate("multiPayment", {
 					...transactionOriginal,
 					asset: {
-						payments: new Array(257).fill({
+						payments: Array.from({ length: 257 }).fill({
 							amount: BigNumber.ONE,
 							recipientId: "a".repeat(62),
 						}),
