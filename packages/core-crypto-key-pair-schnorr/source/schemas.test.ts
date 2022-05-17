@@ -2,9 +2,11 @@ import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
 import { schemas as baseSchemas } from "@arkecosystem/core-crypto-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
+import { generateMnemonic } from "bip39";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { describe, Sandbox } from "../../core-test-framework";
+import { KeyPairFactory } from "./pair";
 import { schemas } from "./schemas";
 
 describe<{
@@ -35,6 +37,12 @@ describe<{
 		for (const char of validChars) {
 			assert.undefined(validator.validate("publicKey", char.repeat(64)).error);
 		}
+	});
+
+	it("publicKey - should be ok from key pair factory", async (context) => {
+		const kayPair = await context.sandbox.app.resolve(KeyPairFactory).fromMnemonic(generateMnemonic(256));
+
+		assert.undefined(context.validator.validate("publicKey", kayPair.publicKey).error);
 	});
 
 	it("publicKey - should not be ok", ({ validator }) => {
