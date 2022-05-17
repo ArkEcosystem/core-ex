@@ -807,11 +807,14 @@ importers:
       '@arkecosystem/core-container': workspace:*
       '@arkecosystem/core-contracts': workspace:*
       '@arkecosystem/core-crypto-config': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
+      '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
       '@noble/ed25519': ^1.6.0
       '@noble/hashes': ^1.0.0
       '@scure/bip39': ^1.0.0
+      bip39: 3.0.4
       uvu: ^0.5.3
       wif: ^2.0.6
     dependencies:
@@ -825,6 +828,9 @@ importers:
       '@scure/bip39': 1.0.0
       wif: 2.0.6
     devDependencies:
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
+      '@arkecosystem/core-validation': link:../core-validation
+      bip39: 3.0.4
       uvu: 0.5.3
 
   packages/core-crypto-key-pair-schnorr:
