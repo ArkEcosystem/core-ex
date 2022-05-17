@@ -182,6 +182,21 @@ describe<{
 		}
 	});
 
+	it("#getSchema - asset should not contain unevaluated properties", ({ validator }) => {
+		validator.addSchema(VoteTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			asset: {
+				test: "test",
+				unvotes: [],
+				votes: ["a".repeat(64)],
+			},
+		};
+
+		assert.true(validator.validate("vote", transaction).error.includes("unevaluated properties"));
+	});
+
 	it("#getSchema - asset.votes should be required array with public keys, max 1", ({ validator }) => {
 		validator.addSchema(VoteTransaction.getSchema());
 

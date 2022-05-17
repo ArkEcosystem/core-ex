@@ -35,6 +35,7 @@ export class VoteTransaction extends Transaction {
 					},
 					required: ["unvotes", "votes"],
 					type: "object",
+					unevaluatedProperties: false,
 				},
 				fee: { bignumber: { minimum: 1 } },
 				recipientId: { $ref: "address" },
