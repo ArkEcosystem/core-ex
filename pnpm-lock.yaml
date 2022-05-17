@@ -487,10 +487,12 @@ importers:
       '@arkecosystem/core-crypto-config': workspace:*
       '@arkecosystem/core-crypto-key-pair-ecdsa': workspace:*
       '@arkecosystem/core-crypto-key-pair-schnorr': workspace:*
+      '@arkecosystem/core-crypto-validation': workspace:*
       '@arkecosystem/core-kernel': workspace:*
       '@arkecosystem/core-validation': workspace:*
       '@arkecosystem/utils': workspace:*
       '@scure/base': ^1.0.0
+      bip39: 3.0.4
       uvu: ^0.5.3
     dependencies:
       '@arkecosystem/core-container': link:../core-container
@@ -502,7 +504,9 @@ importers:
       '@arkecosystem/core-crypto-config': link:../core-crypto-config
       '@arkecosystem/core-crypto-key-pair-ecdsa': link:../core-crypto-key-pair-ecdsa
       '@arkecosystem/core-crypto-key-pair-schnorr': link:../core-crypto-key-pair-schnorr
+      '@arkecosystem/core-crypto-validation': link:../core-crypto-validation
       '@arkecosystem/core-validation': link:../core-validation
+      bip39: 3.0.4
       uvu: 0.5.3
 
   packages/core-crypto-address-bech32m:
