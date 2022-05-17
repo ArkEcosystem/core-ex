@@ -109,6 +109,40 @@ describe<{
 		}
 	});
 
+	it("#getSchema - asset should not contain unevaluated properties", ({ validator }) => {
+		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			asset: {
+				multiSignature: {
+					min: 1,
+					publicKeys: ["a".repeat(64), "b".repeat(64)],
+				},
+				test: "test",
+			},
+		};
+
+		assert.true(validator.validate("multiSignature", transaction).error.includes("unevaluated properties"));
+	});
+
+	it("#getSchema - asset.multiSignature should not contain unevaluated properties", ({ validator }) => {
+		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			asset: {
+				multiSignature: {
+					min: 1,
+					publicKeys: ["a".repeat(64), "b".repeat(64)],
+					test: "test",
+				},
+			},
+		};
+
+		assert.true(validator.validate("multiSignature", transaction).error.includes("unevaluated properties"));
+	});
+
 	it("#getSchema - asset.multiSignature should be required object", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
