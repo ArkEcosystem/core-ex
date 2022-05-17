@@ -108,6 +108,38 @@ describe<{
 		}
 	});
 
+	it("#getSchema - asset should not contain unevaluated properties", ({ validator }) => {
+		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			asset: {
+				test: "test",
+				validator: {
+					username: "username",
+				},
+			},
+		};
+
+		assert.true(validator.validate("validatorRegistration", transaction).error.includes("unevaluated properties"));
+	});
+
+	it("#getSchema - asset.validator should not contain unevaluated properties", ({ validator }) => {
+		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			asset: {
+				validator: {
+					test: "test",
+					username: "username",
+				},
+			},
+		};
+
+		assert.true(validator.validate("validatorRegistration", transaction).error.includes("unevaluated properties"));
+	});
+
 	it("#getSchema - asset.validator should be required object", ({ validator }) => {
 		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
 
