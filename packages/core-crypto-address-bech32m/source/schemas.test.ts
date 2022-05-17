@@ -1,6 +1,6 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
 import { Configuration } from "@arkecosystem/core-crypto-config";
-core-crypto-address-bech32mimport { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
+import { ServiceProvider as Schnorr } from "@arkecosystem/core-crypto-key-pair-schnorr";
 import { schemas as baseSchemas } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
 import { Validator } from "@arkecosystem/core-validation/source/validator";
