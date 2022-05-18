@@ -1,9 +1,10 @@
-import { inject } from "@arkecosystem/core-container";
+import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { FastifyRequest } from "fastify";
 
 import { getPeerConfig } from "../utils/get-peer-config";
 
+@injectable()
 export class GetStatusController {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
