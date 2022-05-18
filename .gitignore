@@ -43,6 +43,7 @@ docs
 
 # Optional npm cache directory
 .npm
+.pnpm-store
 package-lock.json
 .ultra.cache.json
 
@@ -109,3 +110,5 @@ tags
 
 # Madge
 *.svg
+
+

@@ -19,7 +19,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "core-p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.PeerConnector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
@@ -49,9 +52,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@postConstruct()
 	public initialize(): void {
 		this.#outgoingRateLimiter = buildRateLimiter({
-			rateLimit: this.configuration.getOptional<number>("rateLimit", 100),
+			rateLimit: this.pluginConfiguration.getOptional<number>("rateLimit", 100),
 
-			rateLimitPostTransactions: this.configuration.getOptional<number>("rateLimitPostTransactions", 25),
+			rateLimitPostTransactions: this.pluginConfiguration.getOptional<number>("rateLimitPostTransactions", 25),
 
 			remoteAccess: [],
 			// White listing anybody here means we would not throttle ourselves when sending
@@ -83,7 +86,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
-		const postTransactionsRateLimit = this.configuration.getOptional<number>("rateLimitPostTransactions", 25);
+		const postTransactionsRateLimit = this.pluginConfiguration.getOptional<number>("rateLimitPostTransactions", 25);
 
 		if (!this.#postTransactionsQueueByIp.get(peer.ip)) {
 			this.#postTransactionsQueueByIp.set(peer.ip, await this.createQueue());
@@ -237,13 +240,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 				block.transactions[index] = data;
 			}
 		}
-		this.configuration;
+		this.pluginConfiguration;
 
 		return peerBlocks;
 	}
 
 	#validatePeerConfig(peer: Contracts.P2P.Peer, config: Contracts.P2P.PeerConfig): boolean {
-		if (config.network.nethash !== this.configuration.get("network.nethash")) {
+		if (config.network.nethash !== this.configuration.get("network.nethash")) {			
 			return false;
 		}
 
@@ -278,7 +281,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 							version: this.app.version(),
 						},
 						searchParams,
-						timeout: this.configuration.getRequired<number>("getBlocksTimeout"),
+						timeout: this.pluginConfiguration.getRequired<number>("getBlocksTimeout"),
 					})
 					.json(),
 			schema,
@@ -311,7 +314,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 						},
 						json,
 						searchParams,
-						timeout: this.configuration.getRequired<number>("getBlocksTimeout"),
+						timeout: this.pluginConfiguration.getRequired<number>("getBlocksTimeout"),
 					})
 					.json(),
 			schema,
@@ -391,7 +394,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			peer.sequentialErrorCounter++;
 
-			if (peer.sequentialErrorCounter >= this.configuration.getRequired<number>("maxPeerSequentialErrors")) {
+			if (peer.sequentialErrorCounter >= this.pluginConfiguration.getRequired<number>("maxPeerSequentialErrors")) {
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.PeerEvent.Disconnect, { peer });
 			}
