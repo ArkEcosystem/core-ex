@@ -8,6 +8,9 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.Database.RootStorage)
+	private readonly rootStorage: lmdb.RootDatabase;
+
 	@inject(Identifiers.Database.BlockStorage)
 	private readonly blockStorage: lmdb.Database;
 
@@ -95,6 +98,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async saveBlocks(blocks: Contracts.Crypto.IBlock[]): Promise<void> {
+		// await this.rootStorage.transaction(async () => {
 		for (const block of blocks) {
 			const blockID: string | undefined = block.data.id;
 
@@ -102,16 +106,44 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 				throw new Error(`Failed to store block ${block.data.height} because it has no ID.`);
 			}
 
-			await this.blockStorage.ifNoExists(blockID, async () => {
-				await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
+			console.log("EXISTS", this.transactionStorage.doesExist(blockID), blockID);
 
-				await this.blockStorageById.put(block.data.height, blockID);
+			// if (this.blockStorage.doesExist(blockID)) {
+			// 	console.log("PUT");
+			// await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
 
-				for (const transaction of block.transactions) {
-					await this.transactionStorage.put(transaction.data.id, transaction.serialized);
-				}
-			});
+			// await this.blockStorageById.put(block.data.height, blockID);
+
+			// for (const transaction of block.transactions) {
+			// 	await this.transactionStorage.put(transaction.data.id, transaction.serialized);
+			// }
+			// } else {
+			// 	console.log("ELSE", this.blockStorage.doesExist(blockID), blockID);
+			// 	console.log("GET", this.blockStorage.get(blockID));
+			// }
+
+			// console.log("CHECK", this.blockStorage.doesExist(blockID));
+			// console.log("CHECK2", await this.blockStorage.ifNoExists(blockID, async () => {}));
+			// await this.blockStorage.ifNoExists(blockID, async () => {
+			// 	console.log("EXEC");
+
+			// 	await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
+
+			// 	console.log("Stored");
+			// });
+
+			// await this.blockStorage.ifNoExists(blockID, async () => {
+			// 	console.log("TEST");
+			// 	await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
+
+			// 	await this.blockStorageById.put(block.data.height, blockID);
+
+			// 	for (const transaction of block.transactions) {
+			// 		await this.transactionStorage.put(transaction.data.id, transaction.serialized);
+			// 	}
+			// });
 		}
+		// });
 	}
 
 	public async findBlocksByIds(ids: any[]): Promise<Contracts.Crypto.IBlockData[]> {
