@@ -1,12 +1,12 @@
-import { Identifiers, Constants, Contracts } from "@arkecosystem/core-contracts";
+import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { ServiceProvider as CoreLmdb } from "@arkecosystem/core-lmdb";
-import { describe, Factories, Sandbox } from "@arkecosystem/core-test-framework";
+import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
+import { describe, Factories, Sandbox } from "../../core-test-framework";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
-import lmdb from "lmdb";
 
 describe<{
 	sandbox: Sandbox;

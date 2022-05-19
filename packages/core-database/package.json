@@ -29,7 +29,6 @@
 	},
 	"devDependencies": {
 		"@arkecosystem/core-lmdb": "workspace:*",
-		"@arkecosystem/core-test-framework": "workspace:*",
 		"tmp": "0.2.1",
 		"uvu": "0.5.3"
 	},

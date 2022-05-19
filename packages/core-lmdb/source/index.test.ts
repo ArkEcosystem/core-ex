@@ -1,8 +1,8 @@
 import { Identifiers } from "@arkecosystem/core-contracts";
-import { describe, Sandbox } from "@arkecosystem/core-test-framework";
 import { RootDatabase } from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { describe, Sandbox } from "../../core-test-framework";
 import { ServiceProvider } from "./index";
 
 describe<{

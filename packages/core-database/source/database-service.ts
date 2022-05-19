@@ -8,8 +8,8 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Database.RootStorage)
-	private readonly rootStorage: lmdb.RootDatabase;
+	// @inject(Identifiers.Database.RootStorage)
+	// private readonly rootStorage: lmdb.RootDatabase;
 
 	@inject(Identifiers.Database.BlockStorage)
 	private readonly blockStorage: lmdb.Database;
