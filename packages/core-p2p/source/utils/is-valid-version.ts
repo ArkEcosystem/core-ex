@@ -12,27 +12,18 @@ export const isValidVersion = (app: Contracts.Kernel.Application, peer: Contract
 		return false;
 	}
 
-	const configuration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
+	const pluginConfiguration = app.getTagged<Providers.PluginConfiguration>(
+		Identifiers.PluginConfiguration,
+		"plugin",
+		"core-p2p",
+	);
+	const minimumVersions = pluginConfiguration.getOptional<string[]>("minimumVersions", []);
 
-	let minimumVersions: string[];
-	const milestones: Record<string, any> = configuration.getMilestone();
-
-	const { p2p } = milestones;
-
-	if (p2p && Array.isArray(p2p.minimumVersions) && p2p.minimumVersions.length > 0) {
-		minimumVersions = p2p.minimumVersions;
-	} else {
-		const configuration = app.getTagged<Providers.PluginConfiguration>(
-			Identifiers.PluginConfiguration,
-			"plugin",
-			"core-p2p",
-		);
-		minimumVersions = configuration.getOptional<string[]>("minimumVersions", []);
-	}
-
-	const includePrerelease: boolean = configuration.get("network.name") !== "mainnet";
+	const includePrerelease: boolean =
+		app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).get("network.name") !==
+		"mainnet";
+		
 	return minimumVersions.some((minimumVersion: string) =>
-		// @ts-ignore - check why the peer.version errors even though we exit early
 		semver.satisfies(peer.version, minimumVersion, { includePrerelease }),
 	);
 };
