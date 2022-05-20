@@ -8,8 +8,8 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	// @inject(Identifiers.Database.RootStorage)
-	// private readonly rootStorage: lmdb.RootDatabase;
+	@inject(Identifiers.Database.RootStorage)
+	private readonly rootStorage: lmdb.RootDatabase;
 
 	@inject(Identifiers.Database.BlockStorage)
 	private readonly blockStorage: lmdb.Database;
@@ -30,7 +30,13 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	private readonly transactionFactory: Contracts.Crypto.ITransactionFactory;
 
 	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
-		return this.blockFactory.fromBytes(this.blockStorage.get(id));
+		const bytes = this.blockStorage.get(id);
+
+		if (bytes) {
+			return this.blockFactory.fromBytes(bytes);
+		}
+
+		return undefined;
 	}
 
 	public async findBlocksByHeightRange(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
@@ -98,52 +104,29 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async saveBlocks(blocks: Contracts.Crypto.IBlock[]): Promise<void> {
-		// await this.rootStorage.transaction(async () => {
-		for (const block of blocks) {
-			const blockID: string | undefined = block.data.id;
+		await this.rootStorage.transaction(() => {
+			for (const block of blocks) {
+				const blockID: string | undefined = block.data.id;
 
-			if (!blockID) {
-				throw new Error(`Failed to store block ${block.data.height} because it has no ID.`);
+				if (!blockID) {
+					throw new Error(`Failed to store block ${block.data.height} because it has no ID.`);
+				}
+
+				if (!this.blockStorage.doesExist(blockID)) {
+					// Awaits can be ignored in transaction
+					// eslint-disable-next-line @typescript-eslint/no-floating-promises
+					this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
+
+					// eslint-disable-next-line @typescript-eslint/no-floating-promises
+					this.blockStorageById.put(block.data.height, blockID);
+
+					for (const transaction of block.transactions) {
+						// eslint-disable-next-line @typescript-eslint/no-floating-promises
+						this.transactionStorage.put(transaction.data.id, transaction.serialized);
+					}
+				}
 			}
-
-			console.log("EXISTS", this.transactionStorage.doesExist(blockID), blockID);
-
-			// if (this.blockStorage.doesExist(blockID)) {
-			// 	console.log("PUT");
-			// await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
-
-			// await this.blockStorageById.put(block.data.height, blockID);
-
-			// for (const transaction of block.transactions) {
-			// 	await this.transactionStorage.put(transaction.data.id, transaction.serialized);
-			// }
-			// } else {
-			// 	console.log("ELSE", this.blockStorage.doesExist(blockID), blockID);
-			// 	console.log("GET", this.blockStorage.get(blockID));
-			// }
-
-			// console.log("CHECK", this.blockStorage.doesExist(blockID));
-			// console.log("CHECK2", await this.blockStorage.ifNoExists(blockID, async () => {}));
-			// await this.blockStorage.ifNoExists(blockID, async () => {
-			// 	console.log("EXEC");
-
-			// 	await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
-
-			// 	console.log("Stored");
-			// });
-
-			// await this.blockStorage.ifNoExists(blockID, async () => {
-			// 	console.log("TEST");
-			// 	await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
-
-			// 	await this.blockStorageById.put(block.data.height, blockID);
-
-			// 	for (const transaction of block.transactions) {
-			// 		await this.transactionStorage.put(transaction.data.id, transaction.serialized);
-			// 	}
-			// });
-		}
-		// });
+		});
 	}
 
 	public async findBlocksByIds(ids: any[]): Promise<Contracts.Crypto.IBlockData[]> {
