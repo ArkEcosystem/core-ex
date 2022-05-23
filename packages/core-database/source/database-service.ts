@@ -1,7 +1,7 @@
 import { inject, injectable } from "@arkecosystem/core-container";
 import { Contracts, Identifiers } from "@arkecosystem/core-contracts";
 import { sortBy, sortByDesc } from "@arkecosystem/utils";
-import lmdb from "lmdb";
+import { Database } from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.IDatabaseService {
@@ -9,16 +9,16 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	private readonly logger: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Database.BlockStorage)
-	private readonly blockStorage: lmdb.Database;
+	private readonly blockStorage: Database;
 
 	@inject(Identifiers.Database.BlockHeightStorage)
-	private readonly blockStorageById: lmdb.Database;
+	private readonly blockStorageById: Database;
 
 	@inject(Identifiers.Database.TransactionStorage)
-	private readonly transactionStorage: lmdb.Database;
+	private readonly transactionStorage: Database;
 
 	@inject(Identifiers.Database.RoundStorage)
-	private readonly roundStorage: lmdb.Database;
+	private readonly roundStorage: Database;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory: Contracts.Crypto.IBlockFactory;
