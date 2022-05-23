@@ -59,15 +59,11 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		).sort((a: Contracts.Crypto.IBlock, b: Contracts.Crypto.IBlock) => a.data.height - b.data.height);
 	}
 
-	public async getBlocks(start: number, end: number, headersOnly?: boolean): Promise<Contracts.Crypto.IBlockData[]> {
+	public async getBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlockData[]> {
 		return (await this.findBlocksByHeightRange(start, end)).map(({ data }) => data);
 	}
 
-	public async getBlocksForDownload(
-		offset: number,
-		limit: number,
-		headersOnly?: boolean,
-	): Promise<Contracts.Shared.DownloadBlock[]> {
+	public async getBlocksForDownload(offset: number, limit: number): Promise<Contracts.Shared.DownloadBlock[]> {
 		return (await this.findBlocksByHeightRange(offset, offset + limit - 1)).map(({ data, transactions }) => ({
 			...data,
 			transactions: transactions.map(({ serialized }) => serialized.toString("hex")),
