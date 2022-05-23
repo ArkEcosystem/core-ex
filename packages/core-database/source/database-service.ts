@@ -153,7 +153,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 		const roundNumber: number = activeValidators[0].getAttribute("validator.round");
 
-		await this.roundStorage.ifNoExists(roundNumber, async () => {
+		if (!this.roundStorage.doesExist(roundNumber)) {
 			await this.roundStorage.put(
 				roundNumber,
 				activeValidators.map((validator: Contracts.State.Wallet) => ({
@@ -162,7 +162,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 					round: validator.getAttribute("validator.round").toString(),
 				})),
 			);
-		});
+		}
 	}
 
 	public async deleteRound(round: number): Promise<void> {

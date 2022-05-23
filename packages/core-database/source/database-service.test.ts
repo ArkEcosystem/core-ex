@@ -12,6 +12,7 @@ import { ServiceProvider as CoreFeesStatic } from "@arkecosystem/core-fees-stati
 import { ServiceProvider as CoreLmdb } from "@arkecosystem/core-lmdb";
 import { ServiceProvider as CoreSerializer } from "@arkecosystem/core-serializer";
 import { ServiceProvider as CoreValidation } from "@arkecosystem/core-validation";
+import { BigNumber } from "@arkecosystem/utils";
 import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -51,6 +52,23 @@ const assertTransactionData = (assert, transactionData1, transactionData2) => {
 	}
 };
 
+const makeWallets = async (count: number, round: number): Promise<Contracts.State.Wallet[]> => {
+	const wallets = [];
+
+	const walletFactory = await Factories.factory("Wallet", cryptoJson);
+
+	for (let index = 0; index < count; index++) {
+		const wallet = await walletFactory.make<Contracts.State.Wallet>();
+
+		wallet.setAttribute("validator.round", round);
+		wallet.setAttribute("validator.voteBalance", BigNumber.ONE);
+
+		wallets.push(wallet);
+	}
+
+	return wallets;
+};
+
 describe<{
 	sandbox: Sandbox;
 	databaseService: DatabaseService;
@@ -64,7 +82,9 @@ describe<{
 
 		context.sandbox.app.useDataPath(dirSync().name);
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
+			info: () => {},
+		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
 		await context.sandbox.app.resolve(CoreValidation).register();
@@ -208,12 +228,10 @@ describe<{
 
 		assert.equal(
 			await databaseService.getBlocksForDownload(2, 4),
-			blocks.map((block) => {
-				return {
-					...block.data,
-					transactions: block.transactions.map(({ serialized }) => serialized.toString("hex")),
-				};
-			}),
+			blocks.map((block) => ({
+				...block.data,
+				transactions: block.transactions.map(({ serialized }) => serialized.toString("hex")),
+			})),
 		);
 	});
 
@@ -272,7 +290,84 @@ describe<{
 		);
 	});
 
-	// TODO: Round
+	it("#saveRound - should save round", async ({ databaseService, sandbox }) => {
+		const spyOnRoundStoragePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.RoundStorage), "put");
+
+		const wallets = await makeWallets(3, 1);
+
+		await databaseService.saveRound(wallets);
+
+		spyOnRoundStoragePut.calledOnce();
+		spyOnRoundStoragePut.calledWith(
+			1,
+			wallets.map((wallet) => ({
+				balance: wallet.getAttribute("validator.voteBalance").toString(),
+				publicKey: wallet.getPublicKey(),
+				round: wallet.getAttribute("validator.round").toString(),
+			})),
+		);
+	});
+
+	it("#saveRound - should not save round second time", async ({ databaseService, sandbox }) => {
+		const spyOnRoundStoragePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.RoundStorage), "put");
+
+		const wallets = await makeWallets(3, 1);
+
+		await databaseService.saveRound(wallets);
+		await databaseService.saveRound(wallets);
+
+		spyOnRoundStoragePut.calledOnce();
+	});
+
+	it("#getRound - should return empty array if round is not stored", async ({ databaseService }) => {
+		assert.equal(await databaseService.getRound(1), []);
+	});
+
+	// TODO: Check round type
+	it("#getRound - should return round", async ({ databaseService }) => {
+		const wallets = await makeWallets(3, 1);
+		await databaseService.saveRound(wallets);
+
+		assert.equal(
+			await databaseService.getRound(1),
+			wallets
+				.sort((a, b) => a.getPublicKey().localeCompare(b.getPublicKey()))
+				.map((wallet) => ({
+					balance: wallet.getAttribute("validator.voteBalance"),
+					publicKey: wallet.getPublicKey(),
+					round: BigNumber.make(wallet.getAttribute("validator.round")),
+				})),
+		);
+	});
+
+	it("#deleteRound - should do nothing if round is not stored", async ({ databaseService, sandbox }) => {
+		const spyOnRoundStorageRemove = spy(
+			sandbox.app.get<lmdb.Database>(Identifiers.Database.RoundStorage),
+			"remove",
+		);
+
+		await databaseService.deleteRound(1);
+
+		spyOnRoundStorageRemove.neverCalled();
+	});
+
+	it("#deleteRound - should delete all round higher or equal given round", async ({ databaseService, sandbox }) => {
+		const spyOnRoundStorageRemove = spy(
+			sandbox.app.get<lmdb.Database>(Identifiers.Database.RoundStorage),
+			"remove",
+		);
+
+		await databaseService.saveRound(await makeWallets(3, 1));
+		await databaseService.saveRound(await makeWallets(3, 2));
+		await databaseService.saveRound(await makeWallets(3, 3));
+
+		await databaseService.deleteRound(2);
+
+		spyOnRoundStorageRemove.calledTimes(2);
+		spyOnRoundStorageRemove.calledWith(2);
+		spyOnRoundStorageRemove.calledWith(3);
+	});
+
 	it("#getForgedTransactionsIds - should return empty array if transaction ids are not found", async ({
 		databaseService,
 	}) => {
