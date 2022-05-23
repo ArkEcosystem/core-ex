@@ -7,6 +7,7 @@ import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@arkecosystem/core-
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@arkecosystem/core-crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@arkecosystem/core-crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@arkecosystem/core-crypto-transaction-transfer";
+import { ServiceProvider as CoreCryptoValidation } from "@arkecosystem/core-crypto-validation";
 import { ServiceProvider as CoreFees } from "@arkecosystem/core-fees";
 import { ServiceProvider as CoreFeesStatic } from "@arkecosystem/core-fees-static";
 import { ServiceProvider as CoreLmdb } from "@arkecosystem/core-lmdb";
@@ -88,6 +89,7 @@ describe<{
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
 		await context.sandbox.app.resolve(CoreValidation).register();
+		await context.sandbox.app.resolve(CoreCryptoValidation).register();
 		await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 		await context.sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
 		await context.sandbox.app.resolve(CoreCryptoAddressBeach32m).register();
@@ -176,7 +178,7 @@ describe<{
 		assert.undefined(await databaseService.getBlock("undefined"));
 	});
 
-	it("#getBlock - should return block id", async ({ databaseService }) => {
+	it("#getBlock - should return block by id", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
 		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.IBlock>();
 
