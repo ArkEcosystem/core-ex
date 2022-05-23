@@ -206,7 +206,6 @@ describe<{
 		assert.equal(await databaseService.getBlocks(5, 10), []);
 	});
 
-	// TODO: Check headers only
 	it("#getBlocks - should return block data by height", async ({ databaseService }) => {
 		const blocks = await generateBlocks(4);
 		await databaseService.saveBlocks(blocks);
@@ -223,7 +222,6 @@ describe<{
 		assert.equal(await databaseService.getBlocksForDownload(5, 10), []);
 	});
 
-	// TODO: Check headers only
 	it("#getBlocksForDownload - should return block data by height", async ({ databaseService }) => {
 		const blocks = await generateBlocks(4);
 		await databaseService.saveBlocks(blocks);
