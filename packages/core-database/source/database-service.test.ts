@@ -305,7 +305,7 @@ describe<{
 			wallets.map((wallet) => ({
 				balance: wallet.getAttribute("validator.voteBalance").toString(),
 				publicKey: wallet.getPublicKey(),
-				round: wallet.getAttribute("validator.round").toString(),
+				round: wallet.getAttribute("validator.round"),
 			})),
 		);
 	});
@@ -325,7 +325,6 @@ describe<{
 		assert.equal(await databaseService.getRound(1), []);
 	});
 
-	// TODO: Check round type
 	it("#getRound - should return round", async ({ databaseService }) => {
 		const wallets = await makeWallets(3, 1);
 		await databaseService.saveRound(wallets);
@@ -337,7 +336,7 @@ describe<{
 				.map((wallet) => ({
 					balance: wallet.getAttribute("validator.voteBalance"),
 					publicKey: wallet.getPublicKey(),
-					round: BigNumber.make(wallet.getAttribute("validator.round")),
+					round: wallet.getAttribute("validator.round"),
 				})),
 		);
 	});

@@ -6,7 +6,7 @@ import { Wallet } from "./state";
 
 export interface IRound {
 	publicKey: string;
-	round: BigNumber;
+	round: number;
 	balance: BigNumber;
 }
 

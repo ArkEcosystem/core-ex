@@ -135,10 +135,10 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	public async getRound(round: number): Promise<Contracts.Database.IRound[]> {
 		const roundByNumber: Contracts.Database.IRound[] = this.roundStorage
 			.get(round)
-			?.map((r: { balance: string; round: string; publicKey: string }) => ({
+			?.map((r: { balance: string; round: number; publicKey: string }) => ({
 				balance: BigNumber.make(r.balance),
 				publicKey: r.publicKey,
-				round: BigNumber.make(r.round),
+				round: r.round,
 			}));
 
 		if (!roundByNumber) {
@@ -159,7 +159,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 				activeValidators.map((validator: Contracts.State.Wallet) => ({
 					balance: validator.getAttribute("validator.voteBalance").toString(),
 					publicKey: validator.getPublicKey(),
-					round: validator.getAttribute("validator.round").toString(),
+					round: validator.getAttribute("validator.round"),
 				})),
 			);
 		}
