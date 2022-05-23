@@ -28,6 +28,24 @@ describe<{
 		setGracefulCleanup();
 	});
 
+	const generateBlocks = async (count: number) => {
+		const blocks = [];
+
+		const blockFactory = await Factories.factory("Block", cryptoJson);
+		let previousBlock = await blockFactory.make<Contracts.Crypto.IBlock>();
+
+		blocks.push(previousBlock);
+
+		for (let i = 0; i < count - 1; i++) {
+			previousBlock = await blockFactory
+				.withOptions({ getPreviousBlock: () => previousBlock.data })
+				.make<Contracts.Crypto.IBlock>();
+			blocks.push(previousBlock);
+		}
+
+		return blocks;
+	};
+
 	beforeEach(async (context) => {
 		context.sandbox = new Sandbox();
 
@@ -119,17 +137,107 @@ describe<{
 		);
 	});
 
-	it("getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {
+	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {
 		assert.undefined(await databaseService.getBlock("undefined"));
 	});
 
 	// TODO: With transactions
-	it("getBlock - should return block id", async ({ databaseService }) => {
+	it("#getBlock - should return block id", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
 		const block = await blockFactory.make<Contracts.Crypto.IBlock>();
 
 		await databaseService.saveBlocks([block]);
 
 		assert.equal(await databaseService.getBlock(block.data.id), block);
+	});
+
+	it("#findBlocksByHeightRange - should return empty array if blocks are not found", async ({ databaseService }) => {
+		await databaseService.saveBlocks(await generateBlocks(3));
+
+		assert.equal(await databaseService.findBlocksByHeightRange(5, 10), []);
+	});
+
+	it("#findBlocksByHeightRange - should return blocks by height", async ({ databaseService }) => {
+		const blocks = await generateBlocks(4);
+		await databaseService.saveBlocks(blocks);
+
+		assert.equal(await databaseService.findBlocksByHeightRange(2, 5), blocks);
+	});
+
+	it("#getBlocks - should return empty array if blocks are not found", async ({ databaseService }) => {
+		await databaseService.saveBlocks(await generateBlocks(3));
+
+		assert.equal(await databaseService.getBlocks(5, 10), []);
+	});
+
+	// TODO: Check headers only
+	it("#getBlocks - should return block data by height", async ({ databaseService }) => {
+		const blocks = await generateBlocks(4);
+		await databaseService.saveBlocks(blocks);
+
+		assert.equal(
+			await databaseService.getBlocks(2, 5),
+			blocks.map((block) => block.data),
+		);
+	});
+
+	it("#getBlocksForDownload - should return empty array if blocks are not found", async ({ databaseService }) => {
+		await databaseService.saveBlocks(await generateBlocks(3));
+
+		assert.equal(await databaseService.getBlocksForDownload(5, 10), []);
+	});
+
+	// TODO: Check headers only
+	// TODO: Check transactions
+	it("#getBlocksForDownload - should return block data by height", async ({ databaseService }) => {
+		const blocks = await generateBlocks(4);
+		await databaseService.saveBlocks(blocks);
+
+		assert.equal(
+			await databaseService.getBlocksForDownload(2, 4),
+			blocks.map((block) => block.data),
+		);
+	});
+
+	it("#findBlockByHeights - should return empty array if blocks are not found", async ({ databaseService }) => {
+		await databaseService.saveBlocks(await generateBlocks(3));
+
+		assert.equal(await databaseService.findBlockByHeights([6, 7, 8]), []);
+	});
+
+	it("#findBlockByHeights - should return block data by height", async ({ databaseService }) => {
+		const blocks = await generateBlocks(4);
+		await databaseService.saveBlocks(blocks);
+
+		assert.equal(await databaseService.findBlockByHeights([2, 3, 4, 5]), blocks);
+	});
+
+	it("#getLastBlock - should return undefined if block is not found", async ({ databaseService }) => {
+		assert.undefined(await databaseService.getLastBlock());
+	});
+
+	it("#getLastBlock - should return last block", async ({ databaseService }) => {
+		const blocks = await generateBlocks(4);
+		await databaseService.saveBlocks(blocks);
+
+		assert.equal(await databaseService.getLastBlock(), blocks[3]);
+	});
+
+	// TODO: getTransaction
+
+	it("#findBlocksByIds - should return empty array if blocks are not found", async ({ databaseService }) => {
+		await databaseService.saveBlocks(await generateBlocks(3));
+
+		assert.equal(await databaseService.findBlocksByIds(["id_1", "id_2", "id_3"]), []);
+	});
+
+	it("#findBlockByHeights - should return block data by ids", async ({ databaseService }) => {
+		const blocks = await generateBlocks(4);
+		await databaseService.saveBlocks(blocks);
+
+		assert.equal(
+			await databaseService.findBlocksByIds(blocks.map((block) => block.data.id)),
+			blocks.map((block) => block.data),
+		);
 	});
 });

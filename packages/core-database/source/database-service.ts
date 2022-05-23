@@ -8,9 +8,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.LogService)
 	private readonly logger: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Database.RootStorage)
-	private readonly rootStorage: lmdb.RootDatabase;
-
 	@inject(Identifiers.Database.BlockStorage)
 	private readonly blockStorage: lmdb.Database;
 
@@ -78,15 +75,18 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {
-		return this.#map<Contracts.Crypto.IBlock>(heights, (height: number) =>
-			this.blockFactory.fromBytes(this.blockStorage.get(height)),
+		const ids = await this.#map<string>(heights, (height: number) => this.blockStorageById.get(height));
+
+		return this.#map<Contracts.Crypto.IBlock>(
+			ids.filter((id) => id !== undefined),
+			(id: string) => this.blockFactory.fromBytes(this.blockStorage.get(id)),
 		);
 	}
 
 	public async getLastBlock(): Promise<Contracts.Crypto.IBlock | undefined> {
 		try {
 			return this.blockFactory.fromBytes(
-				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
+				this.blockStorage.get(this.blockStorageById.getRange({ limit: 1, reverse: true }).asArray[0].value),
 			);
 		} catch {
 			return undefined;
@@ -104,35 +104,31 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	public async saveBlocks(blocks: Contracts.Crypto.IBlock[]): Promise<void> {
-		await this.rootStorage.transaction(() => {
-			for (const block of blocks) {
-				const blockID: string | undefined = block.data.id;
+		for (const block of blocks) {
+			const blockID: string | undefined = block.data.id;
 
-				if (!blockID) {
-					throw new Error(`Failed to store block ${block.data.height} because it has no ID.`);
-				}
+			if (!blockID) {
+				throw new Error(`Failed to store block ${block.data.height} because it has no ID.`);
+			}
 
-				if (!this.blockStorage.doesExist(blockID)) {
-					// Awaits can be ignored in transaction
-					// eslint-disable-next-line @typescript-eslint/no-floating-promises
-					this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
+			if (!this.blockStorage.doesExist(blockID)) {
+				await this.blockStorage.put(blockID, Buffer.from(block.serialized, "hex"));
 
-					// eslint-disable-next-line @typescript-eslint/no-floating-promises
-					this.blockStorageById.put(block.data.height, blockID);
+				await this.blockStorageById.put(block.data.height, blockID);
 
-					for (const transaction of block.transactions) {
-						// eslint-disable-next-line @typescript-eslint/no-floating-promises
-						this.transactionStorage.put(transaction.data.id, transaction.serialized);
-					}
+				for (const transaction of block.transactions) {
+					await this.transactionStorage.put(transaction.data.id, transaction.serialized);
 				}
 			}
-		});
+		}
 	}
 
-	public async findBlocksByIds(ids: any[]): Promise<Contracts.Crypto.IBlockData[]> {
+	public async findBlocksByIds(ids: string[]): Promise<Contracts.Crypto.IBlockData[]> {
+		const blocks = await this.#map<Buffer | undefined>(ids, (id: string) => this.blockStorage.get(id));
+
 		return this.#map(
-			ids,
-			async (id: string) => (await this.blockFactory.fromBytes(this.blockStorage.get(id))).data,
+			blocks.filter((block) => block !== undefined),
+			async (block: Buffer) => (await this.blockFactory.fromBytes(block)).data,
 		);
 	}
 
