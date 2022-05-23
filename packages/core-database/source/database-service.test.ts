@@ -20,6 +20,37 @@ import { describe, Factories, Sandbox } from "../../core-test-framework";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
 
+const generateBlock = async (): Promise<Contracts.Crypto.IBlock> => {
+	const blockFactory = await Factories.factory("Block", cryptoJson);
+	return blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.IBlock>();
+};
+
+const generateBlocks = async (count: number): Promise<Contracts.Crypto.IBlock[]> => {
+	const blocks = [];
+
+	const blockFactory = await Factories.factory("Block", cryptoJson);
+	let previousBlock = await blockFactory.make<Contracts.Crypto.IBlock>();
+
+	blocks.push(previousBlock);
+
+	for (let index = 0; index < count - 1; index++) {
+		previousBlock = await blockFactory
+			.withOptions({ getPreviousBlock: () => previousBlock.data, transactionsCount: 2 })
+			.make<Contracts.Crypto.IBlock>();
+		blocks.push(previousBlock);
+	}
+
+	return blocks;
+};
+
+const assertTransactionData = (assert, transactionData1, transactionData2) => {
+	const transactionFields = ["id", "type", "senderPublicKey", "fee", "amount", "recipientId", "signature"];
+
+	for (const field of transactionFields) {
+		assert.equal(transactionData1[field].toString(), transactionData2[field].toString());
+	}
+};
+
 describe<{
 	sandbox: Sandbox;
 	databaseService: DatabaseService;
@@ -27,24 +58,6 @@ describe<{
 	beforeAll(() => {
 		setGracefulCleanup();
 	});
-
-	const generateBlocks = async (count: number) => {
-		const blocks = [];
-
-		const blockFactory = await Factories.factory("Block", cryptoJson);
-		let previousBlock = await blockFactory.make<Contracts.Crypto.IBlock>();
-
-		blocks.push(previousBlock);
-
-		for (let i = 0; i < count - 1; i++) {
-			previousBlock = await blockFactory
-				.withOptions({ getPreviousBlock: () => previousBlock.data })
-				.make<Contracts.Crypto.IBlock>();
-			blocks.push(previousBlock);
-		}
-
-		return blocks;
-	};
 
 	beforeEach(async (context) => {
 		context.sandbox = new Sandbox();
@@ -68,6 +81,10 @@ describe<{
 		await context.sandbox.app.resolve(CoreLmdb).register();
 		await context.sandbox.app.resolve(CoreDatabase).register();
 
+		context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.setConfig(cryptoJson);
+
 		context.databaseService = context.sandbox.app.get<DatabaseService>(Identifiers.Database.Service);
 	});
 
@@ -82,8 +99,7 @@ describe<{
 			"put",
 		);
 
-		const blockFactory = await Factories.factory("Block", cryptoJson);
-		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.IBlock>();
+		const block = await generateBlock();
 
 		await databaseService.saveBlocks([block]);
 
@@ -107,8 +123,7 @@ describe<{
 			"put",
 		);
 
-		const blockFactory = await Factories.factory("Block", cryptoJson);
-		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.IBlock>();
+		const block = await generateBlock();
 
 		await databaseService.saveBlocks([block, block]);
 
@@ -141,10 +156,9 @@ describe<{
 		assert.undefined(await databaseService.getBlock("undefined"));
 	});
 
-	// TODO: With transactions
 	it("#getBlock - should return block id", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
-		const block = await blockFactory.make<Contracts.Crypto.IBlock>();
+		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.IBlock>();
 
 		await databaseService.saveBlocks([block]);
 
@@ -188,14 +202,18 @@ describe<{
 	});
 
 	// TODO: Check headers only
-	// TODO: Check transactions
 	it("#getBlocksForDownload - should return block data by height", async ({ databaseService }) => {
 		const blocks = await generateBlocks(4);
 		await databaseService.saveBlocks(blocks);
 
 		assert.equal(
 			await databaseService.getBlocksForDownload(2, 4),
-			blocks.map((block) => block.data),
+			blocks.map((block) => {
+				return {
+					...block.data,
+					transactions: block.transactions.map(({ serialized }) => serialized.toString("hex")),
+				};
+			}),
 		);
 	});
 
@@ -223,7 +241,20 @@ describe<{
 		assert.equal(await databaseService.getLastBlock(), blocks[3]);
 	});
 
-	// TODO: getTransaction
+	it("#getTransaction - should return undefined if block is not found", async ({ databaseService }) => {
+		assert.undefined(await databaseService.getTransaction("transaction_id"));
+	});
+
+	it("#getLastBlock - should return last block", async ({ databaseService }) => {
+		const block = await generateBlock();
+		await databaseService.saveBlocks([block]);
+
+		assertTransactionData(
+			assert,
+			(await databaseService.getTransaction(block.transactions[0].id)).data,
+			block.transactions[0].data,
+		);
+	});
 
 	it("#findBlocksByIds - should return empty array if blocks are not found", async ({ databaseService }) => {
 		await databaseService.saveBlocks(await generateBlocks(3));
@@ -238,6 +269,23 @@ describe<{
 		assert.equal(
 			await databaseService.findBlocksByIds(blocks.map((block) => block.data.id)),
 			blocks.map((block) => block.data),
+		);
+	});
+
+	// TODO: Round
+	it("#getForgedTransactionsIds - should return empty array if transaction ids are not found", async ({
+		databaseService,
+	}) => {
+		assert.equal(await databaseService.getForgedTransactionsIds(["id_1", "id_2", "id_3"]), []);
+	});
+
+	it("#getForgedTransactionsIds - should return block data by ids", async ({ databaseService }) => {
+		const block = await generateBlock();
+		await databaseService.saveBlocks([block]);
+
+		assert.equal(
+			await databaseService.getForgedTransactionsIds(block.transactions.map((transaction) => transaction.id)),
+			block.transactions.map((transaction) => transaction.id),
 		);
 	});
 });
