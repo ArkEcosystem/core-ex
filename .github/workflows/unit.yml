@@ -103,7 +103,7 @@ jobs:
         strategy:
             matrix:
                 node-version:
-                    - 16.x
+                    - 18.x
 name: CI
 on:
     pull_request:
